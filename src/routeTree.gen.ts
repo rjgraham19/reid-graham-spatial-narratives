@@ -14,6 +14,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkHubRouteImport } from './routes/work.$hub'
+import { Route as WorkHubIndexRouteImport } from './routes/work.$hub.index'
 import { Route as WorkHubSlugRouteImport } from './routes/work.$hub.$slug'
 
 const WorkRoute = WorkRouteImport.update({
@@ -41,6 +42,11 @@ const WorkHubRoute = WorkHubRouteImport.update({
   path: '/$hub',
   getParentRoute: () => WorkRoute,
 } as any)
+const WorkHubIndexRoute = WorkHubIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkHubRoute,
+} as any)
 const WorkHubSlugRoute = WorkHubSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -54,14 +60,15 @@ export interface FileRoutesByFullPath {
   '/work': typeof WorkRouteWithChildren
   '/work/$hub': typeof WorkHubRouteWithChildren
   '/work/$hub/$slug': typeof WorkHubSlugRoute
+  '/work/$hub/': typeof WorkHubIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/work': typeof WorkRouteWithChildren
-  '/work/$hub': typeof WorkHubRouteWithChildren
   '/work/$hub/$slug': typeof WorkHubSlugRoute
+  '/work/$hub': typeof WorkHubIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +78,7 @@ export interface FileRoutesById {
   '/work': typeof WorkRouteWithChildren
   '/work/$hub': typeof WorkHubRouteWithChildren
   '/work/$hub/$slug': typeof WorkHubSlugRoute
+  '/work/$hub/': typeof WorkHubIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,8 +89,9 @@ export interface FileRouteTypes {
     | '/work'
     | '/work/$hub'
     | '/work/$hub/$slug'
+    | '/work/$hub/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/work' | '/work/$hub' | '/work/$hub/$slug'
+  to: '/' | '/about' | '/contact' | '/work' | '/work/$hub/$slug' | '/work/$hub'
   id:
     | '__root__'
     | '/'
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/work'
     | '/work/$hub'
     | '/work/$hub/$slug'
+    | '/work/$hub/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -137,6 +147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkHubRouteImport
       parentRoute: typeof WorkRoute
     }
+    '/work/$hub/': {
+      id: '/work/$hub/'
+      path: '/'
+      fullPath: '/work/$hub/'
+      preLoaderRoute: typeof WorkHubIndexRouteImport
+      parentRoute: typeof WorkHubRoute
+    }
     '/work/$hub/$slug': {
       id: '/work/$hub/$slug'
       path: '/$slug'
@@ -149,10 +166,12 @@ declare module '@tanstack/react-router' {
 
 interface WorkHubRouteChildren {
   WorkHubSlugRoute: typeof WorkHubSlugRoute
+  WorkHubIndexRoute: typeof WorkHubIndexRoute
 }
 
 const WorkHubRouteChildren: WorkHubRouteChildren = {
   WorkHubSlugRoute: WorkHubSlugRoute,
+  WorkHubIndexRoute: WorkHubIndexRoute,
 }
 
 const WorkHubRouteWithChildren =
@@ -177,3 +196,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

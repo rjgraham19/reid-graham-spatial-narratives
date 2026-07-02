@@ -1,221 +1,171 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroImg from "@/assets/hero.jpg";
-import { HUBS, PROJECTS } from "@/lib/projects";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { HUBS, HERO_URL, PROJECTS } from "@/lib/projects";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Reid Graham Design — Experiential, Scenic & Architecture" },
+      {
+        name: "description",
+        content:
+          "The portfolio of Reid Graham — production/scenic design, architecture and visualization work exploring spatial storytelling.",
+      },
+      { property: "og:title", content: "Reid Graham Design" },
+      {
+        property: "og:description",
+        content:
+          "Experiential, scenic and architectural design — a portfolio of built and speculative worlds.",
+      },
+      { property: "og:image", content: HERO_URL },
+      { name: "twitter:image", content: HERO_URL },
+    ],
+  }),
   component: Home,
 });
 
 function Home() {
-  const featured = PROJECTS[0]; // The Liminal Chamber
-
   return (
     <div className="relative">
-      <SiteNav />
+      <SiteNav variant="top-transparent" />
 
-      {/* Hero — The Darkened Entry */}
-      <header className="relative h-screen min-h-[720px] w-full flex flex-col justify-end px-6 md:px-10 pb-16 md:pb-24 overflow-hidden">
-        <div className="absolute inset-0 z-0">
+      {/* Split hero: title left, full-bleed image right */}
+      <header className="relative h-screen min-h-[720px] w-full overflow-hidden">
+        {/* Image on right ~55% */}
+        <div className="absolute inset-y-0 right-0 w-full md:w-[55%] z-0">
           <img
-            src={heroImg}
-            alt="A monumental architectural installation lit by a single beam of light through fog"
-            width={1920}
-            height={1080}
-            className="w-full h-full object-cover opacity-70 animate-slow-zoom"
+            src={HERO_URL}
+            alt="Payphone booth in an overgrown, neon-lit environment — a still from Reid Graham's Immersion rendering"
+            className="w-full h-full object-cover animate-slow-zoom"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/30" />
+          {/* Left-edge fade into black so title reads cleanly */}
+          <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-background via-background/70 to-transparent" />
+          {/* Mobile: darken more */}
+          <div className="absolute inset-0 md:hidden bg-background/60" />
         </div>
 
-        <div className="relative max-w-5xl">
-          <p className="animate-fade-in-slow text-[10px] tracking-[0.35em] uppercase text-accent mb-8">
-            Experiential Designer · Portfolio MMXXVI
-          </p>
-          <h1 className="animate-reveal font-display text-[clamp(3rem,9vw,10rem)] font-extrabold leading-[0.85] tracking-tighter text-balance uppercase">
-            Building
-            <br />
-            worlds.
-          </h1>
-          <div className="mt-8 flex items-baseline gap-6 animate-reveal-delay">
-            <div className="h-px w-24 bg-accent shrink-0" />
-            <p className="font-serif italic text-lg md:text-2xl text-muted-foreground max-w-md">
-              Reid Graham crafts spatial narratives at the intersection of architecture, stage, and light.
+        {/* Title block */}
+        <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-12 lg:px-16 pt-24">
+          <div className="max-w-[720px]">
+            <h1 className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3.5rem,10vw,9.5rem)] animate-reveal">
+              Reid Graham
+            </h1>
+            <p className="font-thin uppercase leading-[0.9] tracking-[0.02em] text-[clamp(2.5rem,8vw,7rem)] mt-2 md:mt-0 animate-reveal-delay text-foreground/95">
+              Design
             </p>
           </div>
         </div>
 
-        <div className="absolute bottom-8 right-6 md:right-10 z-10 text-[10px] tracking-[0.3em] text-muted-foreground uppercase hidden md:flex items-center gap-3">
-          <span>Scroll</span>
-          <span className="h-px w-12 bg-muted-foreground" />
+        {/* Bottom category pills */}
+        <div className="absolute bottom-8 md:bottom-12 left-0 right-0 z-10 px-6 md:px-12 lg:px-16">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-3">
+              {HUBS.map((h) => (
+                <Link
+                  key={h.slug}
+                  to="/work/$hub"
+                  params={{ hub: h.slug }}
+                  className="pill pill-lg"
+                >
+                  {h.title.toUpperCase()}
+                </Link>
+              ))}
+            </div>
+            <Link to="/contact" className="pill pill-lg">CONTACT</Link>
+          </div>
         </div>
       </header>
 
-      {/* Practice hubs — Chapters */}
-      <main className="w-full px-6 md:px-10 py-32">
-        <div className="mb-24 flex items-end justify-between">
-          <div>
-            <p className="text-[10px] tracking-[0.35em] uppercase text-muted-foreground mb-4">
-              Four practices
-            </p>
-            <h2 className="font-display text-3xl md:text-5xl font-extrabold tracking-tighter uppercase max-w-2xl text-balance">
-              Each project is its own room.
-            </h2>
-          </div>
-          <Link
-            to="/work"
-            className="hidden md:inline-flex items-center gap-4 text-[10px] font-bold tracking-[0.3em] uppercase hover:text-accent transition-colors group"
-          >
-            All work
-            <span className="h-px w-8 bg-foreground group-hover:w-16 group-hover:bg-accent transition-all duration-500" />
-          </Link>
+      {/* Intro / statement */}
+      <section className="px-6 md:px-12 lg:px-16 py-24 md:py-32 border-t border-border">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+          <p className="md:col-span-3 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+            Portfolio · MMXXVI
+          </p>
+          <p className="md:col-span-9 font-display font-light text-2xl md:text-4xl leading-tight tracking-tight text-balance">
+            Reid Graham is a designer working across{" "}
+            <span className="text-foreground">production &amp; scenic design</span>,{" "}
+            <span className="text-foreground">architecture</span>, and{" "}
+            <span className="text-foreground">visualization</span> — building rooms, sets, and speculative worlds that ask the viewer to step inside.
+          </p>
         </div>
+      </section>
 
-        <div className="space-y-40 md:space-y-56">
-          {/* Experiential */}
-          <HubRow hub={HUBS[0]} align="right" />
-          {/* Scenic */}
-          <HubRow hub={HUBS[1]} align="left" />
-
-          {/* Compact grid for hubs 3 & 4 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
-            {HUBS.slice(2).map((hub) => (
+      {/* Hubs — three tiles with thumbnails, like the reference index bar */}
+      <section className="px-6 md:px-12 lg:px-16 pb-24 md:pb-32">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {HUBS.map((hub) => {
+            const count = PROJECTS.filter((p) => p.hub === hub.slug).length;
+            return (
               <Link
                 key={hub.slug}
                 to="/work/$hub"
                 params={{ hub: hub.slug }}
-                className="group block space-y-8"
+                className="group relative block aspect-[4/5] overflow-hidden rounded-md bg-secondary"
               >
-                <div className="w-full aspect-[3/4] bg-ash overflow-hidden">
-                  <img
-                    src={hub.cover}
-                    alt={hub.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-cinematic"
-                  />
-                </div>
-                <div>
-                  <span className="text-accent font-display font-bold text-xs tracking-[0.25em] uppercase">
-                    {hub.chapter}
+                <img
+                  src={hub.cover}
+                  alt={hub.title}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-1000 ease-cinematic"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between">
+                  <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-foreground/60">
+                    {hub.chapter} · {count} projects
                   </span>
-                  <h3 className="text-3xl md:text-4xl font-display font-extrabold tracking-tighter uppercase mt-2">
-                    {hub.title}
-                  </h3>
-                  <p className="text-muted-foreground mt-3 max-w-xs font-serif italic">
-                    {hub.tagline}
-                  </p>
+                  <div>
+                    <h2 className="font-display font-black uppercase tracking-tight leading-[0.9] text-3xl md:text-4xl lg:text-5xl">
+                      {hub.title}
+                    </h2>
+                    <p className="mt-3 text-sm text-foreground/70 max-w-xs">{hub.tagline}</p>
+                    <span className="mt-6 inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase">
+                      Enter
+                      <span className="h-px w-6 bg-foreground group-hover:w-12 transition-all duration-500" />
+                    </span>
+                  </div>
                 </div>
               </Link>
-            ))}
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Selected projects — quick index */}
+      <section className="px-6 md:px-12 lg:px-16 pb-32 border-t border-border pt-24">
+        <div className="mb-12 flex items-end justify-between flex-wrap gap-6">
+          <div>
+            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-3">Index</p>
+            <h2 className="font-display font-black uppercase text-3xl md:text-5xl tracking-tight">
+              All projects
+            </h2>
           </div>
         </div>
-
-        {/* Featured narrative */}
-        <section className="mt-48 border-t border-border pt-24">
-          <div className="mb-12 flex items-end justify-between flex-wrap gap-6">
-            <div>
-              <p className="text-[10px] tracking-[0.35em] uppercase text-accent mb-4">
-                Currently on view
-              </p>
-              <h2 className="font-serif italic text-4xl md:text-6xl leading-none">
-                {featured.title}
-              </h2>
-            </div>
-            <Link
-              to="/work/$hub/$slug"
-              params={{ hub: featured.hub, slug: featured.slug }}
-              className="inline-flex items-center gap-4 text-[10px] font-bold tracking-[0.3em] uppercase hover:text-accent transition-colors group"
-            >
-              Enter the room
-              <span className="h-px w-8 bg-foreground group-hover:w-16 group-hover:bg-accent transition-all duration-500" />
-            </Link>
-          </div>
-          <Link
-            to="/work/$hub/$slug"
-            params={{ hub: featured.hub, slug: featured.slug }}
-            className="block group"
-          >
-            <div className="w-full aspect-[21/9] overflow-hidden bg-ash">
-              <img
-                src={featured.cover}
-                alt={featured.title}
-                loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-1000 ease-cinematic"
-              />
-            </div>
-          </Link>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="md:col-span-2 max-w-2xl">
-              <p className="font-serif italic text-2xl md:text-3xl leading-snug text-foreground/90 text-balance">
-                "{featured.logline}"
-              </p>
-            </div>
-            <div className="space-y-4">
-              <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
-                Themes
-              </p>
-              <ul className="space-y-2 text-sm font-serif italic text-foreground/80">
-                {featured.themes.map((t) => (
-                  <li key={t}>— {t}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-      </main>
+        <ul className="divide-y divide-border border-t border-b border-border">
+          {PROJECTS.map((p) => (
+            <li key={p.slug}>
+              <Link
+                to="/work/$hub/$slug"
+                params={{ hub: p.hub, slug: p.slug }}
+                className="group grid grid-cols-12 items-center gap-4 py-5 hover:bg-secondary/40 px-2 -mx-2 transition-colors"
+              >
+                <span className="col-span-7 md:col-span-6 font-display font-semibold uppercase tracking-tight text-lg md:text-2xl group-hover:text-accent transition-colors">
+                  {p.title}
+                </span>
+                <span className="hidden md:block col-span-4 text-xs tracking-[0.2em] uppercase text-foreground/60">
+                  {HUBS.find((h) => h.slug === p.hub)?.title}
+                </span>
+                <span className="col-span-5 md:col-span-2 text-right text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+                  View →
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <SiteFooter />
     </div>
-  );
-}
-
-function HubRow({
-  hub,
-  align,
-}: {
-  hub: (typeof HUBS)[number];
-  align: "left" | "right";
-}) {
-  const imageFirst = align === "right";
-  return (
-    <Link
-      to="/work/$hub"
-      params={{ hub: hub.slug }}
-      className="group relative grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center"
-    >
-      <div
-        className={
-          "md:col-span-7 overflow-hidden bg-ash aspect-[4/5] md:aspect-[16/10] " +
-          (imageFirst ? "md:order-1" : "md:order-2")
-        }
-      >
-        <img
-          src={hub.cover}
-          alt={hub.title}
-          loading="lazy"
-          className="w-full h-full object-cover grayscale-[0.6] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-cinematic"
-        />
-      </div>
-      <div
-        className={
-          "md:col-span-5 " +
-          (imageFirst ? "md:order-2 md:pl-12" : "md:order-1 md:pr-12")
-        }
-      >
-        <span className="text-accent font-display font-bold text-sm tracking-[0.25em] uppercase">
-          {hub.chapter}
-        </span>
-        <h2 className="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mt-4 mb-6 uppercase">
-          {hub.title}
-        </h2>
-        <p className="text-muted-foreground max-w-sm mb-8 leading-relaxed font-serif italic text-lg">
-          {hub.tagline}
-        </p>
-        <span className="inline-flex items-center gap-4 text-[10px] font-bold tracking-[0.3em] uppercase group-hover:text-accent transition-colors">
-          View hub
-          <span className="h-px w-8 bg-foreground group-hover:bg-accent group-hover:w-16 transition-all duration-500" />
-        </span>
-      </div>
-    </Link>
   );
 }
