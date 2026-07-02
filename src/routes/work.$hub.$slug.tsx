@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { HUBS, PROJECTS, projectBySlug } from "@/lib/projects";
@@ -15,9 +16,9 @@ export const Route = createFileRoute("/work/$hub/$slug")({
     return {
       meta: [
         { title: `${p.title} — Reid Graham` },
-        { name: "description", content: p.logline },
+        { name: "description", content: p.description.slice(0, 160) },
         { property: "og:title", content: `${p.title} — Reid Graham` },
-        { property: "og:description", content: p.logline },
+        { property: "og:description", content: p.description.slice(0, 160) },
         { property: "og:image", content: p.cover },
         { name: "twitter:image", content: p.cover },
       ],
@@ -27,13 +28,8 @@ export const Route = createFileRoute("/work/$hub/$slug")({
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center px-6 text-center">
       <div>
-        <p className="font-serif italic text-muted-foreground">This project isn't part of the exhibition.</p>
-        <Link
-          to="/work"
-          className="mt-6 inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase hover:text-accent transition-colors"
-        >
-          Back to work <span className="h-px w-8 bg-current" />
-        </Link>
+        <p className="text-foreground/60">This project isn't part of the portfolio.</p>
+        <Link to="/" className="mt-6 inline-block pill">← Back to home</Link>
       </div>
     </div>
   ),
@@ -43,212 +39,207 @@ function ProjectPage() {
   const { project } = Route.useLoaderData();
   const hub = HUBS.find((h) => h.slug === project.hub)!;
 
-  // Find next project (any hub) for the "next room" link
-  const idx = PROJECTS.findIndex((p) => p.slug === project.slug);
-  const next = PROJECTS[(idx + 1) % PROJECTS.length];
+  const idxAll = PROJECTS.findIndex((p) => p.slug === project.slug);
+  const next = PROJECTS[(idxAll + 1) % PROJECTS.length];
 
-  // Bespoke palette applied per-project via CSS vars
-  const style = {
-    ["--proj-bg" as string]: project.palette.background,
-    ["--proj-ink" as string]: project.palette.ink,
-    ["--proj-accent" as string]: project.palette.accent,
-  };
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const close = useCallback(() => setLightbox(null), []);
+  const step = useCallback(
+    (delta: number) => {
+      setLightbox((cur) => {
+        if (cur == null) return cur;
+        const n = project.media.length;
+        return (cur + delta + n) % n;
+      });
+    },
+    [project.media.length],
+  );
+
+  useEffect(() => {
+    if (lightbox == null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox, close, step]);
 
   return (
-    <div
-      style={style}
-      className="relative"
-    >
-      <div
-        style={{
-          backgroundColor: "var(--proj-bg)",
-          color: "var(--proj-ink)",
-        }}
-      >
-        <SiteNav />
+    <div className="relative">
+      <SiteNav />
 
-        {/* Cinematic full-bleed opening */}
-        <section className="relative h-screen min-h-[720px] w-full overflow-hidden">
-          <img
-            src={project.cover}
-            alt={project.title}
-            className="absolute inset-0 w-full h-full object-cover animate-slow-zoom"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to top, var(--proj-bg) 0%, transparent 40%, var(--proj-bg) 100%)",
-              opacity: 0.85,
-            }}
-          />
-          <div className="relative h-full flex flex-col justify-end px-6 md:px-10 pb-16 md:pb-24">
-            <Link
-              to="/work/$hub"
-              params={{ hub: hub.slug }}
-              className="inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase mb-8 opacity-70 hover:opacity-100 transition-opacity"
-              style={{ color: "var(--proj-ink)" }}
-            >
-              <span className="h-px w-8" style={{ backgroundColor: "var(--proj-ink)" }} />
-              {hub.title}
-            </Link>
-            <p
-              className="font-display font-bold text-xs tracking-[0.3em] uppercase mb-6"
-              style={{ color: "var(--proj-accent)" }}
-            >
-              Room {project.chapter} · {project.year}
-            </p>
-            <h1 className="font-serif italic text-6xl md:text-9xl leading-[0.9] text-balance max-w-5xl animate-reveal">
-              {project.title}
-            </h1>
-          </div>
-        </section>
-
-        {/* Logline — oversized quote */}
-        <section className="px-6 md:px-10 py-32 md:py-48 border-t" style={{ borderColor: "color-mix(in oklab, var(--proj-ink) 15%, transparent)" }}>
-          <div className="max-w-5xl">
-            <p
-              className="text-xs tracking-[0.3em] uppercase mb-8"
-              style={{ color: "var(--proj-accent)" }}
-            >
-              The premise
-            </p>
-            <p className="font-serif italic text-3xl md:text-6xl leading-tight text-balance">
-              "{project.logline}"
-            </p>
-          </div>
-        </section>
-
-        {/* Meta grid */}
-        <section
-          className="px-6 md:px-10 py-16 grid grid-cols-2 md:grid-cols-4 gap-10 border-t"
-          style={{ borderColor: "color-mix(in oklab, var(--proj-ink) 15%, transparent)" }}
+      {/* Header */}
+      <header className="pt-32 md:pt-40 px-6 md:px-12 lg:px-16 pb-16 border-b border-border">
+        <Link
+          to="/work/$hub"
+          params={{ hub: hub.slug }}
+          className="inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/60 hover:text-foreground transition-colors mb-10"
         >
-          {[
-            { label: "Year", value: project.year },
-            { label: "Location", value: project.location },
-            { label: "Role", value: project.role },
-            { label: "Client", value: project.client ?? "Self-initiated" },
-          ].map((m) => (
-            <div key={m.label}>
-              <p
-                className="text-[10px] tracking-[0.3em] uppercase mb-3"
-                style={{ color: "color-mix(in oklab, var(--proj-ink) 55%, transparent)" }}
-              >
-                {m.label}
-              </p>
-              <p className="font-serif italic text-lg md:text-xl">{m.value}</p>
-            </div>
-          ))}
-        </section>
+          <span className="h-px w-8 bg-current" />
+          {hub.title}
+        </Link>
+        <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl animate-reveal">
+          {project.title}
+        </h1>
+        <p className="mt-6 text-sm md:text-base tracking-[0.15em] uppercase text-foreground/60">
+          {project.subtitle}
+        </p>
+      </header>
 
-        {/* Narrative — each paragraph on its own beat */}
-        <section
-          className="px-6 md:px-10 py-32 space-y-24 border-t"
-          style={{ borderColor: "color-mix(in oklab, var(--proj-ink) 15%, transparent)" }}
-        >
-          <div className="max-w-4xl">
-            <p
-              className="text-xs tracking-[0.3em] uppercase mb-16"
-              style={{ color: "var(--proj-accent)" }}
-            >
-              The narrative
-            </p>
-            <div className="space-y-16">
-              {project.narrative.map((para: string, i: number) => (
-                <div key={i} className="grid grid-cols-12 gap-6">
-                  <span
-                    className="col-span-1 font-display text-xs tracking-[0.2em] pt-2"
-                    style={{ color: "color-mix(in oklab, var(--proj-ink) 45%, transparent)" }}
-                  >
-                    0{i + 1}
-                  </span>
-                  <p className="col-span-11 md:col-span-10 font-serif text-xl md:text-3xl leading-relaxed text-balance">
-                    {para}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Second image beat */}
-        <section className="px-6 md:px-10">
-          <div className="w-full aspect-[21/9] overflow-hidden">
-            <img
-              src={project.cover}
-              alt=""
-              aria-hidden
-              className="w-full h-full object-cover"
-              style={{ filter: "brightness(0.85) contrast(1.1)" }}
-            />
-          </div>
-        </section>
-
-        {/* Themes */}
-        <section
-          className="px-6 md:px-10 py-32 border-t mt-24"
-          style={{ borderColor: "color-mix(in oklab, var(--proj-ink) 15%, transparent)" }}
-        >
-          <p
-            className="text-xs tracking-[0.3em] uppercase mb-12"
-            style={{ color: "var(--proj-accent)" }}
-          >
-            Themes running through the room
+      {/* Description + credits */}
+      <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-10 border-b border-border">
+        <div className="md:col-span-8">
+          <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+            {project.description}
           </p>
-          <ul className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-            {project.themes.map((t: string, i: number) => (
-              <li key={t} className="border-t pt-6" style={{ borderColor: "color-mix(in oklab, var(--proj-ink) 25%, transparent)" }}>
-                <span
-                  className="text-[10px] tracking-[0.3em] uppercase mb-3 block"
-                  style={{ color: "color-mix(in oklab, var(--proj-ink) 55%, transparent)" }}
-                >
-                  0{i + 1}
-                </span>
-                <p className="font-serif italic text-2xl md:text-3xl leading-tight">
-                  {t}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
+          {project.notes && project.notes.length > 0 && (
+            <ul className="mt-10 space-y-3 text-foreground/70">
+              {project.notes.map((n, i) => (
+                <li key={i} className="flex gap-4">
+                  <span className="text-foreground/40 text-xs mt-1.5">0{i + 1}</span>
+                  <span>{n}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        {project.credits && project.credits.length > 0 && (
+          <div className="md:col-span-4">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-5">Credits</p>
+            <ul className="space-y-3">
+              {project.credits.map((c) => (
+                <li key={c.role} className="text-sm">
+                  <span className="text-foreground/50">{c.role}</span>
+                  <br />
+                  <span className="text-foreground">{c.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
 
-        {/* Next room */}
-        <section
-          className="px-6 md:px-10 py-24 border-t"
-          style={{ borderColor: "color-mix(in oklab, var(--proj-ink) 15%, transparent)" }}
-        >
-          <Link
-            to="/work/$hub/$slug"
-            params={{ hub: next.hub, slug: next.slug }}
-            className="group flex items-end justify-between gap-6 flex-wrap"
-          >
-            <div>
-              <p
-                className="text-[10px] tracking-[0.3em] uppercase mb-4"
-                style={{ color: "color-mix(in oklab, var(--proj-ink) 55%, transparent)" }}
+      {/* Media gallery */}
+      <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
+        <div className="flex items-end justify-between mb-8">
+          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+            Media · {project.media.length}
+          </p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 hidden md:block">
+            Click any image to enlarge
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {project.media.map((m, i) => (
+            <figure key={i} className="group">
+              <button
+                type="button"
+                onClick={() => setLightbox(i)}
+                className="block w-full overflow-hidden rounded-md bg-secondary"
+                aria-label={m.caption ?? `Media ${i + 1}`}
               >
-                Next room
-              </p>
-              <h3 className="font-serif italic text-4xl md:text-6xl leading-none group-hover:opacity-70 transition-opacity">
-                {next.title}
-              </h3>
-            </div>
-            <span
-              className="text-[10px] font-bold tracking-[0.3em] uppercase flex items-center gap-4"
-              style={{ color: "var(--proj-accent)" }}
-            >
-              Continue
-              <span
-                className="h-px w-8 group-hover:w-24 transition-all duration-500"
-                style={{ backgroundColor: "var(--proj-accent)" }}
-              />
-            </span>
-          </Link>
-        </section>
-      </div>
+                <img
+                  src={m.src}
+                  alt={m.caption ?? project.title}
+                  loading="lazy"
+                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                />
+              </button>
+              {m.caption && (
+                <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
+                  {String(i + 1).padStart(2, "0")} — {m.caption}
+                </figcaption>
+              )}
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      {/* Next project */}
+      <section className="border-t border-border px-6 md:px-12 lg:px-16 py-20">
+        <Link
+          to="/work/$hub/$slug"
+          params={{ hub: next.hub, slug: next.slug }}
+          className="group flex items-end justify-between gap-6 flex-wrap"
+        >
+          <div>
+            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
+              Next project
+            </p>
+            <h3 className="font-display font-black uppercase tracking-tight text-3xl md:text-5xl group-hover:text-accent transition-colors">
+              {next.title}
+            </h3>
+          </div>
+          <span className="pill pill-lg group-hover:pill-active">Continue →</span>
+        </Link>
+      </section>
 
       <SiteFooter />
+
+      {/* Lightbox */}
+      {lightbox != null && (
+        <div
+          className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-lg flex flex-col"
+          onClick={close}
+        >
+          <div className="flex items-center justify-between px-6 py-5">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/60">
+              {String(lightbox + 1).padStart(2, "0")} / {String(project.media.length).padStart(2, "0")}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                close();
+              }}
+              className="pill"
+              aria-label="Close"
+            >
+              CLOSE ✕
+            </button>
+          </div>
+          <div
+            className="flex-1 flex items-center justify-center px-6 md:px-12 pb-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={project.media[lightbox].src}
+              alt={project.media[lightbox].caption ?? project.title}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
+          <div className="flex items-center justify-between px-6 pb-6 gap-4">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                step(-1);
+              }}
+              className="pill"
+            >
+              ← PREV
+            </button>
+            {project.media[lightbox].caption && (
+              <p className="text-xs md:text-sm text-foreground/70 text-center flex-1 px-4">
+                {project.media[lightbox].caption}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                step(1);
+              }}
+              className="pill"
+            >
+              NEXT →
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
