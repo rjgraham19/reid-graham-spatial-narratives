@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { ProjectModal } from "@/components/project-modal";
 import { HUBS, projectsByHub, type Hub, type Project } from "@/lib/projects";
 
 const HUB_SLUGS = new Set(HUBS.map((h) => h.slug));
@@ -35,13 +37,14 @@ export const Route = createFileRoute("/work/$hub/")({
 
 function HubPage() {
   const { hub, projects } = Route.useLoaderData();
+  const [active, setActive] = useState<Project | null>(null);
 
   return (
     <div>
       <SiteNav />
 
-      {/* Header — mirrors the reference: title + thumbnail strip */}
-      <header className="pt-32 md:pt-40 pb-10 px-6 md:px-12 lg:px-16 border-b border-border">
+      {/* Header */}
+      <header className="pt-32 md:pt-40 pb-16 px-6 md:px-12 lg:px-16 border-b border-border">
         <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
           Chapter {hub.chapter}
         </p>
@@ -51,81 +54,55 @@ function HubPage() {
         <p className="mt-6 font-display font-light text-lg md:text-2xl text-foreground/80 max-w-3xl text-balance">
           {hub.description}
         </p>
-
-        {/* Thumbnail strip (reference-style) */}
-        <div className="mt-12 -mx-2 md:-mx-3 overflow-x-auto pb-2">
-          <ul className="flex gap-3 md:gap-4 min-w-full snap-x">
-            {projects.map((p: Project) => (
-              <li key={p.slug} className="snap-start shrink-0 w-40 md:w-56">
-                <Link
-                  to="/work/$hub/$slug"
-                  params={{ hub: p.hub, slug: p.slug }}
-                  className="group block"
-                >
-                  <div className="aspect-[4/3] overflow-hidden rounded-md bg-secondary">
-                    <img
-                      src={p.cover}
-                      alt={p.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-[1.04] transition-all duration-700 ease-cinematic"
-                    />
-                  </div>
-                  <p className="mt-2 text-[10px] tracking-[0.15em] uppercase text-foreground/70 group-hover:text-accent transition-colors line-clamp-2">
-                    {p.title}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
       </header>
 
-      {/* Projects — reference-style long stacked layout */}
-      <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 space-y-24 md:space-y-32">
-        {projects.map((p: Project, idx: number) => (
-          <Link
-            key={p.slug}
-            to="/work/$hub/$slug"
-            params={{ hub: p.hub, slug: p.slug }}
-            className="group block"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 items-end">
-              <div
-                className={
-                  "md:col-span-9 overflow-hidden rounded-md bg-secondary " +
-                  (idx % 2 === 1 ? "md:col-start-4" : "")
-                }
+      {/* Square grid of projects */}
+      <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
+        <div className="flex items-end justify-between mb-10">
+          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+            {projects.length} Projects
+          </p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 hidden md:block">
+            Select to enter
+          </p>
+        </div>
+
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {projects.map((p: Project, idx: number) => (
+            <li key={p.slug}>
+              <button
+                type="button"
+                onClick={() => setActive(p)}
+                className="group block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
+                aria-label={`Open ${p.title}`}
               >
-                <img
-                  src={p.cover}
-                  alt={p.title}
-                  loading="lazy"
-                  className="w-full h-auto max-h-[70vh] object-cover group-hover:scale-[1.02] transition-transform duration-1000 ease-cinematic"
-                />
-              </div>
-              <div
-                className={
-                  "md:col-span-3 " +
-                  (idx % 2 === 1 ? "md:col-start-1 md:row-start-1 md:text-right" : "")
-                }
-              >
-                <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-3">
-                  0{idx + 1} · {hub.title}
-                </p>
-                <h2 className="font-display font-black uppercase tracking-tight text-3xl md:text-4xl leading-[0.95] group-hover:text-accent transition-colors">
-                  {p.title}
-                </h2>
-                <p className="mt-3 text-sm text-foreground/60 tracking-[0.1em] uppercase">
-                  {p.subtitle}
-                </p>
-                <span className="mt-6 inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase">
-                  Enter
-                  <span className="h-px w-6 bg-foreground group-hover:w-16 transition-all duration-500" />
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
+                <div className="relative aspect-square overflow-hidden rounded-md bg-secondary">
+                  <img
+                    src={p.cover}
+                    alt={p.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-[900ms] ease-cinematic"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-background/10 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-500" />
+                  <div className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-foreground/70">
+                    0{idx + 1}
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h2 className="font-display font-black uppercase tracking-tight text-2xl md:text-3xl leading-[0.95] text-balance group-hover:text-accent transition-colors">
+                      {p.title}
+                    </h2>
+                    <p className="mt-2 text-[10px] tracking-[0.25em] uppercase text-foreground/70 line-clamp-1">
+                      {p.subtitle}
+                    </p>
+                  </div>
+                  <span className="absolute top-4 right-4 pill opacity-0 group-hover:opacity-100 transition-opacity">
+                    Enter →
+                  </span>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Sibling hubs */}
@@ -149,6 +126,8 @@ function HubPage() {
       </section>
 
       <SiteFooter />
+
+      <ProjectModal project={active} onClose={() => setActive(null)} />
     </div>
   );
 }
