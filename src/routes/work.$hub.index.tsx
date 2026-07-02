@@ -5,7 +5,7 @@ import { HUBS, projectsByHub, type Hub, type Project } from "@/lib/projects";
 
 const HUB_SLUGS = new Set(HUBS.map((h) => h.slug));
 
-export const Route = createFileRoute("/work/$hub")({
+export const Route = createFileRoute("/work/$hub/")({
   loader: ({ params }) => {
     if (!HUB_SLUGS.has(params.hub as Hub)) throw notFound();
     const hub = HUBS.find((h) => h.slug === params.hub)!;
