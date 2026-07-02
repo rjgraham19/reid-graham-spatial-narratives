@@ -96,7 +96,7 @@ function ProjectPage() {
           </p>
           {project.notes && project.notes.length > 0 && (
             <ul className="mt-10 space-y-3 text-foreground/70">
-              {project.notes.map((n, i) => (
+              {project.notes.map((n: string, i: number) => (
                 <li key={i} className="flex gap-4">
                   <span className="text-foreground/40 text-xs mt-1.5">0{i + 1}</span>
                   <span>{n}</span>
@@ -109,7 +109,7 @@ function ProjectPage() {
           <div className="md:col-span-4">
             <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-5">Credits</p>
             <ul className="space-y-3">
-              {project.credits.map((c) => (
+              {project.credits.map((c: Credit) => (
                 <li key={c.role} className="text-sm">
                   <span className="text-foreground/50">{c.role}</span>
                   <br />
@@ -133,7 +133,7 @@ function ProjectPage() {
         </div>
 
         <div className="space-y-6">
-          {project.media.map((m, i) => (
+          {project.media.map((m: MediaItem, i: number) => (
             <figure key={i} className="group">
               <button
                 type="button"

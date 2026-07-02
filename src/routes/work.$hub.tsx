@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { HUBS, projectsByHub, type Hub } from "@/lib/projects";
+import { HUBS, projectsByHub, type Hub, type Project } from "@/lib/projects";
 
 const HUB_SLUGS = new Set(HUBS.map((h) => h.slug));
 
@@ -55,7 +55,7 @@ function HubPage() {
         {/* Thumbnail strip (reference-style) */}
         <div className="mt-12 -mx-2 md:-mx-3 overflow-x-auto pb-2">
           <ul className="flex gap-3 md:gap-4 min-w-full snap-x">
-            {projects.map((p) => (
+            {projects.map((p: Project) => (
               <li key={p.slug} className="snap-start shrink-0 w-40 md:w-56">
                 <Link
                   to="/work/$hub/$slug"
@@ -82,7 +82,7 @@ function HubPage() {
 
       {/* Projects — reference-style long stacked layout */}
       <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 space-y-24 md:space-y-32">
-        {projects.map((p, idx) => (
+        {projects.map((p: Project, idx: number) => (
           <Link
             key={p.slug}
             to="/work/$hub/$slug"
