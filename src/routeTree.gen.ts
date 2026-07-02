@@ -13,6 +13,7 @@ import { Route as WorkRouteImport } from './routes/work'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkHubRouteImport } from './routes/work.$hub'
 import { Route as WorkHubIndexRouteImport } from './routes/work.$hub.index'
 import { Route as WorkHubSlugRouteImport } from './routes/work.$hub.$slug'
 
@@ -36,15 +37,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkHubIndexRoute = WorkHubIndexRouteImport.update({
-  id: '/$hub/',
-  path: '/$hub/',
+const WorkHubRoute = WorkHubRouteImport.update({
+  id: '/$hub',
+  path: '/$hub',
   getParentRoute: () => WorkRoute,
 } as any)
+const WorkHubIndexRoute = WorkHubIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkHubRoute,
+} as any)
 const WorkHubSlugRoute = WorkHubSlugRouteImport.update({
-  id: '/$hub/$slug',
-  path: '/$hub/$slug',
-  getParentRoute: () => WorkRoute,
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => WorkHubRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/work': typeof WorkRouteWithChildren
+  '/work/$hub': typeof WorkHubRouteWithChildren
   '/work/$hub/$slug': typeof WorkHubSlugRoute
   '/work/$hub/': typeof WorkHubIndexRoute
 }
@@ -69,6 +76,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/work': typeof WorkRouteWithChildren
+  '/work/$hub': typeof WorkHubRouteWithChildren
   '/work/$hub/$slug': typeof WorkHubSlugRoute
   '/work/$hub/': typeof WorkHubIndexRoute
 }
@@ -79,6 +87,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/work'
+    | '/work/$hub'
     | '/work/$hub/$slug'
     | '/work/$hub/'
   fileRoutesByTo: FileRoutesByTo
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/work'
+    | '/work/$hub'
     | '/work/$hub/$slug'
     | '/work/$hub/'
   fileRoutesById: FileRoutesById
@@ -130,31 +140,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/work/$hub': {
+      id: '/work/$hub'
+      path: '/$hub'
+      fullPath: '/work/$hub'
+      preLoaderRoute: typeof WorkHubRouteImport
+      parentRoute: typeof WorkRoute
+    }
     '/work/$hub/': {
       id: '/work/$hub/'
-      path: '/$hub'
+      path: '/'
       fullPath: '/work/$hub/'
       preLoaderRoute: typeof WorkHubIndexRouteImport
-      parentRoute: typeof WorkRoute
+      parentRoute: typeof WorkHubRoute
     }
     '/work/$hub/$slug': {
       id: '/work/$hub/$slug'
-      path: '/$hub/$slug'
+      path: '/$slug'
       fullPath: '/work/$hub/$slug'
       preLoaderRoute: typeof WorkHubSlugRouteImport
-      parentRoute: typeof WorkRoute
+      parentRoute: typeof WorkHubRoute
     }
   }
 }
 
-interface WorkRouteChildren {
+interface WorkHubRouteChildren {
   WorkHubSlugRoute: typeof WorkHubSlugRoute
   WorkHubIndexRoute: typeof WorkHubIndexRoute
 }
 
-const WorkRouteChildren: WorkRouteChildren = {
+const WorkHubRouteChildren: WorkHubRouteChildren = {
   WorkHubSlugRoute: WorkHubSlugRoute,
   WorkHubIndexRoute: WorkHubIndexRoute,
+}
+
+const WorkHubRouteWithChildren =
+  WorkHubRoute._addFileChildren(WorkHubRouteChildren)
+
+interface WorkRouteChildren {
+  WorkHubRoute: typeof WorkHubRouteWithChildren
+}
+
+const WorkRouteChildren: WorkRouteChildren = {
+  WorkHubRoute: WorkHubRouteWithChildren,
 }
 
 const WorkRouteWithChildren = WorkRoute._addFileChildren(WorkRouteChildren)
