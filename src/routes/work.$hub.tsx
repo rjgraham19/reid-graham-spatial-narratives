@@ -77,7 +77,7 @@ function HubPage() {
             No projects published in this hub yet.
           </p>
         ) : (
-          projects.map((p, idx) => (
+          projects.map((p: typeof PROJECTS[number], idx: number) => (
             <Link
               key={p.slug}
               to="/work/$hub/$slug"

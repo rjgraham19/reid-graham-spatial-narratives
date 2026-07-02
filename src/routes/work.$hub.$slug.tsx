@@ -155,7 +155,7 @@ function ProjectPage() {
               The narrative
             </p>
             <div className="space-y-16">
-              {project.narrative.map((para, i) => (
+              {project.narrative.map((para: string, i: number) => (
                 <div key={i} className="grid grid-cols-12 gap-6">
                   <span
                     className="col-span-1 font-display text-xs tracking-[0.2em] pt-2"
@@ -197,7 +197,7 @@ function ProjectPage() {
             Themes running through the room
           </p>
           <ul className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-            {project.themes.map((t, i) => (
+            {project.themes.map((t: string, i: number) => (
               <li key={t} className="border-t pt-6" style={{ borderColor: "color-mix(in oklab, var(--proj-ink) 25%, transparent)" }}>
                 <span
                   className="text-[10px] tracking-[0.3em] uppercase mb-3 block"
