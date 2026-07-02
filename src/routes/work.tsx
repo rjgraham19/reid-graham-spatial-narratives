@@ -96,19 +96,16 @@ function WorkIndex() {
                 className="group grid grid-cols-12 gap-4 py-6 items-center hover:bg-ash/50 transition-colors px-2 -mx-2"
               >
                 <span className="col-span-1 text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-                  {p.chapter}
+                  {String(PROJECTS.indexOf(p) + 1).padStart(2, "0")}
                 </span>
-                <span className="col-span-6 md:col-span-5 font-serif italic text-xl md:text-2xl group-hover:text-accent transition-colors">
+                <span className="col-span-7 md:col-span-6 font-serif italic text-xl md:text-2xl group-hover:text-accent transition-colors">
                   {p.title}
                 </span>
                 <span className="hidden md:block col-span-3 text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
                   {HUBS.find((h) => h.slug === p.hub)?.title}
                 </span>
-                <span className="col-span-3 md:col-span-2 text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
-                  {p.location}
-                </span>
-                <span className="col-span-2 md:col-span-1 text-right text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
-                  {p.year}
+                <span className="col-span-4 md:col-span-2 text-right text-[11px] tracking-[0.2em] uppercase text-muted-foreground truncate">
+                  {p.subtitle}
                 </span>
               </Link>
             </li>
