@@ -10,7 +10,13 @@ const NAV: NavItem[] = [
   { label: "CONTACT", to: "/contact" },
 ];
 
-export function SiteNav({ variant = "top" }: { variant?: "top" | "top-transparent" }) {
+export function SiteNav({
+  variant = "top",
+}: {
+  variant?: "top" | "top-transparent";
+  /** legacy prop, ignored */
+  mixBlend?: boolean;
+}) {
   const isTransparent = variant === "top-transparent";
   return (
     <nav
@@ -24,8 +30,7 @@ export function SiteNav({ variant = "top" }: { variant?: "top" | "top-transparen
           <li key={item.label}>
             <Link
               to={item.to}
-              // @ts-expect-error - params optional depending on route
-              params={item.params}
+              params={item.params as never}
               activeOptions={{ exact: item.to === "/" }}
               activeProps={{ className: "pill pill-active" }}
               className="pill"

@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { HUBS, PROJECTS, projectBySlug } from "@/lib/projects";
+import { HUBS, PROJECTS, projectBySlug, type MediaItem, type Credit } from "@/lib/projects";
 
 export const Route = createFileRoute("/work/$hub/$slug")({
   loader: ({ params }) => {
