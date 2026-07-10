@@ -109,6 +109,71 @@
   animation: marquee 40s linear infinite;
 }
 
+/* ── Bespoke narrative animations ─────────────────────────────── */
+@keyframes swoop-in {
+  0% { opacity: 0; transform: translate(-40px, 30px) rotate(-4deg); }
+  100% { opacity: 1; transform: translate(0, 0) rotate(0); }
+}
+@keyframes slide-from-left {
+  from { opacity: 0; transform: translateX(-60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-from-right {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fade-from-black {
+  0% { opacity: 0; filter: brightness(0); }
+  100% { opacity: 1; filter: brightness(1); }
+}
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.9); }
+  55% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes cellphone-rise {
+  0% { opacity: 0; transform: translateY(120px); filter: brightness(3); }
+  60% { filter: brightness(1.15); }
+  100% { opacity: 1; transform: translateY(0); filter: brightness(1); }
+}
+@keyframes twitch {
+  0%, 92%, 100% { transform: translate(0,0) rotate(var(--twitch-r, 0deg)); }
+  94% { transform: translate(1px, -1px) rotate(calc(var(--twitch-r, 0deg) + 0.4deg)); }
+  96% { transform: translate(-1px, 1px) rotate(calc(var(--twitch-r, 0deg) - 0.4deg)); }
+  98% { transform: translate(1px, 0) rotate(var(--twitch-r, 0deg)); }
+}
+
+@utility animate-swoop-in {
+  animation: swoop-in 1.1s var(--ease-cinematic) both;
+}
+@utility animate-swoop-1 {
+  animation: swoop-in 1.0s var(--ease-cinematic) 0.05s both;
+}
+@utility animate-swoop-2 {
+  animation: swoop-in 1.0s var(--ease-cinematic) 0.25s both;
+}
+@utility animate-swoop-3 {
+  animation: swoop-in 1.0s var(--ease-cinematic) 0.45s both;
+}
+@utility animate-slide-from-left {
+  animation: slide-from-left 1.1s var(--ease-cinematic) both;
+}
+@utility animate-slide-from-right {
+  animation: slide-from-right 1.1s var(--ease-cinematic) both;
+}
+@utility animate-fade-from-black {
+  animation: fade-from-black 1.6s var(--ease-cinematic) both;
+}
+@utility animate-pop-in {
+  animation: pop-in 0.9s var(--ease-cinematic) both;
+}
+@utility animate-cellphone-rise {
+  animation: cellphone-rise 1.4s var(--ease-cinematic) both;
+}
+@utility animate-twitch {
+  animation: twitch 6s ease-in-out infinite;
+}
+
 /* Reference-style pill nav buttons */
 @utility pill {
   display: inline-flex;
