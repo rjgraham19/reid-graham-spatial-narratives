@@ -1,8 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { ProjectModal } from "@/components/project-modal";
 import { HUBS, projectsByHub, type Hub, type Project } from "@/lib/projects";
 
 const HUB_SLUGS = new Set(HUBS.map((h) => h.slug));
@@ -37,7 +35,6 @@ export const Route = createFileRoute("/work/$hub/")({
 
 function HubPage() {
   const { hub, projects } = Route.useLoaderData();
-  const [active, setActive] = useState<Project | null>(null);
 
   return (
     <div>
@@ -56,51 +53,20 @@ function HubPage() {
         </p>
       </header>
 
-      {/* Square grid of projects */}
+      {/* Square grid of projects with hover-collage previews */}
       <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
         <div className="flex items-end justify-between mb-10">
           <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50">
             {projects.length} Projects
           </p>
           <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 hidden md:block">
-            Select to enter
+            Hover to preview · Click to enter
           </p>
         </div>
 
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-14">
           {projects.map((p: Project, idx: number) => (
-            <li key={p.slug}>
-              <button
-                type="button"
-                onClick={() => setActive(p)}
-                className="group block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
-                aria-label={`Open ${p.title}`}
-              >
-                <div className="relative aspect-square overflow-hidden rounded-md bg-secondary">
-                  <img
-                    src={p.cover}
-                    alt={p.title}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-[900ms] ease-cinematic"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-background/10 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-500" />
-                  <div className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-foreground/70">
-                    0{idx + 1}
-                  </div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h2 className="font-display font-black uppercase tracking-tight text-2xl md:text-3xl leading-[0.95] text-balance group-hover:text-accent transition-colors">
-                      {p.title}
-                    </h2>
-                    <p className="mt-2 text-[10px] tracking-[0.25em] uppercase text-foreground/70 line-clamp-1">
-                      {p.subtitle}
-                    </p>
-                  </div>
-                  <span className="absolute top-4 right-4 pill opacity-0 group-hover:opacity-100 transition-opacity">
-                    Enter →
-                  </span>
-                </div>
-              </button>
-            </li>
+            <ProjectTile key={p.slug} project={p} index={idx} hub={hub.slug} />
           ))}
         </ul>
       </section>
@@ -126,8 +92,88 @@ function HubPage() {
       </section>
 
       <SiteFooter />
-
-      <ProjectModal project={active} onClose={() => setActive(null)} />
     </div>
+  );
+}
+
+function ProjectTile({
+  project,
+  index,
+  hub,
+}: {
+  project: Project;
+  index: number;
+  hub: Hub;
+}) {
+  // Build up to 3 collage images from `collage` or fallback media.
+  const collageSources = (project.collage && project.collage.length > 0
+    ? project.collage
+    : project.media.slice(1).map((m) => m.src)
+  ).slice(0, 3);
+
+  // Deterministic little offsets so the collage feels loose, not gridded.
+  const offsets = [
+    { x: "-38%", y: "-22%", r: "-6deg" },
+    { x: "42%", y: "-14%", r: "5deg" },
+    { x: "-10%", y: "44%", r: "-3deg" },
+  ];
+
+  return (
+    <li className="relative">
+      <Link
+        to="/work/$hub/$slug"
+        params={{ hub, slug: project.slug }}
+        className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
+        aria-label={`Open ${project.title}`}
+      >
+        {/* Collage layer — pops out on hover, absolute so it can breach the tile */}
+        <div className="relative aspect-square">
+          {collageSources.map((src, i) => {
+            const o = offsets[i] ?? offsets[0];
+            return (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                aria-hidden
+                loading="lazy"
+                className="pointer-events-none absolute left-1/2 top-1/2 w-3/5 h-3/5 object-cover rounded-md shadow-2xl ring-1 ring-border opacity-0 -translate-x-1/2 -translate-y-1/2 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-cinematic z-10"
+                style={{
+                  transitionDelay: `${100 + i * 90}ms`,
+                  ["--tx" as string]: o.x,
+                  ["--ty" as string]: o.y,
+                  transform: `translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) rotate(${o.r})`,
+                }}
+              />
+            );
+          })}
+
+          {/* Main square tile */}
+          <div className="relative aspect-square overflow-hidden rounded-md bg-secondary">
+            <img
+              src={project.cover}
+              alt={project.title}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-[900ms] ease-cinematic"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-background/10 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-500" />
+            <div className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-foreground/70">
+              0{index + 1}
+            </div>
+            <div className="absolute bottom-4 left-4 right-4">
+              <h2 className="font-display font-black uppercase tracking-tight text-2xl md:text-3xl leading-[0.95] text-balance group-hover:text-accent transition-colors">
+                {project.title}
+              </h2>
+              <p className="mt-2 text-[10px] tracking-[0.25em] uppercase text-foreground/70 line-clamp-1">
+                {project.subtitle}
+              </p>
+            </div>
+            <span className="absolute top-4 right-4 pill opacity-0 group-hover:opacity-100 transition-opacity">
+              Enter →
+            </span>
+          </div>
+        </div>
+      </Link>
+    </li>
   );
 }
