@@ -82,7 +82,7 @@ const MOOD_STYLES: Record<Mood, { wrap: string; enter: string }> = {
 function ProjectPage() {
   const { project } = Route.useLoaderData();
   const hub = HUBS.find((h) => h.slug === project.hub)!;
-  const mood = MOOD_STYLES[project.mood ?? "concrete"];
+  const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mood];
   const weight = project.weight ?? "right";
 
   const idxInHub = PROJECTS.filter((p) => p.hub === project.hub).findIndex(
@@ -150,7 +150,7 @@ function ProjectPage() {
         </h1>
         {project.notes && project.notes.length > 0 && (
           <ul className="mt-6 flex flex-wrap gap-2">
-            {project.notes.map((n, i) => (
+            {project.notes.map((n: string, i: number) => (
               <li key={i} className="pill">{n}</li>
             ))}
           </ul>
@@ -255,7 +255,7 @@ function ProjectPage() {
                 Five projected aesthetics
               </h2>
               <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {project.philosophyCards.map((c: PhilosophyCard, i) => (
+                {project.philosophyCards.map((c: PhilosophyCard, i: number) => (
                   <li
                     key={c.title}
                     className="relative rounded-md border border-border bg-background/40 p-6 md:p-7 animate-twitch"
