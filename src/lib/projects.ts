@@ -234,6 +234,7 @@ export const PROJECTS: Project[] = [
     description:
       "An immersive, experiential design for Taubman College's annual Beaux-Arts Ball, reimagining the Renaissance as a timeless expression of creative transformation and continual innovation. Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative and marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials. A pop-up installation, playfully nodding to our event's shared name with TaB soda, became an engaging experiential marketing moment that built anticipation for the event.",
     cover: tab.url,
+    tags: ["Production/Scenic", "Experiential"],
     media: [
       { type: "image", src: tab.url, caption: "Installation, branding, PINK FOUNTAIN diagram, and TaB Soda pop-up" },
     ],
