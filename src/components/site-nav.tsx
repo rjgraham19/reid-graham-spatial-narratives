@@ -1,13 +1,5 @@
 import { Link } from "@tanstack/react-router";
 
-type NavItem = { label: string; to: string; params?: Record<string, string> };
-
-const NAV: NavItem[] = [
-  { label: "PROJECTS", to: "/work" },
-  { label: "VISUALIZATIONS", to: "/work/$hub", params: { hub: "visualizations" } },
-  { label: "CONTACT", to: "/contact" },
-];
-
 export function SiteNav({
   variant = "top",
 }: {
@@ -30,18 +22,68 @@ export function SiteNav({
         Reid Graham
       </Link>
       <ul className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
-        {NAV.map((item) => (
-          <li key={item.label}>
-            <Link
-              to={item.to}
-              params={item.params as never}
-              activeProps={{ className: "pill pill-active" }}
-              className="pill"
-            >
-              {item.label}
-            </Link>
-          </li>
-        ))}
+        {/* PROJECTS — primary, with hover dropdown of disciplines */}
+        <li className="relative group">
+          <Link
+            to="/work"
+            activeProps={{ className: "pill pill-lg pill-active" }}
+            activeOptions={{ exact: false }}
+            className="pill pill-lg"
+          >
+            PROJECTS
+          </Link>
+          <div
+            className="absolute right-0 top-full pt-3 opacity-0 pointer-events-none translate-y-1 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 transition-all duration-200 ease-cinematic"
+          >
+            <ul className="flex flex-col gap-2 p-3 rounded-lg bg-background/95 backdrop-blur-md border border-border shadow-2xl min-w-[240px]">
+              <li>
+                <Link
+                  to="/work"
+                  search={{ tag: "Production/Scenic" }}
+                  className="pill w-full justify-start"
+                >
+                  Production / Scenic
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/work"
+                  search={{ tag: "Architecture" }}
+                  className="pill w-full justify-start"
+                >
+                  Architecture
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/work"
+                  search={{ tag: "Experiential" }}
+                  className="pill w-full justify-start"
+                >
+                  Experiential
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/work/$hub"
+                  params={{ hub: "visualizations" }}
+                  className="pill w-full justify-start"
+                >
+                  Visualizations
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <Link
+            to="/contact"
+            activeProps={{ className: "pill pill-active" }}
+            className="pill"
+          >
+            CONTACT
+          </Link>
+        </li>
       </ul>
     </nav>
   );
