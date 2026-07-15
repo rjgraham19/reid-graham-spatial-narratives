@@ -85,6 +85,8 @@ export type Project = {
   philosophyCards?: PhilosophyCard[];
   /** Direction the hero image "weighs" — drives entrance animation. */
   weight?: "left" | "right";
+  /** Discipline tags — a project can span multiple. */
+  tags?: ProjectTag[];
 };
 
 export const HUBS: {
