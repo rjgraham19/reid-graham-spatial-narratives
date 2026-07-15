@@ -3,8 +3,7 @@ import { Link } from "@tanstack/react-router";
 type NavItem = { label: string; to: string; params?: Record<string, string> };
 
 const NAV: NavItem[] = [
-  { label: "PRODUCTION/SCENIC", to: "/work/$hub", params: { hub: "production-scenic" } },
-  { label: "ARCHITECTURE", to: "/work/$hub", params: { hub: "architecture" } },
+  { label: "PROJECTS", to: "/work" },
   { label: "VISUALIZATIONS", to: "/work/$hub", params: { hub: "visualizations" } },
   { label: "CONTACT", to: "/contact" },
 ];

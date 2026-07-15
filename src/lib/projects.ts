@@ -22,6 +22,22 @@ export const HERO_URL = hero.url;
 
 export type Hub = "production-scenic" | "architecture" | "visualizations";
 
+export type ProjectTag = "Production/Scenic" | "Architecture" | "Experiential";
+
+export const PROJECT_TAGS: ProjectTag[] = [
+  "Production/Scenic",
+  "Architecture",
+  "Experiential",
+];
+
+export function tagToSlug(tag: ProjectTag): string {
+  return tag.toLowerCase().replace(/\//g, "-");
+}
+
+export function slugToTag(slug: string): ProjectTag | undefined {
+  return PROJECT_TAGS.find((t) => tagToSlug(t) === slug);
+}
+
 /** Per-project mood tokens drive palette + entrance animation. */
 export type Mood =
   | "noir" // dark, moody, fade-from-black (Anne Frank)
@@ -69,6 +85,8 @@ export type Project = {
   philosophyCards?: PhilosophyCard[];
   /** Direction the hero image "weighs" — drives entrance animation. */
   weight?: "left" | "right";
+  /** Discipline tags — a project can span multiple. */
+  tags?: ProjectTag[];
 };
 
 export const HUBS: {
@@ -367,6 +385,19 @@ export const PROJECTS: Project[] = [
   },
 ];
 
+// Seed each project's tags from its current hub. Multi-tagging is refined
+// manually per project later.
+const HUB_TAG: Partial<Record<Hub, ProjectTag>> = {
+  "production-scenic": "Production/Scenic",
+  architecture: "Architecture",
+};
+for (const p of PROJECTS) {
+  if (!p.tags || p.tags.length === 0) {
+    const seed = HUB_TAG[p.hub];
+    p.tags = seed ? [seed] : [];
+  }
+}
+
 export function projectsByHub(hub: Hub) {
   return PROJECTS.filter((p) => p.hub === hub);
 }
@@ -374,3 +405,13 @@ export function projectsByHub(hub: Hub) {
 export function projectBySlug(slug: string) {
   return PROJECTS.find((p) => p.slug === slug);
 }
+
+/** Projects displayed on the unified /work feed (everything that carries a tag). */
+export function taggedProjects(): Project[] {
+  return PROJECTS.filter((p) => (p.tags?.length ?? 0) > 0);
+}
+
+export function projectsByTag(tag: ProjectTag): Project[] {
+  return PROJECTS.filter((p) => p.tags?.includes(tag));
+}
+

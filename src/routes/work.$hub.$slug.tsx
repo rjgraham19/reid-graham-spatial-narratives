@@ -10,6 +10,7 @@ import {
   type Credit,
   type Mood,
   type PhilosophyCard,
+  type ProjectTag,
 } from "@/lib/projects";
 
 export const Route = createFileRoute("/work/$hub/$slug")({
@@ -122,16 +123,27 @@ function ProjectPage() {
     <div className={`relative ${mood.wrap}`}>
       <SiteNav />
 
-      {/* Back-to-hub — intentional way back, not browser back */}
+      {/* Back — to /work for tagged projects, to hub for visualizations */}
       <div className="pt-28 md:pt-32 px-6 md:px-12 lg:px-16">
-        <Link
-          to="/work/$hub"
-          params={{ hub: hub.slug }}
-          className="inline-flex items-center gap-3 pill"
-        >
-          <span aria-hidden>←</span>
-          Back to {hub.title}
-        </Link>
+        {project.tags && project.tags.length > 0 ? (
+          <Link
+            to="/work"
+            search={{ tag: project.tags[0] }}
+            className="inline-flex items-center gap-3 pill"
+          >
+            <span aria-hidden>←</span>
+            Back to Projects
+          </Link>
+        ) : (
+          <Link
+            to="/work/$hub"
+            params={{ hub: hub.slug }}
+            className="inline-flex items-center gap-3 pill"
+          >
+            <span aria-hidden>←</span>
+            Back to {hub.title}
+          </Link>
+        )}
       </div>
 
       {/* Header + hero */}
@@ -148,14 +160,32 @@ function ProjectPage() {
         >
           {project.title}
         </h1>
+
+        {/* Tag pills — clickable, link back to filtered feed */}
+        {project.tags && project.tags.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {project.tags.map((t: ProjectTag) => (
+              <Link
+                key={t}
+                to="/work"
+                search={{ tag: t }}
+                className="pill hover:text-accent transition-colors"
+              >
+                #{t}
+              </Link>
+            ))}
+          </div>
+        )}
+
         {project.notes && project.notes.length > 0 && (
-          <ul className="mt-6 flex flex-wrap gap-2">
+          <ul className="mt-4 flex flex-wrap gap-2">
             {project.notes.map((n: string, i: number) => (
               <li key={i} className="pill">{n}</li>
             ))}
           </ul>
         )}
       </header>
+
 
       {/* Hero photo */}
       <figure className={`px-6 md:px-12 lg:px-16 pt-10 md:pt-14 ${mood.enter}`}>
@@ -331,33 +361,49 @@ function ProjectPage() {
         </div>
       </section>
 
-      {/* Back to hub + next in this hub */}
+      {/* Back to feed + next */}
       <section className="border-t border-border px-6 md:px-12 lg:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Link
-          to="/work/$hub"
-          params={{ hub: hub.slug }}
-          className="group block"
-        >
-          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-            Return to
-          </p>
-          <h3 className="font-display font-black uppercase tracking-tight text-2xl md:text-4xl group-hover:text-accent transition-colors">
-            ← {hub.title}
-          </h3>
-        </Link>
+        {project.tags && project.tags.length > 0 ? (
+          <Link
+            to="/work"
+            search={{ tag: project.tags[0] }}
+            className="group block"
+          >
+            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
+              Return to
+            </p>
+            <h3 className="font-display font-black uppercase tracking-tight text-2xl md:text-4xl group-hover:text-accent transition-colors">
+              ← All Projects
+            </h3>
+          </Link>
+        ) : (
+          <Link
+            to="/work/$hub"
+            params={{ hub: hub.slug }}
+            className="group block"
+          >
+            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
+              Return to
+            </p>
+            <h3 className="font-display font-black uppercase tracking-tight text-2xl md:text-4xl group-hover:text-accent transition-colors">
+              ← {hub.title}
+            </h3>
+          </Link>
+        )}
         <Link
           to="/work/$hub/$slug"
           params={{ hub: next.hub, slug: next.slug }}
           className="group block md:text-right"
         >
           <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-            Next in {hub.title}
+            Next
           </p>
           <h3 className="font-display font-black uppercase tracking-tight text-2xl md:text-4xl group-hover:text-accent transition-colors">
             {next.title} →
           </h3>
         </Link>
       </section>
+
 
       <SiteFooter />
 
