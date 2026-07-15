@@ -34,7 +34,7 @@ function Home() {
             to="/"
             className="font-display font-black uppercase tracking-[0.04em] text-xs md:text-sm text-foreground/70 hover:text-accent transition-colors"
           >
-            Reid Graham Design · MMXXVI
+            Reid Graham Design
           </Link>
 
           <div>
