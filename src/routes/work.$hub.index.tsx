@@ -1,13 +1,23 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { HUBS, projectsByHub, type Hub, type Project } from "@/lib/projects";
 
 const HUB_SLUGS = new Set(HUBS.map((h) => h.slug));
 
+// Old hubs now consolidated into the unified /work feed with tag filters.
+const HUB_TAG_REDIRECT: Partial<Record<Hub, "Production/Scenic" | "Architecture">> = {
+  "production-scenic": "Production/Scenic",
+  architecture: "Architecture",
+};
+
 export const Route = createFileRoute("/work/$hub/")({
   loader: ({ params }) => {
     if (!HUB_SLUGS.has(params.hub as Hub)) throw notFound();
+    const tag = HUB_TAG_REDIRECT[params.hub as Hub];
+    if (tag) {
+      throw redirect({ to: "/work", search: { tag } });
+    }
     const hub = HUBS.find((h) => h.slug === params.hub)!;
     return { hub, projects: projectsByHub(hub.slug) };
   },
