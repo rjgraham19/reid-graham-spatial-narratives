@@ -10,6 +10,7 @@ import {
   type Credit,
   type Mood,
   type PhilosophyCard,
+  type ProjectTag,
 } from "@/lib/projects";
 
 export const Route = createFileRoute("/work/$hub/$slug")({
