@@ -22,6 +22,22 @@ export const HERO_URL = hero.url;
 
 export type Hub = "production-scenic" | "architecture" | "visualizations";
 
+export type ProjectTag = "Production/Scenic" | "Architecture" | "Experiential";
+
+export const PROJECT_TAGS: ProjectTag[] = [
+  "Production/Scenic",
+  "Architecture",
+  "Experiential",
+];
+
+export function tagToSlug(tag: ProjectTag): string {
+  return tag.toLowerCase().replace(/\//g, "-");
+}
+
+export function slugToTag(slug: string): ProjectTag | undefined {
+  return PROJECT_TAGS.find((t) => tagToSlug(t) === slug);
+}
+
 /** Per-project mood tokens drive palette + entrance animation. */
 export type Mood =
   | "noir" // dark, moody, fade-from-black (Anne Frank)
