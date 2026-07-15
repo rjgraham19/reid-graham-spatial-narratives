@@ -94,7 +94,7 @@ function ProjectsPage() {
         {projects.length === 0 ? (
           <p className="text-foreground/60">No projects match this filter yet.</p>
         ) : (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-14">
+          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
             {projects.map((p, idx) => (
               <ProjectTile key={p.slug} project={p} index={idx} />
             ))}
@@ -159,8 +159,8 @@ function ProjectTile({ project, index }: { project: Project; index: number }) {
             <div className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-foreground/70">
               {String(index + 1).padStart(2, "0")}
             </div>
-            <div className="absolute bottom-4 left-4 right-4">
-              <h2 className="font-display font-black uppercase tracking-tight text-2xl md:text-3xl leading-[0.95] text-balance group-hover:text-accent transition-colors">
+            <div className="absolute bottom-3 left-3 right-3">
+              <h2 className="font-display font-black uppercase tracking-tight text-base md:text-lg leading-[0.95] text-balance group-hover:text-accent transition-colors line-clamp-2">
                 {project.title}
               </h2>
               <p className="mt-2 text-[10px] tracking-[0.25em] uppercase text-foreground/70 line-clamp-1">

@@ -213,6 +213,7 @@ export const PROJECTS: Project[] = [
     description:
       "A short film reimagining of Georges Méliès' The Living Playing Cards, brought to life through Virtual Production Technology.",
     cover: reshuf.url,
+    tags: ["Production/Scenic", "Experiential"],
     media: [
       { type: "image", src: reshuf.url, caption: "On-set: virtual production stage with painted flats and camera rig" },
     ],
@@ -233,6 +234,7 @@ export const PROJECTS: Project[] = [
     description:
       "An immersive, experiential design for Taubman College's annual Beaux-Arts Ball, reimagining the Renaissance as a timeless expression of creative transformation and continual innovation. Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative and marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials. A pop-up installation, playfully nodding to our event's shared name with TaB soda, became an engaging experiential marketing moment that built anticipation for the event.",
     cover: tab.url,
+    tags: ["Production/Scenic", "Experiential"],
     media: [
       { type: "image", src: tab.url, caption: "Installation, branding, PINK FOUNTAIN diagram, and TaB Soda pop-up" },
     ],
