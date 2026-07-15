@@ -123,16 +123,27 @@ function ProjectPage() {
     <div className={`relative ${mood.wrap}`}>
       <SiteNav />
 
-      {/* Back-to-hub — intentional way back, not browser back */}
+      {/* Back — to /work for tagged projects, to hub for visualizations */}
       <div className="pt-28 md:pt-32 px-6 md:px-12 lg:px-16">
-        <Link
-          to="/work/$hub"
-          params={{ hub: hub.slug }}
-          className="inline-flex items-center gap-3 pill"
-        >
-          <span aria-hidden>←</span>
-          Back to {hub.title}
-        </Link>
+        {project.tags && project.tags.length > 0 ? (
+          <Link
+            to="/work"
+            search={{ tag: project.tags[0] }}
+            className="inline-flex items-center gap-3 pill"
+          >
+            <span aria-hidden>←</span>
+            Back to Projects
+          </Link>
+        ) : (
+          <Link
+            to="/work/$hub"
+            params={{ hub: hub.slug }}
+            className="inline-flex items-center gap-3 pill"
+          >
+            <span aria-hidden>←</span>
+            Back to {hub.title}
+          </Link>
+        )}
       </div>
 
       {/* Header + hero */}
@@ -149,14 +160,32 @@ function ProjectPage() {
         >
           {project.title}
         </h1>
+
+        {/* Tag pills — clickable, link back to filtered feed */}
+        {project.tags && project.tags.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {project.tags.map((t: ProjectTag) => (
+              <Link
+                key={t}
+                to="/work"
+                search={{ tag: t }}
+                className="pill hover:text-accent transition-colors"
+              >
+                #{t}
+              </Link>
+            ))}
+          </div>
+        )}
+
         {project.notes && project.notes.length > 0 && (
-          <ul className="mt-6 flex flex-wrap gap-2">
+          <ul className="mt-4 flex flex-wrap gap-2">
             {project.notes.map((n: string, i: number) => (
               <li key={i} className="pill">{n}</li>
             ))}
           </ul>
         )}
       </header>
+
 
       {/* Hero photo */}
       <figure className={`px-6 md:px-12 lg:px-16 pt-10 md:pt-14 ${mood.enter}`}>
