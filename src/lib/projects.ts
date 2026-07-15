@@ -385,6 +385,19 @@ export const PROJECTS: Project[] = [
   },
 ];
 
+// Seed each project's tags from its current hub. Multi-tagging is refined
+// manually per project later.
+const HUB_TAG: Partial<Record<Hub, ProjectTag>> = {
+  "production-scenic": "Production/Scenic",
+  architecture: "Architecture",
+};
+for (const p of PROJECTS) {
+  if (!p.tags || p.tags.length === 0) {
+    const seed = HUB_TAG[p.hub];
+    p.tags = seed ? [seed] : [];
+  }
+}
+
 export function projectsByHub(hub: Hub) {
   return PROJECTS.filter((p) => p.hub === hub);
 }
@@ -392,3 +405,13 @@ export function projectsByHub(hub: Hub) {
 export function projectBySlug(slug: string) {
   return PROJECTS.find((p) => p.slug === slug);
 }
+
+/** Projects displayed on the unified /work feed (everything that carries a tag). */
+export function taggedProjects(): Project[] {
+  return PROJECTS.filter((p) => (p.tags?.length ?? 0) > 0);
+}
+
+export function projectsByTag(tag: ProjectTag): Project[] {
+  return PROJECTS.filter((p) => p.tags?.includes(tag));
+}
+
