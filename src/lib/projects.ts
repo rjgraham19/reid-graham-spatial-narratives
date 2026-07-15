@@ -213,6 +213,7 @@ export const PROJECTS: Project[] = [
     description:
       "A short film reimagining of Georges Méliès' The Living Playing Cards, brought to life through Virtual Production Technology.",
     cover: reshuf.url,
+    tags: ["Production/Scenic", "Experiential"],
     media: [
       { type: "image", src: reshuf.url, caption: "On-set: virtual production stage with painted flats and camera rig" },
     ],
