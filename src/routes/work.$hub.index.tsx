@@ -81,24 +81,22 @@ function HubPage() {
         </ul>
       </section>
 
-      {/* Sibling hubs */}
-      <section className="border-t border-border grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border">
-        {HUBS.filter((h) => h.slug !== hub.slug).map((h) => (
-          <Link
-            key={h.slug}
-            to="/work/$hub"
-            params={{ hub: h.slug }}
-            className="group px-6 md:px-12 py-12 md:py-16 hover:bg-secondary/40 transition-colors"
-          >
-            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-3">
-              Chapter {h.chapter}
-            </p>
-            <h3 className="font-display font-black uppercase tracking-tight text-3xl md:text-4xl group-hover:text-accent transition-colors">
-              {h.title}
-            </h3>
-            <p className="mt-3 text-sm text-foreground/60 max-w-md">{h.tagline}</p>
-          </Link>
-        ))}
+      {/* Back to unified projects feed */}
+      <section className="border-t border-border">
+        <Link
+          to="/work"
+          className="group block px-6 md:px-12 py-12 md:py-16 hover:bg-secondary/40 transition-colors"
+        >
+          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-3">
+            Return to
+          </p>
+          <h3 className="font-display font-black uppercase tracking-tight text-3xl md:text-4xl group-hover:text-accent transition-colors">
+            ← All Projects
+          </h3>
+          <p className="mt-3 text-sm text-foreground/60 max-w-md">
+            Browse the full body of work, filterable by discipline.
+          </p>
+        </Link>
       </section>
 
       <SiteFooter />
