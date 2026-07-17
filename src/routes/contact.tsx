@@ -30,11 +30,11 @@ function Contact() {
       <SiteNav />
 
       <main className="flex-1 pt-32 md:pt-40 pb-16 px-6 md:px-12 lg:px-16">
-        <p className="text-[10px] tracking-[0.35em] uppercase text-accent mb-6 animate-fade-in-slow">
+        <p className="text-[10px] tracking-[0.35em] uppercase text-accent mb-6">
           The studio is open
         </p>
 
-        <h1 className="font-display font-black uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-8xl animate-slide-from-left">
+        <h1 className="font-display font-black uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-8xl">
           Get in touch
         </h1>
 
