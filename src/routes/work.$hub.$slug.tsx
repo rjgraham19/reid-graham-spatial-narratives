@@ -148,7 +148,7 @@ function ProjectPage() {
 
       {/* Header + hero */}
       <header
-        className={`px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border ${mood.enter}`}
+        className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border"
       >
         <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
           {project.subtitle}
@@ -186,7 +186,7 @@ function ProjectPage() {
 
 
       {/* Hero photo */}
-      <figure className={`px-6 md:px-12 lg:px-16 pt-10 md:pt-14 ${mood.enter}`}>
+      <figure className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14">
         <button
           type="button"
           onClick={() => setLightbox(0)}
@@ -196,7 +196,9 @@ function ProjectPage() {
           <img
             src={project.cover}
             alt={project.title}
-            className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic"
+            className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
+              isYctiwy ? "animate-image-drift-up" : mood.enter
+            }`}
           />
         </button>
       </figure>
