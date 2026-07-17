@@ -39,16 +39,16 @@ function Home() {
 
           <div>
             <h1
-              className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)]"
+              className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
               aria-label="Reid Graham Design"
             >
-              <span className="block animate-swoop-1">Reid</span>
-              <span className="block animate-swoop-2">Graham</span>
-              <span className="block font-thin text-foreground/85 animate-swoop-3">Design</span>
+              <span className="block">Reid</span>
+              <span className="block">Graham</span>
+              <span className="block font-thin text-foreground/85">Design</span>
             </h1>
 
             {/* Category labels — only appearance on the page */}
-            <ul className="mt-10 md:mt-14 flex flex-wrap gap-2 md:gap-3 animate-fade-in-slow">
+            <ul className="mt-10 md:mt-14 flex flex-wrap gap-2 md:gap-3">
               {HUBS.map((h) => (
                 <li key={h.slug}>
                   <Link
