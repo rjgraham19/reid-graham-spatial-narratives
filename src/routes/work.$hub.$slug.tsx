@@ -83,8 +83,7 @@ const MOOD_STYLES: Record<Mood, { wrap: string; enter: string }> = {
 function ProjectPage() {
   const { project } = Route.useLoaderData();
   const hub = HUBS.find((h) => h.slug === project.hub)!;
-  const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mono];
-  void mood;
+  const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mood];
 
   const idxInHub = PROJECTS.filter((p) => p.hub === project.hub).findIndex(
     (p) => p.slug === project.slug,
