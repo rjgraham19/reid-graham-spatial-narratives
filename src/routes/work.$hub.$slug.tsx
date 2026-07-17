@@ -154,9 +154,7 @@ function ProjectPage() {
           {project.subtitle}
         </p>
         <h1
-          className={`font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl ${
-            weight === "left" ? "animate-slide-from-left" : "animate-slide-from-right"
-          }`}
+          className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl"
         >
           {project.title}
         </h1>
