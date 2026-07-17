@@ -84,7 +84,6 @@ function ProjectPage() {
   const { project } = Route.useLoaderData();
   const hub = HUBS.find((h) => h.slug === project.hub)!;
   const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mood];
-  const weight = project.weight ?? "right";
 
   const idxInHub = PROJECTS.filter((p) => p.hub === project.hub).findIndex(
     (p) => p.slug === project.slug,
@@ -118,6 +117,7 @@ function ProjectPage() {
 
   const isStaging = project.slug === "staging-aesthetics";
   const isTab = project.slug === "tab-renaissance";
+  const isYctiwy = project.slug === "you-cant-take-it-with-you";
 
   return (
     <div className={`relative ${mood.wrap}`}>
@@ -148,15 +148,13 @@ function ProjectPage() {
 
       {/* Header + hero */}
       <header
-        className={`px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border ${mood.enter}`}
+        className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border"
       >
         <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
           {project.subtitle}
         </p>
         <h1
-          className={`font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl ${
-            weight === "left" ? "animate-slide-from-left" : "animate-slide-from-right"
-          }`}
+          className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl"
         >
           {project.title}
         </h1>
@@ -188,7 +186,7 @@ function ProjectPage() {
 
 
       {/* Hero photo */}
-      <figure className={`px-6 md:px-12 lg:px-16 pt-10 md:pt-14 ${mood.enter}`}>
+      <figure className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14">
         <button
           type="button"
           onClick={() => setLightbox(0)}
@@ -198,7 +196,9 @@ function ProjectPage() {
           <img
             src={project.cover}
             alt={project.title}
-            className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic"
+            className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
+              isYctiwy ? "animate-image-drift-up" : mood.enter
+            }`}
           />
         </button>
       </figure>
@@ -327,39 +327,99 @@ function ProjectPage() {
           </p>
         </div>
 
-        <div className="space-y-6">
-          {project.media.map((m: MediaItem, i: number) => (
-            <figure
-              key={i}
-              className={`group ${
-                isStaging
-                  ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"} animate-twitch`
-                  : ""
-              }`}
-              style={isStaging ? { animationDelay: `${i * 0.9}s` } : undefined}
-            >
+        {isYctiwy ? (
+          // Custom YCTIWU layout: closeup (left) + sketch (top-right, on dark) + drawing (bottom-right)
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Closeup, left column */}
+            <figure className="group">
               <button
                 type="button"
-                onClick={() => setLightbox(i)}
+                onClick={() => setLightbox(1)}
                 className="block w-full overflow-hidden rounded-md bg-secondary"
-                aria-label={m.caption ?? `Media ${i + 1}`}
+                aria-label={project.media[1].caption ?? "Closeup"}
               >
                 <img
-                  src={m.src}
-                  alt={m.caption ?? project.title}
+                  src={project.media[1].src}
+                  alt={project.media[1].caption ?? project.title}
                   loading="lazy"
-                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                 />
               </button>
-              {m.caption && (
-                <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
-                  {String(i + 1).padStart(2, "0")} — {m.caption}
-                </figcaption>
-              )}
+              <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed">
+                {project.media[1].caption}
+              </figcaption>
             </figure>
-          ))}
-        </div>
+
+            {/* Sketch + drawing stacked, right column */}
+            <div className="flex flex-col gap-6">
+              <figure className="group">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(2)}
+                  className="block w-full overflow-hidden rounded-md bg-black p-6 md:p-8"
+                  aria-label={project.media[2].caption ?? "Sketch"}
+                >
+                  <img
+                    src={project.media[2].src}
+                    alt={project.media[2].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+              <figure className="group">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(3)}
+                  className="block w-full overflow-hidden rounded-md bg-black p-6 md:p-8"
+                  aria-label={project.media[3].caption ?? "Drawing"}
+                >
+                  <img
+                    src={project.media[3].src}
+                    alt={project.media[3].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {project.media.map((m: MediaItem, i: number) => (
+              <figure
+                key={i}
+                className={`group ${
+                  isStaging
+                    ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"} animate-twitch`
+                    : ""
+                }`}
+                style={isStaging ? { animationDelay: `${i * 0.9}s` } : undefined}
+              >
+                <button
+                  type="button"
+                  onClick={() => setLightbox(i)}
+                  className="block w-full overflow-hidden rounded-md bg-secondary"
+                  aria-label={m.caption ?? `Media ${i + 1}`}
+                >
+                  <img
+                    src={m.src}
+                    alt={m.caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+                {m.caption && (
+                  <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
+                    {String(i + 1).padStart(2, "0")} — {m.caption}
+                  </figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        )}
       </section>
+
 
       {/* Back to feed + next */}
       <section className="border-t border-border px-6 md:px-12 lg:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-8">

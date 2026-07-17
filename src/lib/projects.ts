@@ -1,6 +1,11 @@
 import hero from "@/assets/rg/hero.jpg.asset.json";
+import heroPayphone from "@/assets/rg/hero-payphone.jpg.asset.json";
 import ycttiwy from "@/assets/rg/p2_2.jpg.asset.json";
 import ycttiwyDet from "@/assets/rg/p2_3.jpg.asset.json";
+import yctFull from "@/assets/rg/yctiwy-fullview.jpg.asset.json";
+import yctClose from "@/assets/rg/yctiwy-closeup.jpg.asset.json";
+import yctSketch from "@/assets/rg/yctiwy-sketch.png.asset.json";
+import yctDrawing from "@/assets/rg/yctiwy-drawing.png.asset.json";
 import trueWest from "@/assets/rg/p2_4.jpg.asset.json";
 import trueWestDet from "@/assets/rg/p2_5.jpg.asset.json";
 import anne from "@/assets/rg/p2_6.jpg.asset.json";
@@ -18,7 +23,10 @@ import illustration from "@/assets/rg/p4_3.jpg.asset.json";
 import models from "@/assets/rg/p4_4.jpg.asset.json";
 import renderings from "@/assets/rg/p4_5.jpg.asset.json";
 
-export const HERO_URL = hero.url;
+export const HERO_URL = heroPayphone.url;
+export const LEGACY_HERO_URL = hero.url;
+// silence unused
+void ycttiwy; void ycttiwyDet;
 
 export type Hub = "production-scenic" | "architecture" | "visualizations";
 
@@ -104,7 +112,7 @@ export const HUBS: {
     tagline: "Sets, staging, and world-building for theatre, film, and immersive events.",
     description:
       "Scenic environments where architecture becomes performance — walls that lean, floors that hold weather, spaces engineered for the story that will happen inside them.",
-    cover: ycttiwy.url,
+    cover: yctFull.url,
   },
   {
     slug: "architecture",
@@ -131,7 +139,7 @@ export const PROJECTS: Project[] = [
   {
     slug: "you-cant-take-it-with-you",
     hub: "production-scenic",
-    title: "You Can't Take It With You",
+    title: "You Can't Take It With You!",
     subtitle: "Deerfield Studio Theatre",
     mood: "warm",
     weight: "right",
@@ -144,12 +152,13 @@ export const PROJECTS: Project[] = [
       "A living-room set for the Sycamore household. Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character — mirroring the playful heart of the family who lives inside it.",
     pullQuote:
       "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family.",
-    notes: ["Conceptual sketch by Reid Graham."],
-    cover: ycttiwy.url,
-    collage: [ycttiwyDet.url],
+    cover: yctFull.url,
+    collage: [yctSketch.url, yctDrawing.url],
     media: [
-      { type: "image", src: ycttiwy.url, caption: "Full stage — Sycamore family living room" },
-      { type: "image", src: ycttiwyDet.url, caption: "Dining nook + conceptual sketch and wall elevations" },
+      { type: "image", src: yctFull.url, caption: "Full stage — Sycamore family living room" },
+      { type: "image", src: yctClose.url, caption: "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family." },
+      { type: "image", src: yctSketch.url, caption: "Conceptual sketch — slanted architecture and furniture layout" },
+      { type: "image", src: yctDrawing.url, caption: "Wall elevations F / G / H — technical drafting" },
     ],
   },
   {

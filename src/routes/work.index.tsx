@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import {
@@ -49,7 +50,7 @@ function ProjectsPage() {
         <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
           The Work
         </p>
-        <h1 className="font-display font-black uppercase tracking-[-0.03em] leading-[0.9] text-5xl md:text-8xl animate-reveal">
+        <h1 className="font-display font-black uppercase tracking-[-0.03em] leading-[0.9] text-5xl md:text-8xl">
           Projects
         </h1>
         <p className="mt-6 font-display font-light text-lg md:text-2xl text-foreground/80 max-w-3xl text-balance">
@@ -119,12 +120,23 @@ function ProjectTile({ project, index }: { project: Project; index: number }) {
     { x: "-10%", y: "44%", r: "-3deg" },
   ];
 
+  const [previewed, setPreviewed] = useState(false);
+  const handleClick = (e: React.MouseEvent) => {
+    if (typeof window !== "undefined" &&
+        window.matchMedia("(hover: none)").matches &&
+        !previewed) {
+      e.preventDefault();
+      setPreviewed(true);
+    }
+  };
+
   return (
     <li className="relative">
       <Link
         to="/work/$hub/$slug"
         params={{ hub: project.hub, slug: project.slug }}
-        className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
+        onClick={handleClick}
+        className={`group block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md ${previewed ? "is-previewed" : ""}`}
         aria-label={`Open ${project.title}`}
       >
         <div className="relative aspect-square">
@@ -137,7 +149,7 @@ function ProjectTile({ project, index }: { project: Project; index: number }) {
                 alt=""
                 aria-hidden
                 loading="lazy"
-                className="pointer-events-none absolute left-1/2 top-1/2 w-3/5 h-3/5 object-cover rounded-md shadow-2xl ring-1 ring-border opacity-0 -translate-x-1/2 -translate-y-1/2 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-cinematic z-10"
+                className="pointer-events-none absolute left-1/2 top-1/2 w-3/5 h-3/5 object-cover rounded-md shadow-2xl ring-1 ring-border opacity-0 -translate-x-1/2 -translate-y-1/2 scale-90 group-hover:opacity-100 group-hover:scale-100 group-[.is-previewed]:opacity-100 group-[.is-previewed]:scale-100 transition-all duration-700 ease-cinematic z-10"
                 style={{
                   transitionDelay: `${100 + i * 90}ms`,
                   ["--tx" as string]: o.x,
@@ -179,8 +191,8 @@ function ProjectTile({ project, index }: { project: Project; index: number }) {
                 </div>
               )}
             </div>
-            <span className="absolute top-4 right-4 pill opacity-0 group-hover:opacity-100 transition-opacity">
-              Enter →
+            <span className="absolute top-4 right-4 pill opacity-0 group-hover:opacity-100 group-[.is-previewed]:opacity-100 transition-opacity">
+              {previewed ? "Tap again →" : "Enter →"}
             </span>
           </div>
         </div>
