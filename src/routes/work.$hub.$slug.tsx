@@ -117,6 +117,7 @@ function ProjectPage() {
 
   const isStaging = project.slug === "staging-aesthetics";
   const isTab = project.slug === "tab-renaissance";
+  const isYctiwy = project.slug === "you-cant-take-it-with-you";
 
   return (
     <div className={`relative ${mood.wrap}`}>
