@@ -49,7 +49,7 @@ function ProjectsPage() {
         <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
           The Work
         </p>
-        <h1 className="font-display font-black uppercase tracking-[-0.03em] leading-[0.9] text-5xl md:text-8xl animate-reveal">
+        <h1 className="font-display font-black uppercase tracking-[-0.03em] leading-[0.9] text-5xl md:text-8xl">
           Projects
         </h1>
         <p className="mt-6 font-display font-light text-lg md:text-2xl text-foreground/80 max-w-3xl text-balance">
