@@ -83,7 +83,7 @@ function Home() {
             <img
               src={HERO_URL}
               alt="Payphone booth in an overgrown, neon-lit environment — pick up to reach Reid"
-              className="w-full h-full object-cover animate-slow-zoom"
+              className="w-full h-full object-cover"
             />
             {/* Ambient darken toward the split line */}
             <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-background via-background/40 to-transparent hidden md:block" />
