@@ -327,39 +327,99 @@ function ProjectPage() {
           </p>
         </div>
 
-        <div className="space-y-6">
-          {project.media.map((m: MediaItem, i: number) => (
-            <figure
-              key={i}
-              className={`group ${
-                isStaging
-                  ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"} animate-twitch`
-                  : ""
-              }`}
-              style={isStaging ? { animationDelay: `${i * 0.9}s` } : undefined}
-            >
+        {isYctiwy ? (
+          // Custom YCTIWU layout: closeup (left) + sketch (top-right, on dark) + drawing (bottom-right)
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Closeup, left column */}
+            <figure className="group">
               <button
                 type="button"
-                onClick={() => setLightbox(i)}
+                onClick={() => setLightbox(1)}
                 className="block w-full overflow-hidden rounded-md bg-secondary"
-                aria-label={m.caption ?? `Media ${i + 1}`}
+                aria-label={project.media[1].caption ?? "Closeup"}
               >
                 <img
-                  src={m.src}
-                  alt={m.caption ?? project.title}
+                  src={project.media[1].src}
+                  alt={project.media[1].caption ?? project.title}
                   loading="lazy"
-                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                 />
               </button>
-              {m.caption && (
-                <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
-                  {String(i + 1).padStart(2, "0")} — {m.caption}
-                </figcaption>
-              )}
+              <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed">
+                {project.media[1].caption}
+              </figcaption>
             </figure>
-          ))}
-        </div>
+
+            {/* Sketch + drawing stacked, right column */}
+            <div className="flex flex-col gap-6">
+              <figure className="group">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(2)}
+                  className="block w-full overflow-hidden rounded-md bg-black p-6 md:p-8"
+                  aria-label={project.media[2].caption ?? "Sketch"}
+                >
+                  <img
+                    src={project.media[2].src}
+                    alt={project.media[2].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+              <figure className="group">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(3)}
+                  className="block w-full overflow-hidden rounded-md bg-black p-6 md:p-8"
+                  aria-label={project.media[3].caption ?? "Drawing"}
+                >
+                  <img
+                    src={project.media[3].src}
+                    alt={project.media[3].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {project.media.map((m: MediaItem, i: number) => (
+              <figure
+                key={i}
+                className={`group ${
+                  isStaging
+                    ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"} animate-twitch`
+                    : ""
+                }`}
+                style={isStaging ? { animationDelay: `${i * 0.9}s` } : undefined}
+              >
+                <button
+                  type="button"
+                  onClick={() => setLightbox(i)}
+                  className="block w-full overflow-hidden rounded-md bg-secondary"
+                  aria-label={m.caption ?? `Media ${i + 1}`}
+                >
+                  <img
+                    src={m.src}
+                    alt={m.caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+                {m.caption && (
+                  <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
+                    {String(i + 1).padStart(2, "0")} — {m.caption}
+                  </figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        )}
       </section>
+
 
       {/* Back to feed + next */}
       <section className="border-t border-border px-6 md:px-12 lg:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
