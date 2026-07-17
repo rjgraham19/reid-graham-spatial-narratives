@@ -112,7 +112,7 @@ export const HUBS: {
     tagline: "Sets, staging, and world-building for theatre, film, and immersive events.",
     description:
       "Scenic environments where architecture becomes performance — walls that lean, floors that hold weather, spaces engineered for the story that will happen inside them.",
-    cover: ycttiwy.url,
+    cover: yctFull.url,
   },
   {
     slug: "architecture",
