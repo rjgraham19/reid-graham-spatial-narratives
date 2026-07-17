@@ -1,6 +1,11 @@
 import hero from "@/assets/rg/hero.jpg.asset.json";
+import heroPayphone from "@/assets/rg/hero-payphone.jpg.asset.json";
 import ycttiwy from "@/assets/rg/p2_2.jpg.asset.json";
 import ycttiwyDet from "@/assets/rg/p2_3.jpg.asset.json";
+import yctFull from "@/assets/rg/yctiwy-fullview.jpg.asset.json";
+import yctClose from "@/assets/rg/yctiwy-closeup.jpg.asset.json";
+import yctSketch from "@/assets/rg/yctiwy-sketch.png.asset.json";
+import yctDrawing from "@/assets/rg/yctiwy-drawing.png.asset.json";
 import trueWest from "@/assets/rg/p2_4.jpg.asset.json";
 import trueWestDet from "@/assets/rg/p2_5.jpg.asset.json";
 import anne from "@/assets/rg/p2_6.jpg.asset.json";
@@ -18,7 +23,10 @@ import illustration from "@/assets/rg/p4_3.jpg.asset.json";
 import models from "@/assets/rg/p4_4.jpg.asset.json";
 import renderings from "@/assets/rg/p4_5.jpg.asset.json";
 
-export const HERO_URL = hero.url;
+export const HERO_URL = heroPayphone.url;
+export const LEGACY_HERO_URL = hero.url;
+// silence unused
+void ycttiwy; void ycttiwyDet;
 
 export type Hub = "production-scenic" | "architecture" | "visualizations";
 
