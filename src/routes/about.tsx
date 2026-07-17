@@ -54,7 +54,7 @@ function About() {
           <p className="text-[10px] tracking-[0.35em] uppercase text-accent mb-8">
             Studio profile
           </p>
-          <h1 className="font-display text-5xl md:text-8xl font-extrabold tracking-tighter uppercase leading-[0.9] animate-reveal">
+          <h1 className="font-display text-5xl md:text-8xl font-extrabold tracking-tighter uppercase leading-[0.9]">
             Every room
             <br />
             has a story
