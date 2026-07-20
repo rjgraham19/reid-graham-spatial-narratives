@@ -150,30 +150,31 @@ function ProjectPage() {
       <header
         className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border"
       >
-        <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-          {project.subtitle}
-        </p>
+        {/* Tag pills — clickable, link back to filtered feed */}
+        {project.tags && project.tags.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {project.tags.map((t: ProjectTag) => (
+              <Link
+                key={t}
+                to="/work"
+                search={{ tag: t }}
+                className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+              >
+                {t.replace("/", " ")}
+              </Link>
+            ))}
+          </div>
+        )}
+
         <h1
           className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl"
         >
           {project.title}
         </h1>
 
-        {/* Tag pills — clickable, link back to filtered feed */}
-        {project.tags && project.tags.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.tags.map((t: ProjectTag) => (
-              <Link
-                key={t}
-                to="/work"
-                search={{ tag: t }}
-                className="pill hover:text-accent transition-colors"
-              >
-                #{t}
-              </Link>
-            ))}
-          </div>
-        )}
+        <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+          {project.subtitle}
+        </p>
 
         {project.notes && project.notes.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-2">
@@ -183,6 +184,7 @@ function ProjectPage() {
           </ul>
         )}
       </header>
+
 
 
       {/* Hero photo */}
@@ -206,15 +208,14 @@ function ProjectPage() {
       {/* Description + credits */}
       <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-10 border-b border-border">
         <div className="md:col-span-8">
-          <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
-            {project.description}
-          </p>
+          {!isYctiwy && (
+            <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+              {project.description}
+            </p>
+          )}
         </div>
         {project.credits && project.credits.length > 0 && (
           <div className="md:col-span-4">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-5">
-              Credits
-            </p>
             <ul className="space-y-3">
               {project.credits.map((c: Credit) => (
                 <li key={c.role} className="text-sm">
@@ -231,11 +232,12 @@ function ProjectPage() {
       {/* Pull quote */}
       {project.pullQuote && (
         <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-border">
-          <blockquote className="font-serif italic text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
-            “{project.pullQuote}”
+          <blockquote className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
+            {project.pullQuote}
           </blockquote>
         </section>
       )}
+
 
       {/* Special: TaB cellphone fade-up-from-white beat */}
       {isTab && (
@@ -470,11 +472,13 @@ function ProjectPage() {
       {/* Lightbox */}
       {lightbox != null && (
         <div
-          className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-lg flex flex-col"
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-2xl flex flex-col cursor-zoom-out"
           onClick={close}
+          role="dialog"
+          aria-modal="true"
         >
           <div className="flex items-center justify-between px-6 py-5">
-            <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/60">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/70">
               {String(lightbox + 1).padStart(2, "0")} / {String(project.media.length).padStart(2, "0")}
             </span>
             <button
@@ -489,45 +493,51 @@ function ProjectPage() {
               CLOSE ✕
             </button>
           </div>
-          <div
-            className="flex-1 flex items-center justify-center px-6 md:px-12 pb-6"
-            onClick={(e) => e.stopPropagation()}
-          >
+
+          <div className="flex-1 relative flex items-center justify-center px-6 md:px-16 pb-6 group/lb">
             <img
               src={project.media[lightbox].src}
               alt={project.media[lightbox].caption ?? project.title}
-              className="max-h-full max-w-full object-contain"
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-full max-w-full object-contain cursor-default"
             />
-          </div>
-          <div className="flex items-center justify-between px-6 pb-6 gap-4">
+
+            {/* Arrows over image — visible on hover (desktop), always on touch */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 step(-1);
               }}
-              className="pill"
+              aria-label="Previous"
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-xl flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 md:opacity-0 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
             >
-              ← PREV
+              ←
             </button>
-            {project.media[lightbox].caption && (
-              <p className="text-xs md:text-sm text-foreground/70 text-center flex-1 px-4">
-                {project.media[lightbox].caption}
-              </p>
-            )}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 step(1);
               }}
-              className="pill"
+              aria-label="Next"
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-xl flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 md:opacity-0 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
             >
-              NEXT →
+              →
             </button>
           </div>
+
+          {project.media[lightbox].caption && (
+            <p
+              className="text-xs md:text-sm text-foreground/80 text-center px-6 pb-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {project.media[lightbox].caption}
+            </p>
+          )}
         </div>
       )}
+
     </div>
   );
 }
