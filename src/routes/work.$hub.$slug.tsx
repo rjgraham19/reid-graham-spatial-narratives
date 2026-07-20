@@ -208,15 +208,14 @@ function ProjectPage() {
       {/* Description + credits */}
       <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-10 border-b border-border">
         <div className="md:col-span-8">
-          <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
-            {project.description}
-          </p>
+          {!isYctiwy && (
+            <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+              {project.description}
+            </p>
+          )}
         </div>
         {project.credits && project.credits.length > 0 && (
           <div className="md:col-span-4">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-5">
-              Credits
-            </p>
             <ul className="space-y-3">
               {project.credits.map((c: Credit) => (
                 <li key={c.role} className="text-sm">
@@ -233,11 +232,12 @@ function ProjectPage() {
       {/* Pull quote */}
       {project.pullQuote && (
         <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-border">
-          <blockquote className="font-serif italic text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
-            “{project.pullQuote}”
+          <blockquote className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
+            {project.pullQuote}
           </blockquote>
         </section>
       )}
+
 
       {/* Special: TaB cellphone fade-up-from-white beat */}
       {isTab && (
