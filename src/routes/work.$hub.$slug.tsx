@@ -46,39 +46,16 @@ export const Route = createFileRoute("/work/$hub/$slug")({
 
 // Palette + entrance tone per mood.
 const MOOD_STYLES: Record<Mood, { wrap: string; enter: string }> = {
-  noir: {
-    wrap: "bg-black text-foreground",
-    enter: "animate-fade-from-black",
-  },
-  warm: {
-    wrap: "bg-[hsl(28_25%_8%)] text-foreground",
-    enter: "animate-reveal",
-  },
-  desert: {
-    wrap: "bg-[hsl(30_10%_10%)] text-foreground",
-    enter: "animate-reveal",
-  },
-  cinema: {
-    wrap: "bg-[hsl(200_25%_6%)] text-foreground",
-    enter: "animate-reveal",
-  },
-  pop: {
-    wrap: "bg-[hsl(320_35%_10%)] text-foreground",
-    enter: "animate-pop-in",
-  },
-  concrete: {
-    wrap: "bg-[hsl(0_0%_7%)] text-foreground",
-    enter: "animate-reveal",
-  },
-  aqua: {
-    wrap: "bg-[hsl(195_35%_8%)] text-foreground",
-    enter: "animate-reveal",
-  },
-  theatrical: {
-    wrap: "bg-[hsl(280_20%_7%)] text-foreground",
-    enter: "animate-fade-from-black",
-  },
+  noir: { wrap: "bg-black text-foreground", enter: "animate-fade-from-black" },
+  warm: { wrap: "bg-black text-foreground", enter: "animate-reveal" },
+  desert: { wrap: "bg-black text-foreground", enter: "animate-reveal" },
+  cinema: { wrap: "bg-black text-foreground", enter: "animate-reveal" },
+  pop: { wrap: "bg-black text-foreground", enter: "animate-pop-in" },
+  concrete: { wrap: "bg-black text-foreground", enter: "animate-reveal" },
+  aqua: { wrap: "bg-black text-foreground", enter: "animate-reveal" },
+  theatrical: { wrap: "bg-black text-foreground", enter: "animate-fade-from-black" },
 };
+
 
 function ProjectPage() {
   const { project } = Route.useLoaderData();
