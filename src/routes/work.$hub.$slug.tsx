@@ -150,30 +150,31 @@ function ProjectPage() {
       <header
         className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border"
       >
-        <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-          {project.subtitle}
-        </p>
+        {/* Tag pills — clickable, link back to filtered feed */}
+        {project.tags && project.tags.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {project.tags.map((t: ProjectTag) => (
+              <Link
+                key={t}
+                to="/work"
+                search={{ tag: t }}
+                className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+              >
+                {t.replace("/", " ")}
+              </Link>
+            ))}
+          </div>
+        )}
+
         <h1
           className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl"
         >
           {project.title}
         </h1>
 
-        {/* Tag pills — clickable, link back to filtered feed */}
-        {project.tags && project.tags.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.tags.map((t: ProjectTag) => (
-              <Link
-                key={t}
-                to="/work"
-                search={{ tag: t }}
-                className="pill hover:text-accent transition-colors"
-              >
-                #{t}
-              </Link>
-            ))}
-          </div>
-        )}
+        <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+          {project.subtitle}
+        </p>
 
         {project.notes && project.notes.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-2">
@@ -183,6 +184,7 @@ function ProjectPage() {
           </ul>
         )}
       </header>
+
 
 
       {/* Hero photo */}
