@@ -499,15 +499,23 @@ function ProjectPage() {
             </button>
           </div>
 
-          <div className="flex-1 relative flex items-center justify-center px-6 md:px-16 pb-6 group/lb">
+          <div
+            className="flex-1 relative flex items-center justify-center px-6 md:px-16 pb-6 group/lb overflow-hidden"
+            onWheel={onWheelZoom}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
             <img
               src={project.media[lightbox].src}
               alt={project.media[lightbox].caption ?? project.title}
-              onClick={(e) => e.stopPropagation()}
-              className="max-h-full max-w-full object-contain cursor-default"
+              onClick={close}
+              style={{ transform: `scale(${zoom})`, transition: pinchStart.current ? "none" : "transform 120ms ease-out" }}
+              className="max-h-full max-w-full object-contain cursor-zoom-out select-none"
+              draggable={false}
             />
 
-            {/* Arrows over image — visible on hover (desktop), always on touch */}
+            {/* Chevron arrows over image */}
             <button
               type="button"
               onClick={(e) => {
@@ -515,9 +523,9 @@ function ProjectPage() {
                 step(-1);
               }}
               aria-label="Previous"
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-xl flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 md:opacity-0 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-2xl font-light flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
             >
-              ←
+              ‹
             </button>
             <button
               type="button"
@@ -526,9 +534,9 @@ function ProjectPage() {
                 step(1);
               }}
               aria-label="Next"
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-xl flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 md:opacity-0 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-2xl font-light flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
             >
-              →
+              ›
             </button>
           </div>
 
