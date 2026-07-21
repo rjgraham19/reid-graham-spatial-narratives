@@ -81,6 +81,9 @@ function ProjectPage() {
     [project.media.length],
   );
 
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => setZoom(1), [lightbox]);
+
   useEffect(() => {
     if (lightbox == null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -91,6 +94,31 @@ function ProjectPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [lightbox, close, step]);
+
+  const pinchStart = useRef<{ dist: number; zoom: number } | null>(null);
+  const onWheelZoom = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    setZoom((z) => Math.min(5, Math.max(1, z * (e.deltaY < 0 ? 1.1 : 1 / 1.1))));
+  }, []);
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStart.current = { dist: Math.hypot(dx, dy), zoom };
+    }
+  }, [zoom]);
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchStart.current) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const ratio = dist / pinchStart.current.dist;
+      setZoom(Math.min(5, Math.max(1, pinchStart.current.zoom * ratio)));
+    }
+  }, []);
+  const onTouchEnd = useCallback(() => {
+    pinchStart.current = null;
+  }, []);
 
   const isStaging = project.slug === "staging-aesthetics";
   const isTab = project.slug === "tab-renaissance";
