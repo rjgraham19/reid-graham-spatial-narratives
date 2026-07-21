@@ -15,10 +15,10 @@ export function SiteFooter() {
         <div className="md:col-span-3 space-y-3 text-sm text-foreground/70">
           <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50">Contact</p>
           <a
-            href="mailto:hello@reidgraham.design"
+            href="mailto:reidjgraham@gmail.com"
             className="block hover:text-accent transition-colors"
           >
-            hello@reidgraham.design
+            reidjgraham@gmail.com
           </a>
           <Link to="/contact" className="pill inline-flex mt-3">
             Start a conversation
@@ -35,7 +35,6 @@ export function SiteFooter() {
       </div>
       <div className="mt-12 pt-6 border-t border-border flex flex-wrap justify-between items-center text-[10px] tracking-[0.3em] uppercase text-foreground/50">
         <span>© {new Date().getFullYear()} Reid Graham</span>
-        <span>Brooklyn / Ann Arbor</span>
       </div>
     </footer>
   );

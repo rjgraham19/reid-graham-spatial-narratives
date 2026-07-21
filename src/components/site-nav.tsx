@@ -17,9 +17,9 @@ export function SiteNav({
     >
       <Link
         to="/"
-        className="font-display font-black uppercase tracking-[0.02em] text-sm md:text-base hover:text-accent transition-colors"
+        className="font-display font-black uppercase tracking-[0.02em] text-sm md:text-base hover:text-accent transition-colors whitespace-nowrap"
       >
-        Reid Graham
+        Reid Graham Design
       </Link>
       <ul className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
         {/* PROJECTS — primary, with hover dropdown of disciplines */}
@@ -63,17 +63,18 @@ export function SiteNav({
                   Experiential
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/work/$hub"
-                  params={{ hub: "visualizations" }}
-                  className="pill w-full justify-start"
-                >
-                  Visualizations
-                </Link>
-              </li>
             </ul>
           </div>
+        </li>
+        <li>
+          <Link
+            to="/work/$hub"
+            params={{ hub: "visualizations" }}
+            activeProps={{ className: "pill pill-active" }}
+            className="pill"
+          >
+            VISUALIZATIONS
+          </Link>
         </li>
         <li>
           <Link

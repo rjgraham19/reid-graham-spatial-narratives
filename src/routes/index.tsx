@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { HUBS, HERO_URL } from "@/lib/projects";
+import { HERO_URL } from "@/lib/projects";
+import { SiteNav } from "@/components/site-nav";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,17 +27,11 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
+      <SiteNav variant="top-transparent" />
       {/* Split screen: text left, phone-booth image right (right = clickable → /contact) */}
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
-        {/* LEFT — text + nav */}
-        <div className="relative z-10 flex flex-col justify-between px-6 md:px-12 lg:px-16 py-10 md:py-14">
-          <Link
-            to="/"
-            className="font-display font-black uppercase tracking-[0.04em] text-xs md:text-sm text-foreground/70 hover:text-accent transition-colors"
-          >
-            Reid Graham Design
-          </Link>
-
+        {/* LEFT — text */}
+        <div className="relative z-10 flex flex-col justify-end px-6 md:px-12 lg:px-16 py-10 md:py-14 pt-28 md:pt-32">
           <div>
             <h1
               className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
@@ -46,31 +41,7 @@ function Home() {
               <span className="block">Graham</span>
               <span className="block font-thin text-foreground/85">Design</span>
             </h1>
-
-            {/* Category labels — only appearance on the page */}
-            <ul className="mt-10 md:mt-14 flex flex-wrap gap-2 md:gap-3">
-              {HUBS.map((h) => (
-                <li key={h.slug}>
-                  <Link
-                    to="/work/$hub"
-                    params={{ hub: h.slug }}
-                    className="pill pill-lg"
-                  >
-                    {h.title.toUpperCase()}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link to="/contact" className="pill pill-lg">
-                  CONTACT
-                </Link>
-              </li>
-            </ul>
           </div>
-
-          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/40">
-            Spatial storytelling · Brooklyn / Chicago
-          </p>
         </div>
 
         {/* RIGHT — phone booth, clickable easter-egg → /contact */}
