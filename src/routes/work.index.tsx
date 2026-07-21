@@ -45,6 +45,22 @@ function ProjectsPage() {
       <SiteNav />
 
       <section className="px-6 md:px-12 lg:px-16 pt-32 md:pt-40 pb-16 md:pb-24">
+        <h1 className="font-display font-black uppercase tracking-tight text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-foreground mb-8 md:mb-10">
+          Projects
+        </h1>
+
+        <div className="flex flex-wrap gap-2 md:gap-3 mb-10 md:mb-14">
+          <FilterPill to={{}} active={!tag} label="All" />
+          {PROJECT_TAGS.map((t) => (
+            <FilterPill
+              key={t}
+              to={{ tag: t }}
+              active={tag === t}
+              label={formatTag(t)}
+            />
+          ))}
+        </div>
+
         {projects.length === 0 ? (
           <p className="text-foreground/60">No projects match this filter yet.</p>
         ) : (
@@ -62,7 +78,31 @@ function ProjectsPage() {
 }
 
 function formatTag(t: ProjectTag) {
-  return t.replace("/", " ");
+  return t.replace("/", " / ");
+}
+
+function FilterPill({
+  to,
+  active,
+  label,
+}: {
+  to: WorkSearch;
+  active: boolean;
+  label: string;
+}) {
+  return (
+    <Link
+      to="/work"
+      search={to}
+      className={`px-5 py-2 rounded-full border text-xs md:text-sm uppercase tracking-[0.2em] transition-colors ${
+        active
+          ? "bg-foreground text-black border-foreground"
+          : "border-foreground/30 text-foreground/80 hover:border-foreground hover:text-foreground"
+      }`}
+    >
+      {label}
+    </Link>
+  );
 }
 
 function ProjectTile({ project }: { project: Project }) {
@@ -79,28 +119,17 @@ function ProjectTile({ project }: { project: Project }) {
             src={project.cover}
             alt={project.title}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-[1.05] transition-all duration-[900ms] ease-cinematic"
+            className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.06] transition-all duration-[900ms] ease-cinematic"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-500" />
-          <div className="absolute bottom-3 left-3 right-3">
-            <h2 className="font-display font-black uppercase tracking-tight text-base md:text-lg leading-[0.95] text-balance group-hover:text-accent transition-colors line-clamp-2">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-95 group-hover:opacity-85 transition-opacity duration-500" />
+          <div className="absolute bottom-4 left-4 right-4">
+            <h2 className="font-display font-black uppercase tracking-tight text-xl md:text-2xl lg:text-3xl leading-[0.95] text-balance text-foreground group-hover:text-accent transition-colors line-clamp-3">
               {project.title}
             </h2>
-            {project.tags && project.tags.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {project.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="text-[9px] tracking-[0.25em] uppercase text-foreground/70 group-hover:text-foreground transition-colors"
-                  >
-                    {formatTag(t)}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </Link>
     </li>
   );
 }
+
