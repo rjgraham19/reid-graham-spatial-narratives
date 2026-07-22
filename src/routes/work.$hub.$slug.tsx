@@ -205,7 +205,7 @@ function ProjectPage() {
       </div>
 
       {/* Description + credits */}
-      <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-10 border-b border-border">
+      <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6 border-b border-border">
         <div className="md:col-span-8">
           {!isYctiwy && (
             <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
@@ -230,7 +230,7 @@ function ProjectPage() {
 
       {/* Pull quote */}
       {project.pullQuote && (
-        <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-border">
+        <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
           <blockquote className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
             {project.pullQuote}
           </blockquote>
@@ -318,19 +318,10 @@ function ProjectPage() {
       )}
 
       {/* Media gallery */}
-      <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
-        <div className="flex items-end justify-between mb-8">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50">
-            Media · {project.media.length}
-          </p>
-          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 hidden md:block">
-            Click any image to enlarge
-          </p>
-        </div>
-
+      <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
         {isYctiwy ? (
           // Custom YCTIWU layout: closeup (left) + sketch (top-right, on dark) + drawing (bottom-right)
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {/* Closeup, left column */}
             <figure className="group">
               <button
@@ -352,7 +343,7 @@ function ProjectPage() {
             </figure>
 
             {/* Sketch + drawing stacked, right column */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3 md:gap-4">
               <figure className="group">
                 <button
                   type="button"
@@ -386,7 +377,7 @@ function ProjectPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-3 md:space-y-4">
             {project.media.map((m: MediaItem, i: number) => (
               <figure
                 key={i}
