@@ -20,6 +20,7 @@ export function useScrollScrubVideo(
 
     let duration = 0;
     let raf = 0;
+    let lastProgress = -1;
 
     const onLoaded = () => {
       duration = video.duration || 0;
@@ -27,8 +28,10 @@ export function useScrollScrubVideo(
     video.addEventListener("loadedmetadata", onLoaded);
     if (video.readyState >= 1) onLoaded();
 
-    const update = () => {
-      raf = 0;
+    // Continuous rAF loop, not gated by scroll events — Lenis's own smoothing
+    // means scroll events don't fire at a steady rate, so we just read the
+    // current scroll position fresh every animation frame instead.
+    const tick = () => {
       const rect = wrapper.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
       const progress =
@@ -37,22 +40,21 @@ export function useScrollScrubVideo(
             ? 1
             : 0
           : Math.min(1, Math.max(0, -rect.top / total));
-      if (duration) video.currentTime = progress * duration;
-      onProgressRef.current?.(progress);
+
+      if (progress !== lastProgress) {
+        lastProgress = progress;
+        if (duration) video.currentTime = progress * duration;
+        onProgressRef.current?.(progress);
+      }
+
+      raf = requestAnimationFrame(tick);
     };
 
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(update);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    update();
+    raf = requestAnimationFrame(tick);
 
     return () => {
       video.removeEventListener("loadedmetadata", onLoaded);
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
+      cancelAnimationFrame(raf);
     };
   }, [wrapperRef, videoRef]);
 }
