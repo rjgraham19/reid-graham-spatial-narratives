@@ -123,6 +123,7 @@ function ProjectPage() {
   const isStaging = project.slug === "staging-aesthetics";
   const isTab = project.slug === "tab-renaissance";
   const isYctiwy = project.slug === "you-cant-take-it-with-you";
+  const isTrueWest = project.slug === "true-west";
 
   return (
     <div className={`relative ${mood.wrap}`}>
@@ -151,17 +152,31 @@ function ProjectPage() {
         )}
       </div>
 
-      {/* Header + hero — title stays pinned as the hero photo scrolls up from beneath it */}
-      <div className="relative">
-        <div className="sticky top-16 md:top-20 z-10 px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-16 md:pb-24 bg-gradient-to-b from-black via-black/80 to-transparent">
+      {isTrueWest ? (
+        /* True West — full-bleed hero with title + credits overlaid directly on the photo */
+        <div className="relative w-full h-[85vh] md:h-screen overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setLightbox(0)}
+            className="absolute inset-0 w-full h-full group"
+            aria-label={`Enlarge ${project.title}`}
+          >
+            <img
+              src={project.cover}
+              alt={project.title}
+              className={`w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${mood.enter}`}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-black/50 pointer-events-none" />
+          </button>
+
           {project.tags && project.tags.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
+            <div className="absolute top-24 md:top-28 left-6 md:left-12 lg:left-16 z-10 flex flex-wrap gap-2">
               {project.tags.map((t: ProjectTag) => (
                 <Link
                   key={t}
                   to="/work"
                   search={{ tag: t }}
-                  className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+                  className="text-[10px] tracking-[0.3em] uppercase text-foreground/80 hover:text-accent transition-colors"
                 >
                   {t.replace("/", " ")}
                 </Link>
@@ -169,64 +184,108 @@ function ProjectPage() {
             </div>
           )}
 
-          <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl">
-            {project.title}
-          </h1>
-
-          <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
-            {project.subtitle}
-          </p>
-
-          {project.notes && project.notes.length > 0 && (
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {project.notes.map((n: string, i: number) => (
-                <li key={i} className="pill">{n}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <figure className="relative z-0 px-6 md:px-12 lg:px-16">
-          <button
-            type="button"
-            onClick={() => setLightbox(0)}
-            className="block w-full h-[120vh] md:h-[130vh] overflow-hidden rounded-md bg-secondary group"
-            aria-label={`Enlarge ${project.title}`}
-          >
-            <img
-              src={project.cover}
-              alt={project.title}
-              className={`w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
-                isYctiwy ? "animate-image-drift-up" : mood.enter
-              }`}
-            />
-          </button>
-        </figure>
-      </div>
-
-      {/* Description + credits */}
-      <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6 border-b border-border">
-        <div className="md:col-span-8">
-          {!isYctiwy && (
-            <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
-              {project.description}
+          <div className="absolute top-24 md:top-28 right-6 md:right-12 lg:right-16 z-10 max-w-xl text-right">
+            <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-7xl text-balance">
+              {project.title}
+            </h1>
+            <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/70">
+              {project.subtitle}
             </p>
-          )}
-        </div>
-        {project.credits && project.credits.length > 0 && (
-          <div className="md:col-span-4">
-            <ul className="space-y-3">
+          </div>
+
+          {project.credits && project.credits.length > 0 && (
+            <ul className="absolute bottom-8 md:bottom-12 right-6 md:right-12 lg:right-16 z-10 space-y-1.5 text-right">
               {project.credits.map((c: Credit) => (
-                <li key={c.role} className="text-sm">
-                  <span className="text-foreground/50">{c.role}</span>
-                  <br />
+                <li key={c.role} className="text-xs md:text-sm">
+                  <span className="mr-2 font-semibold uppercase tracking-wide text-foreground/70">
+                    {c.role}:
+                  </span>
                   <span className="text-foreground">{c.name}</span>
                 </li>
               ))}
             </ul>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Header + hero — title stays pinned as the hero photo scrolls up from beneath it */}
+          <div className="relative">
+            <div className="sticky top-16 md:top-20 z-10 px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-16 md:pb-24 bg-gradient-to-b from-black via-black/80 to-transparent">
+              {project.tags && project.tags.length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {project.tags.map((t: ProjectTag) => (
+                    <Link
+                      key={t}
+                      to="/work"
+                      search={{ tag: t }}
+                      className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+                    >
+                      {t.replace("/", " ")}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl">
+                {project.title}
+              </h1>
+
+              <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+                {project.subtitle}
+              </p>
+
+              {project.notes && project.notes.length > 0 && (
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {project.notes.map((n: string, i: number) => (
+                    <li key={i} className="pill">{n}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <figure className="relative z-0 px-6 md:px-12 lg:px-16">
+              <button
+                type="button"
+                onClick={() => setLightbox(0)}
+                className="block w-full h-[120vh] md:h-[130vh] overflow-hidden rounded-md bg-secondary group"
+                aria-label={`Enlarge ${project.title}`}
+              >
+                <img
+                  src={project.cover}
+                  alt={project.title}
+                  className={`w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
+                    isYctiwy ? "animate-image-drift-up" : mood.enter
+                  }`}
+                />
+              </button>
+            </figure>
           </div>
-        )}
-      </section>
+
+          {/* Description + credits */}
+          <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6 border-b border-border">
+            <div className="md:col-span-8">
+              {!isYctiwy && (
+                <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+                  {project.description}
+                </p>
+              )}
+            </div>
+            {project.credits && project.credits.length > 0 && (
+              <div className="md:col-span-4">
+                <ul className="space-y-3">
+                  {project.credits.map((c: Credit) => (
+                    <li key={c.role} className="text-sm">
+                      <span className="text-foreground/50">{c.role}</span>
+                      <br />
+                      <span className="text-foreground">{c.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+        </>
+      )}
 
       {/* Pull quote */}
       {project.pullQuote && (
@@ -235,6 +294,93 @@ function ProjectPage() {
             {project.pullQuote}
           </blockquote>
         </section>
+      )}
+
+      {/* Special: True West — dual-world comparison + plan diagrams */}
+      {isTrueWest && (
+        <>
+          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
+            <div className="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-3 md:gap-4">
+              <figure className="group h-full animate-slide-from-left">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(1)}
+                  className="block h-full w-full overflow-hidden rounded-md bg-secondary"
+                  aria-label={project.media[1].caption ?? "True West — second act"}
+                >
+                  <img
+                    src={project.media[1].src}
+                    alt={project.media[1].caption ?? project.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+
+              <div className="flex flex-col">
+                <figure className="group animate-slide-from-right">
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(2)}
+                    className="block w-full overflow-hidden bg-secondary"
+                    aria-label={project.media[2].caption ?? "Rendered model study"}
+                  >
+                    <img
+                      src={project.media[2].src}
+                      alt={project.media[2].caption ?? project.title}
+                      loading="lazy"
+                      className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                    />
+                  </button>
+                </figure>
+                <figure className="group animate-slide-from-right" style={{ animationDelay: "0.15s" }}>
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(3)}
+                    className="block w-full overflow-hidden bg-secondary"
+                    aria-label={project.media[3].caption ?? "Rendered model study"}
+                  >
+                    <img
+                      src={project.media[3].src}
+                      alt={project.media[3].caption ?? project.title}
+                      loading="lazy"
+                      className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                    />
+                  </button>
+                </figure>
+              </div>
+            </div>
+
+            {project.dualityLines && (
+              <div className="mt-8 md:mt-10 max-w-3xl space-y-3">
+                <p className="font-serif italic text-lg md:text-xl leading-relaxed text-foreground/90">
+                  {project.dualityLines[0]}
+                </p>
+                <p className="font-serif italic text-lg md:text-xl leading-relaxed text-foreground/90">
+                  {project.dualityLines[1]}
+                </p>
+              </div>
+            )}
+          </section>
+
+          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
+            <figure className="group">
+              <button
+                type="button"
+                onClick={() => setLightbox(4)}
+                className="block w-full overflow-hidden rounded-md bg-secondary"
+                aria-label={project.media[4].caption ?? "Plan comparison diagram"}
+              >
+                <img
+                  src={project.media[4].src}
+                  alt={project.media[4].caption ?? project.title}
+                  loading="lazy"
+                  className="w-full h-auto object-contain group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                />
+              </button>
+            </figure>
+          </section>
+        </>
       )}
 
 
@@ -318,6 +464,7 @@ function ProjectPage() {
       )}
 
       {/* Media gallery */}
+      {!isTrueWest && (
       <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
         {isYctiwy ? (
           // Custom YCTIWU layout: closeup (left) + sketch (top-right, on dark) + drawing (bottom-right)
@@ -411,6 +558,7 @@ function ProjectPage() {
           </div>
         )}
       </section>
+      )}
 
 
       {/* Back to feed + next */}

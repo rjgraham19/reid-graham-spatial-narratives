@@ -8,6 +8,9 @@ import yctSketch from "@/assets/rg/yctiwy-sketch.png";
 import yctDrawing from "@/assets/rg/yctiwy-drawing.png";
 import trueWest from "@/assets/rg/true-west-full.jpg";
 import trueWestDet from "@/assets/rg/true-west-detail.jpg";
+import trueWestRender1 from "@/assets/rg/true-west-render1.jpg";
+import trueWestRender2 from "@/assets/rg/true-west-render2.jpg";
+import trueWestDiagram from "@/assets/rg/true-west-diagram.png";
 import anne from "@/assets/rg/anne-frank-full.jpg";
 import anneDet from "@/assets/rg/anne-frank-detail.jpg";
 import reshuf from "@/assets/rg/reshuffling-full.jpg";
@@ -95,6 +98,8 @@ export type Project = {
   weight?: "left" | "right";
   /** Discipline tags — a project can span multiple. */
   tags?: ProjectTag[];
+  /** Two-line thematic duality statement (used on True West). */
+  dualityLines?: [string, string];
 };
 
 export const HUBS: {
@@ -177,11 +182,18 @@ export const PROJECTS: Project[] = [
       "The Wild West is honest — untamed and uncivilized. Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery. A suburban kitchen unravels as the wild west comes pouring in.",
     pullQuote:
       "A suburban kitchen unravels as the wild west comes pouring in.",
+    dualityLines: [
+      "The Wild West is honest — untamed and uncivilized.",
+      "Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery.",
+    ],
     cover: trueWest,
     collage: [trueWestDet],
     media: [
       { type: "image", src: trueWest, caption: "Full set — the suburban kitchen at rest" },
-      { type: "image", src: trueWestDet, caption: "Second act + rendered model studies (Natural vs. Artificial Lushness)" },
+      { type: "image", src: trueWestDet, caption: "Second act — the wild west pours in" },
+      { type: "image", src: trueWestRender1, caption: "Rendered model study — axonometric view" },
+      { type: "image", src: trueWestRender2, caption: "Rendered model study — second axonometric view" },
+      { type: "image", src: trueWestDiagram, caption: "Suburbia — Artificial Lushness / Wild West — Natural: plan comparison" },
     ],
   },
   {
