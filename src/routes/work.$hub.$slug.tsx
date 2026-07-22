@@ -219,38 +219,38 @@ function ProjectPage() {
         </figure>
       </div>
 
-      {/* Lollapalooza — record-player scroll-scrub video, integrated into a white scene */}
+      {/* Lollapalooza — record-player scroll-scrub video, full-bleed background with text overlaid on top */}
       {isLollapalooza && (
-        <div ref={recordScrubWrapperRef} className="relative w-full h-[350vh] bg-white">
-          <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] bg-white">
+          <div className="sticky top-0 h-screen w-full overflow-hidden">
             <video
               ref={recordScrubVideoRef}
               src="/lollapalooza-recordplayer.mp4"
               muted
               playsInline
               preload="auto"
-              className="max-h-[85vh] max-w-[70%] md:max-w-[60%] object-contain"
+              className="absolute inset-0 h-full w-full object-cover"
             />
 
-            {/* Text appears in the negative space to the right of the record player */}
-            <div className="absolute right-6 md:right-16 lg:right-24 top-1/2 -translate-y-1/2 max-w-xs md:max-w-sm text-right">
+            {/* Text overlaid on top of the video, right side */}
+            <div className="absolute right-6 md:right-16 lg:right-24 top-1/2 -translate-y-1/2 z-10 max-w-xs md:max-w-md text-right">
               <p
-                className="absolute right-0 top-0 w-full font-display font-light text-black text-xl md:text-3xl leading-snug text-balance transition-opacity duration-200"
+                className="absolute right-0 top-0 w-full font-display font-light text-black text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
                 style={{ opacity: segmentOpacity(recordScrubProgress, 0.05, 0.3) }}
               >
-                PLACEHOLDER — first beat of copy as the needle drops
+                Copy pending — first beat
               </p>
               <p
-                className="absolute right-0 top-0 w-full font-display font-light text-black text-xl md:text-3xl leading-snug text-balance transition-opacity duration-200"
+                className="absolute right-0 top-0 w-full font-display font-light text-black text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
                 style={{ opacity: segmentOpacity(recordScrubProgress, 0.4, 0.65) }}
               >
-                PLACEHOLDER — second beat of copy, mid-scroll
+                Copy pending — second beat
               </p>
               <p
-                className="absolute right-0 top-0 w-full font-display font-light text-black text-xl md:text-3xl leading-snug text-balance transition-opacity duration-200"
+                className="absolute right-0 top-0 w-full font-display font-light text-black text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
                 style={{ opacity: segmentOpacity(recordScrubProgress, 0.75, 0.95) }}
               >
-                PLACEHOLDER — closing beat of copy
+                Copy pending — closing beat
               </p>
             </div>
           </div>
