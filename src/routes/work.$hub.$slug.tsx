@@ -124,6 +124,7 @@ function ProjectPage() {
   const isTab = project.slug === "tab-renaissance";
   const isYctiwy = project.slug === "you-cant-take-it-with-you";
   const isTrueWest = project.slug === "true-west";
+  const isLollapalooza = project.slug === "lollapalooza";
 
   return (
     <div className={`relative ${mood.wrap}`}>
@@ -204,6 +205,17 @@ function ProjectPage() {
           </button>
         </figure>
       </div>
+
+      {/* Reserved slot: Lollapalooza record-player scroll animation — the second thing on the page, right after the hero. Placeholder until frame images are uploaded. */}
+      {isLollapalooza && (
+        <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-border">
+          <div className="flex items-center justify-center h-[60vh] rounded-md border border-dashed border-border/60 bg-secondary/30 text-center px-6">
+            <p className="text-xs md:text-sm tracking-[0.2em] uppercase text-foreground/40">
+              Record player scroll animation — reserved slot, pending frame upload
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Description + credits */}
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6 border-b border-border">

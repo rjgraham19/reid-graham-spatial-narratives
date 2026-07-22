@@ -140,6 +140,24 @@ export const HUBS: {
 ];
 
 export const PROJECTS: Project[] = [
+  // ─── Experiential highlight (appears first under the Experiential tag) ──
+  {
+    slug: "lollapalooza",
+    hub: "production-scenic",
+    title: "Lollapalooza",
+    subtitle: "PLACEHOLDER — venue/context line pending",
+    mood: "pop",
+    weight: "right",
+    tags: ["Experiential"],
+    // PLACEHOLDER copy — replace once real project copy is provided.
+    description:
+      "PLACEHOLDER description — Y2K/futurism-themed experiential work. Replace with real project copy.",
+    cover: heroPayphone,
+    media: [
+      { type: "image", src: heroPayphone, caption: "PLACEHOLDER hero image — replace with real Lollapalooza photo" },
+    ],
+  },
+
   // ─── Production / Scenic (order per spec) ────────────────────────
   {
     slug: "you-cant-take-it-with-you",
