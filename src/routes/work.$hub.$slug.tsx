@@ -186,11 +186,11 @@ function ProjectPage() {
           )}
         </div>
 
-        <figure className="relative z-0 -mt-[13vh] md:-mt-[14vh] px-6 md:px-12 lg:px-16">
+        <figure className="relative z-0 px-6 md:px-12 lg:px-16">
           <button
             type="button"
             onClick={() => setLightbox(0)}
-            className="block w-full h-[43vh] md:h-[50vh] overflow-hidden rounded-md bg-secondary group"
+            className="block w-full h-[120vh] md:h-[130vh] overflow-hidden rounded-md bg-secondary group"
             aria-label={`Enlarge ${project.title}`}
           >
             <img
