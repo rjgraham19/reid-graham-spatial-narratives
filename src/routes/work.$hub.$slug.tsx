@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import {
   HUBS,
   PROJECTS,
@@ -126,6 +127,18 @@ function ProjectPage() {
   const isTrueWest = project.slug === "true-west";
   const isLollapalooza = project.slug === "lollapalooza";
 
+  const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
+  const recordScrubVideoRef = useRef<HTMLVideoElement>(null);
+  const [recordScrubProgress, setRecordScrubProgress] = useState(0);
+  useScrollScrubVideo(recordScrubWrapperRef, recordScrubVideoRef, setRecordScrubProgress);
+
+  const segmentOpacity = (p: number, start: number, end: number, fade = 0.06) => {
+    if (p < start - fade || p > end + fade) return 0;
+    if (p < start) return (p - (start - fade)) / fade;
+    if (p > end) return 1 - (p - end) / fade;
+    return 1;
+  };
+
   return (
     <div className={`relative ${mood.wrap}`}>
       <SiteNav />
@@ -206,15 +219,42 @@ function ProjectPage() {
         </figure>
       </div>
 
-      {/* Reserved slot: Lollapalooza record-player scroll animation — the second thing on the page, right after the hero. Placeholder until frame images are uploaded. */}
+      {/* Lollapalooza — record-player scroll-scrub video, integrated into a white scene */}
       {isLollapalooza && (
-        <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-border">
-          <div className="flex items-center justify-center h-[60vh] rounded-md border border-dashed border-border/60 bg-secondary/30 text-center px-6">
-            <p className="text-xs md:text-sm tracking-[0.2em] uppercase text-foreground/40">
-              Record player scroll animation — reserved slot, pending frame upload
-            </p>
+        <div ref={recordScrubWrapperRef} className="relative w-full h-[350vh] bg-white">
+          <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+            <video
+              ref={recordScrubVideoRef}
+              src="/lollapalooza-recordplayer.mp4"
+              muted
+              playsInline
+              preload="auto"
+              className="max-h-[85vh] max-w-[70%] md:max-w-[60%] object-contain"
+            />
+
+            {/* Text appears in the negative space to the right of the record player */}
+            <div className="absolute right-6 md:right-16 lg:right-24 top-1/2 -translate-y-1/2 max-w-xs md:max-w-sm text-right">
+              <p
+                className="absolute right-0 top-0 w-full font-display font-light text-black text-xl md:text-3xl leading-snug text-balance transition-opacity duration-200"
+                style={{ opacity: segmentOpacity(recordScrubProgress, 0.05, 0.3) }}
+              >
+                PLACEHOLDER — first beat of copy as the needle drops
+              </p>
+              <p
+                className="absolute right-0 top-0 w-full font-display font-light text-black text-xl md:text-3xl leading-snug text-balance transition-opacity duration-200"
+                style={{ opacity: segmentOpacity(recordScrubProgress, 0.4, 0.65) }}
+              >
+                PLACEHOLDER — second beat of copy, mid-scroll
+              </p>
+              <p
+                className="absolute right-0 top-0 w-full font-display font-light text-black text-xl md:text-3xl leading-snug text-balance transition-opacity duration-200"
+                style={{ opacity: segmentOpacity(recordScrubProgress, 0.75, 0.95) }}
+              >
+                PLACEHOLDER — closing beat of copy
+              </p>
+            </div>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Description + credits */}
