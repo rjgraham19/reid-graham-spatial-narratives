@@ -151,64 +151,115 @@ function ProjectPage() {
         )}
       </div>
 
-      {/* Header + hero */}
-      <header
-        className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border"
-      >
-        {/* Tag pills — clickable, link back to filtered feed */}
-        {project.tags && project.tags.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {project.tags.map((t: ProjectTag) => (
-              <Link
-                key={t}
-                to="/work"
-                search={{ tag: t }}
-                className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
-              >
-                {t.replace("/", " ")}
-              </Link>
-            ))}
+      {isYctiwy ? (
+        /* You Can't Take It With You — title stays pinned as the hero photo scrolls up from beneath it */
+        <div className="relative">
+          <div className="sticky top-16 md:top-20 z-10 px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-16 md:pb-24 bg-gradient-to-b from-black via-black/80 to-transparent">
+            {project.tags && project.tags.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {project.tags.map((t: ProjectTag) => (
+                  <Link
+                    key={t}
+                    to="/work"
+                    search={{ tag: t }}
+                    className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+                  >
+                    {t.replace("/", " ")}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl">
+              {project.title}
+            </h1>
+
+            <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+              {project.subtitle}
+            </p>
+
+            {project.notes && project.notes.length > 0 && (
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {project.notes.map((n: string, i: number) => (
+                  <li key={i} className="pill">{n}</li>
+                ))}
+              </ul>
+            )}
           </div>
-        )}
 
-        <h1
-          className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl"
-        >
-          {project.title}
-        </h1>
+          <figure className="relative z-0 -mt-[38vh] md:-mt-[42vh] px-6 md:px-12 lg:px-16">
+            <button
+              type="button"
+              onClick={() => setLightbox(0)}
+              className="block w-full h-[130vh] md:h-[150vh] overflow-hidden rounded-md bg-secondary group"
+              aria-label={`Enlarge ${project.title}`}
+            >
+              <img
+                src={project.cover}
+                alt={project.title}
+                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic animate-image-drift-up"
+              />
+            </button>
+          </figure>
+        </div>
+      ) : (
+        <>
+          {/* Header + hero */}
+          <header
+            className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-12 md:pb-16 border-b border-border"
+          >
+            {/* Tag pills — clickable, link back to filtered feed */}
+            {project.tags && project.tags.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {project.tags.map((t: ProjectTag) => (
+                  <Link
+                    key={t}
+                    to="/work"
+                    search={{ tag: t }}
+                    className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+                  >
+                    {t.replace("/", " ")}
+                  </Link>
+                ))}
+              </div>
+            )}
 
-        <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
-          {project.subtitle}
-        </p>
+            <h1
+              className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl"
+            >
+              {project.title}
+            </h1>
 
-        {project.notes && project.notes.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {project.notes.map((n: string, i: number) => (
-              <li key={i} className="pill">{n}</li>
-            ))}
-          </ul>
-        )}
-      </header>
+            <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+              {project.subtitle}
+            </p>
 
+            {project.notes && project.notes.length > 0 && (
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {project.notes.map((n: string, i: number) => (
+                  <li key={i} className="pill">{n}</li>
+                ))}
+              </ul>
+            )}
+          </header>
 
-
-      {/* Hero photo */}
-      <figure className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14">
-        <button
-          type="button"
-          onClick={() => setLightbox(0)}
-          className="block w-full overflow-hidden rounded-md bg-secondary group"
-          aria-label={`Enlarge ${project.title}`}
-        >
-          <img
-            src={project.cover}
-            alt={project.title}
-            className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
-              isYctiwy ? "animate-image-drift-up" : mood.enter
-            }`}
-          />
-        </button>
-      </figure>
+          {/* Hero photo */}
+          <figure className="px-6 md:px-12 lg:px-16 pt-10 md:pt-14">
+            <button
+              type="button"
+              onClick={() => setLightbox(0)}
+              className="block w-full overflow-hidden rounded-md bg-secondary group"
+              aria-label={`Enlarge ${project.title}`}
+            >
+              <img
+                src={project.cover}
+                alt={project.title}
+                className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${mood.enter}`}
+              />
+            </button>
+          </figure>
+        </>
+      )}
 
       {/* Description + credits */}
       <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-10 border-b border-border">
