@@ -1,29 +1,29 @@
 import hero from "@/assets/rg/hero.jpg.asset.json";
-import heroPayphone from "@/assets/rg/hero-payphone.jpg.asset.json";
+import heroPayphone from "@/assets/rg/hero-payphone.jpg";
 import ycttiwy from "@/assets/rg/p2_2.jpg.asset.json";
 import ycttiwyDet from "@/assets/rg/p2_3.jpg.asset.json";
-import yctFull from "@/assets/rg/yctiwy-fullview.jpg.asset.json";
-import yctClose from "@/assets/rg/yctiwy-closeup.jpg.asset.json";
-import yctSketch from "@/assets/rg/yctiwy-sketch.png.asset.json";
-import yctDrawing from "@/assets/rg/yctiwy-drawing.png.asset.json";
-import trueWest from "@/assets/rg/p2_4.jpg.asset.json";
-import trueWestDet from "@/assets/rg/p2_5.jpg.asset.json";
-import anne from "@/assets/rg/p2_6.jpg.asset.json";
-import anneDet from "@/assets/rg/p2_7.jpg.asset.json";
-import reshuf from "@/assets/rg/p2_8.jpg.asset.json";
-import tab from "@/assets/rg/p2_9.jpg.asset.json";
+import yctFull from "@/assets/rg/yctiwy-fullview.jpg";
+import yctClose from "@/assets/rg/yctiwy-closeup.jpg";
+import yctSketch from "@/assets/rg/yctiwy-sketch.png";
+import yctDrawing from "@/assets/rg/yctiwy-drawing.png";
+import trueWest from "@/assets/rg/true-west-full.jpg";
+import trueWestDet from "@/assets/rg/true-west-detail.jpg";
+import anne from "@/assets/rg/anne-frank-full.jpg";
+import anneDet from "@/assets/rg/anne-frank-detail.jpg";
+import reshuf from "@/assets/rg/reshuffling-full.jpg";
+import tab from "@/assets/rg/tab-full.jpg";
 import fieldHouse from "@/assets/rg/p3_2.jpg.asset.json";
 import fieldHouseDet from "@/assets/rg/p3_3.jpg.asset.json";
 import townHouse from "@/assets/rg/p3_4.jpg.asset.json";
 import townHouseDet from "@/assets/rg/p3_5.jpg.asset.json";
-import exchange from "@/assets/rg/p3_6.jpg.asset.json";
+import exchange from "@/assets/rg/exchange-render.jpg";
 import staging from "@/assets/rg/p3_7.jpg.asset.json";
 import drafting from "@/assets/rg/p4_2.jpg.asset.json";
 import illustration from "@/assets/rg/p4_3.jpg.asset.json";
 import models from "@/assets/rg/p4_4.jpg.asset.json";
 import renderings from "@/assets/rg/p4_5.jpg.asset.json";
 
-export const HERO_URL = heroPayphone.url;
+export const HERO_URL = heroPayphone;
 export const LEGACY_HERO_URL = hero.url;
 // silence unused
 void ycttiwy; void ycttiwyDet;
@@ -112,7 +112,7 @@ export const HUBS: {
     tagline: "Sets, staging, and world-building for theatre, film, and immersive events.",
     description:
       "Scenic environments where architecture becomes performance — walls that lean, floors that hold weather, spaces engineered for the story that will happen inside them.",
-    cover: yctFull.url,
+    cover: yctFull,
   },
   {
     slug: "architecture",
@@ -152,13 +152,13 @@ export const PROJECTS: Project[] = [
       "A living-room set for the Sycamore household. Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character — mirroring the playful heart of the family who lives inside it.",
     pullQuote:
       "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family.",
-    cover: yctFull.url,
-    collage: [yctSketch.url, yctDrawing.url],
+    cover: yctFull,
+    collage: [yctSketch, yctDrawing],
     media: [
-      { type: "image", src: yctFull.url, caption: "Full stage — Sycamore family living room" },
-      { type: "image", src: yctClose.url, caption: "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family." },
-      { type: "image", src: yctSketch.url, caption: "Conceptual sketch — slanted architecture and furniture layout" },
-      { type: "image", src: yctDrawing.url, caption: "Wall elevations F / G / H — technical drafting" },
+      { type: "image", src: yctFull, caption: "Full stage — Sycamore family living room" },
+      { type: "image", src: yctClose, caption: "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family." },
+      { type: "image", src: yctSketch, caption: "Conceptual sketch — slanted architecture and furniture layout" },
+      { type: "image", src: yctDrawing, caption: "Wall elevations F / G / H — technical drafting" },
     ],
   },
   {
@@ -177,11 +177,11 @@ export const PROJECTS: Project[] = [
       "The Wild West is honest — untamed and uncivilized. Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery. A suburban kitchen unravels as the wild west comes pouring in.",
     pullQuote:
       "A suburban kitchen unravels as the wild west comes pouring in.",
-    cover: trueWest.url,
-    collage: [trueWestDet.url],
+    cover: trueWest,
+    collage: [trueWestDet],
     media: [
-      { type: "image", src: trueWest.url, caption: "Full set — the suburban kitchen at rest" },
-      { type: "image", src: trueWestDet.url, caption: "Second act + rendered model studies (Natural vs. Artificial Lushness)" },
+      { type: "image", src: trueWest, caption: "Full set — the suburban kitchen at rest" },
+      { type: "image", src: trueWestDet, caption: "Second act + rendered model studies (Natural vs. Artificial Lushness)" },
     ],
   },
   {
@@ -201,11 +201,11 @@ export const PROJECTS: Project[] = [
     pullQuote:
       "Skeletal framing and deteriorating wood slatting — a tribute to Anne and her diary's enduring legacy.",
     notes: ["Conceptual sketch by Reid Graham."],
-    cover: anne.url,
-    collage: [anneDet.url],
+    cover: anne,
+    collage: [anneDet],
     media: [
-      { type: "image", src: anne.url, caption: "Full attic set — skeletal framing over the annex" },
-      { type: "image", src: anneDet.url, caption: "Kitchen detail with conceptual sketch, elevations and ground plan" },
+      { type: "image", src: anne, caption: "Full attic set — skeletal framing over the annex" },
+      { type: "image", src: anneDet, caption: "Kitchen detail with conceptual sketch, elevations and ground plan" },
     ],
   },
   {
@@ -221,10 +221,10 @@ export const PROJECTS: Project[] = [
     ],
     description:
       "A short film reimagining of Georges Méliès' The Living Playing Cards, brought to life through Virtual Production Technology.",
-    cover: reshuf.url,
+    cover: reshuf,
     tags: ["Production/Scenic", "Experiential"],
     media: [
-      { type: "image", src: reshuf.url, caption: "On-set: virtual production stage with painted flats and camera rig" },
+      { type: "image", src: reshuf, caption: "On-set: virtual production stage with painted flats and camera rig" },
     ],
   },
   {
@@ -242,10 +242,10 @@ export const PROJECTS: Project[] = [
     ],
     description:
       "An immersive, experiential design for Taubman College's annual Beaux-Arts Ball, reimagining the Renaissance as a timeless expression of creative transformation and continual innovation. Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative and marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials. A pop-up installation, playfully nodding to our event's shared name with TaB soda, became an engaging experiential marketing moment that built anticipation for the event.",
-    cover: tab.url,
+    cover: tab,
     tags: ["Production/Scenic", "Experiential"],
     media: [
-      { type: "image", src: tab.url, caption: "Installation, branding, PINK FOUNTAIN diagram, and TaB Soda pop-up" },
+      { type: "image", src: tab, caption: "Installation, branding, PINK FOUNTAIN diagram, and TaB Soda pop-up" },
     ],
   },
 
@@ -291,9 +291,9 @@ export const PROJECTS: Project[] = [
     weight: "left",
     description:
       "Amid a climate crisis in 2114, the scarcity of clean water revives human reverence for its powers, facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
-    cover: exchange.url,
+    cover: exchange,
     media: [
-      { type: "image", src: exchange.url, caption: "River-status map, Algae Purification Station, section and interior vessels (RIBI Oasis, Wavescapes, Steam Sanctuary)" },
+      { type: "image", src: exchange, caption: "River-status map, Algae Purification Station, section and interior vessels (RIBI Oasis, Wavescapes, Steam Sanctuary)" },
     ],
   },
   {
