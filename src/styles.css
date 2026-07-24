@@ -76,6 +76,27 @@
   --foreground: hsl(0 0% 98%);
 }
 
+/* Light-mode override — toggled via the dark/light switch (currently test-enabled
+   on the Contact page only). Mirrors duncanbrazzil.com's approach: a single class
+   on <html> flips the theme tokens, everything using them updates automatically. */
+html.white {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(0 0% 8%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(0 0% 8%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(0 0% 8%);
+  --primary: hsl(0 0% 8%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(0 0% 96%);
+  --secondary-foreground: hsl(0 0% 8%);
+  --muted: hsl(0 0% 96%);
+  --muted-foreground: hsl(0 0% 8% / 0.6);
+  --border: hsl(0 0% 8% / 0.12);
+  --input: hsl(0 0% 8% / 0.16);
+  --ash: hsl(0 0% 95%);
+}
+
 @keyframes reveal-up {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
@@ -261,6 +282,24 @@
     inset 1px 1px #292929,
     inset -2px -2px #ffffff,
     inset 2px 2px rgb(158, 158, 158);
+}
+
+/* Plain bold nav links — replaces the pill/button treatment on the main nav */
+@utility nav-link {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+  white-space: nowrap;
+  transition: color 0.25s var(--ease-cinematic);
+}
+.nav-link:hover {
+  color: var(--color-accent);
+}
+@utility nav-link-active {
+  color: var(--color-accent);
 }
 
 @layer base {

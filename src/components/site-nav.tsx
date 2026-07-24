@@ -21,14 +21,14 @@ export function SiteNav({
       >
         Reid Graham Design
       </Link>
-      <ul className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
+      <ul className="flex flex-wrap items-center justify-end gap-5 md:gap-7">
         {/* PROJECTS — primary, with hover dropdown of disciplines */}
         <li className="relative group">
           <Link
             to="/work"
-            activeProps={{ className: "pill pill-lg pill-active" }}
+            activeProps={{ className: "nav-link nav-link-active" }}
             activeOptions={{ exact: false }}
-            className="pill pill-lg"
+            className="nav-link"
           >
             PROJECTS
           </Link>
@@ -70,8 +70,8 @@ export function SiteNav({
           <Link
             to="/work/$hub"
             params={{ hub: "visualizations" }}
-            activeProps={{ className: "pill pill-active" }}
-            className="pill"
+            activeProps={{ className: "nav-link nav-link-active" }}
+            className="nav-link"
           >
             VISUALIZATIONS
           </Link>
@@ -79,8 +79,8 @@ export function SiteNav({
         <li>
           <Link
             to="/contact"
-            activeProps={{ className: "pill pill-active" }}
-            className="pill"
+            activeProps={{ className: "nav-link nav-link-active" }}
+            className="nav-link"
           >
             CONTACT
           </Link>
