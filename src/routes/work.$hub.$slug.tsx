@@ -201,23 +201,27 @@ function ProjectPage() {
           )}
         </div>
 
-        <figure className="relative z-0 px-6 md:px-12 lg:px-16">
-          <button
-            type="button"
-            onClick={() => setLightbox(0)}
-            className="block w-full h-[120vh] md:h-[130vh] overflow-hidden rounded-md bg-secondary group"
-            aria-label={`Enlarge ${project.title}`}
-          >
-            <img
-              src={project.cover}
-              alt={project.title}
-              className={`w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
-                isYctiwy ? "animate-image-drift-up" : mood.enter
-              }`}
-            />
-          </button>
-        </figure>
+        {/* Fixed-height runway — controls exactly how long the title stays pinned
+            (in pixels, not tied to the hero image's height) before releasing. */}
+        <div className="h-[250px]" />
       </div>
+
+      <figure className="px-6 md:px-12 lg:px-16">
+        <button
+          type="button"
+          onClick={() => setLightbox(0)}
+          className="block w-full h-auto overflow-hidden rounded-md bg-secondary group"
+          aria-label={`Enlarge ${project.title}`}
+        >
+          <img
+            src={project.cover}
+            alt={project.title}
+            className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
+              isYctiwy ? "animate-image-drift-up" : mood.enter
+            }`}
+          />
+        </button>
+      </figure>
 
       {/* Lollapalooza — record-player scroll-scrub video, full-bleed background with text overlaid on top */}
       {isLollapalooza && (
