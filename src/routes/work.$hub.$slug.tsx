@@ -149,7 +149,7 @@ function ProjectPage() {
           <Link
             to="/work"
             search={{ tag: project.tags[0] }}
-            className="inline-flex items-center gap-3 pill"
+            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill"}
           >
             <span aria-hidden>←</span>
             Back to Projects
@@ -158,7 +158,7 @@ function ProjectPage() {
           <Link
             to="/work/$hub"
             params={{ hub: hub.slug }}
-            className="inline-flex items-center gap-3 pill"
+            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill"}
           >
             <span aria-hidden>←</span>
             Back to {hub.title}
