@@ -4,12 +4,10 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { AnimatePresence, motion } from "motion/react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -127,23 +125,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useLenis();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Brief threshold/fade between pages on nav — mirrors the pause-then-reveal
-          feel of duncanbrazzil.com's page transitions. */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={pathname}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: "easeInOut" }}
-        >
-          <Outlet />
-        </motion.div>
-      </AnimatePresence>
+      <Outlet />
     </QueryClientProvider>
   );
 }

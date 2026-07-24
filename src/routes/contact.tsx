@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -26,27 +25,14 @@ export const Route = createFileRoute("/contact")({
 function Contact() {
   const [zoom, setZoom] = useState(false);
 
-  // Test-scoped: this page can flip the site to a light background via the
-  // dark/light switch. Since this is a single-page app (no full reloads
-  // between routes), reset the class on unmount so it never leaks onto
-  // other pages when navigating away.
-  useEffect(() => {
-    return () => {
-      document.documentElement.classList.remove("white");
-    };
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col">
       <SiteNav />
 
       <main className="flex-1 pt-32 md:pt-40 pb-16 px-6 md:px-12 lg:px-16">
-        <div className="mb-6 flex items-center justify-between gap-6">
-          <p className="text-[10px] tracking-[0.35em] uppercase text-accent">
-            The studio is open
-          </p>
-          <ThemeToggle />
-        </div>
+        <p className="text-[10px] tracking-[0.35em] uppercase text-accent mb-6">
+          The studio is open
+        </p>
 
         <h1 className="font-display font-black uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-8xl">
           Get in touch
