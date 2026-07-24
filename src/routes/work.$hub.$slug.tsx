@@ -166,62 +166,68 @@ function ProjectPage() {
         )}
       </div>
 
-      {/* Header + hero — title stays pinned as the hero photo scrolls up from beneath it */}
+      {/* Header + hero — title stays pinned as the hero photo scrolls up from beneath it.
+          The inner wrapper (header + fixed-height runway) is the sticky element's direct
+          containing block, so release timing is controlled purely by the 250px runway,
+          independent of the image's height. The image is pulled up by that same 250px so
+          it sits immediately behind the title with no gap — at rest (unscrolled) this
+          exactly cancels out, so the title and image still simply touch, no pre-overlap. */}
       <div className="relative">
-        <div className="sticky top-16 md:top-20 z-10 px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-16 md:pb-24 bg-gradient-to-b from-black via-black/80 to-transparent">
-          {project.tags && project.tags.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
-              {project.tags.map((t: ProjectTag) => (
-                <Link
-                  key={t}
-                  to="/work"
-                  search={{ tag: t }}
-                  className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
-                >
-                  {t.replace("/", " ")}
-                </Link>
-              ))}
-            </div>
-          )}
+        <div className="relative">
+          <div className="sticky top-16 md:top-20 z-10 px-6 md:px-12 lg:px-16 pt-10 md:pt-14 pb-16 md:pb-24 bg-gradient-to-b from-black via-black/80 to-transparent">
+            {project.tags && project.tags.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {project.tags.map((t: ProjectTag) => (
+                  <Link
+                    key={t}
+                    to="/work"
+                    search={{ tag: t }}
+                    className="text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+                  >
+                    {t.replace("/", " ")}
+                  </Link>
+                ))}
+              </div>
+            )}
 
-          <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl">
-            {project.title}
-          </h1>
+            <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl">
+              {project.title}
+            </h1>
 
-          <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
-            {project.subtitle}
-          </p>
+            <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+              {project.subtitle}
+            </p>
 
-          {project.notes && project.notes.length > 0 && (
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {project.notes.map((n: string, i: number) => (
-                <li key={i} className="pill">{n}</li>
-              ))}
-            </ul>
-          )}
+            {project.notes && project.notes.length > 0 && (
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {project.notes.map((n: string, i: number) => (
+                  <li key={i} className="pill">{n}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Fixed-height runway — controls exactly how long the title stays pinned. */}
+          <div className="h-[250px]" />
         </div>
 
-        {/* Fixed-height runway — controls exactly how long the title stays pinned
-            (in pixels, not tied to the hero image's height) before releasing. */}
-        <div className="h-[250px]" />
+        <figure className="relative z-0 -mt-[250px] px-6 md:px-12 lg:px-16">
+          <button
+            type="button"
+            onClick={() => setLightbox(0)}
+            className="block w-full h-auto overflow-hidden rounded-md bg-secondary group"
+            aria-label={`Enlarge ${project.title}`}
+          >
+            <img
+              src={project.cover}
+              alt={project.title}
+              className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
+                isYctiwy ? "animate-image-drift-up" : mood.enter
+              }`}
+            />
+          </button>
+        </figure>
       </div>
-
-      <figure className="px-6 md:px-12 lg:px-16">
-        <button
-          type="button"
-          onClick={() => setLightbox(0)}
-          className="block w-full h-auto overflow-hidden rounded-md bg-secondary group"
-          aria-label={`Enlarge ${project.title}`}
-        >
-          <img
-            src={project.cover}
-            alt={project.title}
-            className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
-              isYctiwy ? "animate-image-drift-up" : mood.enter
-            }`}
-          />
-        </button>
-      </figure>
 
       {/* Lollapalooza — record-player scroll-scrub video, full-bleed background with text overlaid on top */}
       {isLollapalooza && (
