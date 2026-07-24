@@ -168,8 +168,8 @@ function ProjectPage() {
 
       {/* Header + hero — title stays pinned as the hero photo scrolls up from beneath it.
           The inner wrapper (header + fixed-height runway) is the sticky element's direct
-          containing block, so release timing is controlled purely by the 250px runway,
-          independent of the image's height. The image is pulled up by that same 250px so
+          containing block, so release timing is controlled purely by the 300px runway,
+          independent of the image's height. The image is pulled up by that same 300px so
           it sits immediately behind the title with no gap — at rest (unscrolled) this
           exactly cancels out, so the title and image still simply touch, no pre-overlap. */}
       <div className="relative">
@@ -208,10 +208,10 @@ function ProjectPage() {
           </div>
 
           {/* Fixed-height runway — controls exactly how long the title stays pinned. */}
-          <div className="h-[250px]" />
+          <div className="h-[300px]" />
         </div>
 
-        <figure className="relative z-0 -mt-[250px] px-6 md:px-12 lg:px-16">
+        <figure className="relative z-0 -mt-[300px] px-6 md:px-12 lg:px-16">
           <button
             type="button"
             onClick={() => setLightbox(0)}
