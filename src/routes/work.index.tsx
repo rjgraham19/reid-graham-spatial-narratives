@@ -94,10 +94,10 @@ function FilterPill({
     <Link
       to="/work"
       search={to}
-      className={`px-5 py-2 rounded-full border text-xs md:text-sm uppercase tracking-[0.2em] transition-colors ${
+      className={`px-5 py-2 rounded-full border text-xs md:text-sm uppercase tracking-[0.2em] transition-colors duration-[350ms] ${
         active
           ? "bg-foreground text-black border-foreground"
-          : "border-foreground/30 text-foreground/80 hover:border-foreground hover:text-foreground"
+          : "border-foreground/30 text-foreground/45 hover:border-foreground hover:text-foreground"
       }`}
     >
       {label}

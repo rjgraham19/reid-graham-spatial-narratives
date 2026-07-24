@@ -26,21 +26,21 @@ export function SiteNav({
         <li className="relative group">
           <Link
             to="/work"
-            activeProps={{ className: "pill pill-lg nav-fade nav-fade-active" }}
+            activeProps={{ className: "pill nav-fade nav-fade-active" }}
             activeOptions={{ exact: false }}
-            className="pill pill-lg nav-fade"
+            className="pill nav-fade"
           >
             PROJECTS
           </Link>
           <div
             className="absolute right-0 top-full pt-3 opacity-0 pointer-events-none translate-y-1 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 transition-all duration-200 ease-cinematic"
           >
-            <ul className="flex flex-col gap-2 p-3 rounded-lg bg-background/95 backdrop-blur-md border border-border shadow-2xl min-w-[240px]">
+            <ul className="flex flex-col gap-2 min-w-[240px]">
               <li>
                 <Link
                   to="/work"
                   search={{ tag: "Production/Scenic" }}
-                  className="pill nav-fade w-full justify-start"
+                  className="pill nav-fade w-full justify-center"
                 >
                   Production / Scenic
                 </Link>
@@ -49,7 +49,7 @@ export function SiteNav({
                 <Link
                   to="/work"
                   search={{ tag: "Architecture" }}
-                  className="pill nav-fade w-full justify-start"
+                  className="pill nav-fade w-full justify-center"
                 >
                   Architecture
                 </Link>
@@ -58,7 +58,7 @@ export function SiteNav({
                 <Link
                   to="/work"
                   search={{ tag: "Experiential" }}
-                  className="pill nav-fade w-full justify-start"
+                  className="pill nav-fade w-full justify-center"
                 >
                   Experiential
                 </Link>
@@ -82,7 +82,7 @@ export function SiteNav({
             activeProps={{ className: "pill nav-fade nav-fade-active" }}
             className="pill nav-fade"
           >
-            CONTACT
+            CONNECT
           </Link>
         </li>
       </ul>
