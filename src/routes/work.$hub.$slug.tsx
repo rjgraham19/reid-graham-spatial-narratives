@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
+import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import {
   HUBS,
   PROJECTS,
@@ -190,9 +191,10 @@ function ProjectPage() {
               </div>
             )}
 
-            <h1 className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl">
-              {project.title}
-            </h1>
+            <AnimatedHeading
+              text={project.title}
+              className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-5xl md:text-8xl text-balance max-w-5xl"
+            />
 
             <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
               {project.subtitle}
@@ -271,13 +273,15 @@ function ProjectPage() {
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6 border-b border-border">
         <div className="md:col-span-8">
           {!isYctiwy && (
-            <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
-              {project.description}
-            </p>
+            <RevealBlock>
+              <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+                {project.description}
+              </p>
+            </RevealBlock>
           )}
         </div>
         {project.credits && project.credits.length > 0 && (
-          <div className="md:col-span-4">
+          <RevealBlock className="md:col-span-4" delay={0.1}>
             <ul className="space-y-3">
               {project.credits.map((c: Credit) => (
                 <li key={c.role} className="text-sm">
@@ -287,16 +291,18 @@ function ProjectPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </RevealBlock>
         )}
       </section>
 
       {/* Pull quote */}
       {project.pullQuote && (
         <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
-          <blockquote className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
-            {project.pullQuote}
-          </blockquote>
+          <RevealBlock>
+            <blockquote className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
+              {project.pullQuote}
+            </blockquote>
+          </RevealBlock>
         </section>
       )}
 
