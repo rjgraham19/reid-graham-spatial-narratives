@@ -233,6 +233,23 @@
   border-color: hsl(180 82% 55% / 0.4);
 }
 
+/* Nav-only color modifier — gray by default, white on hover or when active,
+   like meinhardtaxer.com's top bar. Layered on top of .pill's shape; doesn't
+   touch the shared pill style used elsewhere (tags, back buttons, etc). */
+@utility nav-fade {
+  transition: color 0.35s var(--ease-cinematic);
+}
+.pill.nav-fade {
+  color: hsl(0 0% 98% / 0.45);
+}
+.pill.nav-fade:hover {
+  color: var(--color-foreground);
+  border-color: hsl(0 0% 100% / 0.06);
+}
+.pill.nav-fade.nav-fade-active {
+  color: var(--color-foreground);
+}
+
 /* Retro beveled button (Lollapalooza page only) — via uiverse.io */
 .retro-btn {
   display: inline-flex;
