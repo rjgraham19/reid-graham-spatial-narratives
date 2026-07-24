@@ -4,6 +4,7 @@ import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
+import tabAnimation from "@/assets/rg/tab-animation.svg";
 import {
   HUBS,
   PROJECTS,
@@ -230,6 +231,20 @@ function ProjectPage() {
           </button>
         </figure>
       </div>
+
+      {/* TaB: Renaissance — full-bleed graphic marking the black-to-white transition.
+          The graphic's own bottom portion is solid white; whatever comes after this
+          section should start white too, so the seam is hidden behind the graphic
+          rather than appearing as a visible hard cut. */}
+      {isTab && (
+        <div className="w-full bg-black">
+          <img
+            src={tabAnimation}
+            alt=""
+            className="block w-full h-auto"
+          />
+        </div>
+      )}
 
       {/* Lollapalooza — record-player scroll-scrub video, full-bleed background with text overlaid on top */}
       {isLollapalooza && (
