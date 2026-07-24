@@ -221,7 +221,7 @@ function ProjectPage() {
 
       {/* Lollapalooza — record-player scroll-scrub video, full-bleed background with text overlaid on top */}
       {isLollapalooza && (
-        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] bg-white">
+        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] bg-black">
           <div className="sticky top-0 h-screen w-full overflow-hidden">
             <video
               ref={recordScrubVideoRef}
@@ -235,19 +235,19 @@ function ProjectPage() {
             {/* Text overlaid on top of the video, right side */}
             <div className="absolute right-6 md:right-16 lg:right-24 top-1/2 -translate-y-1/2 z-10 max-w-xs md:max-w-md text-right">
               <p
-                className="absolute right-0 top-0 w-full font-display font-light text-black text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
+                className="absolute right-0 top-0 w-full font-display font-light text-foreground text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
                 style={{ opacity: segmentOpacity(recordScrubProgress, 0.05, 0.3) }}
               >
                 Copy pending — first beat
               </p>
               <p
-                className="absolute right-0 top-0 w-full font-display font-light text-black text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
+                className="absolute right-0 top-0 w-full font-display font-light text-foreground text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
                 style={{ opacity: segmentOpacity(recordScrubProgress, 0.4, 0.65) }}
               >
                 Copy pending — second beat
               </p>
               <p
-                className="absolute right-0 top-0 w-full font-display font-light text-black text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
+                className="absolute right-0 top-0 w-full font-display font-light text-foreground text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
                 style={{ opacity: segmentOpacity(recordScrubProgress, 0.75, 0.95) }}
               >
                 Copy pending — closing beat

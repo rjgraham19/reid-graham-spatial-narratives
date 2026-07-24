@@ -1,5 +1,8 @@
 import { useEffect, useRef, type RefObject } from "react";
 
+// Matches the exported frame rate of the source video.
+const SOURCE_FPS = 30;
+
 /**
  * Ties a video's playback position to scroll progress through a tall wrapper element.
  * Scrolling down plays the video forward; scrolling up reverses it. No autoplay —
@@ -18,19 +21,22 @@ export function useScrollScrubVideo(
     const video = videoRef.current;
     if (!wrapper || !video) return;
 
-    let duration = 0;
+    let totalFrames = 0;
     let raf = 0;
-    let lastProgress = -1;
+    let lastFrame = -1;
 
     const onLoaded = () => {
-      duration = video.duration || 0;
+      totalFrames = Math.max(1, Math.round((video.duration || 0) * SOURCE_FPS));
     };
     video.addEventListener("loadedmetadata", onLoaded);
     if (video.readyState >= 1) onLoaded();
 
     // Continuous rAF loop, not gated by scroll events — Lenis's own smoothing
     // means scroll events don't fire at a steady rate, so we just read the
-    // current scroll position fresh every animation frame instead.
+    // current scroll position fresh every animation frame instead. We only
+    // ever seek when the target actually lands on a new source frame —
+    // seeking to a sub-frame time that resolves to the same visible frame
+    // just wastes a decode and is what made the scrub feel stepped/janky.
     const tick = () => {
       const rect = wrapper.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
@@ -41,11 +47,14 @@ export function useScrollScrubVideo(
             : 0
           : Math.min(1, Math.max(0, -rect.top / total));
 
-      if (progress !== lastProgress) {
-        lastProgress = progress;
-        if (duration) video.currentTime = progress * duration;
-        onProgressRef.current?.(progress);
+      if (totalFrames > 1) {
+        const targetFrame = Math.round(progress * (totalFrames - 1));
+        if (targetFrame !== lastFrame) {
+          lastFrame = targetFrame;
+          video.currentTime = targetFrame / SOURCE_FPS;
+        }
       }
+      onProgressRef.current?.(progress);
 
       raf = requestAnimationFrame(tick);
     };
