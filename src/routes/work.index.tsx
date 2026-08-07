@@ -97,7 +97,10 @@ function FilterPill({
       // Display family at extra-light, matching the pills and the thin
       // "Design" in the wordmark. This row previously fell through to the body
       // font, which is why it read as a second typeface.
-      className={`font-display font-extralight px-5 py-2 rounded-full border text-xs md:text-sm uppercase tracking-[0.2em] transition-colors duration-[350ms] ${
+      // inline-flex + min-h-11 gives the row the 44px a finger needs on a
+      // phone without changing how it looks anywhere else — the label stays
+      // centred, and from md the padding governs the height as before.
+      className={`font-display font-extralight inline-flex items-center min-h-11 md:min-h-0 px-5 py-2 rounded-full border text-xs md:text-sm uppercase tracking-[0.2em] transition-colors duration-[350ms] ${
         active
           ? "bg-foreground text-black border-foreground"
           : "border-foreground/30 text-foreground/45 hover:border-foreground hover:text-foreground"

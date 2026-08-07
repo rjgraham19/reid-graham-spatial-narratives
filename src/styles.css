@@ -103,6 +103,12 @@
 @utility animate-fade-in-slow {
   animation: fade-in 1.6s var(--ease-cinematic) both;
 }
+/* For UI that has to arrive the moment it's asked for — the phone menu. The
+   cinematic timings elsewhere are for content; a menu that takes a beat to
+   appear just reads as lag. */
+@utility animate-fade-in-fast {
+  animation: fade-in 0.25s var(--ease-cinematic) both;
+}
 @utility animate-slow-zoom {
   animation: slow-zoom 22s var(--ease-cinematic) both;
 }
@@ -218,6 +224,21 @@
   font-size: 0.78rem;
   letter-spacing: 0.18em;
 }
+/* Touch-sized pill. The shape is unchanged — only the box grows to the 44px
+   minimum a finger needs, and since .pill centres its label the type stays put.
+   For pills that are actually tapped (nav, menu, back links, close buttons),
+   not for the static ones used as tags and captions.
+
+   Gated on the pointer rather than the viewport so a mouse never sees it: the
+   sizes elsewhere are tuned to the eye, and growing them on a desktop window
+   that merely happens to be narrow would change the composition for no gain. */
+@utility pill-touch {
+  @media (pointer: coarse) {
+    min-height: 44px;
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+  }
+}
 @utility pill-active {
   color: var(--color-accent);
   border-color: hsl(180 82% 55% / 0.35);
@@ -267,6 +288,14 @@
   letter-spacing: 2px;
   padding: 5px 30px;
 }
+/* The bevel is sized to the 90s reference, which is shorter than a finger
+   needs. On touch it grows to 44px; the beveled edges and type are untouched,
+   so it still reads as the same button. */
+@media (pointer: coarse) {
+  .retro-btn {
+    min-height: 44px;
+  }
+}
 .retro-btn:active {
   box-shadow:
     inset -1px -1px #fff,
@@ -285,6 +314,12 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Several entrances arrive from off to the right (animate-slide-from-right,
+       swoop-in). On a narrow screen that briefly puts them past the edge, which
+       a phone browser answers with a sideways rubber-band. `clip` rather than
+       `hidden` on purpose: hidden would make this a scroll container and every
+       sticky project title would stop pinning. */
+    overflow-x: clip;
   }
   ::selection {
     background: var(--color-accent);

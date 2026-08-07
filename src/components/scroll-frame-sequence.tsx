@@ -151,7 +151,10 @@ export function ScrollFrameSequence({
 
   return (
     <div ref={wrapperRef} className={className}>
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+      {/* svh so the pinned frame fits the visible area on a phone; with vh its
+          bottom sits behind the address bar, and the frame resizes mid-scroll
+          as that bar hides. */}
+      <div className="sticky top-0 h-[100svh] w-full flex items-center justify-center overflow-hidden">
         {backdrop}
         <canvas
           ref={canvasRef}
@@ -162,7 +165,7 @@ export function ScrollFrameSequence({
              box. At full height it stands clearly proud of the banner strip
              behind it, overhanging top and bottom the way the composition
              calls for; the empty padding is what the frame clips. */
-          className="relative z-10 h-screen w-auto max-w-full"
+          className="relative z-10 h-[100svh] w-auto max-w-full"
         />
       </div>
     </div>

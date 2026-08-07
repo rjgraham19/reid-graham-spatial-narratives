@@ -143,7 +143,7 @@ function Contact() {
               e.stopPropagation();
               setZoom(false);
             }}
-            className="absolute top-6 right-6 pill"
+            className="absolute top-6 right-6 pill pill-touch"
           >
             CLOSE ✕
           </button>

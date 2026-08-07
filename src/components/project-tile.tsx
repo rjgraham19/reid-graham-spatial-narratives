@@ -27,8 +27,13 @@ export function ProjectTile({ project }: { project: Project }) {
             className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.06] transition-all duration-[900ms] ease-cinematic"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-95 group-hover:opacity-85 transition-opacity duration-500" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <h2 className="font-display font-black uppercase tracking-tight text-xl md:text-2xl lg:text-3xl leading-[0.95] text-balance text-foreground group-hover:text-accent transition-colors line-clamp-3">
+          {/* Two tiles to a row on a phone leaves each about 156px square, and
+              at the desktop title size a three-line name like "You Can't Take It
+              With You!" ate a third of the image. A step down in size and a
+              tighter inset give the picture back its tile without changing the
+              proportions of the composition. */}
+          <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4">
+            <h2 className="font-display font-black uppercase tracking-tight text-base sm:text-xl md:text-2xl lg:text-3xl leading-[0.95] text-balance text-foreground group-hover:text-accent transition-colors line-clamp-3">
               {project.title}
             </h2>
           </div>

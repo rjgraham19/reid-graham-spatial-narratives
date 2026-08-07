@@ -180,7 +180,7 @@ function ProjectPage() {
           <Link
             to="/work"
             search={{ tag: project.tags[0] }}
-            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill"}
+            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill pill-touch"}
           >
             <span aria-hidden>←</span>
             Back to Projects
@@ -189,7 +189,7 @@ function ProjectPage() {
           <Link
             to="/work/$hub"
             params={{ hub: hub.slug }}
-            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill"}
+            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill pill-touch"}
           >
             <span aria-hidden>←</span>
             Back to {hub.title}
@@ -232,7 +232,10 @@ function ProjectPage() {
           }
         >
           <div
-            className={`sticky top-16 md:top-20 pt-10 md:pt-14 bg-gradient-to-b from-black via-black/70 to-transparent ${
+            /* Sticky offsets match the height of the fixed bar the title pins
+               under — 76px on phones, 82px from md — so the title comes to rest
+               against the bar rather than sliding a few pixels behind it. */
+            className={`sticky top-[76px] md:top-20 pt-10 md:pt-14 bg-gradient-to-b from-black via-black/70 to-transparent ${
               isTitleAbove ? "pb-8 md:pb-10" : "pb-16 md:pb-24 pointer-events-none"
             } ${isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"}`}
           >
@@ -479,7 +482,10 @@ function ProjectPage() {
       {/* Lollapalooza — record-player scroll-scrub video, full-bleed background with text overlaid on top */}
       {isLollapalooza && (
         <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] bg-black">
-          <div className="sticky top-0 h-screen w-full overflow-hidden">
+          {/* svh, not vh: on a phone the sticky frame must fit the space that's
+              actually visible with the address bar showing, or its bottom is cut
+              off. vh measures the tall viewport the bar is hidden in. */}
+          <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
             <video
               ref={recordScrubVideoRef}
               src="/lollapalooza-recordplayer.mp4"
@@ -489,8 +495,13 @@ function ProjectPage() {
               className="absolute inset-0 h-full w-full object-cover"
             />
 
-            {/* Text overlaid on top of the video, right side */}
-            <div className="absolute right-6 md:right-16 lg:right-24 top-1/2 -translate-y-1/2 z-10 max-w-xs md:max-w-md text-right">
+            {/* Text overlaid on top of the video, right side.
+                The width is set explicitly rather than left to max-w: every
+                line inside is absolutely positioned, so there's nothing in flow
+                to size this box — it collapsed to zero, and the `w-full` on each
+                line collapsed with it, breaking every beat onto one word per
+                line against the right edge. */}
+            <div className="absolute right-6 md:right-16 lg:right-24 top-1/2 -translate-y-1/2 z-10 w-[min(74vw,20rem)] md:w-[28rem] text-right">
               <p
                 className="absolute right-0 top-0 w-full font-display font-light text-foreground text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
                 style={{ opacity: segmentOpacity(recordScrubProgress, 0.05, 0.3) }}
@@ -972,7 +983,7 @@ function ProjectPage() {
                 e.stopPropagation();
                 close();
               }}
-              className="pill"
+              className="pill pill-touch"
               aria-label="Close"
             >
               CLOSE ✕
