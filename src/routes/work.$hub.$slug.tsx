@@ -214,7 +214,8 @@ function ProjectPage() {
       )}
 
       {/* Header + hero.
-          Two arrangements, both keeping the same sticky behaviour:
+
+          From lg up, two arrangements, both keeping the same sticky behaviour:
 
           • Overlay (default) — title and image sit in one single-cell grid so
             they occupy the same space and the text reads over the photo. The
@@ -227,7 +228,21 @@ function ProjectPage() {
           • Title-above (heroTitleAbove) — for compositions whose top carries
             subject matter that shouldn't be covered. The title stacks above
             and the image is pulled up by exactly the runway height so it
-            begins right where the title ends, with no gap and no overlap. */}
+            begins right where the title ends, with no gap and no overlap.
+
+          Below lg, neither. Both arrangements are built on the image and the
+          title sharing space, which works when the image is wide enough to
+          have room to spare. On a phone it doesn't: a hero rendering about
+          200px tall sat under a title block of 220–290px, so the text and its
+          scrim covered the photograph completely — measured at 100% on every
+          overlay project, whatever the length of the name.
+
+          So below lg the two simply stack, in ordinary flow. That is the whole
+          mechanism: with no runway to reserve height and no negative margin to
+          pull the image back over it, the hero begins exactly where the title
+          block ends, and a title that runs to three lines pushes the image
+          down by three lines rather than eating three lines of it. Nothing
+          here is a fixed offset that a longer name could overrun. */}
       <div
         className={
           isPortraitHero
@@ -237,14 +252,17 @@ function ProjectPage() {
       >
       <div
         className={`${
-          isTitleAbove ? "relative" : "relative grid grid-cols-1 grid-rows-1"
+          /* The single-cell grid — the thing that makes title and image share
+             space — only exists from lg. Below it this is a plain block and
+             the two children stack. */
+          isTitleAbove ? "relative" : "relative lg:grid lg:grid-cols-1 lg:grid-rows-1"
         } ${isReshuffling ? "md:col-start-1 md:row-start-1" : ""}`}
       >
         <div
           className={
             isTitleAbove
               ? "relative z-10"
-              : "col-start-1 row-start-1 self-start z-10 pointer-events-none"
+              : "z-10 lg:col-start-1 lg:row-start-1 lg:self-start lg:pointer-events-none"
           }
         >
           <div
@@ -262,7 +280,12 @@ function ProjectPage() {
                  comes to rest against the bar rather than sliding behind it. */
               panel ? "top-0 pt-9 md:pt-10" : "top-[76px] md:top-20 pt-10 md:pt-14"
             } ${
-              isTitleAbove ? "pb-8 md:pb-10" : "pb-16 md:pb-24 pointer-events-none"
+              /* Below lg this is the gap between the title and the hero under
+                 it, so it wants to be a breath — not the deep run-out the
+                 overlay needs to fade its scrim off the photograph. */
+              isTitleAbove
+                ? "pb-8 md:pb-10"
+                : "pb-8 sm:pb-10 lg:pb-24 lg:pointer-events-none"
             } ${isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"}`}
           >
             {project.tags && project.tags.length > 0 && (
@@ -280,9 +303,17 @@ function ProjectPage() {
               </div>
             )}
 
+            {/* One continuous ramp from phone to the lg hand-off, rather than
+                a step at md: 11vw capped at 3rem meant every width from 437px
+                up to the tablet break rendered at exactly 48px and then jumped
+                to 65px, which is why a long name broke to three lines on a
+                phone and stayed there. 8vw between 2.25 and 4.75rem tracks the
+                screen the whole way, and takes the longest title in the
+                portfolio — "You Can't Take It With You!" — from three lines to
+                two without it reading as shrunken. Desktop is untouched. */}
             <AnimatedHeading
               text={project.title}
-              className="font-display font-black uppercase leading-[0.9] tracking-[-0.03em] text-[clamp(2rem,11vw,3rem)] md:text-[clamp(3rem,8.5vw,6rem)] text-balance max-w-5xl"
+              className="font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-[clamp(2.25rem,8vw,4.75rem)] lg:text-[clamp(3rem,8.5vw,6rem)] text-balance max-w-5xl"
             />
 
             <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
@@ -298,8 +329,12 @@ function ProjectPage() {
             )}
           </div>
 
-          {/* Fixed-height runway — controls exactly how long the title stays pinned. */}
-          <div className="h-[300px]" />
+          {/* Runway — controls exactly how long the title stays pinned while
+              the image scrolls under it. It only has a job in the overlaid
+              arrangement, so below lg it collapses: with no reserved height
+              there is nothing for the hero to be pulled back across, and the
+              title block's own height becomes the spacing. */}
+          <div className="h-0 lg:h-[300px]" />
         </div>
 
         <figure
@@ -310,11 +345,16 @@ function ProjectPage() {
                    behind the whole title block, which lifts everything below
                    it by the same amount — the point being that the closeup
                    animation starts near enough to the fold to signal there's
-                   more page. Readable because of the blue scrim above. */
+                   more page. Readable because of the blue scrim above.
+
+                   Both are lg-only. Below it the runway is collapsed, so there
+                   is nothing to cancel — and TaB's deeper tuck would be pulling
+                   the image up over the title rather than behind a scrim that
+                   has room to fade. */
                 isTab
-                ? "relative -mt-[340px] md:-mt-[540px]"
-                : "relative -mt-[300px]"
-              : "col-start-1 row-start-1"
+                ? "relative mt-0 lg:-mt-[540px]"
+                : "relative mt-0 lg:-mt-[300px]"
+              : "lg:col-start-1 lg:row-start-1"
           } ${
             /* Full bleed in the panel. The standard 64px gutter left the hero
                sitting inside a black border, which is the effect Reid was
