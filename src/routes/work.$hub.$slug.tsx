@@ -34,6 +34,13 @@ import {
 } from "@/lib/projects";
 
 export const Route = createFileRoute("/work/$hub/$slug")({
+  /* panel=1 is set only when this page is rendered inset over the feed, which
+     only happens on a wide screen. It suppresses the site nav: the wordmark
+     and top-level links belong to the page showing behind the panel, and
+     repeating them there reads as the site nested inside itself. Absent — a
+     direct visit, and every visit on a phone — nothing changes. */
+  validateSearch: (search: Record<string, unknown>): { panel?: boolean } =>
+    search.panel === "1" || search.panel === true ? { panel: true } : {},
   loader: ({ params }) => {
     const project = projectBySlug(params.slug);
     if (!project || project.hub !== params.hub) throw notFound();
@@ -79,6 +86,7 @@ const MOOD_STYLES: Record<Mood, { wrap: string; enter: string }> = {
 
 function ProjectPage() {
   const { project } = Route.useLoaderData();
+  const { panel } = Route.useSearch();
   const hub = HUBS.find((h) => h.slug === project.hub)!;
   const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mood];
 
@@ -172,10 +180,17 @@ function ProjectPage() {
 
   return (
     <div className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor" : ""}`}>
-      <SiteNav />
+      {!panel && <SiteNav />}
 
       {/* Back — to /work for tagged projects, to hub for visualizations */}
-      <div className="pt-28 md:pt-32 px-6 md:px-12 lg:px-16">
+      {/* Back link, and the tall top padding that clears the fixed site nav.
+          Both are dropped in the panel: the panel puts its own back control in
+          the chrome above the frame, where it stays put instead of scrolling
+          away with the page, and without the nav this padding was just dead
+          black along the top edge. Outside the panel — every phone and tablet
+          visit — this is the only back control, so it stays. */}
+      {!panel && (
+      <div className="px-6 md:px-12 lg:px-16 pt-28 md:pt-32">
         {project.tags && project.tags.length > 0 ? (
           <Link
             to="/work"
@@ -196,6 +211,7 @@ function ProjectPage() {
           </Link>
         )}
       </div>
+      )}
 
       {/* Header + hero.
           Two arrangements, both keeping the same sticky behaviour:
@@ -232,10 +248,20 @@ function ProjectPage() {
           }
         >
           <div
-            /* Sticky offsets match the height of the fixed bar the title pins
-               under — 76px on phones, 82px from md — so the title comes to rest
-               against the bar rather than sliding a few pixels behind it. */
-            className={`sticky top-[76px] md:top-20 pt-10 md:pt-14 bg-gradient-to-b from-black via-black/70 to-transparent ${
+            className={`sticky bg-gradient-to-b from-black via-black/70 to-transparent ${
+              /* Two cases, and they want opposite things.
+
+                 In the panel there is no site nav, so the offset and padding
+                 that exist to clear it left about 115px of black above the
+                 title — the last of the dead space at the top of the panel.
+                 It pins to the panel's own top instead, with just enough
+                 padding to breathe.
+
+                 On the page, the offsets match the height of the fixed bar the
+                 title pins under — 76px on phones, 82px from md — so the title
+                 comes to rest against the bar rather than sliding behind it. */
+              panel ? "top-0 pt-9 md:pt-10" : "top-[76px] md:top-20 pt-10 md:pt-14"
+            } ${
               isTitleAbove ? "pb-8 md:pb-10" : "pb-16 md:pb-24 pointer-events-none"
             } ${isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"}`}
           >
@@ -266,7 +292,7 @@ function ProjectPage() {
             {project.notes && project.notes.length > 0 && (
               <ul className="mt-4 flex flex-wrap gap-2">
                 {project.notes.map((n: string, i: number) => (
-                  <li key={i} className="pill">{n}</li>
+                  <li key={i} className="pill pill-wrap">{n}</li>
                 ))}
               </ul>
             )}
@@ -289,7 +315,17 @@ function ProjectPage() {
                 ? "relative -mt-[340px] md:-mt-[540px]"
                 : "relative -mt-[300px]"
               : "col-start-1 row-start-1"
-          } ${isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"} ${
+          } ${
+            /* Full bleed in the panel. The standard 64px gutter left the hero
+               sitting inside a black border, which is the effect Reid was
+               seeing at the sides; letting the image meet the panel edge reads
+               as intentional framing instead. */
+            panel
+              ? "px-0"
+              : isPortraitHero
+                ? "px-6 md:px-0"
+                : "px-6 md:px-12 lg:px-16"
+          } ${
             /* nudged down so the title clears more of the composition and the
                stacked views alongside sit within the page rather than above it */
             isReshuffling ? "mt-10 md:mt-24" : ""
@@ -917,7 +953,11 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Back to feed + next */}
+      {/* Back to feed + next. Suppressed in the panel: the feed is already
+          sitting right behind it, so onward navigation belongs to that page,
+          not to a window floating over it. In the panel the project simply
+          ends with its last section. */}
+      {!panel && (
       <section className="border-t border-border px-6 md:px-12 lg:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
         {project.tags && project.tags.length > 0 ? (
           <Link
@@ -959,9 +999,11 @@ function ProjectPage() {
           </h3>
         </Link>
       </section>
+      )}
 
-
-      <SiteFooter />
+      {/* Footer likewise — the wordmark, the statement line and the contact
+          details belong to the site, and the site is the page behind. */}
+      {!panel && <SiteFooter />}
 
       </div>{/* end light-zone */}
 

@@ -9,12 +9,35 @@ import type { Project } from "@/lib/projects";
  * number, no subtitle, no hover-collage pop-out, no "Enter" affordance —
  * the tile itself is the affordance.
  */
-export function ProjectTile({ project }: { project: Project }) {
+export function ProjectTile({
+  project,
+  onOpen,
+}: {
+  project: Project;
+  /**
+   * When supplied, a plain click opens the project as a panel over the feed
+   * instead of navigating. It stays a real link underneath, so middle-click,
+   * cmd-click, "open in new tab" and no-JS all still get the full page — the
+   * panel is an enhancement rather than a replacement.
+   *
+   * The feed only supplies it on a wide screen. Left out — on a phone or a
+   * tablet — the tile is exactly the link it looks like, and the project opens
+   * as its own full page.
+   */
+  onOpen?: (project: Project) => void;
+}) {
   return (
     <li className="relative">
       <Link
         to="/work/$hub/$slug"
         params={{ hub: project.hub, slug: project.slug }}
+        onClick={(e) => {
+          if (!onOpen) return;
+          // Let the browser handle any click that means "somewhere else".
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+          e.preventDefault();
+          onOpen(project);
+        }}
         className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
         aria-label={`Open ${project.title}`}
       >

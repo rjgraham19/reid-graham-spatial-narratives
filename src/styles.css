@@ -243,6 +243,16 @@
   color: var(--color-accent);
   border-color: hsl(180 82% 55% / 0.35);
 }
+/* A pill carrying a sentence rather than a label.
+   .pill is nowrap so short uppercase labels never break mid-word, which is
+   right for the nav and the buttons but wrong for a project note — "Honorable
+   Mention, Wallenberg Foundation Awards" measured 409px against a 390px
+   screen and simply ran off the edge. These wrap instead. */
+@utility pill-wrap {
+  white-space: normal;
+  text-align: center;
+  max-width: 100%;
+}
 
 .pill:hover {
   color: var(--color-accent);

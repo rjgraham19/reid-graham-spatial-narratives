@@ -1,20 +1,26 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ProjectTile } from "@/components/project-tile";
+import { ProjectPanel } from "@/components/project-panel";
+import { useCanShowPanel } from "@/hooks/use-media-query";
 import {
   PROJECT_TAGS,
   taggedProjects,
+  type Project,
   type ProjectTag,
 } from "@/lib/projects";
 
-type WorkSearch = { tag?: ProjectTag };
+/** `project` is the slug of the one shown in the panel over the feed. */
+type WorkSearch = { tag?: ProjectTag; project?: string };
 
 export const Route = createFileRoute("/work/")({
   validateSearch: (search: Record<string, unknown>): WorkSearch => {
     const raw = typeof search.tag === "string" ? search.tag : undefined;
     const tag = PROJECT_TAGS.find((t) => t === raw);
-    return tag ? { tag } : {};
+    const project = typeof search.project === "string" ? search.project : undefined;
+    return { ...(tag ? { tag } : {}), ...(project ? { project } : {}) };
   },
   head: () => ({
     meta: [
@@ -36,9 +42,49 @@ export const Route = createFileRoute("/work/")({
 });
 
 function ProjectsPage() {
-  const { tag } = Route.useSearch();
+  const { tag, project } = Route.useSearch();
   const all = taggedProjects();
   const projects = tag ? all.filter((p) => p.tags?.includes(tag)) : all;
+
+  /* Which project is panelled lives in the URL as ?project=<slug>, so Back
+     closes it and the link is shareable. It has to go through the router
+     rather than history.pushState: pushing /work/<hub>/<slug> directly made
+     the router navigate the top-level route, which unmounted the feed the
+     panel is supposed to be sitting on top of. A search param keeps the
+     route — and so the feed — exactly where it is. */
+  const navigate = Route.useNavigate();
+  const open = project ? all.find((p) => p.slug === project) ?? null : null;
+
+  /* The panel is a wide-screen treatment only. `undefined` while the query is
+     still being measured, so nothing renders until it's known — a phone never
+     paints a frame of the panel before correcting itself. */
+  const canPanel = useCanShowPanel();
+
+  const openProject = useCallback(
+    (p: Project) => {
+      void navigate({ search: (prev) => ({ ...prev, project: p.slug }) });
+    },
+    [navigate],
+  );
+
+  const closeProject = useCallback(() => {
+    void navigate({ search: (prev) => ({ ...prev, project: undefined }) });
+  }, [navigate]);
+
+  /* A ?project= link opened on a phone — shared from a desktop, or the window
+     narrowed while the panel was up. There's no panel at this width to show
+     it in, so the project takes over as its own full page, which is what it
+     would have done had the link been followed here in the first place. */
+  const toProject = useNavigate();
+  useEffect(() => {
+    if (canPanel === false && open) {
+      void toProject({
+        to: "/work/$hub/$slug",
+        params: { hub: open.hub, slug: open.slug },
+        replace: true,
+      });
+    }
+  }, [canPanel, open, toProject]);
 
   return (
     <div className="bg-black min-h-screen">
@@ -66,11 +112,26 @@ function ProjectsPage() {
         ) : (
           <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
             {projects.map((p) => (
-              <ProjectTile key={p.slug} project={p} />
+              /* onOpen only on a wide screen. Without it the tile stays the
+                 plain link it renders as, so a tap goes straight to the full
+                 project page. */
+              <ProjectTile
+                key={p.slug}
+                project={p}
+                onOpen={canPanel ? openProject : undefined}
+              />
             ))}
           </ul>
         )}
       </section>
+
+      {canPanel && open && (
+        <ProjectPanel
+          url={`/work/${open.hub}/${open.slug}`}
+          title={open.title}
+          onClose={closeProject}
+        />
+      )}
 
       <SiteFooter />
     </div>
