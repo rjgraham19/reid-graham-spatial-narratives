@@ -65,7 +65,7 @@ export function SiteNav({
              page below it allows for, so headings and back buttons ended up
              underneath it. Below md the three links collapse into one MENU
              control instead, which keeps the bar one row high everywhere. */
-          "fixed top-0 left-0 w-full z-50 px-6 md:px-10 py-4 md:py-6 flex items-center justify-between gap-4 md:gap-6 " +
+          "fixed top-0 left-0 w-full z-[110] px-6 md:px-10 py-4 md:py-6 flex items-center justify-between gap-4 md:gap-6 " +
           (isTransparent ? "" : "bg-background/80 backdrop-blur-md")
         }
       >
@@ -151,7 +151,7 @@ export function SiteNav({
       {menuOpen && (
         <div
           id="site-menu"
-          className="fixed inset-0 z-[60] bg-background md:hidden flex flex-col animate-fade-in-fast"
+          className="fixed inset-0 z-[120] bg-background md:hidden flex flex-col animate-fade-in-fast"
           role="dialog"
           aria-modal="true"
           aria-label="Menu"

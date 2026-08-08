@@ -404,12 +404,11 @@
     --overlay-sat: 0;
     --overlay-alpha: 0.8;
   }
-  .project-overlay-scope .project-overlay-panel,
-  .project-overlay-scope .panel-control-start {
+  /* Only the panel reads the gutter now. The Back control used to align to it
+     too, which is exactly what dropped it on top of the wordmark; it lives in
+     the nav row instead, positioned by the component. */
+  .project-overlay-scope .project-overlay-panel {
     left: var(--panel-gutter);
-  }
-  .project-overlay-scope .project-overlay-panel,
-  .project-overlay-scope .panel-control-end {
     right: var(--panel-gutter);
   }
 

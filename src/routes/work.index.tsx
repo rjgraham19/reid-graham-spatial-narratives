@@ -100,7 +100,14 @@ function ProjectsPage() {
 
   return (
     <div className="bg-black min-h-screen">
-      <SiteNav />
+      {/* With a project open the nav sits above the tinted glass rather than
+          behind it, so it stays crisp and clickable. Its usual translucent bar
+          would then lay a black band across the top of the perimeter and hide
+          the band of colour the overlay is carefully graded to show, so it
+          drops to the transparent variant for the duration. The links are
+          glass tiles with their own surface, so they stay legible against
+          whatever colour they end up over. */}
+      <SiteNav variant={canPanel && open ? "top-transparent" : "top"} />
 
       <section className="px-6 md:px-12 lg:px-16 pt-32 md:pt-40 pb-16 md:pb-24">
         <h1 className="font-display font-black uppercase tracking-tight text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-foreground mb-8 md:mb-10">

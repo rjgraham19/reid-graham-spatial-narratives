@@ -190,23 +190,23 @@ export function ProjectPanel({
     [requestClose],
   );
 
-  return createPortal(
+  const overlayVars = tinted
+    ? ({
+        "--overlay-hue": String(accentHue),
+        "--overlay-sat": String(accentSaturation),
+        "--overlay-alpha": "1",
+      } as React.CSSProperties)
+    : undefined;
+
+  const dialog = createPortal(
     <div
-      /* The scope carries the panel-width variable the panel and both
-         controls read, plus this project's tint. Setting the hue here rather
-         than swapping a class means changing project only updates a custom
-         property on an element that stays mounted — the glass shifts colour
-         without the overlay being torn down and rebuilt. */
+      /* The scope carries the panel-width variable the panel reads, plus this
+         project's tint. Setting the hue here rather than swapping a class
+         means changing project only updates a custom property on an element
+         that stays mounted — the glass shifts colour without the overlay
+         being torn down and rebuilt. */
       className="project-overlay-scope fixed inset-0 z-[100]"
-      style={
-        tinted
-          ? ({
-              "--overlay-hue": String(accentHue),
-              "--overlay-sat": String(accentSaturation),
-              "--overlay-alpha": "1",
-            } as React.CSSProperties)
-          : undefined
-      }
+      style={overlayVars}
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -243,23 +243,44 @@ export function ProjectPanel({
           className="h-full w-full border-0"
         />
       </div>
-
-      {/* One exit, not two. The Close button did exactly what Back does, and
-          two controls for one action made the hierarchy read as though they
-          were different — particularly with the lightbox's own Close nested
-          inside. Back stays because it names where you end up; the perimeter
-          and Escape do the same thing without needing a label.
-
-          It lives in the panel's chrome rather than in the page inside it, so
-          it stays put while the project scrolls. */}
-      <GlassButton
-        onClick={requestClose}
-        className="panel-control-start absolute left-[3vw] top-[34px] z-10 md:left-[5vw]"
-      >
-        <BackChevron />
-        Back to Projects
-      </GlassButton>
     </div>,
     document.body,
+  );
+
+  /* Back rides in its own layer, above the nav.
+
+     One exit, not two. The Close button did exactly what Back does, and two
+     controls for one action made the hierarchy read as though they were
+     different — the more so with the lightbox's own Close nested inside.
+     Back stays because it names where you end up; the perimeter and Escape do
+     the same thing without needing a label.
+
+     It can't live inside the dialog any more. The dialog is a stacking
+     context at z-100 and the nav now sits above that, so anything within it
+     paints under the nav bar. A separate portal is the only way for the
+     control to clear it.
+
+     Position: in the nav's own row, just clear of the wordmark. It used to
+     align to the panel's left edge, which put it directly on top of "Reid
+     Graham Design" — 115px of overlap. The strip is only 78px tall and the
+     nav occupies both ends of it, so there is nowhere in that band aligned to
+     the panel that is actually free; sitting in the nav row alongside the
+     wordmark is, and it reads as chrome rather than as a stray control. */
+  const backControl = createPortal(
+    <GlassButton
+      onClick={requestClose}
+      className="fixed left-6 top-[19px] z-[130] md:left-[248px] md:top-[23px]"
+    >
+      <BackChevron />
+      Back to Projects
+    </GlassButton>,
+    document.body,
+  );
+
+  return (
+    <>
+      {dialog}
+      {backControl}
+    </>
   );
 }
