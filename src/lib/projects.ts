@@ -147,6 +147,26 @@ export type Project = {
    * that shouldn't be covered. Sticky behaviour is unchanged either way.
    */
   heroTitleAbove?: boolean;
+  /**
+   * Hue, 0–360, for the tinted glass surrounding this project when it opens
+   * as an inset panel on desktop. One number is all it takes: the overlay
+   * builds its whole range — the wash against the panel, the side highlights,
+   * the burgundy at the window edges and the glow off the panel itself — from
+   * this hue, holding the saturation and lightness ramp that makes it read as
+   * smoked glass rather than a coloured film.
+   *
+   * Omit it and the project gets the neutral treatment: the same glass with
+   * the saturation at zero, so it reads as smoke.
+   *
+   * 330 magenta · 210 blue · 190 cyan · 30 amber · 265 violet
+   */
+  overlayHue?: number;
+  /**
+   * Peak saturation for the overlay, 0–100. Defaults to 100. Only worth
+   * setting for a hue that comes out shrill at full strength; the hue alone
+   * is the intended knob.
+   */
+  overlaySaturation?: number;
 };
 
 export const HUBS: {
@@ -191,6 +211,8 @@ export const PROJECTS: Project[] = [
   {
     slug: "lollapalooza",
     heroTitleAbove: true,
+    /* Y2K magenta. The overlay derives its whole range from this one number. */
+    overlayHue: 330,
     hub: "production-scenic",
     title: "Lollapalooza",
     subtitle: "PLACEHOLDER — venue/context line pending",

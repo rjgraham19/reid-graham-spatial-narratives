@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+import { glassButton } from "./glass-button";
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-border mt-16 px-6 md:px-12 lg:px-16 py-16 md:py-20">
@@ -20,7 +22,7 @@ export function SiteFooter() {
           >
             reidjgraham@gmail.com
           </a>
-          <Link to="/contact" className="pill inline-flex mt-3">
+          <Link to="/contact" className={glassButton({ className: "mt-3" })}>
             Start a conversation
           </Link>
         </div>

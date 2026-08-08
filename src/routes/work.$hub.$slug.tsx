@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { ScrollFrameSequence } from "@/components/scroll-frame-sequence";
+import { BackChevron, glassButton } from "@/components/glass-button";
 
 /**
  * TaB can spin frames. The export intentionally kept only every other frame
@@ -195,18 +196,18 @@ function ProjectPage() {
           <Link
             to="/work"
             search={{ tag: project.tags[0] }}
-            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill pill-touch"}
+            className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
           >
-            <span aria-hidden>←</span>
+            {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
             Back to Projects
           </Link>
         ) : (
           <Link
             to="/work/$hub"
             params={{ hub: hub.slug }}
-            className={isLollapalooza ? "retro-btn" : "inline-flex items-center gap-3 pill pill-touch"}
+            className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
           >
-            <span aria-hidden>←</span>
+            {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
             Back to {hub.title}
           </Link>
         )}
@@ -280,11 +281,16 @@ function ProjectPage() {
                  comes to rest against the bar rather than sliding behind it. */
               panel ? "top-0 pt-9 md:pt-10" : "top-[76px] md:top-20 pt-10 md:pt-14"
             } ${
-              /* PROTOTYPE — Lollapalooza title lockup, desktop only. Tighter
-                 top and bottom padding, pulling the black title area in by
-                 about 17% without touching the title's own scale. Paired with
-                 the tightened gaps below; lg-gated so the phone and tablet
-                 layouts are untouched, and scoped to this one project. */
+              /* Lollapalooza title lockup, desktop only. Tighter top and
+                 bottom padding, pulling the black title area in by about 17%
+                 without touching the title's own scale. Paired with the
+                 tightened gaps below.
+
+                 Still scoped to this one project rather than promoted to all
+                 of them: it's an approved composition for Lollapalooza, and
+                 applying it site-wide would restyle every other project's
+                 title block, which is its own decision. lg-gated, so phone
+                 and tablet are untouched either way. */
               isLollapalooza ? "lg:pt-8 lg:pb-6" : ""
             } ${
               /* Below lg this is the gap between the title and the hero under
@@ -1085,7 +1091,7 @@ function ProjectPage() {
                 e.stopPropagation();
                 close();
               }}
-              className="pill pill-touch"
+              className={glassButton({ touch: true })}
               aria-label="Close"
             >
               CLOSE ✕

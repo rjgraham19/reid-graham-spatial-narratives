@@ -109,6 +109,13 @@
 @utility animate-fade-in-fast {
   animation: fade-in 0.25s var(--ease-cinematic) both;
 }
+
+/* The project overlay's entrance. Opacity only — the tint arrives with the
+   panel and then holds; nothing here ever plays in reverse or resets it. */
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 @utility animate-slow-zoom {
   animation: slow-zoom 22s var(--ease-cinematic) both;
 }
@@ -349,25 +356,29 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   PROTOTYPE — Lollapalooza tinted-glass panel perimeter.
+   PROJECT OVERLAY — the tinted glass a project sits in when it opens as an
+   inset panel on desktop.
 
-   Temporary, for visual review only. Nothing reaches these rules unless
-   ProjectPanel is passed `prototypeGlass`, which work.index.tsx sets for
-   the Lollapalooza project and nothing else.
+   One system for every project. What differs between them is a single hue,
+   set in the project data as `overlayHue` and handed down here by
+   ProjectPanel as a custom property. Everything else — the saturation and
+   lightness ramp, the alphas, the geometry — is shared, so a new colour is a
+   number in projects.ts and nothing in this file.
+
+     --overlay-hue     0–360. Lollapalooza is 330.
+     --overlay-sat     peak saturation. 0 gives the neutral smoked glass a
+                       project with no hue falls back to.
+     --overlay-alpha   overall strength multiplier; the neutral case runs at
+                       0.8 so grey doesn't sit as heavily as colour does.
 
    Gated to 1024px and up. The panel already doesn't render below that
    (useCanShowPanel), so the query is belt-and-braces — but it puts the
-   desktop-only constraint in the stylesheet rather than leaving it
-   implied by a component two files away.
+   desktop-only constraint in the stylesheet rather than leaving it implied
+   by a component two files away.
 
-   Covers the perimeter sheet and the panel's own glow only. The Back and
-   Close controls are NOT tinted here — they're clear glass that shows
-   whatever is behind them, which is the point of keeping them colourless.
-   See `.panel-glass-pill` below.
-
-   To remove: delete this block, the `prototypeGlass` prop on
-   ProjectPanel, and the one line in work.index.tsx that sets it. Leave
-   `.panel-glass-pill` — it isn't part of the experiment.
+   The Back and Close controls are deliberately not tinted here. They're
+   colourless glass that shows whatever is behind them, so a new project hue
+   needs no matching button work. See `.glass-button`.
    ───────────────────────────────────────────────────────────────────── */
 @media (min-width: 1024px) {
   /* ── The one number to change ──────────────────────────────────────
@@ -383,29 +394,35 @@
 
      The panel and both controls read the same gutter, so the controls
      stay aligned to the panel's edges whatever the width is set to. */
-  .lolla-glass-scope {
-    --lolla-panel-width: 86%;
-    --lolla-panel-gutter: calc((100% - var(--lolla-panel-width)) / 2);
+  .project-overlay-scope {
+    --panel-width: 86%;
+    --panel-gutter: calc((100% - var(--panel-width)) / 2);
+
+    /* Neutral defaults. ProjectPanel overrides hue/sat/alpha inline when the
+       project carries an overlayHue. */
+    --overlay-hue: 0;
+    --overlay-sat: 0;
+    --overlay-alpha: 0.8;
   }
-  .lolla-glass-scope .lolla-glass-panel,
-  .lolla-glass-scope .panel-control-start {
-    left: var(--lolla-panel-gutter);
+  .project-overlay-scope .project-overlay-panel,
+  .project-overlay-scope .panel-control-start {
+    left: var(--panel-gutter);
   }
-  .lolla-glass-scope .lolla-glass-panel,
-  .lolla-glass-scope .panel-control-end {
-    right: var(--lolla-panel-gutter);
+  .project-overlay-scope .project-overlay-panel,
+  .project-overlay-scope .panel-control-end {
+    right: var(--panel-gutter);
   }
 
-  /* One continuous sheet of smoky magenta glass across the whole
-     perimeter, including behind the controls.
+  /* One continuous sheet of smoked glass across the whole perimeter,
+     including behind the controls.
 
      Built as a colour that is always present plus gradients that vary it,
      rather than as a gradient that runs out of colour. A single radial
-     couldn't do this: the panel leaves only a ~70px band, so nearly
+     couldn't do this: the panel leaves only a ~100px band, so nearly
      everything visible sits in the last fifth of one gradient's range and
-     the sheet read as black with magenta light leaking from behind the
-     window. The base wash is what keeps magenta in every part of the
-     frame; the layers on top only shift it.
+     the sheet read as black with light leaking from behind the window. The
+     base wash keeps the tint in every part of the frame; the layers on top
+     only shift it.
 
      Layers, in paint order (first in the list paints on top):
 
@@ -419,61 +436,67 @@
           (200 x 470px, fading out by 72%) that they read as unevenness in
           the material rather than as beams or a rectangular glow.
 
-       4. The body. Rich magenta against the panel easing out through
-          berry to burgundy at the window edges — burgundy, not black, so
-          the frame stays chromatic all the way out.
+       4. The body. Full tint against the panel easing out through a deeper
+          tone to a dark chromatic edge — never to black, so the frame stays
+          coloured all the way out.
 
-     Composited alpha lands near 0.38 against the panel, 0.56 at the edge
-     midpoints and 0.78 in the corners, so the feed stays readable
-     through the whole frame — which is what tells you it's clickable. */
-  .lolla-glass-perimeter {
-    /* Every alpha here is ~18% lighter than the previous pass. The hue
-       relationships are unchanged — rich magenta against the panel, burgundy
-       at the edges, near-black only in the corners — but more of the feed
-       survives the wash, so the frame reads as glass with a page behind it
-       rather than as a coloured surface. */
-    background-color: rgba(196, 16, 106, 0.11);
+     Every stop is one hue with a fixed saturation and lightness ramp, which
+     is what makes a new project a single number. The ramp was derived from
+     the approved magenta so that at hue 330 it reproduces it; the largest
+     deviation is 4/255 on one channel of two stops, both under 0.4 alpha.
+
+     Composited alpha lands near 0.45 against the panel, 0.55 at the edge
+     midpoints and 0.71 in the corners, so the feed stays readable through
+     the whole frame — which is what tells you it's clickable. */
+  .project-overlay {
+    background-color: hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.849%) 41.57% / calc(0.11 * var(--overlay-alpha)));
     background-image:
       radial-gradient(ellipse farthest-corner at 50% 50%,
-        rgba(10, 0, 6, 0) 80%,
-        rgba(12, 0, 7, 0.18) 92%,
-        rgba(8, 0, 5, 0.42) 100%),
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 1.96% / 0) 80%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 2.35% / calc(0.18 * var(--overlay-alpha))) 92%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 1.57% / calc(0.42 * var(--overlay-alpha))) 100%),
       radial-gradient(ellipse 14% 52% at 5% 50%,
-        rgba(255, 54, 158, 0.15) 0%,
-        rgba(255, 54, 158, 0) 72%),
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / calc(0.15 * var(--overlay-alpha))) 0%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / 0) 72%),
       radial-gradient(ellipse 14% 52% at 95% 50%,
-        rgba(255, 54, 158, 0.15) 0%,
-        rgba(255, 54, 158, 0) 72%),
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / calc(0.15 * var(--overlay-alpha))) 0%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / 0) 72%),
       radial-gradient(ellipse farthest-side at 50% 50%,
-        rgba(255, 44, 150, 0.24) 0%,
-        rgba(246, 30, 140, 0.26) 80%,
-        rgba(198, 20, 108, 0.31) 88%,
-        rgba(126, 22, 70, 0.39) 95%,
-        rgba(74, 20, 46, 0.46) 100%);
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 58.63% / calc(0.24 * var(--overlay-alpha))) 0%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.923%) 54.12% / calc(0.26 * var(--overlay-alpha))) 80%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.817%) 42.75% / calc(0.31 * var(--overlay-alpha))) 88%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.703%) 29.02% / calc(0.39 * var(--overlay-alpha))) 95%,
+        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.574%) 18.43% / calc(0.46 * var(--overlay-alpha))) 100%);
     /* saturate() as a percentage, not a bare number: the build drops the
        whole declaration on `saturate(1.35)` and the blur goes with it. */
     -webkit-backdrop-filter: blur(14px) saturate(135%);
     backdrop-filter: blur(14px) saturate(135%);
+
+    /* The tint fades up once as the panel opens and then holds for as long
+       as it's open. It's on the element that lives for the panel's whole
+       lifetime, and switching projects only changes the hue variable — the
+       element is never replaced, so the glass never blinks or resets. */
+    animation: overlay-fade-in 0.45s var(--ease-cinematic) both;
   }
 
   /* The panel is the sharp dark window floating on top of that sheet.
 
      No border, and no dark halo hugging it either. Both drew a line around
      the image; the picture should simply stop and the lit glass begin.
-     What separates them is contrast — pure black panel against magenta
-     glass — not an edge drawn between them.
+     What separates them is contrast — pure black panel against lit glass —
+     not an edge drawn between them.
 
-     The magenta lift is back, at roughly half of what it was. At full
-     strength it read as light escaping from behind the window; gone
-     entirely, the frame flattened out and the boundary stopped reading.
-     This sits between the two: enough to brighten the glass in the first
-     ~40px off the edge, not enough to have a shape of its own.
+     The lift is at roughly half of what it first was. At full strength it
+     read as light escaping from behind the window; gone entirely, the frame
+     flattened out and the boundary stopped reading. This sits between the
+     two: enough to brighten the glass in the first ~40px off the edge, not
+     enough to have a shape of its own.
 
      The one remaining black is thrown downward rather than spread all
      round, so it reads as the window floating rather than as an outline. */
-  .lolla-glass-panel {
+  .project-overlay-panel {
     box-shadow:
-      0 0 54px -12px rgba(255, 62, 162, 0.34),
+      0 0 54px -12px hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 62.16% / calc(0.34 * var(--overlay-alpha))),
       0 30px 70px -10px rgba(0, 0, 0, 0.62);
   }
 
@@ -597,6 +620,29 @@
 .glass-button:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.55);
   outline-offset: 2px;
+}
+
+/* Quiet — for nav, where a row of labels at full strength competes with the
+   page. The glass is unchanged; only the label recedes, and it comes back on
+   hover and when the link is the current page. This replaces `nav-fade`,
+   which did the same job on the old pill. */
+.glass-button--quiet {
+  color: rgba(255, 255, 255, 0.5);
+}
+.glass-button--quiet:hover,
+.glass-button--quiet[aria-current],
+.glass-button--quiet.is-active {
+  color: rgba(255, 255, 255, 0.97);
+}
+
+/* Touch sizing, on coarse pointers only — a mouse keeps the tighter box the
+   composition was drawn at. Mirrors what `pill-touch` does for the old pill. */
+@media (pointer: coarse) {
+  .glass-button--touch {
+    min-height: 44px;
+    padding-left: 1.05rem;
+    padding-right: 1.05rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import { GlassButton } from "./glass-button";
+import { BackChevron, GlassButton } from "./glass-button";
 
 /**
  * Opens a project as an inset panel over the feed, rather than as a full page.
@@ -32,19 +32,22 @@ export function ProjectPanel({
   url,
   title,
   onClose,
-  prototypeGlass = false,
+  overlayHue,
+  overlaySaturation = 100,
 }: {
   url: string;
   title: string;
   onClose: () => void;
   /**
-   * PROTOTYPE — swaps the neutral glass perimeter for the tinted magenta
-   * treatment. Set for Lollapalooza only, and the rules behind it are gated
-   * to 1024px and up. See the marked block in styles.css; removing that
-   * block and this prop takes the experiment out entirely.
+   * The project's tint, straight from its `overlayHue` in projects.ts. Left
+   * undefined the overlay falls back to neutral smoked glass, so a project
+   * needs no overlay entry at all to open correctly.
    */
-  prototypeGlass?: boolean;
+  overlayHue?: number;
+  /** Peak saturation, 0–100. Only worth setting for a shrill hue. */
+  overlaySaturation?: number;
 }) {
+  const tinted = typeof overlayHue === "number";
   const panelRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<Element | null>(null);
 
@@ -100,9 +103,21 @@ export function ProjectPanel({
 
   return createPortal(
     <div
-      /* The scope carries the panel-width variable the prototype's panel and
-         both controls read, so they stay in step from one declaration. */
-      className={`fixed inset-0 z-[100] ${prototypeGlass ? "lolla-glass-scope" : ""}`}
+      /* The scope carries the panel-width variable the panel and both
+         controls read, plus this project's tint. Setting the hue here rather
+         than swapping a class means changing project only updates a custom
+         property on an element that stays mounted — the glass shifts colour
+         without the overlay being torn down and rebuilt. */
+      className="project-overlay-scope fixed inset-0 z-[100]"
+      style={
+        tinted
+          ? ({
+              "--overlay-hue": String(overlayHue),
+              "--overlay-sat": String(overlaySaturation),
+              "--overlay-alpha": "1",
+            } as React.CSSProperties)
+          : undefined
+      }
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -115,11 +130,7 @@ export function ProjectPanel({
         type="button"
         onClick={onClose}
         aria-label="Close project"
-        className={`absolute inset-0 h-full w-full cursor-zoom-out ${
-          prototypeGlass
-            ? "lolla-glass-perimeter"
-            : "bg-white/[0.07] backdrop-blur-[5px]"
-        }`}
+        className="project-overlay absolute inset-0 h-full w-full cursor-zoom-out"
       />
 
       {/* Panel top is a fixed distance rather than a viewport fraction, so the
@@ -129,11 +140,7 @@ export function ProjectPanel({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`absolute inset-x-[3vw] bottom-[4vh] top-[78px] overflow-hidden rounded-lg bg-background outline-none md:inset-x-[5vw] ${
-          prototypeGlass
-            ? "lolla-glass-panel"
-            : "shadow-[0_30px_90px_rgba(0,0,0,0.7)]"
-        }`}
+        className="project-overlay-panel absolute inset-x-[3vw] bottom-[4vh] top-[78px] overflow-hidden rounded-lg bg-background outline-none md:inset-x-[5vw]"
       >
         {/* panel=1 tells the project page it's inset, so it drops the site
             nav — inside the panel the wordmark and top-level links belong to
@@ -158,23 +165,7 @@ export function ProjectPanel({
         onClick={onClose}
         className="panel-control-start absolute left-[3vw] top-[34px] z-10 md:left-[5vw]"
       >
-        {/* Drawn rather than typed. The arrow was a glyph with a shaft, which
-            at this size read as a dash with a point on it; a bare chevron is
-            the mark that belongs on a cut-glass control, and as an SVG its
-            weight and proportions don't shift with the font. */}
-        <svg
-          aria-hidden
-          viewBox="0 0 8 14"
-          width="6"
-          height="11"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M6.5 1 1.5 7l5 6" />
-        </svg>
+        <BackChevron />
         Back to Projects
       </GlassButton>
 

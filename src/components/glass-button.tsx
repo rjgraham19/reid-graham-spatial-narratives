@@ -22,11 +22,66 @@ export function GlassButton({
   children,
   className = "",
   type = "button",
+  quiet = false,
   ...props
-}: { children: ReactNode } & ButtonHTMLAttributes<HTMLButtonElement>) {
+}: {
+  children: ReactNode;
+  /** Dims the label until hover. For nav, where a row of full-strength
+   *  labels competes with the page. */
+  quiet?: boolean;
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button type={type} className={`glass-button ${className}`.trim()} {...props}>
+    <button type={type} className={glassButton({ quiet, className })} {...props}>
       {children}
     </button>
   );
+}
+
+/**
+ * The back mark, drawn rather than typed. The `←` glyph is a shaft with a
+ * point on it, which at this size reads as a dash; a bare chevron is what
+ * belongs on a cut-glass control. As SVG its weight doesn't shift with the
+ * font, and `currentColor` keeps it with the label through hover and press.
+ *
+ * Exported so the panel's Back control and the full page's Back link can't
+ * drift apart.
+ */
+export function BackChevron() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 8 14"
+      width="6"
+      height="11"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6.5 1 1.5 7l5 6" />
+    </svg>
+  );
+}
+
+/**
+ * The same surface, as a class string, for the things that have to be real
+ * links — router `Link`s and `<a>`s. Wrapping TanStack's Link would mean
+ * re-plumbing its generics for no gain, and an anchor styled as a button is
+ * still an anchor: middle-click, cmd-click and "open in new tab" all keep
+ * working, which they wouldn't through a <button>.
+ */
+export function glassButton({
+  quiet = false,
+  touch = false,
+  className = "",
+}: { quiet?: boolean; touch?: boolean; className?: string } = {}) {
+  return [
+    "glass-button",
+    quiet ? "glass-button--quiet" : "",
+    touch ? "glass-button--touch" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 }

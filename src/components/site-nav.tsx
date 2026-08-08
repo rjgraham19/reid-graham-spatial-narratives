@@ -1,6 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { GlassButton, glassButton } from "./glass-button";
+
 /** Everything the nav offers, in one place, so the desktop bar and the phone
  *  overlay can't drift apart. `sub` items are the discipline filters that hang
  *  off PROJECTS — a hover dropdown on desktop, indented pills on the phone. */
@@ -78,15 +80,15 @@ export function SiteNav({
         </Link>
 
         {/* Phone — one control, opening the full-screen menu below. */}
-        <button
-          type="button"
+        <GlassButton
+          quiet
           onClick={() => setMenuOpen(true)}
           aria-expanded={menuOpen}
           aria-label="Open menu"
-          className="pill nav-fade pill-touch md:hidden"
+          className="glass-button--touch md:hidden"
         >
           MENU
-        </button>
+        </GlassButton>
 
         {/* Tablet and up — the full bar. */}
         <ul className="hidden md:flex items-center justify-end gap-2 md:gap-3">
@@ -94,9 +96,9 @@ export function SiteNav({
           <li className="relative group">
             <Link
               to="/work"
-              activeProps={{ className: "pill nav-fade nav-fade-active" }}
+              activeProps={{ className: glassButton({ quiet: true, className: "is-active" }) }}
               activeOptions={{ exact: false }}
-              className="pill nav-fade"
+              className={glassButton({ quiet: true })}
             >
               PROJECTS
             </Link>
@@ -109,7 +111,7 @@ export function SiteNav({
                     <Link
                       to="/work"
                       search={{ tag: p.tag }}
-                      className="pill nav-fade w-full justify-center"
+                      className={glassButton({ quiet: true, className: "w-full justify-center" })}
                     >
                       {p.label}
                     </Link>
@@ -122,8 +124,8 @@ export function SiteNav({
             <Link
               to="/work/$hub"
               params={{ hub: "visualizations" }}
-              activeProps={{ className: "pill nav-fade nav-fade-active" }}
-              className="pill nav-fade"
+              activeProps={{ className: glassButton({ quiet: true, className: "is-active" }) }}
+              className={glassButton({ quiet: true })}
             >
               VISUALIZATIONS
             </Link>
@@ -131,8 +133,8 @@ export function SiteNav({
           <li>
             <Link
               to="/contact"
-              activeProps={{ className: "pill nav-fade nav-fade-active" }}
-              className="pill nav-fade"
+              activeProps={{ className: glassButton({ quiet: true, className: "is-active" }) }}
+              className={glassButton({ quiet: true })}
             >
               CONNECT
             </Link>
@@ -159,14 +161,14 @@ export function SiteNav({
             <span className="font-display font-black uppercase tracking-[0.02em] text-sm">
               Reid Graham <span className="font-thin">Design</span>
             </span>
-            <button
-              type="button"
+            <GlassButton
+              quiet
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
-              className="pill nav-fade pill-touch"
+              className="glass-button--touch"
             >
               CLOSE ✕
-            </button>
+            </GlassButton>
           </div>
 
           <div className="flex-1 overflow-y-auto px-6 pb-16 pt-8">
@@ -185,7 +187,7 @@ export function SiteNav({
                       <Link
                         to="/work"
                         search={{ tag: p.tag }}
-                        className="pill pill-touch animate-title-lr"
+                        className={glassButton({ touch: true, className: "animate-title-lr" })}
                         style={{ animationDelay: `${0.08 + i * 0.06}s` }}
                       >
                         {p.label}

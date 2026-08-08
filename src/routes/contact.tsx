@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { glassButton } from "@/components/glass-button";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -143,7 +144,7 @@ function Contact() {
               e.stopPropagation();
               setZoom(false);
             }}
-            className="absolute top-6 right-6 pill pill-touch"
+            className={glassButton({ touch: true, className: "absolute top-6 right-6" })}
           >
             CLOSE ✕
           </button>
