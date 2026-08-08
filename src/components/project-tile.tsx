@@ -23,11 +23,8 @@ export function ProjectTile({
    * The feed only supplies it on a wide screen. Left out — on a phone or a
    * tablet — the tile is exactly the link it looks like, and the project opens
    * as its own full page.
-   *
-   * Receives the tile's own rectangle so the panel can expand out of it and
-   * collapse back into it.
    */
-  onOpen?: (project: Project, originRect: DOMRect) => void;
+  onOpen?: (project: Project) => void;
 }) {
   return (
     <li
@@ -51,7 +48,7 @@ export function ProjectTile({
           // Let the browser handle any click that means "somewhere else".
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
           e.preventDefault();
-          onOpen(project, e.currentTarget.getBoundingClientRect());
+          onOpen(project);
         }}
         className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
         aria-label={`Open ${project.title}`}

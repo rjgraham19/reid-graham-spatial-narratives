@@ -3,25 +3,18 @@ import { createPortal } from "react-dom";
 
 import { BackChevron, GlassButton } from "./glass-button";
 
-const OPEN_MS = 460;
-const CLOSE_MS = 360;
+/**
+ * How long the panel takes to fade out before unmounting.
+ *
+ * There was an expand-from-the-tile / collapse-back-into-it animation here.
+ * It's gone: scaling the panel also scales the iframe inside it, so the whole
+ * project page stretched and squashed through the transform, and the controls
+ * rode along on top of the nav while it played. A fade does the job of
+ * covering the state change without deforming anything.
+ */
+const CLOSE_MS = 220;
 /** Matches --ease-cinematic, which WAAPI can't read from a custom property. */
 const CINEMATIC = "cubic-bezier(0.32, 0.72, 0, 1)";
-
-/**
- * The transform that maps the panel's own box onto the tile it came from, so
- * the two can be animated between. Null when there's no usable origin — a
- * direct link, or a tile that has since been laid out away — and the caller
- * falls back to a plain fade.
- */
-function transformToOrigin(panel: HTMLElement, origin?: DOMRect | null) {
-  if (!origin?.width || !origin.height) return null;
-  const r = panel.getBoundingClientRect();
-  if (!r.width || !r.height) return null;
-  const dx = origin.left + origin.width / 2 - (r.left + r.width / 2);
-  const dy = origin.top + origin.height / 2 - (r.top + r.height / 2);
-  return `translate(${dx}px, ${dy}px) scale(${origin.width / r.width}, ${origin.height / r.height})`;
-}
 
 /**
  * Opens a project as an inset panel over the feed, rather than as a full page.
@@ -54,7 +47,6 @@ export function ProjectPanel({
   onClose,
   accentHue,
   accentSaturation = 100,
-  originRect,
 }: {
   url: string;
   title: string;
@@ -67,29 +59,18 @@ export function ProjectPanel({
   accentHue?: number;
   /** Peak saturation, 0–100. Only worth setting for a shrill hue. */
   accentSaturation?: number;
-  /**
-   * The tile this was opened from, in viewport coordinates. The panel expands
-   * out of it and collapses back into it. Null on a direct ?project= visit,
-   * where there's no tile to come from and the panel simply fades.
-   */
-  originRect?: DOMRect | null;
 }) {
   const tinted = typeof accentHue === "number";
   const panelRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<Element | null>(null);
-  /** Guards against a second exit being triggered mid-collapse. */
+  /** Guards against a second exit being triggered mid-close. */
   const closingRef = useRef(false);
-  /** The expand is a one-shot. React runs effects twice in development, and
-   *  the second pass measured the panel while the first animation had it
-   *  scaled down — which produced a second, contradictory animation from
-   *  scale(1) that cancelled the effect out. */
-  const expandedRef = useRef(false);
 
   /**
    * The single exit. Back, the perimeter and Escape all come through here, so
-   * there is one close animation rather than three code paths that could
-   * drift. Runs the collapse, then unmounts.
+   * there is one close path rather than three that could drift apart. Fades
+   * the panel and its tint out together, then unmounts.
    */
   const requestClose = useCallback(() => {
     if (closingRef.current) return;
@@ -101,12 +82,6 @@ export function ProjectPanel({
       onClose();
       return;
     }
-
-    /* Cancel anything still running before measuring. Closing part-way
-       through the expand would otherwise measure the panel at whatever scale
-       it had reached, and collapse to the wrong place. */
-    panel.getAnimations().forEach((a) => a.cancel());
-    const to = transformToOrigin(panel, originRect);
 
     /* The close must not depend on the animation reporting back. A browser
        that suspends animations — a backgrounded tab, most obviously — never
@@ -121,15 +96,11 @@ export function ProjectPanel({
     };
     const failsafe = window.setTimeout(finish, CLOSE_MS + 150);
 
-    const collapse = panel.animate(
-      to
-        ? [
-            { transform: "none", opacity: 1 },
-            { transform: to, opacity: 0.15 },
-          ]
-        : [{ opacity: 1 }, { opacity: 0 }],
-      { duration: CLOSE_MS, easing: CINEMATIC, fill: "forwards" },
-    );
+    const fade = panel.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: CLOSE_MS,
+      easing: CINEMATIC,
+      fill: "forwards",
+    });
     /* The tint goes with it. A WAAPI animation outranks the CSS
        `overlay-fade-in`, so this wins over that rule's held end state. */
     overlayRef.current?.animate([{ opacity: 1 }, { opacity: 0 }], {
@@ -138,31 +109,13 @@ export function ProjectPanel({
       fill: "forwards",
     });
 
-    collapse.finished
+    fade.finished
       .then(() => {
         window.clearTimeout(failsafe);
         finish();
       })
       .catch(finish);
-  }, [onClose, originRect]);
-
-  /* Expand out of the tile. Runs once on mount — changing project while open
-     doesn't replay it, since the panel isn't remounted. */
-  useEffect(() => {
-    const panel = panelRef.current;
-    if (!panel || expandedRef.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    expandedRef.current = true;
-    const from = transformToOrigin(panel, originRect);
-    if (!from) return;
-    panel.animate(
-      [
-        { transform: from, opacity: 0.15 },
-        { transform: "none", opacity: 1 },
-      ],
-      { duration: OPEN_MS, easing: CINEMATIC },
-    );
-  }, [originRect]);
+  }, [onClose]);
 
   // Close on Escape. Captured on the parent document; the iframe gets its own
   // listener once it loads, since key events inside it don't bubble out here.

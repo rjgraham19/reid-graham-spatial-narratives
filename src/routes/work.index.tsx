@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ProjectTile } from "@/components/project-tile";
@@ -60,14 +60,6 @@ function ProjectsPage() {
      paints a frame of the panel before correcting itself. */
   const canPanel = useCanShowPanel();
 
-  /* The tile's rectangle at the moment it was clicked, so the panel knows
-     where to expand out of and collapse back into. A ref rather than state:
-     it's set in the click handler, which is already followed by the navigate
-     that re-renders, so there's nothing to gain from a second render — and
-     the panel reads it on mount, which happens after. Null on a direct
-     ?project= visit, where the panel falls back to a plain fade. */
-  const originRectRef = useRef<DOMRect | null>(null);
-
   /* resetScroll: false on both. Opening and closing the panel is a change of
      search param, not a change of page — the router's default is to send the
      reader to the top, which threw away the position they were browsing from
@@ -75,8 +67,7 @@ function ProjectsPage() {
      exactly where they left it, with the tile they clicked still under the
      cursor. */
   const openProject = useCallback(
-    (p: Project, originRect: DOMRect) => {
-      originRectRef.current = originRect;
+    (p: Project) => {
       void navigate({
         search: (prev) => ({ ...prev, project: p.slug }),
         resetScroll: false,
@@ -155,7 +146,6 @@ function ProjectsPage() {
              the neutral smoked glass, so nothing needs adding for them. */
           accentHue={open.accentHue}
           accentSaturation={open.accentSaturation}
-          originRect={originRectRef.current}
         />
       )}
 
