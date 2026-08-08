@@ -412,6 +412,33 @@
     right: var(--panel-gutter);
   }
 
+  /* The project's own close, inside the window's upper-right corner. Inset
+     from the panel edges rather than the viewport, so it holds its corner at
+     any panel width. */
+  .project-overlay-scope .panel-close {
+    top: 106px;
+    right: calc(var(--panel-gutter) + 28px);
+  }
+
+  /* Behind the site header. Near-solid black at the very top, easing down
+     through the project's own hue and out to nothing, so the header always
+     has something to sit on without a bar being drawn under it. The last
+     stop carries the hue at zero alpha rather than fading through grey,
+     which is what keeps the dissolve reading as colour rather than haze.
+
+     It paints over the perimeter but under the panel, so the project's own
+     content is never darkened by it. */
+  .project-overlay-scope .project-overlay-header-scrim {
+    background: linear-gradient(
+      to bottom,
+      hsl(0 0% 0% / 0.94) 0%,
+      hsl(0 0% 0% / 0.88) 22%,
+      hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.35%) 7% / 0.72) 48%,
+      hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.62%) 16% / 0.34) 74%,
+      hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.8%) 24% / 0) 100%
+    );
+  }
+
   /* One continuous sheet of smoked glass across the whole perimeter,
      including behind the controls.
 
@@ -535,12 +562,17 @@
    hairline dark line along the bottom edge, and one short faint catch of light
    near the top-left corner. The border is 0.07, enough to find the edge
    against bright glass and no more. */
-/* Note: no `position` here on purpose. This file's rules are unlayered and
-   Tailwind's utilities are layered, so a `position: relative` set here would
-   outrank the `absolute` its callers put on it — which is exactly what
-   happened, dropping both controls into normal flow. Positioning belongs to
-   whoever places the button, and the reflection below is drawn as a
-   background layer so it needs no positioned ancestor. */
+/* In `components` on purpose, so Tailwind's utilities — which live in a later
+   layer — win over anything declared here.
+
+   Everything else in this file is unlayered and therefore outranks utilities,
+   which is right for the pills but wrong for a button meant to be positioned
+   and hidden by whoever uses it. Unlayered, this rule's `position` beat the
+   callers' `absolute` and dropped both panel controls into normal flow; its
+   `display: inline-flex` then beat `md:hidden` and left the phone MENU button
+   showing on desktop. Layering it fixes that whole class of collision at
+   once rather than one property at a time. */
+@layer components {
 .glass-button {
   display: inline-flex;
   align-items: center;
@@ -650,6 +682,14 @@
   color: rgba(255, 255, 255, 0.97);
 }
 
+/* Icon-only — a square pane for a single mark, where the label padding would
+   leave it lopsided. */
+.glass-button--icon {
+  padding: 0;
+  width: 34px;
+  height: 34px;
+}
+
 /* Touch sizing, on coarse pointers only — a mouse keeps the tighter box the
    composition was drawn at. Mirrors what `pill-touch` does for the old pill. */
 @media (pointer: coarse) {
@@ -668,6 +708,7 @@
   .glass-button:active {
     transform: none;
   }
+}
 }
 
 /* Scoped light region.

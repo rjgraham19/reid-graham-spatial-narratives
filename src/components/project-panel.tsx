@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { BackChevron, GlassButton } from "./glass-button";
+import { CloseMark, GlassButton } from "./glass-button";
 
 /**
  * How long the panel takes to fade out before unmounting.
@@ -66,6 +66,14 @@ export function ProjectPanel({
   const returnFocusRef = useRef<Element | null>(null);
   /** Guards against a second exit being triggered mid-close. */
   const closingRef = useRef(false);
+  /**
+   * True while the project page inside the frame has its image viewer open.
+   * The project's own close hides for the duration, so there's never a pair
+   * of × marks on screen competing to be the one that dismisses the image.
+   */
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const observerRef = useRef<MutationObserver | null>(null);
+  useEffect(() => () => observerRef.current?.disconnect(), []);
 
   /**
    * The single exit. Back, the perimeter and Escape all come through here, so
@@ -183,6 +191,17 @@ export function ProjectPanel({
           "html{scrollbar-width:none}html::-webkit-scrollbar{display:none}";
         doc.head.appendChild(style);
 
+        /* Watch the frame for its image viewer opening and closing. The
+           viewer lives in the project page, a document down; same-origin, so
+           observing it directly is simpler and less brittle than adding a
+           message channel to every project page for one boolean. */
+        const check = () =>
+          setViewerOpen(!!doc.querySelector('[role="dialog"][aria-modal="true"]'));
+        check();
+        const observer = new MutationObserver(check);
+        observer.observe(doc.body, { childList: true, subtree: true });
+        observerRef.current = observer;
+
       } catch {
         /* cross-origin — outer close paths still work */
       }
@@ -223,6 +242,13 @@ export function ProjectPanel({
         className="project-overlay absolute inset-0 h-full w-full cursor-zoom-out"
       />
 
+      {/* Behind the site header: black at the top easing down through the
+          project's hue and out to nothing. Sits over the perimeter but under
+          the panel, so it gives the header something to sit on without ever
+          darkening the project's own content, and without drawing a bar.
+          pointer-events-none so the perimeter underneath stays clickable. */}
+      <div className="project-overlay-header-scrim pointer-events-none absolute inset-x-0 top-0 h-[150px]" />
+
       {/* Panel top is a fixed distance rather than a viewport fraction, so the
           controls above it always have room. The previous calc(4vh - 2.6rem)
           went negative on shorter screens and clipped the close button off the
@@ -243,44 +269,27 @@ export function ProjectPanel({
           className="h-full w-full border-0"
         />
       </div>
+
+      {/* The project's own close, in the window's upper-right corner. The only
+          control belonging to the project — the site header outside the window
+          handles everything else, and PROJECTS there already goes back to the
+          feed, which is why the Back control is gone.
+
+          Hidden while the frame's image viewer is up, so the viewer's own
+          close is unambiguously the one that dismisses the image. */}
+      {!viewerOpen && (
+        <GlassButton
+          icon
+          onClick={requestClose}
+          aria-label="Close project"
+          className="panel-close absolute z-10"
+        >
+          <CloseMark />
+        </GlassButton>
+      )}
     </div>,
     document.body,
   );
 
-  /* Back rides in its own layer, above the nav.
-
-     One exit, not two. The Close button did exactly what Back does, and two
-     controls for one action made the hierarchy read as though they were
-     different — the more so with the lightbox's own Close nested inside.
-     Back stays because it names where you end up; the perimeter and Escape do
-     the same thing without needing a label.
-
-     It can't live inside the dialog any more. The dialog is a stacking
-     context at z-100 and the nav now sits above that, so anything within it
-     paints under the nav bar. A separate portal is the only way for the
-     control to clear it.
-
-     Position: in the nav's own row, just clear of the wordmark. It used to
-     align to the panel's left edge, which put it directly on top of "Reid
-     Graham Design" — 115px of overlap. The strip is only 78px tall and the
-     nav occupies both ends of it, so there is nowhere in that band aligned to
-     the panel that is actually free; sitting in the nav row alongside the
-     wordmark is, and it reads as chrome rather than as a stray control. */
-  const backControl = createPortal(
-    <GlassButton
-      onClick={requestClose}
-      className="fixed left-6 top-[19px] z-[130] md:left-[248px] md:top-[23px]"
-    >
-      <BackChevron />
-      Back to Projects
-    </GlassButton>,
-    document.body,
-  );
-
-  return (
-    <>
-      {dialog}
-      {backControl}
-    </>
-  );
+  return dialog;
 }

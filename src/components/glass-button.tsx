@@ -23,15 +23,18 @@ export function GlassButton({
   className = "",
   type = "button",
   quiet = false,
+  icon = false,
   ...props
 }: {
   children: ReactNode;
   /** Dims the label until hover. For nav, where a row of full-strength
    *  labels competes with the page. */
   quiet?: boolean;
+  /** Square, for a single mark rather than a label. */
+  icon?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button type={type} className={glassButton({ quiet, className })} {...props}>
+    <button type={type} className={glassButton({ quiet, icon, className })} {...props}>
       {children}
     </button>
   );
@@ -74,14 +77,35 @@ export function BackChevron() {
 export function glassButton({
   quiet = false,
   touch = false,
+  icon = false,
   className = "",
-}: { quiet?: boolean; touch?: boolean; className?: string } = {}) {
+}: { quiet?: boolean; touch?: boolean; icon?: boolean; className?: string } = {}) {
   return [
     "glass-button",
     quiet ? "glass-button--quiet" : "",
     touch ? "glass-button--touch" : "",
+    icon ? "glass-button--icon" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
+}
+
+/** The close mark. Drawn for the same reason as the chevron — a glyph's
+ *  weight shifts with the font, and this one has to sit square. */
+export function CloseMark() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 12 12"
+      width="10"
+      height="10"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    >
+      <path d="M1.5 1.5 10.5 10.5M10.5 1.5 1.5 10.5" />
+    </svg>
+  );
 }
