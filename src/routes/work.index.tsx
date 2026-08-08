@@ -130,6 +130,9 @@ function ProjectsPage() {
           url={`/work/${open.hub}/${open.slug}`}
           title={open.title}
           onClose={closeProject}
+          /* PROTOTYPE — tinted magenta glass perimeter, Lollapalooza only.
+             Delete this line to take the experiment out of the site. */
+          prototypeGlass={open.slug === "lollapalooza"}
         />
       )}
 

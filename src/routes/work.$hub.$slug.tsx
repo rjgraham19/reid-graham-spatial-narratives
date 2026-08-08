@@ -280,6 +280,13 @@ function ProjectPage() {
                  comes to rest against the bar rather than sliding behind it. */
               panel ? "top-0 pt-9 md:pt-10" : "top-[76px] md:top-20 pt-10 md:pt-14"
             } ${
+              /* PROTOTYPE — Lollapalooza title lockup, desktop only. Tighter
+                 top and bottom padding, pulling the black title area in by
+                 about 17% without touching the title's own scale. Paired with
+                 the tightened gaps below; lg-gated so the phone and tablet
+                 layouts are untouched, and scoped to this one project. */
+              isLollapalooza ? "lg:pt-8 lg:pb-6" : ""
+            } ${
               /* Below lg this is the gap between the title and the hero under
                  it, so it wants to be a breath — not the deep run-out the
                  overlay needs to fade its scrim off the photograph. */
@@ -289,7 +296,10 @@ function ProjectPage() {
             } ${isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"}`}
           >
             {project.tags && project.tags.length > 0 && (
-              <div className="mb-4 flex flex-wrap gap-2">
+              /* Lollapalooza desktop: the tag sits ~40% closer to the title,
+                 so the three lines read as one lockup rather than three
+                 stacked items. */
+              <div className={`mb-4 flex flex-wrap gap-2 ${isLollapalooza ? "lg:mb-2.5" : ""}`}>
                 {project.tags.map((t: ProjectTag) => (
                   <Link
                     key={t}
@@ -316,7 +326,17 @@ function ProjectPage() {
               className="font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-[clamp(2.25rem,8vw,4.75rem)] lg:text-[clamp(3rem,8.5vw,6rem)] text-balance max-w-5xl"
             />
 
-            <p className="mt-4 text-[10px] tracking-[0.3em] uppercase text-foreground/50">
+            {/* Lollapalooza desktop: pulled up under the title so the lockup
+                closes, and lifted from 50% to 70% opacity — still clearly
+                secondary to the display type, but no longer receding into
+                the black at 10px. */}
+            <p
+              className={`mt-4 text-[10px] tracking-[0.3em] uppercase ${
+                isLollapalooza
+                  ? "text-foreground/50 lg:mt-2 lg:text-foreground/70"
+                  : "text-foreground/50"
+              }`}
+            >
               {project.subtitle}
             </p>
 

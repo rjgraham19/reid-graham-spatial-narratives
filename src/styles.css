@@ -348,6 +348,267 @@
   cursor: url("/lolla-cursor.png") 0 0, auto;
 }
 
+/* ─────────────────────────────────────────────────────────────────────
+   PROTOTYPE — Lollapalooza tinted-glass panel perimeter.
+
+   Temporary, for visual review only. Nothing reaches these rules unless
+   ProjectPanel is passed `prototypeGlass`, which work.index.tsx sets for
+   the Lollapalooza project and nothing else.
+
+   Gated to 1024px and up. The panel already doesn't render below that
+   (useCanShowPanel), so the query is belt-and-braces — but it puts the
+   desktop-only constraint in the stylesheet rather than leaving it
+   implied by a component two files away.
+
+   Covers the perimeter sheet and the panel's own glow only. The Back and
+   Close controls are NOT tinted here — they're clear glass that shows
+   whatever is behind them, which is the point of keeping them colourless.
+   See `.panel-glass-pill` below.
+
+   To remove: delete this block, the `prototypeGlass` prop on
+   ProjectPanel, and the one line in work.index.tsx that sets it. Leave
+   `.panel-glass-pill` — it isn't part of the experiment.
+   ───────────────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  /* ── The one number to change ──────────────────────────────────────
+     Panel width as a share of the viewport. The gutter is derived from
+     it, so the left and right bands are symmetrical by construction
+     rather than by two values being kept in step by hand.
+
+     Percentages, not vw: with the feed's scrollbar still reserved behind
+     the panel, 100vw is ~15px wider than the box these sit in, which
+     would push everything left by half that and quietly break the
+     symmetry. Percentages resolve against the dialog itself, which is
+     exactly the visible area.
+
+     The panel and both controls read the same gutter, so the controls
+     stay aligned to the panel's edges whatever the width is set to. */
+  .lolla-glass-scope {
+    --lolla-panel-width: 86%;
+    --lolla-panel-gutter: calc((100% - var(--lolla-panel-width)) / 2);
+  }
+  .lolla-glass-scope .lolla-glass-panel,
+  .lolla-glass-scope .panel-control-start {
+    left: var(--lolla-panel-gutter);
+  }
+  .lolla-glass-scope .lolla-glass-panel,
+  .lolla-glass-scope .panel-control-end {
+    right: var(--lolla-panel-gutter);
+  }
+
+  /* One continuous sheet of smoky magenta glass across the whole
+     perimeter, including behind the controls.
+
+     Built as a colour that is always present plus gradients that vary it,
+     rather than as a gradient that runs out of colour. A single radial
+     couldn't do this: the panel leaves only a ~70px band, so nearly
+     everything visible sits in the last fifth of one gradient's range and
+     the sheet read as black with magenta light leaking from behind the
+     window. The base wash is what keeps magenta in every part of the
+     frame; the layers on top only shift it.
+
+     Layers, in paint order (first in the list paints on top):
+
+       1. Corners. `farthest-corner` puts the edge midpoints at 0.707 and
+          the true corners at 1.0, so darkening only from 0.80 up reaches
+          the corners and leaves the rest of the frame alone. This is the
+          only place near-black belongs.
+
+       2/3. Side highlights. Broad, low-alpha ellipses sitting in the left
+          and right bands — variation within the glass, wide enough
+          (200 x 470px, fading out by 72%) that they read as unevenness in
+          the material rather than as beams or a rectangular glow.
+
+       4. The body. Rich magenta against the panel easing out through
+          berry to burgundy at the window edges — burgundy, not black, so
+          the frame stays chromatic all the way out.
+
+     Composited alpha lands near 0.38 against the panel, 0.56 at the edge
+     midpoints and 0.78 in the corners, so the feed stays readable
+     through the whole frame — which is what tells you it's clickable. */
+  .lolla-glass-perimeter {
+    /* Every alpha here is ~18% lighter than the previous pass. The hue
+       relationships are unchanged — rich magenta against the panel, burgundy
+       at the edges, near-black only in the corners — but more of the feed
+       survives the wash, so the frame reads as glass with a page behind it
+       rather than as a coloured surface. */
+    background-color: rgba(196, 16, 106, 0.11);
+    background-image:
+      radial-gradient(ellipse farthest-corner at 50% 50%,
+        rgba(10, 0, 6, 0) 80%,
+        rgba(12, 0, 7, 0.18) 92%,
+        rgba(8, 0, 5, 0.42) 100%),
+      radial-gradient(ellipse 14% 52% at 5% 50%,
+        rgba(255, 54, 158, 0.15) 0%,
+        rgba(255, 54, 158, 0) 72%),
+      radial-gradient(ellipse 14% 52% at 95% 50%,
+        rgba(255, 54, 158, 0.15) 0%,
+        rgba(255, 54, 158, 0) 72%),
+      radial-gradient(ellipse farthest-side at 50% 50%,
+        rgba(255, 44, 150, 0.24) 0%,
+        rgba(246, 30, 140, 0.26) 80%,
+        rgba(198, 20, 108, 0.31) 88%,
+        rgba(126, 22, 70, 0.39) 95%,
+        rgba(74, 20, 46, 0.46) 100%);
+    /* saturate() as a percentage, not a bare number: the build drops the
+       whole declaration on `saturate(1.35)` and the blur goes with it. */
+    -webkit-backdrop-filter: blur(14px) saturate(135%);
+    backdrop-filter: blur(14px) saturate(135%);
+  }
+
+  /* The panel is the sharp dark window floating on top of that sheet.
+
+     No border, and no dark halo hugging it either. Both drew a line around
+     the image; the picture should simply stop and the lit glass begin.
+     What separates them is contrast — pure black panel against magenta
+     glass — not an edge drawn between them.
+
+     The magenta lift is back, at roughly half of what it was. At full
+     strength it read as light escaping from behind the window; gone
+     entirely, the frame flattened out and the boundary stopped reading.
+     This sits between the two: enough to brighten the glass in the first
+     ~40px off the edge, not enough to have a shape of its own.
+
+     The one remaining black is thrown downward rather than spread all
+     round, so it reads as the window floating rather than as an outline. */
+  .lolla-glass-panel {
+    box-shadow:
+      0 0 54px -12px rgba(255, 62, 162, 0.34),
+      0 30px 70px -10px rgba(0, 0, 0, 0.62);
+  }
+
+}
+
+/* Glass button — a small tile for controls sitting on top of a page rather
+   than in it. Used by the project panel's Back and Close; see the component
+   in components/glass-button.tsx. Not part of the Lollapalooza experiment,
+   which is why it lives outside that block.
+
+   A cut pane, not a tile and not a pill: 7px corners, just enough to take the
+   sharpness off the corner without rounding into a lozenge. The surface is
+   dark and translucent rather than a pale fill — at 0.34 the perimeter still
+   comes through, so on Lollapalooza the pane picks up a hint of the magenta
+   without being given a magenta of its own.
+
+   Almost all of the modelling has been taken out on purpose. There is no top
+   sheen, no bevel, no inner glow: a broad light-to-dark gradient down the face
+   is what made these read as glossy plastic. What is left is what a thin piece
+   of smoked glass actually shows — the lower third shading very slightly, a
+   hairline dark line along the bottom edge, and one short faint catch of light
+   near the top-left corner. The border is 0.07, enough to find the edge
+   against bright glass and no more. */
+/* Note: no `position` here on purpose. This file's rules are unlayered and
+   Tailwind's utilities are layered, so a `position: relative` set here would
+   outrank the `absolute` its callers put on it — which is exactly what
+   happened, dropping both controls into normal flow. Positioning belongs to
+   whoever places the button, and the reflection below is drawn as a
+   background layer so it needs no positioned ancestor. */
+.glass-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-family: var(--font-display);
+  font-weight: 200;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.97);
+  cursor: pointer;
+
+  background-color: rgba(8, 6, 10, 0.34);
+  /* Two layers. The first is the catch of light: 1px tall, 26% of the width,
+     sitting near the top-left corner at 0.18 — short and faint enough to read
+     as an edge catching light, where the old full-width 0.55 bar read as a
+     drawn line. The second darkens only the lower third; the face above it is
+     left flat, because a gradient running the whole height is what made these
+     look like glossy buttons. */
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 62%,
+      rgba(0, 0, 0, 0.16) 100%
+    );
+  background-repeat: no-repeat, no-repeat;
+  background-size: 26% 1px, 100% 100%;
+  background-position: 20% 0, 0 0;
+  /* Percentage saturate, not a bare number — the build silently drops the
+     whole declaration otherwise, blur included. */
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+  backdrop-filter: blur(8px) saturate(115%);
+
+  /* A hairline along the bottom edge and a shallow contact shadow. No inner
+     glow, no bevel. */
+  box-shadow:
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    0 1px 4px rgba(0, 0, 0, 0.28);
+
+  transition:
+    transform 0.18s var(--ease-cinematic),
+    background-color 0.18s var(--ease-cinematic),
+    box-shadow 0.18s var(--ease-cinematic),
+    border-color 0.18s var(--ease-cinematic);
+}
+
+/* Hover lifts the pane very slightly off the glass. The label never changes
+   colour, so it stays neutral over any surround. */
+.glass-button:hover {
+  transform: translateY(-1px);
+  background-color: rgba(18, 13, 22, 0.38);
+  border-color: rgba(255, 255, 255, 0.13);
+  box-shadow:
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    0 4px 10px rgba(0, 0, 0, 0.34);
+}
+
+/* Pressed: it settles back down, darkens, and the catch of light goes out —
+   a pane pushed into its housing stops catching anything along its top edge.
+   Shallow, so it reads as the glass seating rather than as a button depressing. */
+.glass-button:active {
+  transform: translateY(1px);
+  background-color: rgba(4, 3, 6, 0.46);
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 55%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.42),
+    0 1px 2px rgba(0, 0, 0, 0.26);
+}
+
+.glass-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-button {
+    transition: background-color 0.18s linear, border-color 0.18s linear;
+  }
+  .glass-button:hover,
+  .glass-button:active {
+    transform: none;
+  }
+}
+
 /* Scoped light region.
    Used on the TaB page for everything after the transition graphic, whose
    lower half is solid white — from that point the page is meant to stay
