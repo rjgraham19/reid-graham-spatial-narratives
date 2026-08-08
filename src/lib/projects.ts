@@ -148,25 +148,30 @@ export type Project = {
    */
   heroTitleAbove?: boolean;
   /**
-   * Hue, 0–360, for the tinted glass surrounding this project when it opens
-   * as an inset panel on desktop. One number is all it takes: the overlay
-   * builds its whole range — the wash against the panel, the side highlights,
-   * the burgundy at the window edges and the glow off the panel itself — from
-   * this hue, holding the saturation and lightness ramp that makes it read as
-   * smoked glass rather than a coloured film.
+   * The project's accent, as a hue from 0–360. One number drives everything
+   * that carries this project's colour:
    *
-   * Omit it and the project gets the neutral treatment: the same glass with
-   * the saturation at zero, so it reads as smoke.
+   *   · the tinted glass surrounding it when it opens as an inset panel —
+   *     the wash against the panel, the side highlights, the deep tone at
+   *     the window edges, and the glow off the panel itself
+   *   · its title's hover colour on the projects grid
    *
-   * 330 magenta · 210 blue · 190 cyan · 30 amber · 265 violet
+   * The saturation and lightness ramps live in the CSS, so a new colour is
+   * this number and nothing else. Giving True West `accentHue: 50` turns both
+   * its overlay and its title hover yellow, with no other edit anywhere.
+   *
+   * Omit it and the project gets the neutral fallback: the overlay's glass at
+   * zero saturation, so it reads as smoke, and the site accent on the title.
+   *
+   * 330 magenta · 210 blue · 190 cyan · 50 yellow · 30 amber · 265 violet
    */
-  overlayHue?: number;
+  accentHue?: number;
   /**
-   * Peak saturation for the overlay, 0–100. Defaults to 100. Only worth
+   * Peak saturation for the accent, 0–100. Defaults to 100. Only worth
    * setting for a hue that comes out shrill at full strength; the hue alone
    * is the intended knob.
    */
-  overlaySaturation?: number;
+  accentSaturation?: number;
 };
 
 export const HUBS: {
@@ -211,8 +216,8 @@ export const PROJECTS: Project[] = [
   {
     slug: "lollapalooza",
     heroTitleAbove: true,
-    /* Y2K magenta. The overlay derives its whole range from this one number. */
-    overlayHue: 330,
+    /* Y2K magenta. Drives the overlay and the title hover from this one number. */
+    accentHue: 330,
     hub: "production-scenic",
     title: "Lollapalooza",
     subtitle: "PLACEHOLDER — venue/context line pending",

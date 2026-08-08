@@ -502,6 +502,22 @@
 
 }
 
+/* A project title takes its hover colour from the same accent that tints that
+   project's overlay — one `accentHue` in projects.ts drives both, so giving
+   True West a yellow accent turns its title hover yellow with no CSS edit.
+   ProjectTile sets `--project-accent` on the tile; projects without an accent
+   fall through to the site accent, which is what they have always used.
+
+   Lightness is fixed at 62% across every hue so the label stays legible
+   against the tile's darkened lower edge whatever colour it is.
+
+   Unlayered, so it outranks the Tailwind utility that used to do this. The
+   transition still comes from `transition-colors` on the heading — only the
+   colour changed, not the timing. */
+.group:hover .project-title {
+  color: var(--project-accent, var(--color-accent));
+}
+
 /* Glass button — a small tile for controls sitting on top of a page rather
    than in it. Used by the project panel's Back and Close; see the component
    in components/glass-button.tsx. Not part of the Lollapalooza experiment,

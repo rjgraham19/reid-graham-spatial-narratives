@@ -3,6 +3,26 @@ import { createPortal } from "react-dom";
 
 import { BackChevron, GlassButton } from "./glass-button";
 
+const OPEN_MS = 460;
+const CLOSE_MS = 360;
+/** Matches --ease-cinematic, which WAAPI can't read from a custom property. */
+const CINEMATIC = "cubic-bezier(0.32, 0.72, 0, 1)";
+
+/**
+ * The transform that maps the panel's own box onto the tile it came from, so
+ * the two can be animated between. Null when there's no usable origin — a
+ * direct link, or a tile that has since been laid out away — and the caller
+ * falls back to a plain fade.
+ */
+function transformToOrigin(panel: HTMLElement, origin?: DOMRect | null) {
+  if (!origin?.width || !origin.height) return null;
+  const r = panel.getBoundingClientRect();
+  if (!r.width || !r.height) return null;
+  const dx = origin.left + origin.width / 2 - (r.left + r.width / 2);
+  const dy = origin.top + origin.height / 2 - (r.top + r.height / 2);
+  return `translate(${dx}px, ${dy}px) scale(${origin.width / r.width}, ${origin.height / r.height})`;
+}
+
 /**
  * Opens a project as an inset panel over the feed, rather than as a full page.
  *
@@ -32,43 +52,159 @@ export function ProjectPanel({
   url,
   title,
   onClose,
-  overlayHue,
-  overlaySaturation = 100,
+  accentHue,
+  accentSaturation = 100,
+  originRect,
 }: {
   url: string;
   title: string;
   onClose: () => void;
   /**
-   * The project's tint, straight from its `overlayHue` in projects.ts. Left
+   * The project's tint, straight from its `accentHue` in projects.ts. Left
    * undefined the overlay falls back to neutral smoked glass, so a project
    * needs no overlay entry at all to open correctly.
    */
-  overlayHue?: number;
+  accentHue?: number;
   /** Peak saturation, 0–100. Only worth setting for a shrill hue. */
-  overlaySaturation?: number;
+  accentSaturation?: number;
+  /**
+   * The tile this was opened from, in viewport coordinates. The panel expands
+   * out of it and collapses back into it. Null on a direct ?project= visit,
+   * where there's no tile to come from and the panel simply fades.
+   */
+  originRect?: DOMRect | null;
 }) {
-  const tinted = typeof overlayHue === "number";
+  const tinted = typeof accentHue === "number";
   const panelRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<Element | null>(null);
+  /** Guards against a second exit being triggered mid-collapse. */
+  const closingRef = useRef(false);
+  /** The expand is a one-shot. React runs effects twice in development, and
+   *  the second pass measured the panel while the first animation had it
+   *  scaled down — which produced a second, contradictory animation from
+   *  scale(1) that cancelled the effect out. */
+  const expandedRef = useRef(false);
+
+  /**
+   * The single exit. Back, the perimeter and Escape all come through here, so
+   * there is one close animation rather than three code paths that could
+   * drift. Runs the collapse, then unmounts.
+   */
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+
+    const panel = panelRef.current;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !panel) {
+      onClose();
+      return;
+    }
+
+    /* Cancel anything still running before measuring. Closing part-way
+       through the expand would otherwise measure the panel at whatever scale
+       it had reached, and collapse to the wrong place. */
+    panel.getAnimations().forEach((a) => a.cancel());
+    const to = transformToOrigin(panel, originRect);
+
+    /* The close must not depend on the animation reporting back. A browser
+       that suspends animations — a backgrounded tab, most obviously — never
+       resolves `finished`, and the panel would be stranded open with no way
+       out. Whichever arrives first wins, and the guard makes the second a
+       no-op. */
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      onClose();
+    };
+    const failsafe = window.setTimeout(finish, CLOSE_MS + 150);
+
+    const collapse = panel.animate(
+      to
+        ? [
+            { transform: "none", opacity: 1 },
+            { transform: to, opacity: 0.15 },
+          ]
+        : [{ opacity: 1 }, { opacity: 0 }],
+      { duration: CLOSE_MS, easing: CINEMATIC, fill: "forwards" },
+    );
+    /* The tint goes with it. A WAAPI animation outranks the CSS
+       `overlay-fade-in`, so this wins over that rule's held end state. */
+    overlayRef.current?.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: CLOSE_MS,
+      easing: "linear",
+      fill: "forwards",
+    });
+
+    collapse.finished
+      .then(() => {
+        window.clearTimeout(failsafe);
+        finish();
+      })
+      .catch(finish);
+  }, [onClose, originRect]);
+
+  /* Expand out of the tile. Runs once on mount — changing project while open
+     doesn't replay it, since the panel isn't remounted. */
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel || expandedRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    expandedRef.current = true;
+    const from = transformToOrigin(panel, originRect);
+    if (!from) return;
+    panel.animate(
+      [
+        { transform: from, opacity: 0.15 },
+        { transform: "none", opacity: 1 },
+      ],
+      { duration: OPEN_MS, easing: CINEMATIC },
+    );
+  }, [originRect]);
 
   // Close on Escape. Captured on the parent document; the iframe gets its own
   // listener once it loads, since key events inside it don't bubble out here.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") requestClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [requestClose]);
 
-  // Hold the feed still behind the panel, and put focus back where it was.
+  /* Hold the feed still behind the panel, and put focus back where it was.
+
+     `overflow: hidden` alone wasn't holding it still: making the document
+     unscrollable clamps the scroll offset to zero, so the feed jumped to the
+     top the moment the panel opened — visible right through the glass — and
+     closing left the reader at the top of the page rather than at the tile
+     they came from. Pinning the body at a negative offset keeps every pixel
+     where it was, and the offset is scrolled back on the way out.
+
+     This also keeps `originRect` valid: the tile stays at the same viewport
+     position throughout, so the panel collapses back onto it. */
   useEffect(() => {
     returnFocusRef.current = document.activeElement;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const body = document.body;
+    const y = window.scrollY;
+    const previous = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      overflow: body.style.overflow,
+    };
+    body.style.position = "fixed";
+    body.style.top = `-${y}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.overflow = "hidden";
     panelRef.current?.focus();
     return () => {
-      document.body.style.overflow = previous;
+      Object.assign(body.style, previous);
+      window.scrollTo(0, y);
       (returnFocusRef.current as HTMLElement | null)?.focus?.();
     };
   }, []);
@@ -83,7 +219,7 @@ export function ProjectPanel({
         if (!doc) return;
 
         doc.addEventListener("keydown", (ev) => {
-          if ((ev as KeyboardEvent).key === "Escape") onClose();
+          if ((ev as KeyboardEvent).key === "Escape") requestClose();
         });
 
         // Hide the panel's scrollbar. It sits inside the rounded corners and
@@ -98,7 +234,7 @@ export function ProjectPanel({
         /* cross-origin — outer close paths still work */
       }
     },
-    [onClose],
+    [requestClose],
   );
 
   return createPortal(
@@ -112,8 +248,8 @@ export function ProjectPanel({
       style={
         tinted
           ? ({
-              "--overlay-hue": String(overlayHue),
-              "--overlay-sat": String(overlaySaturation),
+              "--overlay-hue": String(accentHue),
+              "--overlay-sat": String(accentSaturation),
               "--overlay-alpha": "1",
             } as React.CSSProperties)
           : undefined
@@ -127,8 +263,9 @@ export function ProjectPanel({
           gentler blur keeps the feed legible underneath, so it stays obvious
           that the page is only inset and that clicking out returns to it. */}
       <button
+        ref={overlayRef}
         type="button"
-        onClick={onClose}
+        onClick={requestClose}
         aria-label="Close project"
         className="project-overlay absolute inset-0 h-full w-full cursor-zoom-out"
       />
@@ -154,27 +291,20 @@ export function ProjectPanel({
         />
       </div>
 
-      {/* Both controls live in the panel's chrome rather than in the page
-          inside it, so they stay put while the project scrolls. The back link
-          used to be the first thing in the page itself and scrolled away with
-          it; here it mirrors the close button and is always reachable. */}
-      {/* Glass tiles, the same for every project — they take their tint from
-          the perimeter behind them rather than carrying one of their own, so
-          a tinted perimeter needs no matching button treatment. */}
+      {/* One exit, not two. The Close button did exactly what Back does, and
+          two controls for one action made the hierarchy read as though they
+          were different — particularly with the lightbox's own Close nested
+          inside. Back stays because it names where you end up; the perimeter
+          and Escape do the same thing without needing a label.
+
+          It lives in the panel's chrome rather than in the page inside it, so
+          it stays put while the project scrolls. */}
       <GlassButton
-        onClick={onClose}
+        onClick={requestClose}
         className="panel-control-start absolute left-[3vw] top-[34px] z-10 md:left-[5vw]"
       >
         <BackChevron />
         Back to Projects
-      </GlassButton>
-
-      <GlassButton
-        onClick={onClose}
-        aria-label="Close project"
-        className="panel-control-end absolute right-[3vw] top-[34px] z-10 md:right-[5vw]"
-      >
-        Close ✕
       </GlassButton>
     </div>,
     document.body,
