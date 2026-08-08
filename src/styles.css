@@ -420,25 +420,6 @@
     right: calc(var(--panel-gutter) + 28px);
   }
 
-  /* Behind the site header. Near-solid black at the very top, easing down
-     through the project's own hue and out to nothing, so the header always
-     has something to sit on without a bar being drawn under it. The last
-     stop carries the hue at zero alpha rather than fading through grey,
-     which is what keeps the dissolve reading as colour rather than haze.
-
-     It paints over the perimeter but under the panel, so the project's own
-     content is never darkened by it. */
-  .project-overlay-scope .project-overlay-header-scrim {
-    background: linear-gradient(
-      to bottom,
-      hsl(0 0% 0% / 0.94) 0%,
-      hsl(0 0% 0% / 0.88) 22%,
-      hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.35%) 7% / 0.72) 48%,
-      hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.62%) 16% / 0.34) 74%,
-      hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.8%) 24% / 0) 100%
-    );
-  }
-
   /* One continuous sheet of smoked glass across the whole perimeter,
      including behind the controls.
 

@@ -242,13 +242,6 @@ export function ProjectPanel({
         className="project-overlay absolute inset-0 h-full w-full cursor-zoom-out"
       />
 
-      {/* Behind the site header: black at the top easing down through the
-          project's hue and out to nothing. Sits over the perimeter but under
-          the panel, so it gives the header something to sit on without ever
-          darkening the project's own content, and without drawing a bar.
-          pointer-events-none so the perimeter underneath stays clickable. */}
-      <div className="project-overlay-header-scrim pointer-events-none absolute inset-x-0 top-0 h-[150px]" />
-
       {/* Panel top is a fixed distance rather than a viewport fraction, so the
           controls above it always have room. The previous calc(4vh - 2.6rem)
           went negative on shorter screens and clipped the close button off the
