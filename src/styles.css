@@ -581,27 +581,21 @@
   cursor: pointer;
 
   background-color: rgba(8, 6, 10, 0.34);
-  /* Two layers. The first is the catch of light: 1px tall, 26% of the width,
-     sitting near the top-left corner at 0.18 — short and faint enough to read
-     as an edge catching light, where the old full-width 0.55 bar read as a
-     drawn line. The second darkens only the lower third; the face above it is
-     left flat, because a gradient running the whole height is what made these
-     look like glossy buttons. */
-  background-image:
-    linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.18) 50%,
-      rgba(255, 255, 255, 0) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) 62%,
-      rgba(0, 0, 0, 0.16) 100%
-    );
-  background-repeat: no-repeat, no-repeat;
-  background-size: 26% 1px, 100% 100%;
-  background-position: 20% 0, 0 0;
+  /* One continuous shade gathering in the lower third, and nothing else.
+     The face above it is left flat: a gradient running the whole height is
+     what made these look like glossy buttons.
+
+     There was a catch of light along the top edge here, drawn as a second
+     background layer 1px tall. At that height a low-alpha gradient has
+     nowhere to resolve — the renderer dithers it, and on a fractional device
+     pixel it straddles two rows — which is what showed up as a pixelated
+     strip. Nothing replaces it; the border and the lower shade carry the
+     edge on their own. */
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 62%,
+    rgba(0, 0, 0, 0.16) 100%
+  );
   /* Percentage saturate, not a bare number — the build silently drops the
      whole declaration otherwise, blur included. */
   -webkit-backdrop-filter: blur(8px) saturate(115%);
@@ -637,18 +631,11 @@
 .glass-button:active {
   transform: translateY(1px);
   background-color: rgba(4, 3, 6, 0.46);
-  background-image:
-    linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) 55%,
-      rgba(0, 0, 0, 0.2) 100%
-    );
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 55%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
   box-shadow:
     inset 0 1px 3px rgba(0, 0, 0, 0.42),
     0 1px 2px rgba(0, 0, 0, 0.26);
