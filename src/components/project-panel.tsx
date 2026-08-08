@@ -45,22 +45,18 @@ export function ProjectPanel({
   url,
   title,
   onClose,
-  accentHue,
-  accentSaturation = 100,
+  accentColor,
 }: {
   url: string;
   title: string;
   onClose: () => void;
   /**
-   * The project's tint, straight from its `accentHue` in projects.ts. Left
+   * The project's tint, straight from its `accentColor` in projects.ts. Left
    * undefined the overlay falls back to neutral smoked glass, so a project
-   * needs no overlay entry at all to open correctly.
+   * needs no accent at all to open correctly.
    */
-  accentHue?: number;
-  /** Peak saturation, 0–100. Only worth setting for a shrill hue. */
-  accentSaturation?: number;
+  accentColor?: string;
 }) {
-  const tinted = typeof accentHue === "number";
   const panelRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<Element | null>(null);
@@ -209,12 +205,8 @@ export function ProjectPanel({
     [requestClose],
   );
 
-  const overlayVars = tinted
-    ? ({
-        "--overlay-hue": String(accentHue),
-        "--overlay-sat": String(accentSaturation),
-        "--overlay-alpha": "1",
-      } as React.CSSProperties)
+  const overlayVars = accentColor
+    ? ({ "--accent-color": accentColor } as React.CSSProperties)
     : undefined;
 
   const dialog = createPortal(

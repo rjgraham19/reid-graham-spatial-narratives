@@ -398,11 +398,20 @@
     --panel-width: 86%;
     --panel-gutter: calc((100% - var(--panel-width)) / 2);
 
-    /* Neutral defaults. ProjectPanel overrides hue/sat/alpha inline when the
-       project carries an overlayHue. */
-    --overlay-hue: 0;
-    --overlay-sat: 0;
-    --overlay-alpha: 0.8;
+    /* Neutral default. ProjectPanel sets --accent-color inline from the
+       project's own hex; without one this grey gives the smoked glass a
+       project with no accent falls back to. */
+    --accent-color: #6b6b6b;
+
+    /* The ramp, derived from that one colour. Lifted for the highlight that
+       sits against the panel, then mixed progressively into black on the way
+       out to the window edge. Every tone below is one of these plus an
+       alpha — which is what keeps the sheet translucent rather than a field
+       of the accent. */
+    --accent-lift: color-mix(in srgb, var(--accent-color) 82%, white);
+    --accent-deep: color-mix(in srgb, var(--accent-color) 62%, black);
+    --accent-deeper: color-mix(in srgb, var(--accent-color) 38%, black);
+    --accent-edge: color-mix(in srgb, var(--accent-color) 22%, black);
   }
   /* Only the panel reads the gutter now. The Back control used to align to it
      too, which is exactly what dropped it on top of the wordmark; it lives in
@@ -456,24 +465,24 @@
      midpoints and 0.71 in the corners, so the feed stays readable through
      the whole frame — which is what tells you it's clickable. */
   .project-overlay {
-    background-color: hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.849%) 41.57% / calc(0.11 * var(--overlay-alpha)));
+    background-color: color-mix(in srgb, var(--accent-deep) 11%, transparent);
     background-image:
       radial-gradient(ellipse farthest-corner at 50% 50%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 1.96% / 0) 80%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 2.35% / calc(0.18 * var(--overlay-alpha))) 92%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 1.57% / calc(0.42 * var(--overlay-alpha))) 100%),
+        rgba(0, 0, 0, 0) 80%,
+        color-mix(in srgb, black 18%, transparent) 92%,
+        color-mix(in srgb, black 42%, transparent) 100%),
       radial-gradient(ellipse 14% 52% at 5% 50%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / calc(0.15 * var(--overlay-alpha))) 0%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / 0) 72%),
+        color-mix(in srgb, var(--accent-lift) 15%, transparent) 0%,
+        color-mix(in srgb, var(--accent-lift) 0%, transparent) 72%),
       radial-gradient(ellipse 14% 52% at 95% 50%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / calc(0.15 * var(--overlay-alpha))) 0%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 60.59% / 0) 72%),
+        color-mix(in srgb, var(--accent-lift) 15%, transparent) 0%,
+        color-mix(in srgb, var(--accent-lift) 0%, transparent) 72%),
       radial-gradient(ellipse farthest-side at 50% 50%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 58.63% / calc(0.24 * var(--overlay-alpha))) 0%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.923%) 54.12% / calc(0.26 * var(--overlay-alpha))) 80%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.817%) 42.75% / calc(0.31 * var(--overlay-alpha))) 88%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.703%) 29.02% / calc(0.39 * var(--overlay-alpha))) 95%,
-        hsl(var(--overlay-hue) calc(var(--overlay-sat) * 0.574%) 18.43% / calc(0.46 * var(--overlay-alpha))) 100%);
+        color-mix(in srgb, var(--accent-lift) 24%, transparent) 0%,
+        color-mix(in srgb, var(--accent-color) 26%, transparent) 80%,
+        color-mix(in srgb, var(--accent-deep) 31%, transparent) 88%,
+        color-mix(in srgb, var(--accent-deeper) 39%, transparent) 95%,
+        color-mix(in srgb, var(--accent-edge) 46%, transparent) 100%);
     /* saturate() as a percentage, not a bare number: the build drops the
        whole declaration on `saturate(1.35)` and the blur goes with it. */
     -webkit-backdrop-filter: blur(14px) saturate(135%);
@@ -503,7 +512,7 @@
      round, so it reads as the window floating rather than as an outline. */
   .project-overlay-panel {
     box-shadow:
-      0 0 54px -12px hsl(var(--overlay-hue) calc(var(--overlay-sat) * 1%) 62.16% / calc(0.34 * var(--overlay-alpha))),
+      0 0 54px -12px color-mix(in srgb, var(--accent-lift) 34%, transparent),
       0 30px 70px -10px rgba(0, 0, 0, 0.62);
   }
 

@@ -149,10 +149,9 @@ function ProjectsPage() {
           url={`/work/${open.hub}/${open.slug}`}
           title={open.title}
           onClose={closeProject}
-          /* Straight from the project data. Projects with no accentHue get
+          /* Straight from the project data. Projects with no accentColor get
              the neutral smoked glass, so nothing needs adding for them. */
-          accentHue={open.accentHue}
-          accentSaturation={open.accentSaturation}
+          accentColor={open.accentColor}
         />
       )}
 

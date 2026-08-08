@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { Project } from "@/lib/projects";
+import { accentTitleColor, type Project } from "@/lib/projects";
 
 /**
  * Square grid thumbnail, shared by the unified /work feed and the
@@ -29,13 +29,15 @@ export function ProjectTile({
   return (
     <li
       className="relative"
-      /* The project's accent, from the same `accentHue` that tints its
-         overlay. Set here so the title inherits it; left unset the title
-         falls through to the site accent, which is what it has always used. */
+      /* The project's accent, from the same `accentColor` that tints its
+         overlay — used as given, except where it is too dark to read as a
+         hover, which accentTitleColor lifts. Set here so the title inherits
+         it; left unset the title falls through to the site accent, which is
+         what it has always used. */
       style={
-        typeof project.accentHue === "number"
+        project.accentColor
           ? ({
-              "--project-accent": `hsl(${project.accentHue} ${project.accentSaturation ?? 100}% 62%)`,
+              "--project-accent": accentTitleColor(project.accentColor),
             } as React.CSSProperties)
           : undefined
       }

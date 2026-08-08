@@ -148,31 +148,63 @@ export type Project = {
    */
   heroTitleAbove?: boolean;
   /**
-   * The project's accent, as a hue from 0–360. One number drives everything
-   * that carries this project's colour:
+   * The project's accent, as a hex colour. One value drives everything that
+   * carries this project's colour:
    *
    *   · the tinted glass surrounding it when it opens as an inset panel —
-   *     the wash against the panel, the side highlights, the deep tone at
-   *     the window edges, and the glow off the panel itself
+   *     the wash against the panel, the side highlights, the deepening tone
+   *     out to the window edges, and the glow off the panel itself
    *   · its title's hover colour on the projects grid
    *
-   * The saturation and lightness ramps live in the CSS, so a new colour is
-   * this number and nothing else. Giving True West `accentHue: 50` turns both
-   * its overlay and its title hover yellow, with no other edit anywhere.
+   * The tones are derived in CSS with color-mix, so changing this hex changes
+   * both places and nothing else needs editing.
    *
-   * Omit it and the project gets the neutral fallback: the overlay's glass at
-   * zero saturation, so it reads as smoke, and the site accent on the title.
-   *
-   * 330 magenta · 210 blue · 190 cyan · 50 yellow · 30 amber · 265 violet
+   * Omit it and the project keeps the neutral fallback: grey smoked glass in
+   * the overlay, and the site accent on the title.
    */
-  accentHue?: number;
-  /**
-   * Peak saturation for the accent, 0–100. Defaults to 100. Only worth
-   * setting for a hue that comes out shrill at full strength; the hue alone
-   * is the intended knob.
-   */
-  accentSaturation?: number;
+  accentColor?: string;
 };
+
+/**
+ * The accent as a title-hover colour.
+ *
+ * Normally the accent exactly as given. The one exception is a colour too
+ * dark to read as a hover against the tile's darkened lower edge — Anne
+ * Frank's #363D4F sits at 26% lightness, which would be all but invisible on
+ * black. Those are lifted to a legible lightness with their hue and
+ * saturation intact, so it stays that project's colour rather than becoming
+ * a different one.
+ *
+ * The rule is applied uniformly from the stored value rather than being a
+ * per-project override, so the threshold governs any future accent too.
+ */
+const MIN_HOVER_LIGHTNESS = 0.42;
+
+export function accentTitleColor(hex?: string): string | undefined {
+  if (!hex) return undefined;
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (l >= MIN_HOVER_LIGHTNESS) return hex;
+
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = 60 * (((g - b) / d) % 6);
+    else if (max === g) h = 60 * ((b - r) / d + 2);
+    else h = 60 * ((r - g) / d + 4);
+  }
+  if (h < 0) h += 360;
+  return `hsl(${h.toFixed(1)} ${(s * 100).toFixed(1)}% 58%)`;
+}
 
 export const HUBS: {
   slug: Hub;
@@ -216,8 +248,8 @@ export const PROJECTS: Project[] = [
   {
     slug: "lollapalooza",
     heroTitleAbove: true,
-    /* Y2K magenta. Drives the overlay and the title hover from this one number. */
-    accentHue: 330,
+    /* Y2K magenta. Drives the overlay and the title hover from this one value. */
+    accentColor: "#E20074",
     hub: "production-scenic",
     title: "Lollapalooza",
     subtitle: "PLACEHOLDER — venue/context line pending",
@@ -261,6 +293,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "true-west",
+    accentColor: "#D6BAA0",
     highlight: hlTrueWest,
     highlightPosition: "50% 50%",
     hub: "production-scenic",
@@ -293,6 +326,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "the-diary-of-anne-frank",
+    accentColor: "#363D4F",
     hub: "production-scenic",
     title: "The Diary of Anne Frank",
     subtitle: "Deerfield Studio Theatre",
@@ -321,6 +355,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "reshuffling-the-deck",
+    accentColor: "#A79E95",
     heroPortrait: true,
     hub: "production-scenic",
     title: "Reshuffling the Deck",
@@ -370,6 +405,7 @@ export const PROJECTS: Project[] = [
   // ─── Architecture (order per spec) ───────────────────────────────
   {
     slug: "field-house",
+    accentColor: "#98A633",
     highlight: hlFieldHouse,
     highlightPosition: "70% 50%",
     hub: "architecture",
@@ -424,6 +460,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "staging-aesthetics",
+    accentColor: "#3854B1",
     heroTitleAbove: true,
     heroPortrait: true,
     highlight: hlStaging,
