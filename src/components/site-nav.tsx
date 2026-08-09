@@ -105,7 +105,13 @@ export function SiteNav({
             <div
               className="absolute right-0 top-full pt-3 opacity-0 pointer-events-none translate-y-1 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 transition-all duration-200 ease-cinematic"
             >
-              <ul className="flex flex-col gap-2 min-w-[240px]">
+              {/* No fixed width. The list shrink-to-fits the longest label —
+                  "Production / Scenic" — and w-full below sizes the other two
+                  to match, so all three stay equal without a number being
+                  picked. The 240px that used to be here left 46px of empty
+                  space either side of even the longest one, and 79px around
+                  "Experiential". */}
+              <ul className="flex flex-col gap-2">
                 {NAV.projects.map((p) => (
                   <li key={p.tag}>
                     <Link
