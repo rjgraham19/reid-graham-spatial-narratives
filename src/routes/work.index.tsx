@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProjectTile } from "@/components/project-tile";
 import { ProjectPanel } from "@/components/project-panel";
 import { useCanShowPanel } from "@/hooks/use-media-query";
+import { glassButton } from "@/components/glass-button";
 import {
   PROJECT_TAGS,
   taggedProjects,
@@ -174,20 +175,18 @@ function FilterPill({
   label: string;
 }) {
   return (
+    /* The same glass pane as the nav, from the same component — these are
+       navigation controls too, and they sat two rows below the nav in a
+       different shape, radius and type size.
+
+       Active reads the way it does in the nav: the label at full strength
+       against the others at half. That replaces the filled-white pill this
+       row used to use for its selected state — a solid fill is the one thing
+       the glass surface can't also be. */
     <Link
       to="/work"
       search={to}
-      // Display family at extra-light, matching the pills and the thin
-      // "Design" in the wordmark. This row previously fell through to the body
-      // font, which is why it read as a second typeface.
-      // inline-flex + min-h-11 gives the row the 44px a finger needs on a
-      // phone without changing how it looks anywhere else — the label stays
-      // centred, and from md the padding governs the height as before.
-      className={`font-display font-extralight inline-flex items-center min-h-11 md:min-h-0 px-5 py-2 rounded-full border text-xs md:text-sm uppercase tracking-[0.2em] transition-colors duration-[350ms] ${
-        active
-          ? "bg-foreground text-black border-foreground"
-          : "border-foreground/30 text-foreground/45 hover:border-foreground hover:text-foreground"
-      }`}
+      className={glassButton({ quiet: true, touch: true, className: active ? "is-active" : "" })}
     >
       {label}
     </Link>

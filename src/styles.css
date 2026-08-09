@@ -653,8 +653,13 @@
 .glass-button--quiet {
   color: rgba(255, 255, 255, 0.5);
 }
+/* `.is-active` only — deliberately not `[aria-current]`. The router marks a
+   link current on a path match, and every filter in the projects row points
+   at /work, so "All" was flagged current alongside whichever tag was actually
+   selected and two labels lit at once. The class is set explicitly, by the
+   nav's activeProps and by the filter row's own active prop, so it means the
+   one thing intended. */
 .glass-button--quiet:hover,
-.glass-button--quiet[aria-current],
 .glass-button--quiet.is-active {
   color: rgba(255, 255, 255, 0.97);
 }
