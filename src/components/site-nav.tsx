@@ -65,7 +65,12 @@ export function SiteNav({
              page below it allows for, so headings and back buttons ended up
              underneath it. Below md the three links collapse into one MENU
              control instead, which keeps the bar one row high everywhere. */
-          "fixed top-0 left-0 w-full z-[110] px-6 md:px-10 py-4 md:py-6 flex items-center justify-between gap-4 md:gap-6 " +
+          /* The backing fades rather than switching. This same bar stays
+             mounted when a project opens over the feed — only its background
+             drops away so the project's ombré shows through it — and swapping
+             that instantly was what made a persistent header read as a
+             replaced one. Nothing else about the bar animates. */
+          "fixed top-0 left-0 w-full z-[110] px-6 md:px-10 py-4 md:py-6 flex items-center justify-between gap-4 md:gap-6 transition-[background-color,backdrop-filter] duration-300 ease-cinematic " +
           (isTransparent ? "" : "bg-background/80 backdrop-blur-md")
         }
       >

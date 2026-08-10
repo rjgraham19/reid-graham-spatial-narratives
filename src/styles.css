@@ -338,6 +338,23 @@
        sticky project title would stop pinning. */
     overflow-x: clip;
   }
+  /* Hold the scrollbar's space open whether or not a scrollbar is showing.
+
+     Opening a project pins the body so the feed can't scroll behind it, which
+     removes the scrollbar — and with it 15px of viewport width. Everything
+     anchored to the right edge jumped left to right by that much as the panel
+     opened, and back again when it closed: the header's PROJECTS /
+     VISUALIZATIONS / CONNECT most visibly, since they're right-aligned in a
+     full-width bar. Reserving the gutter permanently means the width never
+     changes, so nothing moves.
+
+     On html only — putting it on both would reserve two gutters. It reserves
+     space rather than altering scrolling, so the scroll behaviour and the
+     existing lock are untouched, and it fixes every other place that hides
+     overflow (the phone menu, the lightboxes) at the same time. */
+  html {
+    scrollbar-gutter: stable;
+  }
   ::selection {
     background: var(--color-accent);
     color: var(--color-accent-foreground);
