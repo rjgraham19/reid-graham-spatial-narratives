@@ -180,7 +180,15 @@ function ProjectPage() {
   };
 
   return (
-    <div className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor" : ""}`}>
+    /* `is-panel-frame` marks this document as the one rendered inside the
+       panel. It's server-rendered from the panel=1 search param, so it's in
+       the very first HTML the frame parses, which is what lets the stylesheet
+       hide the frame's scrollbar before anything is painted. */
+    <div
+      className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor" : ""}${
+        panel ? " is-panel-frame" : ""
+      }`}
+    >
       {!panel && <SiteNav />}
 
       {/* Back — to /work for tagged projects, to hub for visualizations */}

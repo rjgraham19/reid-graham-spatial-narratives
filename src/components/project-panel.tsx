@@ -179,9 +179,12 @@ export function ProjectPanel({
           if ((ev as KeyboardEvent).key === "Escape") requestClose();
         });
 
-        // Hide the panel's scrollbar. It sits inside the rounded corners and
-        // reads as a browser chrome artefact rather than part of the page.
-        // Scrolling itself is untouched.
+        /* Fallback only. The frame's scrollbar is hidden by a stylesheet rule
+           matching `.is-panel-frame`, which the frame server-renders — that
+           lands before first paint, where this doesn't: injecting on load left
+           the scrollbar visible for the first few hundred milliseconds, which
+           is the bar that appeared and vanished as the panel opened. This stays
+           for browsers without :has(), where it's the only thing hiding it. */
         const style = doc.createElement("style");
         style.textContent =
           "html{scrollbar-width:none}html::-webkit-scrollbar{display:none}";

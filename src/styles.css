@@ -355,6 +355,25 @@
   html {
     scrollbar-gutter: stable;
   }
+  /* …except in the panel. A project opened inset is its own document, so it
+     gets its own scrollbar, and that scrollbar sits inside the panel's
+     rounded corners reading as browser chrome rather than part of the page.
+
+     This has to land before first paint. It used to be injected by the parent
+     on the frame's load event, which left the scrollbar — and, since the rule
+     above, a reserved gutter with it — visible for the first few hundred
+     milliseconds: the bar that appeared and vanished as the panel opened.
+     Matching on a class the frame server-renders means the rule is in the
+     stylesheet the frame parses, so there's nothing to flash.
+
+     Scrolling itself is untouched; only the indicator is hidden. */
+  html:has(.is-panel-frame) {
+    scrollbar-width: none;
+    scrollbar-gutter: auto;
+  }
+  html:has(.is-panel-frame)::-webkit-scrollbar {
+    display: none;
+  }
   ::selection {
     background: var(--color-accent);
     color: var(--color-accent-foreground);
