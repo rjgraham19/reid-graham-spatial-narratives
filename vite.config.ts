@@ -12,8 +12,18 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  // Target Netlify for production builds instead of the default Cloudflare preset.
+  /* Which host this build targets.
+   *
+   * Netlify by default, so nothing about the existing GitHub → Netlify flow
+   * changes. Cloudflare Pages sets NITRO_PRESET=cloudflare-pages in its own
+   * build environment and gets a Workers build from the same commit — two
+   * hosts off one repo, without either of them needing a branch of its own.
+   *
+   * The preset decides where the server bundle lands, which is why it can't
+   * just be swapped by hand per deploy: netlify writes to
+   * .netlify/functions-internal/, cloudflare-pages writes a worker into dist/.
+   */
   nitro: {
-    preset: "netlify",
+    preset: process.env.NITRO_PRESET ?? "netlify",
   },
 });
