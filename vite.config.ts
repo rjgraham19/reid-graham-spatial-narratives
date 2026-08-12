@@ -14,16 +14,17 @@ export default defineConfig({
   },
   /* Which host this build targets.
    *
-   * Netlify by default, so nothing about the existing GitHub → Netlify flow
-   * changes. Cloudflare Pages sets NITRO_PRESET=cloudflare-pages in its own
-   * build environment and gets a Workers build from the same commit — two
-   * hosts off one repo, without either of them needing a branch of its own.
+   * Cloudflare Pages by default, because that's where the site is hosted.
+   * This has to be the default rather than something Cloudflare sets in its
+   * dashboard: the preset decides where the server bundle lands, and under
+   * the netlify preset the build emits .netlify/functions-internal/ and a
+   * dist/ with no worker in it at all — assets and nothing to render them.
+   * Cloudflare would deploy that quite happily and serve nothing.
    *
-   * The preset decides where the server bundle lands, which is why it can't
-   * just be swapped by hand per deploy: netlify writes to
-   * .netlify/functions-internal/, cloudflare-pages writes a worker into dist/.
+   * Netlify still builds correctly from the same commit by setting
+   * NITRO_PRESET=netlify in its own build environment.
    */
   nitro: {
-    preset: process.env.NITRO_PRESET ?? "netlify",
+    preset: process.env.NITRO_PRESET ?? "cloudflare-pages",
   },
 });
