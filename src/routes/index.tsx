@@ -52,7 +52,7 @@ function Home() {
           <Link
             to="/contact"
             aria-label="Contact — pick up the phone"
-            className="group absolute inset-0 block overflow-hidden"
+            className="absolute inset-0 block overflow-hidden"
           >
             <img
               src={HERO_URL}
@@ -62,12 +62,6 @@ function Home() {
             {/* Ambient darken toward the split line */}
             <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-background via-background/40 to-transparent hidden md:block" />
             <div className="absolute inset-0 md:hidden bg-background/50" />
-            {/* Ring the phone-booth hotspot subtly on hover */}
-            <span
-              className="pointer-events-none absolute right-6 bottom-6 md:right-10 md:bottom-10 pill pill-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            >
-              PICK UP · CONTACT
-            </span>
           </Link>
         </div>
       </div>
