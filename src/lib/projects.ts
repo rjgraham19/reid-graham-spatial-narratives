@@ -168,15 +168,15 @@ export type Project = {
 /**
  * The accent as a title-hover colour.
  *
- * Normally the accent exactly as given. The one exception is a colour too
- * dark to read as a hover against the tile's darkened lower edge — Anne
- * Frank's #363D4F sits at 26% lightness, which would be all but invisible on
- * black. Those are lifted to a legible lightness with their hue and
- * saturation intact, so it stays that project's colour rather than becoming
- * a different one.
+ * Normally the accent exactly as given. The exception is a colour too dark to
+ * read as a hover against the tile's darkened lower edge: below 42% lightness
+ * it's lifted to 58% with its hue and saturation intact, so it stays that
+ * project's colour rather than becoming a different one.
  *
- * The rule is applied uniformly from the stored value rather than being a
- * per-project override, so the threshold governs any future accent too.
+ * No current accent trips it — the darkest in use is #9c00e1 at 44%. It's kept
+ * as a guard on future ones, and applied uniformly from the stored value
+ * rather than as a per-project override. The overlay always uses the stored
+ * colour exactly; only this hover reading is ever lifted.
  */
 const MIN_HOVER_LIGHTNESS = 0.42;
 
@@ -293,7 +293,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "true-west",
-    accentColor: "#D6BAA0",
+    accentColor: "#c28127",
     highlight: hlTrueWest,
     highlightPosition: "50% 50%",
     hub: "production-scenic",
@@ -326,7 +326,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "the-diary-of-anne-frank",
-    accentColor: "#363D4F",
+    accentColor: "#d7d9e6",
     hub: "production-scenic",
     title: "The Diary of Anne Frank",
     subtitle: "Deerfield Studio Theatre",
@@ -378,6 +378,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "tab-renaissance",
+    accentColor: "#9c00e1",
     heroTitleAbove: true,
     hub: "production-scenic",
     title: "TaB: Renaissance",
@@ -424,6 +425,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "townhouse",
+    accentColor: "#3c9aab",
     heroPortrait: true,
     highlight: hlTownhouse,
     highlightPosition: "50% 50%",
@@ -443,6 +445,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "the-exchange-facility",
+    accentColor: "#b89bec",
     heroTitleAbove: true,
     highlight: hlExchange,
     highlightPosition: "33% 50%",
@@ -460,7 +463,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "staging-aesthetics",
-    accentColor: "#3854B1",
+    accentColor: "#b89bec",
     heroTitleAbove: true,
     heroPortrait: true,
     highlight: hlStaging,
