@@ -555,19 +555,50 @@
 }
 
 /* A project title takes its hover colour from the same accent that tints that
-   project's overlay — one `accentHue` in projects.ts drives both, so giving
+   project's overlay — one `accentColor` in projects.ts drives both, so giving
    True West a yellow accent turns its title hover yellow with no CSS edit.
    ProjectTile sets `--project-accent` on the tile; projects without an accent
    fall through to the site accent, which is what they have always used.
 
-   Lightness is fixed at 62% across every hue so the label stays legible
-   against the tile's darkened lower edge whatever colour it is.
+   The title also lifts with the picture, by the same 1.06 the image uses and
+   on the same 900ms curve, so hovering a card reads as one movement rather
+   than a photo zooming while a label recolours at its own pace — the colour
+   used to run on Tailwind's 150ms default, six times faster than the image
+   under it.
 
-   Unlayered, so it outranks the Tailwind utility that used to do this. The
-   transition still comes from `transition-colors` on the heading — only the
-   colour changed, not the timing. */
+   Scaled rather than resized: a transform doesn't reflow, so the line breaks,
+   the clamp and the card's layout are all untouched while it plays.
+   transform-origin keeps the bottom-left corner pinned where the title
+   already sits, so the left edge never drifts.
+
+   The lift is there because scale alone wouldn't read as one. The title box is
+   about 208px wide and 28px tall, so 1.06 adds ~12px of width against under
+   2px of height — the eye sees it spreading sideways, not growing. Raising it
+   by 0.25em alongside the scale puts the movement where it belongs: the width
+   change is a stretch of one edge, while the lift moves the whole block, and a
+   translation reads far more strongly than a 6% stretch. In em so it stays
+   proportional from the 16px phone size up to 30px on a wide screen.
+
+   Unlayered, so it outranks the Tailwind utilities that used to do this. */
+.project-title {
+  transform-origin: bottom left;
+  transition:
+    transform 900ms var(--ease-cinematic),
+    color 900ms var(--ease-cinematic);
+}
 .group:hover .project-title {
+  transform: translateY(-0.25em) scale(1.06);
   color: var(--project-accent, var(--color-accent));
+}
+
+/* Colour still carries the response; only the movement goes. */
+@media (prefers-reduced-motion: reduce) {
+  .project-title {
+    transition: color 300ms linear;
+  }
+  .group:hover .project-title {
+    transform: none;
+  }
 }
 
 /* Glass button — a small tile for controls sitting on top of a page rather

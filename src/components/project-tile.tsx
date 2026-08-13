@@ -69,8 +69,16 @@ export function ProjectTile({
               With You!" ate a third of the image. A step down in size and a
               tighter inset give the picture back its tile without changing the
               proportions of the composition. */}
-          <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4">
-            <h2 className="project-title font-display font-black uppercase tracking-tight text-base sm:text-xl md:text-2xl lg:text-3xl leading-[0.95] text-balance text-foreground transition-colors line-clamp-3">
+          {/* Insets are uneven on purpose. leading-[0.95] is tighter than the
+              font's natural height, so the glyphs hang about 6px below their
+              box — at a matched 16px inset the text read as 16px from the left
+              but under 10px from the bottom, sitting high and right in the
+              corner. The bottom inset is the larger number so the two optical
+              gaps come out level. */}
+          <div className="absolute bottom-2.5 left-1.5 right-3 md:bottom-3 md:left-1.5 md:right-4">
+            {/* No transition-colors here — the scale and the colour share one
+                transition in .project-title so they can't drift apart. */}
+            <h2 className="project-title font-display font-black uppercase tracking-tight text-base sm:text-xl md:text-2xl lg:text-3xl leading-[0.95] text-balance text-foreground line-clamp-3">
               {project.title}
             </h2>
           </div>
