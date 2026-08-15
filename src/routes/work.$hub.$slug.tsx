@@ -33,6 +33,12 @@ import {
   type PhilosophyCard,
   type ProjectTag,
 } from "@/lib/projects";
+import { applyOverrides, designModeStyleTag, mergeOverridesFiles } from "@/lib/apply-overrides";
+import designOverrides from "@/lib/design-overrides.json";
+import type { DesignOverridesFile } from "@/lib/design-overrides.types";
+import { designId } from "@/lib/design-ids";
+import { useLiveOverrides } from "@/lib/use-live-overrides";
+import { DesignFrameBridge } from "@/design-mode/frame-bridge";
 
 export const Route = createFileRoute("/work/$hub/$slug")({
   /* panel=1 is set only when this page is rendered inset over the feed, which
@@ -85,8 +91,26 @@ const MOOD_STYLES: Record<Mood, { wrap: string; enter: string }> = {
 };
 
 
+function CreditRow({ slug, credit }: { slug: string; credit: Credit }) {
+  return (
+    <li
+      className="text-sm"
+      data-design-id={designId.projectCredit(slug, credit.role)}
+      data-design-kind="text"
+    >
+      <span className="text-foreground/50">{credit.role}</span>
+      <br />
+      <span className="text-foreground">{credit.name}</span>
+    </li>
+  );
+}
+
 function ProjectPage() {
-  const { project } = Route.useLoaderData();
+  const { project: rawProject } = Route.useLoaderData();
+  const { live, onLocalPatch, onLocalReset } = useLiveOverrides();
+  const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
+  const project = applyOverrides(rawProject, overridesFile);
+  const responsiveCss = designModeStyleTag(overridesFile);
   const { panel } = Route.useSearch();
   const hub = HUBS.find((h) => h.slug === project.hub)!;
   const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mood];
@@ -165,7 +189,10 @@ function ProjectPage() {
      index travels with each item, since that's what the lightbox counts by. */
   const galleryMedia = project.media
     .map((item: MediaItem, index: number) => ({ item, index }))
-    .filter(({ index }: { index: number }) => !(isTab && index !== 0));
+    .filter(
+      ({ item, index }: { item: MediaItem; index: number }) =>
+        !(isTab && index !== 0) && !item.hidden,
+    );
 
   const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
   const recordScrubVideoRef = useRef<HTMLVideoElement>(null);
@@ -189,7 +216,14 @@ function ProjectPage() {
         panel ? " is-panel-frame" : ""
       }`}
     >
-      {!panel && <SiteNav />}
+      {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
+      <DesignFrameBridge liveOverrides={live} onLocalPatch={onLocalPatch} onLocalReset={onLocalReset} />
+
+      {!panel && (
+        <div data-design-protected="Protected navigation">
+          <SiteNav />
+        </div>
+      )}
 
       {/* Back — to /work for tagged projects, to hub for visualizations */}
       {/* Back link, and the tall top padding that clears the fixed site nav.
@@ -335,16 +369,20 @@ function ProjectPage() {
                 screen the whole way, and takes the longest title in the
                 portfolio — "You Can't Take It With You!" — from three lines to
                 two without it reading as shrunken. Desktop is untouched. */}
-            <AnimatedHeading
-              text={project.title}
-              className="font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-[clamp(2.25rem,8vw,4.75rem)] lg:text-[clamp(3rem,8.5vw,6rem)] text-balance max-w-5xl"
-            />
+            <div data-design-id={designId.projectTitle(project.slug)} data-design-kind="heading">
+              <AnimatedHeading
+                text={project.title}
+                className="font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-[clamp(2.25rem,8vw,4.75rem)] lg:text-[clamp(3rem,8.5vw,6rem)] text-balance max-w-5xl"
+              />
+            </div>
 
             {/* Lollapalooza desktop: pulled up under the title so the lockup
                 closes, and lifted from 50% to 70% opacity — still clearly
                 secondary to the display type, but no longer receding into
                 the black at 10px. */}
             <p
+              data-design-id={designId.projectSubtitle(project.slug)}
+              data-design-kind="text"
               className={`mt-4 text-[10px] tracking-[0.3em] uppercase ${
                 isLollapalooza
                   ? "text-foreground/50 lg:mt-2 lg:text-foreground/70"
@@ -357,7 +395,14 @@ function ProjectPage() {
             {project.notes && project.notes.length > 0 && (
               <ul className="mt-4 flex flex-wrap gap-2">
                 {project.notes.map((n: string, i: number) => (
-                  <li key={i} className="pill pill-wrap">{n}</li>
+                  <li
+                    key={i}
+                    className="pill pill-wrap"
+                    data-design-id={`project.${project.slug}.note.${i}`}
+                    data-design-kind="text"
+                  >
+                    {n}
+                  </li>
                 ))}
               </ul>
             )}
@@ -412,6 +457,8 @@ function ProjectPage() {
             aria-label={`Enlarge ${project.title}`}
           >
             <img
+              data-design-id={designId.projectMedia(project.slug, project.media[0]?.id ?? "0")}
+              data-design-kind="image"
               src={project.cover}
               alt={project.title}
               className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
@@ -457,19 +504,19 @@ function ProjectPage() {
           </div>
 
           <RevealBlock className="px-6 md:px-0 mt-6 md:mt-0 md:col-start-2 md:row-start-2">
-            <p className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance md:text-right">
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance md:text-right"
+            >
               {project.description}
             </p>
           </RevealBlock>
 
           {project.credits && project.credits.length > 0 && (
             <ul className="px-6 md:px-0 mt-8 md:mt-0 space-y-3 md:col-start-1 md:row-start-2">
-              {project.credits.map((c: Credit) => (
-                <li key={c.role} className="text-sm">
-                  <span className="text-foreground/50">{c.role}</span>
-                  <br />
-                  <span className="text-foreground">{c.name}</span>
-                </li>
+              {project.credits.filter((c: Credit) => !c.hidden).map((c: Credit) => (
+                <CreditRow key={c.role} slug={project.slug} credit={c} />
               ))}
             </ul>
           )}
@@ -479,17 +526,17 @@ function ProjectPage() {
       {isPortraitHero && !isReshuffling && (
         <aside className="px-6 md:px-0 pt-8 md:pt-14 pb-4 md:pb-0">
           <div className="md:sticky md:top-32">
-            <p className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance">
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance"
+            >
               {project.description}
             </p>
             {project.credits && project.credits.length > 0 && (
               <ul className="mt-8 space-y-3">
-                {project.credits.map((c: Credit) => (
-                  <li key={c.role} className="text-sm">
-                    <span className="text-foreground/50">{c.role}</span>
-                    <br />
-                    <span className="text-foreground">{c.name}</span>
-                  </li>
+                {project.credits.filter((c: Credit) => !c.hidden).map((c: Credit) => (
+                  <CreditRow key={c.role} slug={project.slug} credit={c} />
                 ))}
               </ul>
             )}
@@ -524,7 +571,11 @@ function ProjectPage() {
 
             <div className="mt-8 md:mt-0">
               <RevealBlock>
-                <p className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance">
+                <p
+                  data-design-id={designId.projectDescription(project.slug)}
+                  data-design-kind="text"
+                  className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance"
+                >
                   {project.description}
                 </p>
               </RevealBlock>
@@ -644,7 +695,11 @@ function ProjectPage() {
               the closeup animation higher up the page. */}
           {!isYctiwy && !isTab && !isAnneFrank && (
             <RevealBlock>
-              <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+              <p
+                data-design-id={designId.projectDescription(project.slug)}
+                data-design-kind="text"
+                className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
+              >
                 {project.description}
               </p>
             </RevealBlock>
@@ -653,12 +708,8 @@ function ProjectPage() {
         {project.credits && project.credits.length > 0 && (
           <RevealBlock className="md:col-span-4" delay={0.1}>
             <ul className="space-y-3">
-              {project.credits.map((c: Credit) => (
-                <li key={c.role} className="text-sm">
-                  <span className="text-foreground/50">{c.role}</span>
-                  <br />
-                  <span className="text-foreground">{c.name}</span>
-                </li>
+              {project.credits.filter((c: Credit) => !c.hidden).map((c: Credit) => (
+                <CreditRow key={c.role} slug={project.slug} credit={c} />
               ))}
             </ul>
           </RevealBlock>
@@ -670,7 +721,11 @@ function ProjectPage() {
       {project.pullQuote && (
         <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
           <RevealBlock>
-            <blockquote className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl">
+            <blockquote
+              data-design-id={designId.projectPullQuote(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl"
+            >
               {project.pullQuote}
             </blockquote>
           </RevealBlock>
@@ -690,6 +745,8 @@ function ProjectPage() {
                   aria-label={project.media[1].caption ?? "True West — second act"}
                 >
                   <img
+                    data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
+                    data-design-kind="image"
                     src={project.media[1].src}
                     alt={project.media[1].caption ?? project.title}
                     loading="lazy"
@@ -707,6 +764,8 @@ function ProjectPage() {
                     aria-label={project.media[2].caption ?? "Rendered model study"}
                   >
                     <img
+                      data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
+                      data-design-kind="image"
                       src={project.media[2].src}
                       alt={project.media[2].caption ?? project.title}
                       loading="lazy"
@@ -722,6 +781,8 @@ function ProjectPage() {
                     aria-label={project.media[3].caption ?? "Rendered model study"}
                   >
                     <img
+                      data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
+                      data-design-kind="image"
                       src={project.media[3].src}
                       alt={project.media[3].caption ?? project.title}
                       loading="lazy"
@@ -849,6 +910,8 @@ function ProjectPage() {
                     aria-label={project.media[1].caption ?? "Conceptual sketch"}
                   >
                     <img
+                      data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
+                      data-design-kind="image"
                       src={project.media[1].src}
                       alt={project.media[1].caption ?? project.title}
                       loading="lazy"
@@ -858,7 +921,11 @@ function ProjectPage() {
                 </figure>
 
                 <RevealBlock>
-                  <p className="mt-6 md:mt-8 font-display font-light text-base md:text-lg leading-relaxed text-balance text-foreground/85 md:max-w-sm md:ml-auto md:text-right">
+                  <p
+                    data-design-id={designId.projectDescription(project.slug)}
+                    data-design-kind="text"
+                    className="mt-6 md:mt-8 font-display font-light text-base md:text-lg leading-relaxed text-balance text-foreground/85 md:max-w-sm md:ml-auto md:text-right"
+                  >
                     {project.description}
                   </p>
                 </RevealBlock>
@@ -873,6 +940,8 @@ function ProjectPage() {
                   aria-label={project.media[2].caption ?? "Set closeup"}
                 >
                   <img
+                    data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
+                    data-design-kind="image"
                     src={project.media[2].src}
                     alt={project.media[2].caption ?? project.title}
                     loading="lazy"
@@ -896,6 +965,8 @@ function ProjectPage() {
                     aria-label={project.media[idx].caption ?? `Technical drawing ${idx - 2}`}
                   >
                     <img
+                      data-design-id={designId.projectMedia(project.slug, project.media[idx].id ?? String(idx))}
+                      data-design-kind="image"
                       src={project.media[idx].src}
                       alt={project.media[idx].caption ?? project.title}
                       loading="lazy"
@@ -910,6 +981,7 @@ function ProjectPage() {
           // Custom YCTIWU layout: closeup (left) + sketch (top-right, on dark) + drawing (bottom-right)
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {/* Closeup, left column */}
+            {!project.media[1]?.hidden && (
             <figure className="group">
               <button
                 type="button"
@@ -918,19 +990,27 @@ function ProjectPage() {
                 aria-label={project.media[1].caption ?? "Closeup"}
               >
                 <img
+                  data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
+                  data-design-kind="image"
                   src={project.media[1].src}
                   alt={project.media[1].caption ?? project.title}
                   loading="lazy"
                   className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                 />
               </button>
-              <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed">
+              <figcaption
+                data-design-id={designId.projectMediaCaption(project.slug, project.media[1].id ?? "1")}
+                data-design-kind="text"
+                className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed"
+              >
                 {project.media[1].caption}
               </figcaption>
             </figure>
+            )}
 
             {/* Sketch + drawing stacked, right column */}
             <div className="flex flex-col gap-3 md:gap-4">
+              {!project.media[2]?.hidden && (
               <figure className="group">
                 <button
                   type="button"
@@ -939,6 +1019,8 @@ function ProjectPage() {
                   aria-label={project.media[2].caption ?? "Sketch"}
                 >
                   <img
+                    data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
+                    data-design-kind="image"
                     src={project.media[2].src}
                     alt={project.media[2].caption ?? project.title}
                     loading="lazy"
@@ -946,6 +1028,8 @@ function ProjectPage() {
                   />
                 </button>
               </figure>
+              )}
+              {!project.media[3]?.hidden && (
               <figure className="group">
                 <button
                   type="button"
@@ -954,6 +1038,8 @@ function ProjectPage() {
                   aria-label={project.media[3].caption ?? "Drawing"}
                 >
                   <img
+                    data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
+                    data-design-kind="image"
                     src={project.media[3].src}
                     alt={project.media[3].caption ?? project.title}
                     loading="lazy"
@@ -961,6 +1047,7 @@ function ProjectPage() {
                   />
                 </button>
               </figure>
+              )}
             </div>
           </div>
         ) : (
@@ -982,6 +1069,8 @@ function ProjectPage() {
                   aria-label={m.caption ?? `Media ${i + 1}`}
                 >
                   <img
+                    data-design-id={designId.projectMedia(project.slug, m.id ?? String(i))}
+                    data-design-kind="image"
                     src={m.src}
                     alt={m.caption ?? project.title}
                     loading="lazy"
@@ -990,7 +1079,13 @@ function ProjectPage() {
                 </button>
                 {m.caption && (
                   <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
-                    {String(i + 1).padStart(2, "0")} — {m.caption}
+                    {String(i + 1).padStart(2, "0")} —{" "}
+                    <span
+                      data-design-id={designId.projectMediaCaption(project.slug, m.id ?? String(i))}
+                      data-design-kind="text"
+                    >
+                      {m.caption}
+                    </span>
                   </figcaption>
                 )}
               </figure>
@@ -1077,7 +1172,11 @@ function ProjectPage() {
 
       {/* Footer likewise — the wordmark, the statement line and the contact
           details belong to the site, and the site is the page behind. */}
-      {!panel && <SiteFooter />}
+      {!panel && (
+        <div data-design-protected="Protected navigation">
+          <SiteFooter />
+        </div>
+      )}
 
       </div>{/* end light-zone */}
 
@@ -1167,6 +1266,11 @@ function ProjectPage() {
             <p
               className="text-xs md:text-sm text-foreground/80 text-center px-6 pb-6"
               onClick={(e) => e.stopPropagation()}
+              data-design-id={designId.projectMediaCaption(
+                project.slug,
+                project.media[lightbox].id ?? String(lightbox),
+              )}
+              data-design-kind="text"
             >
               {project.media[lightbox].caption}
             </p>

@@ -5,12 +5,24 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { designModeSavePlugin } from "./src/design-mode/dev-save-plugin";
+import { designModePublishPlugin } from "./src/design-mode/dev-publish-plugin";
 
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+  },
+  /* Local-only Design Mode save + publish endpoints. Both plugins no-op
+     unless running `vite dev --mode design` (see dev-save-plugin.ts /
+     dev-publish-plugin.ts) — this file is Node build tooling, never bundled
+     into the app, so including it here carries no production risk regardless.
+     Save (writes design-overrides.json) and Publish (git commit + push) are
+     kept as two separate endpoints/actions deliberately — approving a design
+     change should never itself trigger a live deploy. */
+  vite: {
+    plugins: [designModeSavePlugin("./src/lib/design-overrides.json"), designModePublishPlugin(".")],
   },
   /* Which host this build targets.
    *

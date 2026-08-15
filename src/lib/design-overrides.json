@@ -1,0 +1,32 @@
+{
+  "project.you-cant-take-it-with-you.media.closeup.caption": {
+    "base": {
+      "text": ""
+    }
+  },
+  "project.you-cant-take-it-with-you.media.drawing": {
+    "desktop": {
+      "layoutShiftY": -153
+    }
+  },
+  "project.you-cant-take-it-with-you.media.drawing.caption": {
+    "base": {
+      "text": "Wall Elevations, Technical Drafting"
+    }
+  },
+  "project.you-cant-take-it-with-you.credit.scenic-designer": {
+    "base": {
+      "text": "Reid Graham"
+    },
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -12
+    }
+  },
+  "project.you-cant-take-it-with-you.credit.technical-director": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -24
+    }
+  }
+}

@@ -88,13 +88,21 @@ export type Mood =
   | "theatrical"; // staging aesthetics
 
 export type MediaItem = {
+  /** Stable ID for Design Mode overrides. Only populated on the V1 pilot project so far. */
+  id?: string;
   type: "image" | "video";
   src: string;
   poster?: string;
   caption?: string;
+  /**
+   * Set by Design Mode overrides only. Never remove hidden items from the
+   * `media` array itself — several project pages address media by fixed
+   * index, so splicing would silently corrupt unrelated images.
+   */
+  hidden?: boolean;
 };
 
-export type Credit = { role: string; name: string };
+export type Credit = { id?: string; role: string; name: string; hidden?: boolean };
 
 export type PhilosophyCard = {
   title: string;
@@ -274,9 +282,9 @@ export const PROJECTS: Project[] = [
     mood: "warm",
     weight: "right",
     credits: [
-      { role: "Director", name: "Helen Crowley" },
-      { role: "Scenic Designer", name: "Reid Graham" },
-      { role: "Technical Director", name: "Michael Clack" },
+      { id: "director", role: "Director", name: "Helen Crowley" },
+      { id: "scenic-designer", role: "Scenic Designer", name: "Reid Graham" },
+      { id: "technical-director", role: "Technical Director", name: "Michael Clack" },
     ],
     description:
       "A living-room set for the Sycamore household. Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character — mirroring the playful heart of the family who lives inside it.",
@@ -285,10 +293,10 @@ export const PROJECTS: Project[] = [
     cover: yctFull,
     collage: [yctSketch, yctDrawing],
     media: [
-      { type: "image", src: yctFull, caption: "Full stage — Sycamore family living room" },
-      { type: "image", src: yctClose, caption: "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family." },
-      { type: "image", src: yctSketch, caption: "Conceptual sketch — slanted architecture and furniture layout" },
-      { type: "image", src: yctDrawing, caption: "Wall elevations F / G / H — technical drafting" },
+      { id: "full", type: "image", src: yctFull, caption: "Full stage — Sycamore family living room" },
+      { id: "closeup", type: "image", src: yctClose, caption: "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family." },
+      { id: "sketch", type: "image", src: yctSketch, caption: "Conceptual sketch — slanted architecture and furniture layout" },
+      { id: "drawing", type: "image", src: yctDrawing, caption: "Wall elevations F / G / H — technical drafting" },
     ],
   },
   {

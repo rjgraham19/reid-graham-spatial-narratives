@@ -3,6 +3,12 @@ import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { glassButton } from "@/components/glass-button";
+import designOverrides from "@/lib/design-overrides.json";
+import { mergeOverridesFiles, resolveText, resolveHidden, designModeStyleTag } from "@/lib/apply-overrides";
+import type { DesignOverridesFile } from "@/lib/design-overrides.types";
+import { designId } from "@/lib/design-ids";
+import { useLiveOverrides } from "@/lib/use-live-overrides";
+import { DesignFrameBridge } from "@/design-mode/frame-bridge";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -25,19 +31,39 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   const [zoom, setZoom] = useState(false);
+  const { live, onLocalPatch, onLocalReset } = useLiveOverrides();
+  const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
+  const responsiveCss = designModeStyleTag(overridesFile);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <SiteNav />
+      {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
+      <DesignFrameBridge liveOverrides={live} onLocalPatch={onLocalPatch} onLocalReset={onLocalReset} />
+
+      <div data-design-protected="Protected navigation">
+        <SiteNav />
+      </div>
 
       <main className="flex-1 pt-32 md:pt-40 pb-16 px-6 md:px-12 lg:px-16">
-        <p className="text-[10px] tracking-[0.35em] uppercase text-accent mb-6">
-          The studio is open
-        </p>
+        {!resolveHidden(overridesFile, designId.connect("eyebrow")) && (
+          <p
+            data-design-id={designId.connect("eyebrow")}
+            data-design-kind="text"
+            className="text-[10px] tracking-[0.35em] uppercase text-accent mb-6"
+          >
+            {resolveText(overridesFile, designId.connect("eyebrow"), "The studio is open")}
+          </p>
+        )}
 
-        <h1 className="font-display font-black uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-8xl">
-          Get in touch
-        </h1>
+        {!resolveHidden(overridesFile, designId.connect("heading")) && (
+          <h1
+            data-design-id={designId.connect("heading")}
+            data-design-kind="heading"
+            className="font-display font-black uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-8xl"
+          >
+            {resolveText(overridesFile, designId.connect("heading"), "Get in touch")}
+          </h1>
+        )}
 
         {/* Resume + info */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16">
@@ -114,23 +140,36 @@ function Contact() {
               <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
                 About Me
               </p>
-              <h2 className="font-display font-black uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-6xl">
-                Hi <span className="text-accent">:)</span>
+              <h2
+                data-design-id={designId.connect("about-heading")}
+                data-design-kind="heading"
+                className="font-display font-black uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-6xl"
+              >
+                {overridesFile[designId.connect("about-heading")]?.base?.text ?? (
+                  <>
+                    Hi <span className="text-accent">:)</span>
+                  </>
+                )}
               </h2>
-              <p className="mt-6 font-display font-light text-lg md:text-2xl leading-snug text-foreground/85 max-w-xl text-balance">
-                I'm Reid Graham, a designer based in New York City and Chicago.
-                I'm a recent graduate of the University of Michigan, where I studied
-                architecture with a minor in scenic design. My foundation in theater,
-                combined with my architectural background, fuels my desire to merge
-                these disciplines and elevate the possibilities for immersive
-                storytelling through the built environment.
+              <p
+                data-design-id={designId.connect("about-description")}
+                data-design-kind="text"
+                className="mt-6 font-display font-light text-lg md:text-2xl leading-snug text-foreground/85 max-w-xl text-balance"
+              >
+                {resolveText(
+                  overridesFile,
+                  designId.connect("about-description"),
+                  "I'm Reid Graham, a designer based in New York City and Chicago. I'm a recent graduate of the University of Michigan, where I studied architecture with a minor in scenic design. My foundation in theater, combined with my architectural background, fuels my desire to merge these disciplines and elevate the possibilities for immersive storytelling through the built environment.",
+                )}
               </p>
             </div>
           </div>
         </div>
       </main>
 
-      <SiteFooter />
+      <div data-design-protected="Protected navigation">
+        <SiteFooter />
+      </div>
 
       {/* Résumé lightbox */}
       {zoom && (
