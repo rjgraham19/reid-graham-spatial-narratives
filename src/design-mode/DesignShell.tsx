@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import designOverrides from "@/lib/design-overrides.json";
+import designMediaAdditions from "@/lib/design-media-additions.json";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
-import { useDesignStore, type DevicePreset } from "./use-design-store";
+import type { AddedMediaEntry, MediaAdditionsFile, MediaLayout } from "@/lib/media-additions.types";
+import { useDesignStore, type DevicePreset, type DraftState } from "./use-design-store";
 import { DESIGN_BRIDGE_SOURCE, isDesignMessage, type FrameToParent, type InteractionMode, type MoveKind } from "./protocol";
 import { PropertyPanel } from "./PropertyPanel";
+import { uploadMediaFile, mediaTypeFor, type StagedUpload } from "./media-client";
 
-const PAGES: { label: string; url: string }[] = [
-  { label: "You Can't Take It With You!", url: "/work/production-scenic/you-cant-take-it-with-you" },
-  { label: "True West", url: "/work/production-scenic/true-west" },
-  { label: "The Diary of Anne Frank", url: "/work/production-scenic/the-diary-of-anne-frank" },
-  { label: "Renderings (Visualizations)", url: "/work/visualizations/renderings" },
+const PAGES: { label: string; url: string; slug?: string }[] = [
+  { label: "Home", url: "/" },
+  { label: "You Can't Take It With You!", url: "/work/production-scenic/you-cant-take-it-with-you", slug: "you-cant-take-it-with-you" },
+  { label: "True West", url: "/work/production-scenic/true-west", slug: "true-west" },
+  { label: "The Diary of Anne Frank", url: "/work/production-scenic/the-diary-of-anne-frank", slug: "the-diary-of-anne-frank" },
+  { label: "Renderings", url: "/work/visualizations/renderings", slug: "renderings" },
+  { label: "Construction Drafting", url: "/work/visualizations/construction-drafting", slug: "construction-drafting" },
+  { label: "Physical Models", url: "/work/visualizations/physical-models", slug: "physical-models" },
+  { label: "Illustration", url: "/work/visualizations/illustration", slug: "illustration" },
   { label: "Connect", url: "/contact" },
 ];
 
@@ -30,14 +37,22 @@ type PublishStatus =
   | { phase: "publishing" }
   | { phase: "done"; ok: boolean; message: string; log?: string };
 
+function newMediaId(): string {
+  return `media-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
 export default function DesignShell() {
   const [page, setPage] = useState(PAGES[0]);
-  const savedOverrides = designOverrides as DesignOverridesFile;
-  const store = useDesignStore(savedOverrides);
+  const savedDraft: DraftState = {
+    overrides: designOverrides as DesignOverridesFile,
+    media: designMediaAdditions as MediaAdditionsFile,
+  };
+  const store = useDesignStore(savedDraft);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [saving, setSaving] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [moveKind, setMoveKind] = useState<MoveKind>("layout");
   const [publish, setPublish] = useState<PublishStatus>({ phase: "idle" });
+  const [addMediaOpen, setAddMediaOpen] = useState(false);
 
   const postToFrame = (msg: object) => {
     iframeRef.current?.contentWindow?.postMessage(msg, window.location.origin);
@@ -50,6 +65,22 @@ export default function DesignShell() {
   useEffect(() => {
     postToFrame({ source: DESIGN_BRIDGE_SOURCE, type: "setMoveKind", moveKind });
   }, [moveKind]);
+
+  // The single source of truth for what the canvas renders. Undo, Redo,
+  // Discard Draft, Resume Draft, and every media add/replace/reorder all
+  // replace `store.working` wholesale without knowing which individual
+  // fields changed — mirroring the whole thing into the iframe on every
+  // change (rather than only echoing individually-patched fields) is what
+  // makes all of those actually visible in the canvas.
+  useEffect(() => {
+    postToFrame({
+      source: DESIGN_BRIDGE_SOURCE,
+      type: "syncState",
+      overrides: store.working.overrides,
+      media: store.working.media,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.working]);
 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
@@ -65,6 +96,10 @@ export default function DesignShell() {
         store.setText(msg.id, msg.text);
       } else if (msg.type === "moved") {
         store.nudgeOrDrag(msg.id, msg.scope, msg.kind, msg.dx, msg.dy);
+      } else if (msg.type === "requestUndo") {
+        store.undo();
+      } else if (msg.type === "requestRedo") {
+        store.redo();
       }
     };
     window.addEventListener("message", onMessage);
@@ -72,24 +107,49 @@ export default function DesignShell() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.mode]);
 
+  // Shortcuts for when focus is in the shell itself (toolbar, property
+  // panel) — key events from inside the canvas iframe are a separate
+  // document and arrive as "requestUndo"/"requestRedo" messages instead.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const mod = e.ctrlKey || e.metaKey;
+      const target = e.target as HTMLElement;
+      if (target?.isContentEditable) return;
+      if (mod && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        if (e.shiftKey) store.redo();
+        else store.undo();
+      } else if (e.ctrlKey && (e.key === "y" || e.key === "Y")) {
+        e.preventDefault();
+        store.redo();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const save = async () => {
     setSaving("saving");
     try {
       const res = await fetch("/__design-mode/save", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ overrides: store.working }),
+        body: JSON.stringify({ overrides: store.working.overrides, media: store.working.media }),
       });
       if (!res.ok) throw new Error(await res.text());
-      store.markSaved(store.working);
+      const data = (await res.json()) as { overrides: DesignOverridesFile; media: MediaAdditionsFile };
+      // The server may have rewritten staged src paths to their approved
+      // /design-media/... location — adopt that as the new saved baseline
+      // rather than the pre-save draft, or the next edit's Undo could step
+      // back to a staged path that no longer exists.
+      store.markSaved({ overrides: data.overrides, media: data.media });
       setSaving("saved");
-      // The site reads design-overrides.json at module load; reload the
-      // frame so it re-fetches the file that was just written, proving the
-      // saved values (not just the live in-memory preview) render.
       if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
       setTimeout(() => setSaving("idle"), 2000);
-    } catch {
+    } catch (err) {
       setSaving("error");
+      window.alert(`Save failed: ${(err as Error).message}`);
     }
   };
 
@@ -123,6 +183,21 @@ export default function DesignShell() {
     }
   };
 
+  const replaceSelectedMedia = async (file: File) => {
+    const sel = store.selection;
+    if (!sel?.media) return;
+    try {
+      const staged = await uploadMediaFile(file);
+      if (sel.media.addedByDesignMode && page.slug) {
+        store.patchMedia(page.slug, sel.id, { src: staged.url, filename: staged.filename }, "Media replaced");
+      } else {
+        store.patchElement(sel.id, "base", { src: staged.url });
+      }
+    } catch (err) {
+      window.alert((err as Error).message);
+    }
+  };
+
   if (store.hasDraftPrompt) {
     return (
       <div style={styles.centerScreen}>
@@ -141,6 +216,7 @@ export default function DesignShell() {
 
   const size = DEVICE_SIZE[store.device];
   const inCanvasChrome = store.mode !== "browse";
+  const selMedia = store.selection?.media;
 
   return (
     <div style={styles.root}>
@@ -172,8 +248,22 @@ export default function DesignShell() {
         </div>
 
         <div style={styles.toolbarGroup}>
-          <button style={styles.btn} onClick={store.undo} disabled={!store.canUndo}>Undo</button>
-          <button style={styles.btn} onClick={store.redo} disabled={!store.canRedo}>Redo</button>
+          <button
+            style={{ ...styles.btn, opacity: store.canUndo ? 1 : 0.4, cursor: store.canUndo ? "pointer" : "default" }}
+            onClick={store.undo}
+            disabled={!store.canUndo}
+            title="Ctrl/Cmd+Z"
+          >
+            {store.canUndo ? `Undo ${store.undoLabel}` : "Undo"}
+          </button>
+          <button
+            style={{ ...styles.btn, opacity: store.canRedo ? 1 : 0.4, cursor: store.canRedo ? "pointer" : "default" }}
+            onClick={store.redo}
+            disabled={!store.canRedo}
+            title="Ctrl/Cmd+Shift+Z"
+          >
+            {store.canRedo ? `Redo ${store.redoLabel}` : "Redo"}
+          </button>
           {store.isDirty && <span style={styles.unsavedDot} title="Unsaved changes" />}
           <button style={styles.primaryBtn} onClick={save} disabled={saving === "saving"}>
             {saving === "saving" ? "Saving…" : saving === "saved" ? "Saved" : "Save Approved Changes"}
@@ -207,6 +297,30 @@ export default function DesignShell() {
                 </div>
               ))}
             </div>
+
+            {page.slug && (
+              <div style={styles.panelSection}>
+                <div style={styles.panelHeading}>Media</div>
+                <button style={styles.btn} onClick={() => setAddMediaOpen(true)}>+ Add Media</button>
+                {(store.working.media[page.slug] ?? []).length > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    {(store.working.media[page.slug] ?? []).map((m) => (
+                      <div key={m.id} style={styles.hiddenItem}>
+                        <span style={{ wordBreak: "break-all", fontSize: 11 }}>
+                          {m.filename ?? m.id} ({m.layout})
+                        </span>
+                        <div style={{ display: "flex", gap: 4 }}>
+                          <button style={styles.linkBtn} onClick={() => store.reorderMedia(page.slug!, m.id, "up")}>↑</button>
+                          <button style={styles.linkBtn} onClick={() => store.reorderMedia(page.slug!, m.id, "down")}>↓</button>
+                          <button style={styles.linkBtn} onClick={() => store.removeMedia(page.slug!, m.id)}>Remove</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div style={styles.panelSection}>
               <div style={styles.panelHeading}>Deleted Items</div>
               {store.hiddenIds.length === 0 && (
@@ -248,7 +362,7 @@ export default function DesignShell() {
 
         {inCanvasChrome && (
           <aside style={styles.rightPanel}>
-            {store.mode === "arrange" && store.selection?.kind === "image" && (
+            {store.mode === "arrange" && selMedia && (
               <div style={styles.panelSection}>
                 <div style={styles.panelHeading}>Move behaviour</div>
                 <div style={{ display: "flex", gap: 4 }}>
@@ -267,9 +381,58 @@ export default function DesignShell() {
                 </div>
               </div>
             )}
+
+            {selMedia && (
+              <div style={styles.panelSection}>
+                <div style={styles.panelHeading}>Media</div>
+                <img src={selMedia.src} alt="" style={{ width: "100%", borderRadius: 6, marginBottom: 8, background: "#000" }} />
+                <div style={styles.inspectorRow}><span>Role</span><span>{selMedia.role}</span></div>
+                <div style={styles.inspectorRow}><span>Project</span><span>{selMedia.project || "—"}</span></div>
+                <div style={styles.inspectorRow}><span>ID</span><span style={{ wordBreak: "break-all" }}>{store.selection?.id}</span></div>
+                <div style={styles.inspectorRow}><span>Source</span><span style={{ wordBreak: "break-all" }}>{selMedia.src}</span></div>
+                <div style={styles.inspectorRow}><span>Filename</span><span>{selMedia.filename}</span></div>
+                {selMedia.layout && <div style={styles.inspectorRow}><span>Layout</span><span>{selMedia.layout}</span></div>}
+                <label style={{ display: "block", marginTop: 8 }}>
+                  <input
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.mp4,image/png,image/jpeg,video/mp4"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) replaceSelectedMedia(f);
+                      e.target.value = "";
+                    }}
+                    id="replace-media-input"
+                  />
+                  <span
+                    style={{ ...styles.btn, display: "inline-block", textAlign: "center", cursor: "pointer" }}
+                    onClick={() => document.getElementById("replace-media-input")?.click()}
+                  >
+                    Replace Media
+                  </span>
+                </label>
+                {selMedia.addedByDesignMode && selMedia.layout && page.slug && (
+                  <div style={{ display: "flex", gap: 4, marginTop: 8 }}>
+                    <button
+                      style={{ ...styles.chip, ...(selMedia.layout === "full" ? styles.chipActive : {}) }}
+                      onClick={() => store.patchMedia(page.slug!, store.selection!.id, { layout: "full" }, "Layout change")}
+                    >
+                      Full Width
+                    </button>
+                    <button
+                      style={{ ...styles.chip, ...(selMedia.layout === "half" ? styles.chipActive : {}) }}
+                      onClick={() => store.patchMedia(page.slug!, store.selection!.id, { layout: "half" }, "Layout change")}
+                    >
+                      Half Width
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             <PropertyPanel
               selection={store.selection}
-              working={store.working}
+              working={store.working.overrides}
               deviceScope={store.deviceScope}
               onPatch={(id, scope, patch) => {
                 store.patchElement(id, scope, patch);
@@ -287,6 +450,18 @@ export default function DesignShell() {
           </aside>
         )}
       </div>
+
+      {addMediaOpen && page.slug && (
+        <AddMediaModal
+          slug={page.slug}
+          insertAfterId={store.selection?.media && !store.selection.media.addedByDesignMode ? store.selection.id : undefined}
+          onClose={() => setAddMediaOpen(false)}
+          onAdd={(entry) => {
+            store.addMedia(page.slug!, entry);
+            setAddMediaOpen(false);
+          }}
+        />
+      )}
 
       {publish.phase === "confirming" && (
         <div style={styles.centerScreen}>
@@ -338,6 +513,150 @@ export default function DesignShell() {
   );
 }
 
+function AddMediaModal({
+  slug,
+  insertAfterId,
+  onClose,
+  onAdd,
+}: {
+  slug: string;
+  insertAfterId?: string;
+  onClose: () => void;
+  onAdd: (entry: AddedMediaEntry) => void;
+}) {
+  const [staged, setStaged] = useState<StagedUpload | null>(null);
+  const [type, setType] = useState<"image" | "video">("image");
+  const [layout, setLayout] = useState<MediaLayout>("full");
+  const [caption, setCaption] = useState("");
+  const [alt, setAlt] = useState("");
+  const [decorative, setDecorative] = useState(false);
+  const [link, setLink] = useState("");
+  const [placement, setPlacement] = useState<"end" | "after">(insertAfterId ? "after" : "end");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const onFile = async (file: File) => {
+    setError(null);
+    setUploading(true);
+    try {
+      const result = await uploadMediaFile(file);
+      setStaged(result);
+      setType(mediaTypeFor(file));
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const canAdd = staged && (type !== "image" || decorative || alt.trim() || caption.trim());
+
+  return (
+    <div style={styles.centerScreen} onClick={onClose}>
+      <div style={{ ...styles.modal, width: 420 }} onClick={(e) => e.stopPropagation()}>
+        <p style={{ fontWeight: 600, marginBottom: 12 }}>Add Media — {slug}</p>
+
+        {!staged ? (
+          <div
+            style={styles.dropTarget}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const f = e.dataTransfer.files?.[0];
+              if (f) onFile(f);
+            }}
+          >
+            <p style={{ marginBottom: 8, color: "#aaa", fontSize: 12 }}>
+              {uploading ? "Uploading…" : "Drop a .png, .jpg, .jpeg, or .mp4 here, or choose a file"}
+            </p>
+            <input
+              type="file"
+              accept=".png,.jpg,.jpeg,.mp4,image/png,image/jpeg,video/mp4"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onFile(f);
+              }}
+            />
+            {error && <p style={{ color: "#ff8f8f", fontSize: 12, marginTop: 8 }}>{error}</p>}
+          </div>
+        ) : (
+          <>
+            {type === "image" ? (
+              <img src={staged.url} alt="" style={{ width: "100%", borderRadius: 6, marginBottom: 10, background: "#000" }} />
+            ) : (
+              <video src={staged.url} controls style={{ width: "100%", borderRadius: 6, marginBottom: 10, background: "#000" }} />
+            )}
+
+            <div style={{ display: "flex", gap: 4, marginBottom: 10 }}>
+              <button style={{ ...styles.chip, flex: 1, ...(layout === "full" ? styles.chipActive : {}) }} onClick={() => setLayout("full")}>
+                Full Width
+              </button>
+              <button style={{ ...styles.chip, flex: 1, ...(layout === "half" ? styles.chipActive : {}) }} onClick={() => setLayout("half")}>
+                Half Width
+              </button>
+            </div>
+
+            <label style={styles.fieldLabel}>Caption</label>
+            <textarea style={styles.textarea} rows={2} value={caption} onChange={(e) => setCaption(e.target.value)} />
+
+            {type === "image" && (
+              <>
+                <label style={styles.fieldLabel}>Alt text {decorative ? "(skipped — decorative)" : "(required)"}</label>
+                <input style={styles.input} value={alt} onChange={(e) => setAlt(e.target.value)} disabled={decorative} />
+                <label style={{ ...styles.fieldLabel, display: "flex", alignItems: "center", gap: 6 }}>
+                  <input type="checkbox" checked={decorative} onChange={(e) => setDecorative(e.target.checked)} />
+                  Decorative (no meaningful content — skip alt text)
+                </label>
+              </>
+            )}
+
+            <label style={styles.fieldLabel}>Link (optional)</label>
+            <input style={styles.input} placeholder="/work/... or https://…" value={link} onChange={(e) => setLink(e.target.value)} />
+
+            {insertAfterId && (
+              <div style={{ marginTop: 10 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
+                  <input type="radio" checked={placement === "after"} onChange={() => setPlacement("after")} />
+                  Insert after the selected image
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
+                  <input type="radio" checked={placement === "end"} onChange={() => setPlacement("end")} />
+                  Add at the end of the section
+                </label>
+              </div>
+            )}
+          </>
+        )}
+
+        <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+          <button
+            style={styles.primaryBtn}
+            disabled={!canAdd}
+            onClick={() => {
+              if (!staged) return;
+              onAdd({
+                id: newMediaId(),
+                type,
+                src: staged.url,
+                caption: caption.trim() || undefined,
+                alt: type === "image" ? (decorative ? undefined : alt.trim() || undefined) : undefined,
+                decorative: type === "image" ? decorative : undefined,
+                layout,
+                insertAfterId: placement === "after" ? insertAfterId : undefined,
+                link: link.trim() || undefined,
+                filename: staged.filename,
+              });
+            }}
+          >
+            Add to Page
+          </button>
+          <button style={styles.btn} onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const styles: Record<string, React.CSSProperties> = {
   root: { position: "fixed", inset: 0, background: "#0b0b0c", color: "#eee", display: "flex", flexDirection: "column", fontFamily: "system-ui, sans-serif", fontSize: 13, zIndex: 999999 },
   toolbar: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", borderBottom: "1px solid #222", gap: 16 },
@@ -350,7 +669,7 @@ const styles: Record<string, React.CSSProperties> = {
   unsavedDot: { width: 8, height: 8, borderRadius: "50%", background: "#ffb84f", display: "inline-block" },
   body: { flex: 1, display: "flex", minHeight: 0 },
   leftPanel: { width: 240, borderRight: "1px solid #222", padding: 12, overflowY: "auto" },
-  rightPanel: { width: 280, borderLeft: "1px solid #222", padding: 12, overflowY: "auto" },
+  rightPanel: { width: 300, borderLeft: "1px solid #222", padding: 12, overflowY: "auto" },
   canvasArea: { flex: 1, overflow: "auto", padding: 24, display: "flex" },
   panelSection: { marginBottom: 20 },
   panelHeading: { fontSize: 11, textTransform: "uppercase", letterSpacing: 1, color: "#888", marginBottom: 8 },
@@ -360,11 +679,16 @@ const styles: Record<string, React.CSSProperties> = {
   hiddenItem: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", gap: 8 },
   linkBtn: { background: "none", border: "none", color: "#4f8cff", cursor: "pointer", fontSize: 12, whiteSpace: "nowrap" },
   centerScreen: { position: "fixed", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)", zIndex: 1000000 },
-  modal: { background: "#1a1a1c", border: "1px solid #333", borderRadius: 8, padding: 24, color: "#eee", maxWidth: 420, maxHeight: "70vh", overflowY: "auto" },
+  modal: { background: "#1a1a1c", border: "1px solid #333", borderRadius: 8, padding: 24, color: "#eee", maxWidth: 420, maxHeight: "80vh", overflowY: "auto" },
   chip: { flex: 1, background: "#1a1a1c", color: "#aaa", border: "1px solid #333", borderRadius: 999, padding: "6px 8px", fontSize: 11, cursor: "pointer" },
   chipActive: { background: "#4f8cff", color: "#fff", borderColor: "#4f8cff" },
   publishBtn: { background: "#d9622b", color: "#fff", border: "none", borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontWeight: 600 },
   publishBtnDisabled: { background: "#4a352a", color: "#8a7565", cursor: "not-allowed" },
   fileList: { background: "#0f0f10", border: "1px solid #2a2a2a", borderRadius: 6, padding: 8, maxHeight: 160, overflowY: "auto" },
   log: { background: "#0f0f10", border: "1px solid #2a2a2a", borderRadius: 6, padding: 8, fontSize: 10, whiteSpace: "pre-wrap", maxHeight: 200, overflowY: "auto", marginBottom: 12 },
+  inspectorRow: { display: "flex", justifyContent: "space-between", gap: 8, fontSize: 11, padding: "3px 0", borderBottom: "1px solid #1e1e1e" },
+  dropTarget: { border: "1px dashed #444", borderRadius: 8, padding: 20, textAlign: "center" },
+  fieldLabel: { display: "block", fontSize: 11, color: "#888", marginTop: 8, marginBottom: 4 },
+  textarea: { width: "100%", background: "#0f0f10", color: "#eee", border: "1px solid #333", borderRadius: 6, padding: 6, fontSize: 12, resize: "vertical" as const },
+  input: { width: "100%", background: "#0f0f10", color: "#eee", border: "1px solid #333", borderRadius: 6, padding: 6, fontSize: 12 },
 };

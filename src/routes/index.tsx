@@ -1,6 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HERO_URL } from "@/lib/projects";
 import { SiteNav } from "@/components/site-nav";
+import designOverrides from "@/lib/design-overrides.json";
+import { mergeOverridesFiles, designModeStyleTag } from "@/lib/apply-overrides";
+import type { DesignOverridesFile } from "@/lib/design-overrides.types";
+import { designId } from "@/lib/design-ids";
+import { useLiveOverrides } from "@/lib/use-live-overrides";
+import { DesignFrameBridge } from "@/design-mode/frame-bridge";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,9 +31,25 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const { live, liveMedia, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
+  const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
+  const responsiveCss = designModeStyleTag(overridesFile);
+  const brandingId = designId.home("branding");
+
   return (
     <div className="relative min-h-[100svh] bg-background text-foreground">
-      <SiteNav variant="top-transparent" />
+      {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
+      <DesignFrameBridge
+        liveOverrides={live}
+        liveMedia={liveMedia}
+        onLocalPatch={onLocalPatch}
+        onLocalReset={onLocalReset}
+        onSyncAll={onSyncAll}
+      />
+
+      <div data-design-protected="Protected navigation">
+        <SiteNav variant="top-transparent" />
+      </div>
       {/* Split screen: text left, phone-booth image right (right = clickable → /contact).
           Heights are in svh so the whole split fits the space a phone actually
           shows with its address bar up — in vh the wordmark is pushed below the
@@ -35,7 +57,14 @@ function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[100svh]">
         {/* LEFT — text */}
         <div className="relative z-10 flex flex-col justify-end px-6 md:px-12 lg:px-16 py-10 md:py-14 pt-28 md:pt-32">
-          <div>
+          {/* The wrapper (not the h1) carries the design ID: typography
+              overrides need to reach the h1's own classes (see
+              apply-overrides.ts), but *positioning* — what this element is
+              actually for — applies to this wrapper so dragging moves the
+              whole three-line lockup as one block via a transform, leaving
+              its reserved layout space untouched rather than switching the
+              header to absolute positioning. */}
+          <div data-design-id={brandingId} data-design-kind="heading">
             <h1
               className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
               aria-label="Reid Graham Design"

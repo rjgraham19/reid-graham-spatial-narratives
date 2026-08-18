@@ -4,7 +4,8 @@
  * intentionally small — one message type per action, no generic "run this"
  * channel.
  */
-import type { ElementOverride, Scope } from "@/lib/design-overrides.types";
+import type { DesignOverridesFile, ElementOverride, Scope } from "@/lib/design-overrides.types";
+import type { MediaAdditionsFile } from "@/lib/media-additions.types";
 
 export const DESIGN_BRIDGE_SOURCE = "reid-portfolio-design-mode";
 
@@ -16,6 +17,17 @@ export type ElementSnapshot = {
   text?: string;
   caption?: string;
   rect: { top: number; left: number; width: number; height: number };
+  /** Present for images/video — the media inspector reads these. */
+  media?: {
+    role: string;
+    project: string;
+    src: string;
+    filename: string;
+    alt?: string;
+    link?: string;
+    layout?: "full" | "half";
+    addedByDesignMode: boolean;
+  };
 };
 
 /** Only three real modes now — Browse, Content, Arrange. */
@@ -31,6 +43,11 @@ export type ParentToFrame =
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "applyOverride"; id: string; scope: Scope; patch: ElementOverride }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "resetElement"; id: string }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "setMoveKind"; moveKind: MoveKind }
+  /** Full replace of the frame's live state (overrides + media additions)
+      with the parent's authoritative working state — the single source of
+      truth for Undo/Redo/Discard/Resume/media-add/media-edit, none of which
+      tell the frame which individual fields changed, only the end result. */
+  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "syncState"; overrides: DesignOverridesFile; media: MediaAdditionsFile }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "clearSelection" };
 
 export type FrameToParent =
@@ -39,7 +56,11 @@ export type FrameToParent =
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "deselect" }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "textCommitted"; id: string; text: string }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "moved"; id: string; scope: Scope; kind: MoveKind; dx: number; dy: number }
-  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "unmapped"; role: string };
+  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "unmapped"; role: string }
+  /** Ctrl/Cmd+Z etc. pressed while focus is inside the canvas iframe — key
+      events don't cross the iframe boundary, so the frame has to ask. */
+  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "requestUndo" }
+  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "requestRedo" };
 
 export function isDesignMessage(data: unknown): data is ParentToFrame | FrameToParent {
   return (

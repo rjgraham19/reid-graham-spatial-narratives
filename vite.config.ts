@@ -7,6 +7,8 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { designModeSavePlugin } from "./src/design-mode/dev-save-plugin";
 import { designModePublishPlugin } from "./src/design-mode/dev-publish-plugin";
+import { designModeMediaPlugin } from "./src/design-mode/dev-media-plugin";
+import { designModeResumePlugin } from "./src/design-mode/dev-resume-plugin";
 
 export default defineConfig({
   tanstackStart: {
@@ -14,15 +16,34 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  /* Local-only Design Mode save + publish endpoints. Both plugins no-op
-     unless running `vite dev --mode design` (see dev-save-plugin.ts /
-     dev-publish-plugin.ts) — this file is Node build tooling, never bundled
-     into the app, so including it here carries no production risk regardless.
-     Save (writes design-overrides.json) and Publish (git commit + push) are
-     kept as two separate endpoints/actions deliberately — approving a design
-     change should never itself trigger a live deploy. */
+  /* Local-only Design Mode save + publish + media endpoints. All three
+     plugins no-op unless running `vite dev --mode design` (see
+     dev-save-plugin.ts / dev-publish-plugin.ts / dev-media-plugin.ts) — this
+     file is Node build tooling, never bundled into the app, so including it
+     here carries no production risk regardless.
+     Save (writes design-overrides.json + design-media-additions.json,
+     promoting any staged uploads into public/design-media/ as part of the
+     same write) and Publish (git commit + push) stay two separate
+     endpoints/actions deliberately — approving a design change should never
+     itself trigger a live deploy. Uploads stage into .design-mode-staging/
+     (gitignored) until approved. */
   vite: {
-    plugins: [designModeSavePlugin("./src/lib/design-overrides.json"), designModePublishPlugin(".")],
+    plugins: [
+      designModeSavePlugin(
+        "./src/lib/design-overrides.json",
+        "./src/lib/design-media-additions.json",
+        "./.design-mode-staging",
+        "./public/design-media",
+      ),
+      designModePublishPlugin("."),
+      designModeMediaPlugin("./.design-mode-staging"),
+      /* Résumé replacement — a fourth, deliberately separate dev-only
+         endpoint. It writes straight to public/resume.pdf and
+         src/lib/resume-meta.json rather than going through the media
+         pipeline above, since a résumé is one file at a fixed path with no
+         draft/approve state worth having (see dev-resume-plugin.ts). */
+      designModeResumePlugin("./public/resume.pdf", "./src/lib/resume-meta.json"),
+    ],
   },
   /* Which host this build targets.
    *

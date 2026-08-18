@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { DESKTOP_BREAKPOINT_PX } from "@/lib/apply-overrides";
 import type { DesignOverridesFile, ElementOverride, Scope } from "@/lib/design-overrides.types";
+import type { MediaAdditionsFile } from "@/lib/media-additions.types";
 import {
   DESIGN_BRIDGE_SOURCE,
   isDesignMessage,
@@ -55,8 +56,20 @@ function snapshotFor(el: HTMLElement): ElementSnapshot {
     rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
   };
   if (kind === "image") {
-    const img = el.tagName === "IMG" ? (el as HTMLImageElement) : el.querySelector("img");
-    base.caption = img?.alt;
+    const media = el.tagName === "IMG" || el.tagName === "VIDEO" ? el : el.querySelector("img,video");
+    const srcEl = media as (HTMLImageElement | HTMLVideoElement) | null;
+    const src = srcEl?.getAttribute("src") ?? "";
+    base.caption = (srcEl as HTMLImageElement | null)?.alt;
+    base.media = {
+      role: el.dataset.designRole ?? "image",
+      project: el.dataset.designProject ?? "",
+      src,
+      filename: src.split("/").pop() ?? src,
+      alt: (srcEl as HTMLImageElement | null)?.alt,
+      link: el.dataset.designLink || undefined,
+      layout: el.dataset.designLayout === "half" ? "half" : el.dataset.designLayout === "full" ? "full" : undefined,
+      addedByDesignMode: el.dataset.designAdded === "1",
+    };
   } else {
     base.text = el.textContent ?? "";
   }
@@ -115,12 +128,16 @@ const SNAP_THRESHOLD = 7;
  */
 export default function InnerFrameBridge({
   liveOverrides,
+  liveMedia: _liveMedia,
   onLocalPatch,
   onLocalReset,
+  onSyncAll,
 }: {
   liveOverrides: DesignOverridesFile;
+  liveMedia: MediaAdditionsFile;
   onLocalPatch: (id: string, scope: Scope, patch: ElementOverride) => void;
   onLocalReset: (id: string) => void;
+  onSyncAll: (overrides: DesignOverridesFile, media: MediaAdditionsFile) => void;
 }) {
   const modeRef = useRef<InteractionMode>("browse");
   const moveKindRef = useRef<MoveKind>("layout");
@@ -148,6 +165,7 @@ export default function InnerFrameBridge({
   // not. The prop still documents that this component's writes flow through
   // the page's live-override state, not raw DOM mutation.
   void liveOverrides;
+  void _liveMedia;
 
   useEffect(() => {
     if (window.self === window.top) return; // only active embedded in the Design Mode canvas
@@ -461,6 +479,17 @@ export default function InnerFrameBridge({
         deselect();
         return;
       }
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && !selectedRef.current?.isContentEditable && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        post({ source: DESIGN_BRIDGE_SOURCE, type: e.shiftKey ? "requestRedo" : "requestUndo" });
+        return;
+      }
+      if (e.ctrlKey && (e.key === "y" || e.key === "Y")) {
+        e.preventDefault();
+        post({ source: DESIGN_BRIDGE_SOURCE, type: "requestRedo" });
+        return;
+      }
       if (modeRef.current !== "arrange" || !selectedRef.current || selectedRef.current.isContentEditable) return;
       const step = e.shiftKey ? 10 : 1;
       let dx = 0;
@@ -500,6 +529,8 @@ export default function InnerFrameBridge({
         onLocalPatch(msg.id, msg.scope, msg.patch);
       } else if (msg.type === "resetElement") {
         onLocalReset(msg.id);
+      } else if (msg.type === "syncState") {
+        onSyncAll(msg.overrides, msg.media);
       }
     };
 
@@ -530,6 +561,19 @@ export default function InnerFrameBridge({
   // Editable/protected hover affordances — pure CSS, mode-scoped via a body class.
   return (
     <style>{`
+      /* Some page compositions (e.g. a title overlaid on its hero image)
+         set pointer-events:none on the text's own container so ordinary
+         clicks fall through to the image below it — intentional on the
+         public site, but it also swallows Design Mode's own click handling
+         in Content/Arrange, making that text unselectable and impossible to
+         double-click into. An explicit "auto" directly on the tagged
+         element re-enables clicks for it specifically without touching the
+         production pointer-events behavior anywhere else (only these two
+         body-scoped selectors exist at all, and only inside npm run design). */
+      body[data-design-mode="content"] [data-design-id],
+      body[data-design-mode="arrange"] [data-design-id] {
+        pointer-events: auto !important;
+      }
       body[data-design-mode="content"] [data-design-id][data-design-kind="text"]:hover,
       body[data-design-mode="content"] [data-design-id][data-design-kind="heading"]:hover,
       body[data-design-mode="arrange"] [data-design-id]:hover {

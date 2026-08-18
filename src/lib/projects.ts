@@ -94,12 +94,27 @@ export type MediaItem = {
   src: string;
   poster?: string;
   caption?: string;
+  alt?: string;
+  /** Explicitly no meaningful alt text needed — set by Design Mode only. */
+  decorative?: boolean;
+  /** Optional click-through destination, set by Design Mode only. */
+  link?: string;
   /**
    * Set by Design Mode overrides only. Never remove hidden items from the
    * `media` array itself — several project pages address media by fixed
    * index, so splicing would silently corrupt unrelated images.
    */
   hidden?: boolean;
+  /**
+   * Layout width in the generic gallery grid. Only meaningful there — the
+   * hand-composed per-project layouts (True West, Anne Frank, ...) ignore
+   * it. Absent on every hand-authored item, which keeps their existing
+   * full-width rendering exactly as it was; only Design-Mode-added items
+   * set this explicitly.
+   */
+  layout?: "full" | "half";
+  /** True when Design Mode added this item — never true for hand-authored media. */
+  addedByDesignMode?: boolean;
 };
 
 export type Credit = { id?: string; role: string; name: string; hidden?: boolean };

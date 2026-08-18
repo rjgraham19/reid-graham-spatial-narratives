@@ -22,6 +22,11 @@ export type TextOverride = {
 export type ImageOverride = {
   caption?: string;
   alt?: string;
+  /** Replacement source — `/design-media/...` once approved, or
+      `/__design-mode/staged/...` while still a draft. Only ever points at
+      Design Mode's own upload area; validated server-side on save. */
+  src?: string;
+  link?: string;
   widthPct?: number; // 1-100, proportional width
   maxWidth?: number; // px
   offsetX?: number; // px — Free Position
@@ -68,6 +73,8 @@ export const WHITELISTED_TEXT_PROPS: (keyof TextOverride)[] = [
 export const WHITELISTED_IMAGE_PROPS: (keyof ImageOverride)[] = [
   "caption",
   "alt",
+  "src",
+  "link",
   "widthPct",
   "maxWidth",
   "offsetX",

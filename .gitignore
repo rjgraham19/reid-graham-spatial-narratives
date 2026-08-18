@@ -20,6 +20,9 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Design Mode: unapproved media uploads (local-only, never committed)
+.design-mode-staging/
+
 # Netlify build output
 .netlify/
 

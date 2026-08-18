@@ -21,6 +21,7 @@ export const designId = {
   projectMedia: (slug: string, mediaKey: string) => `project.${slug}.media.${mediaKey}`,
   projectMediaCaption: (slug: string, mediaKey: string) => `project.${slug}.media.${mediaKey}.caption`,
   connect: (role: string) => `connect.${role}`,
+  home: (role: string) => `home.${role}`,
 };
 
 /** IDs whose elements must never be reachable for edit/delete — no data-design-id is ever emitted for them. */

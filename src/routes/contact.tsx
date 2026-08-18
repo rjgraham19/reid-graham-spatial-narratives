@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { glassButton } from "@/components/glass-button";
+import { ResumeSection } from "@/components/resume-viewer";
 import designOverrides from "@/lib/design-overrides.json";
 import { mergeOverridesFiles, resolveText, resolveHidden, designModeStyleTag } from "@/lib/apply-overrides";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
@@ -30,15 +29,20 @@ export const Route = createFileRoute("/contact")({
 });
 
 function Contact() {
-  const [zoom, setZoom] = useState(false);
-  const { live, onLocalPatch, onLocalReset } = useLiveOverrides();
+  const { live, liveMedia, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const responsiveCss = designModeStyleTag(overridesFile);
 
   return (
     <div className="min-h-screen flex flex-col">
       {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
-      <DesignFrameBridge liveOverrides={live} onLocalPatch={onLocalPatch} onLocalReset={onLocalReset} />
+      <DesignFrameBridge
+        liveOverrides={live}
+        liveMedia={liveMedia}
+        onLocalPatch={onLocalPatch}
+        onLocalReset={onLocalReset}
+        onSyncAll={onSyncAll}
+      />
 
       <div data-design-protected="Protected navigation">
         <SiteNav />
@@ -70,56 +74,9 @@ function Contact() {
           {/* Resume swoop-in */}
           <div className="md:col-span-6">
             <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-              Résumé
+              Resume
             </p>
-            <button
-              type="button"
-              onClick={() => setZoom(true)}
-              className="group relative block w-full max-w-md aspect-[8.5/11] bg-white text-black rounded-md shadow-2xl overflow-hidden animate-swoop-in text-left"
-              aria-label="Enlarge résumé"
-            >
-              <div className="absolute inset-0 p-8 md:p-10 flex flex-col">
-                <div>
-                  <p className="font-display font-black uppercase tracking-tight text-2xl md:text-3xl">
-                    Reid Graham
-                  </p>
-                  <p className="mt-1 text-xs tracking-[0.2em] uppercase text-black/60">
-                    Designer · New York City / Chicago
-                  </p>
-                </div>
-
-                <div className="mt-6 space-y-4 text-xs md:text-sm text-black/80">
-                  <div>
-                    <p className="text-[10px] tracking-[0.3em] uppercase text-black/50">
-                      Education
-                    </p>
-                    <p>University of Michigan — B.S. Architecture, Minor in Scenic Design</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] tracking-[0.3em] uppercase text-black/50">
-                      Practice
-                    </p>
-                    <p>Production & scenic design · Architecture · Visualization</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] tracking-[0.3em] uppercase text-black/50">
-                      Honors
-                    </p>
-                    <p>Honorable Mention — Wallenberg Foundation Awards</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] tracking-[0.3em] uppercase text-black/50">
-                      Contact
-                    </p>
-                    <p>reidgraham@gmail.com</p>
-                  </div>
-                </div>
-
-                <p className="mt-auto text-[10px] tracking-[0.3em] uppercase text-black/40">
-                  Click to enlarge — full PDF placeholder
-                </p>
-              </div>
-            </button>
+            <ResumeSection />
           </div>
 
           {/* Email + About Me */}
@@ -170,49 +127,6 @@ function Contact() {
       <div data-design-protected="Protected navigation">
         <SiteFooter />
       </div>
-
-      {/* Résumé lightbox */}
-      {zoom && (
-        <div
-          className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-lg flex flex-col items-center justify-center p-6"
-          onClick={() => setZoom(false)}
-        >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setZoom(false);
-            }}
-            className={glassButton({ touch: true, className: "absolute top-6 right-6" })}
-          >
-            CLOSE ✕
-          </button>
-          <div
-            className="w-full max-w-3xl aspect-[8.5/11] bg-white text-black rounded-md shadow-2xl overflow-hidden p-10 md:p-16"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="font-display font-black uppercase tracking-tight text-4xl md:text-6xl">
-              Reid Graham
-            </p>
-            <p className="mt-2 text-sm tracking-[0.2em] uppercase text-black/60">
-              Designer · New York City / Chicago
-            </p>
-            <div className="mt-10 space-y-6 text-sm md:text-base text-black/80">
-              <p>reidgraham@gmail.com</p>
-              <p>
-                University of Michigan — B.S. Architecture, Minor in Scenic Design.
-              </p>
-              <p>
-                Practice spans production &amp; scenic design, architecture, and
-                visualization. Honorable Mention — Wallenberg Foundation Awards.
-              </p>
-              <p className="text-black/50 italic">
-                Full résumé PDF placeholder — to be replaced.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

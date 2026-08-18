@@ -33,9 +33,17 @@ import {
   type PhilosophyCard,
   type ProjectTag,
 } from "@/lib/projects";
-import { applyOverrides, designModeStyleTag, mergeOverridesFiles } from "@/lib/apply-overrides";
+import {
+  applyOverrides,
+  applyMediaAdditions,
+  designModeStyleTag,
+  mergeOverridesFiles,
+  mergeMediaAdditions,
+} from "@/lib/apply-overrides";
 import designOverrides from "@/lib/design-overrides.json";
+import designMediaAdditions from "@/lib/design-media-additions.json";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
+import type { MediaAdditionsFile } from "@/lib/media-additions.types";
 import { designId } from "@/lib/design-ids";
 import { useLiveOverrides } from "@/lib/use-live-overrides";
 import { DesignFrameBridge } from "@/design-mode/frame-bridge";
@@ -107,9 +115,10 @@ function CreditRow({ slug, credit }: { slug: string; credit: Credit }) {
 
 function ProjectPage() {
   const { project: rawProject } = Route.useLoaderData();
-  const { live, onLocalPatch, onLocalReset } = useLiveOverrides();
+  const { live, liveMedia, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
-  const project = applyOverrides(rawProject, overridesFile);
+  const mediaAdditionsFile = mergeMediaAdditions(designMediaAdditions as MediaAdditionsFile, liveMedia);
+  const project = applyMediaAdditions(applyOverrides(rawProject, overridesFile), mediaAdditionsFile, overridesFile);
   const responsiveCss = designModeStyleTag(overridesFile);
   const { panel } = Route.useSearch();
   const hub = HUBS.find((h) => h.slug === project.hub)!;
@@ -217,7 +226,13 @@ function ProjectPage() {
       }`}
     >
       {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
-      <DesignFrameBridge liveOverrides={live} onLocalPatch={onLocalPatch} onLocalReset={onLocalReset} />
+      <DesignFrameBridge
+        liveOverrides={live}
+        liveMedia={liveMedia}
+        onLocalPatch={onLocalPatch}
+        onLocalReset={onLocalReset}
+        onSyncAll={onSyncAll}
+      />
 
       {!panel && (
         <div data-design-protected="Protected navigation">
@@ -459,6 +474,8 @@ function ProjectPage() {
             <img
               data-design-id={designId.projectMedia(project.slug, project.media[0]?.id ?? "0")}
               data-design-kind="image"
+              data-design-role="header"
+              data-design-project={project.slug}
               src={project.cover}
               alt={project.title}
               className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
@@ -1051,45 +1068,90 @@ function ProjectPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-3 md:space-y-4">
-            {galleryMedia.map(({ item: m, index: i }) => (
-              <figure
-                key={i}
-                className={`group ${
-                  isStaging
-                    ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"} animate-twitch`
-                    : ""
-                }`}
-                style={isStaging ? { animationDelay: `${i * 0.9}s` } : undefined}
-              >
-                <button
-                  type="button"
-                  onClick={() => setLightbox(i)}
-                  className="block w-full overflow-hidden rounded-md bg-secondary"
-                  aria-label={m.caption ?? `Media ${i + 1}`}
-                >
-                  <img
-                    data-design-id={designId.projectMedia(project.slug, m.id ?? String(i))}
+          // grid-cols-2 lets a "half" item's md:col-span-1 sit next to
+          // another half item automatically (standard grid auto-flow) while
+          // a "full" item's md:col-span-2 takes the whole row — no manual
+          // pairing logic needed, and every hand-authored item (no `layout`
+          // set, treated as full) renders exactly as before.
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            {galleryMedia.map(({ item: m, index: i }) => {
+              const mediaId = designId.projectMedia(project.slug, m.id!);
+              const isHalf = m.layout === "half";
+              const role = m.addedByDesignMode ? (isHalf ? "half-width image" : "full-width image") : "gallery image";
+              const mediaEl =
+                m.type === "video" ? (
+                  <video
+                    data-design-id={mediaId}
                     data-design-kind="image"
+                    data-design-role={role}
+                    data-design-project={project.slug}
+                    data-design-layout={m.layout ?? "full"}
+                    data-design-added={m.addedByDesignMode ? "1" : undefined}
+                    data-design-link={m.link}
                     src={m.src}
-                    alt={m.caption ?? project.title}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    className="w-full h-auto object-cover"
+                  />
+                ) : (
+                  <img
+                    data-design-id={mediaId}
+                    data-design-kind="image"
+                    data-design-role={role}
+                    data-design-project={project.slug}
+                    data-design-layout={m.layout ?? "full"}
+                    data-design-added={m.addedByDesignMode ? "1" : undefined}
+                    data-design-link={m.link}
+                    src={m.src}
+                    alt={m.decorative ? "" : (m.alt ?? m.caption ?? project.title)}
                     loading="lazy"
                     className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
-                </button>
-                {m.caption && (
-                  <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
-                    {String(i + 1).padStart(2, "0")} —{" "}
-                    <span
-                      data-design-id={designId.projectMediaCaption(project.slug, m.id ?? String(i))}
-                      data-design-kind="text"
+                );
+              return (
+                <figure
+                  key={m.id}
+                  className={`group ${isHalf ? "md:col-span-1" : "md:col-span-2"} ${
+                    isStaging ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"} animate-twitch` : ""
+                  }`}
+                  style={isStaging ? { animationDelay: `${i * 0.9}s` } : undefined}
+                >
+                  {/* A link makes the media clickable to navigate instead of
+                      opening the lightbox — never both, since an anchor
+                      can't legally wrap another interactive control. Design
+                      Mode's own click handling still takes over during
+                      Content/Arrange, so a link never fights selection while
+                      editing. */}
+                  {m.link ? (
+                    <a href={m.link} className="block w-full overflow-hidden rounded-md bg-secondary">
+                      {mediaEl}
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setLightbox(i)}
+                      className="block w-full overflow-hidden rounded-md bg-secondary"
+                      aria-label={m.caption ?? `Media ${i + 1}`}
                     >
-                      {m.caption}
-                    </span>
-                  </figcaption>
-                )}
-              </figure>
-            ))}
+                      {mediaEl}
+                    </button>
+                  )}
+                  {m.caption && (
+                    <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
+                      {!m.addedByDesignMode && `${String(i + 1).padStart(2, "0")} — `}
+                      <span
+                        data-design-id={designId.projectMediaCaption(project.slug, m.id!)}
+                        data-design-kind="text"
+                      >
+                        {m.caption}
+                      </span>
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            })}
           </div>
         )}
       </section>

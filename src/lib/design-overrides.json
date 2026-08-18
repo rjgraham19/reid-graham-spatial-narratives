@@ -28,5 +28,53 @@
       "offsetX": 0,
       "offsetY": -24
     }
+  },
+  "home.branding": {
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": -128
+    },
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -142
+    }
+  },
+  "project.true-west.credit.scenic-designer": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -12
+    }
+  },
+  "project.true-west.credit.technical-director": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -24
+    }
+  },
+  "project.the-diary-of-anne-frank.credit.scenic-designer": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -12
+    }
+  },
+  "project.the-diary-of-anne-frank.credit.technical-director": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -24
+    }
+  },
+  "project.the-diary-of-anne-frank.pull-quote": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": 2
+    },
+    "base": {
+      "text": "Skeletal framing and deteriorating wood slatting — a tribute to Anne and her diary's enduring legacy."
+    }
+  },
+  "project.reshuffling-the-deck.media.2.caption": {
+    "base": {
+      "text": "SCENE 1"
+    }
   }
 }
