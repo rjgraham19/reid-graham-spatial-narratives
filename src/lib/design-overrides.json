@@ -19,14 +19,14 @@
       "text": "Reid Graham"
     },
     "desktop": {
-      "offsetX": 0,
-      "offsetY": -12
+      "offsetX": 158,
+      "offsetY": -77
     }
   },
   "project.you-cant-take-it-with-you.credit.technical-director": {
     "desktop": {
-      "offsetX": 0,
-      "offsetY": -24
+      "offsetX": 160,
+      "offsetY": -44
     }
   },
   "home.branding": {
@@ -41,14 +41,14 @@
   },
   "project.true-west.credit.scenic-designer": {
     "desktop": {
-      "offsetX": 0,
-      "offsetY": -12
+      "offsetX": 122,
+      "offsetY": -66
     }
   },
   "project.true-west.credit.technical-director": {
     "desktop": {
-      "offsetX": 0,
-      "offsetY": -24
+      "offsetX": 124,
+      "offsetY": -32
     }
   },
   "project.the-diary-of-anne-frank.credit.scenic-designer": {
@@ -75,6 +75,34 @@
   "project.reshuffling-the-deck.media.2.caption": {
     "base": {
       "text": "SCENE 1"
+    }
+  },
+  "project.true-west.title": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -1
+    }
+  },
+  "project.true-west.media.0": {
+    "desktop": {
+      "layoutShiftY": 131
+    }
+  },
+  "project.you-cant-take-it-with-you.media.full": {
+    "desktop": {
+      "layoutShiftY": 128
+    }
+  },
+  "project.you-cant-take-it-with-you.credit.director": {
+    "desktop": {
+      "offsetX": 159,
+      "offsetY": 16
+    }
+  },
+  "project.true-west.credit.director": {
+    "desktop": {
+      "offsetX": 123,
+      "offsetY": 28
     }
   }
 }
