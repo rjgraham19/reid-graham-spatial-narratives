@@ -364,7 +364,6 @@ export const PROJECTS: Project[] = [
       "The rawness of the space is conveyed through skeletal framing and deteriorating wood slatting. Reflecting historical reference to the original annex, the design pays tribute to Anne and her diary's enduring legacy.",
     pullQuote:
       "Skeletal framing and deteriorating wood slatting — a tribute to Anne and her diary's enduring legacy.",
-    notes: ["Conceptual sketch by Reid Graham."],
     cover: anne,
     collage: [anneDet],
     // Order matters: the custom layout on this page addresses these by index.

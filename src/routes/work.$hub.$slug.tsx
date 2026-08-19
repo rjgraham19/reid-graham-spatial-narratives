@@ -205,15 +205,8 @@ function ProjectPage() {
 
   const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
   const recordScrubVideoRef = useRef<HTMLVideoElement>(null);
-  const [recordScrubProgress, setRecordScrubProgress] = useState(0);
+  const [, setRecordScrubProgress] = useState(0);
   useScrollScrubVideo(recordScrubWrapperRef, recordScrubVideoRef, setRecordScrubProgress);
-
-  const segmentOpacity = (p: number, start: number, end: number, fade = 0.06) => {
-    if (p < start - fade || p > end + fade) return 0;
-    if (p < start) return (p - (start - fade)) / fade;
-    if (p > end) return 1 - (p - end) / fade;
-    return 1;
-  };
 
   return (
     /* `is-panel-frame` marks this document as the one rendered inside the
@@ -672,33 +665,6 @@ function ProjectPage() {
               preload="auto"
               className="absolute inset-0 h-full w-full object-cover"
             />
-
-            {/* Text overlaid on top of the video, right side.
-                The width is set explicitly rather than left to max-w: every
-                line inside is absolutely positioned, so there's nothing in flow
-                to size this box — it collapsed to zero, and the `w-full` on each
-                line collapsed with it, breaking every beat onto one word per
-                line against the right edge. */}
-            <div className="absolute right-6 md:right-16 lg:right-24 top-1/2 -translate-y-1/2 z-10 w-[min(74vw,20rem)] md:w-[28rem] text-right">
-              <p
-                className="absolute right-0 top-0 w-full font-display font-light text-foreground text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
-                style={{ opacity: segmentOpacity(recordScrubProgress, 0.05, 0.3) }}
-              >
-                Copy pending — first beat
-              </p>
-              <p
-                className="absolute right-0 top-0 w-full font-display font-light text-foreground text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
-                style={{ opacity: segmentOpacity(recordScrubProgress, 0.4, 0.65) }}
-              >
-                Copy pending — second beat
-              </p>
-              <p
-                className="absolute right-0 top-0 w-full font-display font-light text-foreground text-2xl md:text-4xl leading-snug text-balance transition-opacity duration-200"
-                style={{ opacity: segmentOpacity(recordScrubProgress, 0.75, 0.95) }}
-              >
-                Copy pending — closing beat
-              </p>
-            </div>
           </div>
         </div>
       )}
