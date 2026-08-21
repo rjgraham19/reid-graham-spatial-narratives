@@ -10,9 +10,16 @@ import { uploadMediaFile, mediaTypeFor, type StagedUpload } from "./media-client
 
 const PAGES: { label: string; url: string; slug?: string }[] = [
   { label: "Home", url: "/" },
+  { label: "Lollapalooza", url: "/work/production-scenic/lollapalooza", slug: "lollapalooza" },
   { label: "You Can't Take It With You!", url: "/work/production-scenic/you-cant-take-it-with-you", slug: "you-cant-take-it-with-you" },
   { label: "True West", url: "/work/production-scenic/true-west", slug: "true-west" },
   { label: "The Diary of Anne Frank", url: "/work/production-scenic/the-diary-of-anne-frank", slug: "the-diary-of-anne-frank" },
+  { label: "Reshuffling the Deck", url: "/work/production-scenic/reshuffling-the-deck", slug: "reshuffling-the-deck" },
+  { label: "TaB: Renaissance", url: "/work/production-scenic/tab-renaissance", slug: "tab-renaissance" },
+  { label: "Field House", url: "/work/architecture/field-house", slug: "field-house" },
+  { label: "Townhouse", url: "/work/architecture/townhouse", slug: "townhouse" },
+  { label: "The Exchange Facility", url: "/work/architecture/the-exchange-facility", slug: "the-exchange-facility" },
+  { label: "Staging Aesthetics", url: "/work/architecture/staging-aesthetics", slug: "staging-aesthetics" },
   { label: "Renderings", url: "/work/visualizations/renderings", slug: "renderings" },
   { label: "Construction Drafting", url: "/work/visualizations/construction-drafting", slug: "construction-drafting" },
   { label: "Physical Models", url: "/work/visualizations/physical-models", slug: "physical-models" },
@@ -628,9 +635,9 @@ function AddMediaModal({
           </>
         )}
 
-        <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 16, alignItems: "center" }}>
           <button
-            style={styles.primaryBtn}
+            style={{ ...styles.primaryBtn, ...(canAdd ? {} : styles.primaryBtnDisabled) }}
             disabled={!canAdd}
             onClick={() => {
               if (!staged) return;
@@ -652,6 +659,11 @@ function AddMediaModal({
           </button>
           <button style={styles.btn} onClick={onClose}>Cancel</button>
         </div>
+        {staged && !canAdd && (
+          <p style={{ color: "#ffb84f", fontSize: 12, marginTop: 8 }}>
+            Add a caption, alt text, or check "Decorative" to enable Add to Page.
+          </p>
+        )}
       </div>
     </div>
   );
@@ -665,6 +677,7 @@ const styles: Record<string, React.CSSProperties> = {
   tabActive: { background: "#4f8cff", color: "#fff", borderColor: "#4f8cff" },
   btn: { background: "#1a1a1c", color: "#eee", border: "1px solid #333", borderRadius: 6, padding: "6px 10px", cursor: "pointer" },
   primaryBtn: { background: "#4f8cff", color: "#fff", border: "none", borderRadius: 6, padding: "6px 14px", cursor: "pointer" },
+  primaryBtnDisabled: { background: "#33415c", color: "#8a94a6", cursor: "not-allowed" },
   badge: { fontSize: 11, color: "#9fb8ff", border: "1px solid #33456f", padding: "3px 8px", borderRadius: 999 },
   unsavedDot: { width: 8, height: 8, borderRadius: "50%", background: "#ffb84f", display: "inline-block" },
   body: { flex: 1, display: "flex", minHeight: 0 },

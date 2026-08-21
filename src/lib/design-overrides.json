@@ -124,5 +124,30 @@
     "base": {
       "text": "A giant CD player channels the early-2000s as an oversized photo backdrop for festivalgoers, with a spinning translucent magenta compact disc. At night, its chrome and brushed aluminum finishes pop against the glowing crescent moon inside the flip-open lid."
     }
+  },
+  "project.field-house.description": {
+    "base": {
+      "text": ""
+    }
+  },
+  "project.field-house.media.0": {
+    "base": {
+      "src": "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg"
+    }
+  },
+  "project.field-house.media.1": {
+    "base": {
+      "src": "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg"
+    }
+  },
+  "project.field-house.media.0.caption": {
+    "base": {
+      "text": ""
+    }
+  },
+  "project.field-house.media.1.caption": {
+    "base": {
+      "text": ""
+    }
   }
 }
