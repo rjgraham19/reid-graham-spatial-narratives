@@ -84,5 +84,15 @@
       "layout": "full",
       "filename": "EXCHANGE_DIAGRAM.jpg"
     }
+  ],
+  "staging-aesthetics": [
+    {
+      "id": "media-mt3ipvcu-itx0k",
+      "type": "image",
+      "src": "/design-media/staging-aesthetics/aesthetics.jpeg.png",
+      "decorative": true,
+      "layout": "full",
+      "filename": "aesthetics.jpeg.png"
+    }
   ]
 }
