@@ -1045,7 +1045,7 @@ function ProjectPage() {
           // else follows it. The wrapper's aspect-ratio matches the axon's
           // real dimensions exactly, so it's never cropped and never grows
           // taller than the picture itself.
-          <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-3 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 md:gap-10 md:items-center">
             {!project.media[0]?.hidden && (
               <figure className="group overflow-hidden rounded-md" style={{ aspectRatio: "1865 / 1143" }}>
                 <button
@@ -1066,11 +1066,14 @@ function ProjectPage() {
               </figure>
             )}
 
-            <div className="flex flex-col justify-center items-end gap-6 md:gap-8">
+            {/* Squares fill their column's own width exactly (no inner
+                max-width) so there's no blank margin between the two
+                columns beyond the grid gap itself. */}
+            <div className="flex flex-col gap-4 md:gap-6">
               {[1, 2, 3].map(
                 (idx) =>
                   !project.media[idx]?.hidden && (
-                    <figure key={idx} className="group w-full max-w-[220px] md:max-w-[240px]">
+                    <figure key={idx} className="group">
                       <button
                         type="button"
                         onClick={() => setLightbox(idx)}
