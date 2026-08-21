@@ -195,8 +195,8 @@ export default function DesignShell() {
     if (!sel?.media) return;
     try {
       const staged = await uploadMediaFile(file);
-      if (sel.media.addedByDesignMode && page.slug) {
-        store.patchMedia(page.slug, sel.id, { src: staged.url, filename: staged.filename }, "Media replaced");
+      if (sel.media.addedByDesignMode && sel.media.mediaId && page.slug) {
+        store.patchMedia(page.slug, sel.media.mediaId, { src: staged.url, filename: staged.filename }, "Media replaced");
       } else {
         store.patchElement(sel.id, "base", { src: staged.url });
       }
@@ -422,24 +422,24 @@ export default function DesignShell() {
                     Replace Media
                   </span>
                 </label>
-                {selMedia.addedByDesignMode && selMedia.layout && page.slug && (
+                {selMedia.addedByDesignMode && selMedia.layout && selMedia.mediaId && page.slug && (
                   <div style={{ display: "flex", gap: 4, marginTop: 8 }}>
                     <button
                       style={{ ...styles.chip, ...(selMedia.layout === "full" ? styles.chipActive : {}) }}
-                      onClick={() => store.patchMedia(page.slug!, store.selection!.id, { layout: "full" }, "Layout change")}
+                      onClick={() => store.patchMedia(page.slug!, selMedia.mediaId!, { layout: "full" }, "Layout change")}
                     >
                       Full Width
                     </button>
                     <button
                       style={{ ...styles.chip, ...(selMedia.layout === "half" ? styles.chipActive : {}) }}
-                      onClick={() => store.patchMedia(page.slug!, store.selection!.id, { layout: "half" }, "Layout change")}
+                      onClick={() => store.patchMedia(page.slug!, selMedia.mediaId!, { layout: "half" }, "Layout change")}
                     >
                       Half Width
                     </button>
                   </div>
                 )}
 
-                {selMedia.addedByDesignMode && page.slug && (
+                {selMedia.addedByDesignMode && selMedia.mediaId && page.slug && (
                   <div style={{ marginTop: 12 }}>
                     <label style={styles.fieldLabel}>Caption</label>
                     <textarea
@@ -447,7 +447,7 @@ export default function DesignShell() {
                       rows={2}
                       value={selMedia.caption ?? ""}
                       onChange={(e) =>
-                        store.patchMedia(page.slug!, store.selection!.id, { caption: e.target.value || undefined }, "Caption edit")
+                        store.patchMedia(page.slug!, selMedia.mediaId!, { caption: e.target.value || undefined }, "Caption edit")
                       }
                     />
                     {selMedia.type === "image" && (
@@ -460,7 +460,7 @@ export default function DesignShell() {
                           value={selMedia.alt ?? ""}
                           disabled={selMedia.decorative}
                           onChange={(e) =>
-                            store.patchMedia(page.slug!, store.selection!.id, { alt: e.target.value || undefined }, "Alt text edit")
+                            store.patchMedia(page.slug!, selMedia.mediaId!, { alt: e.target.value || undefined }, "Alt text edit")
                           }
                         />
                         <label style={{ ...styles.fieldLabel, display: "flex", alignItems: "center", gap: 6 }}>
@@ -470,7 +470,7 @@ export default function DesignShell() {
                             onChange={(e) =>
                               store.patchMedia(
                                 page.slug!,
-                                store.selection!.id,
+                                selMedia.mediaId!,
                                 { decorative: e.target.checked, alt: e.target.checked ? undefined : selMedia.alt },
                                 "Decorative toggle",
                               )

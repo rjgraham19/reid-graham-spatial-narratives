@@ -1054,6 +1054,8 @@ function ProjectPage() {
                     data-design-layout={m.layout ?? "full"}
                     data-design-added={m.addedByDesignMode ? "1" : undefined}
                     data-design-link={m.link}
+                    data-design-media-id={m.addedByDesignMode ? m.id : undefined}
+                    data-design-caption={m.caption}
                     src={m.src}
                     muted
                     loop
@@ -1070,6 +1072,9 @@ function ProjectPage() {
                     data-design-layout={m.layout ?? "full"}
                     data-design-added={m.addedByDesignMode ? "1" : undefined}
                     data-design-link={m.link}
+                    data-design-media-id={m.addedByDesignMode ? m.id : undefined}
+                    data-design-caption={m.caption}
+                    data-design-decorative={m.decorative ? "1" : undefined}
                     src={m.src}
                     alt={m.decorative ? "" : (m.alt ?? m.caption ?? project.title)}
                     loading="lazy"

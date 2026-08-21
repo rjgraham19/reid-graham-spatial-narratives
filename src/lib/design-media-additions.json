@@ -50,5 +50,39 @@
       "layout": "half",
       "filename": "TOWNHOUSE_RENDER3.jpg"
     }
+  ],
+  "the-exchange-facility": [
+    {
+      "id": "media-mt3ils39-2501u",
+      "type": "image",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_NIBIOASIS.jpg",
+      "decorative": true,
+      "layout": "half",
+      "filename": "EXCHANGE_NIBIOASIS.jpg"
+    },
+    {
+      "id": "media-mt3imc31-91zcc",
+      "type": "image",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_STEAMSANCTUARY.jpg",
+      "decorative": true,
+      "layout": "half",
+      "filename": "EXCHANGE_STEAMSANCTUARY.jpg"
+    },
+    {
+      "id": "media-mt3imlov-ot5ov",
+      "type": "image",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE.jpg",
+      "decorative": true,
+      "layout": "half",
+      "filename": "EXCHANGE_WAVESCAPE.jpg"
+    },
+    {
+      "id": "media-mt3imyu8-nau7g",
+      "type": "image",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_DIAGRAM.jpg",
+      "decorative": true,
+      "layout": "full",
+      "filename": "EXCHANGE_DIAGRAM.jpg"
+    }
   ]
 }

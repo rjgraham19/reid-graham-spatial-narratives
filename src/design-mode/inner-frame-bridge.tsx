@@ -66,9 +66,13 @@ function snapshotFor(el: HTMLElement): ElementSnapshot {
       src,
       filename: src.split("/").pop() ?? src,
       alt: (srcEl as HTMLImageElement | null)?.alt,
+      caption: el.dataset.designCaption || undefined,
+      type: el.tagName === "VIDEO" || srcEl?.tagName === "VIDEO" ? "video" : "image",
+      decorative: el.dataset.designDecorative === "1",
       link: el.dataset.designLink || undefined,
       layout: el.dataset.designLayout === "half" ? "half" : el.dataset.designLayout === "full" ? "full" : undefined,
       addedByDesignMode: el.dataset.designAdded === "1",
+      mediaId: el.dataset.designMediaId || undefined,
     };
   } else {
     base.text = el.textContent ?? "";
