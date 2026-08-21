@@ -104,5 +104,25 @@
       "offsetX": 123,
       "offsetY": 28
     }
+  },
+  "project.lollapalooza.title": {
+    "base": {
+      "text": "LollapaloozaLollapalooza"
+    }
+  },
+  "project.lollapalooza.subtitle": {
+    "base": {
+      "text": "T-Mobile Club Magenta, Chicago, IL"
+    }
+  },
+  "project.lollapalooza.media.0.caption": {
+    "base": {
+      "text": ""
+    }
+  },
+  "project.lollapalooza.description": {
+    "base": {
+      "text": "A giant CD player channels the early-2000s as an oversized photo backdrop for festivalgoers, with a spinning translucent magenta compact disc. At night, its chrome and brushed aluminum finishes pop against the glowing crescent moon inside the flip-open lid."
+    }
   }
 }
