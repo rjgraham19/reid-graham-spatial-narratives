@@ -441,8 +441,17 @@ export const PROJECTS: Project[] = [
     cover: fieldHouseFull,
     collage: [fieldHouseDet.url],
     media: [
-      { type: "image", src: fieldHouseFull, caption: "Perspective — long ramp folding through the courts" },
-      { type: "image", src: fieldHouseDet.url, caption: "Site section, axonometric and orthographic plans" },
+      {
+        type: "image",
+        src: "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg",
+        caption:
+          "Guided by accessibility and inclusive play for individuals of all ages and physical abilities, the Community Tennis and Recreational Building incorporates ramps to facilitate activity and motion around the courts — watching the game becomes as dynamic as playing it.",
+        layout: "half",
+      },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg", layout: "half" },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg" },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP1.jpg", layout: "half" },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP2.jpg", layout: "half" },
     ],
   },
   {
@@ -461,8 +470,10 @@ export const PROJECTS: Project[] = [
     cover: townhouseFull,
     collage: [townHouseDet.url],
     media: [
-      { type: "image", src: townhouseFull, caption: "Front Exterior Entry · Section · Plan · Inspiration precedent" },
-      { type: "image", src: townHouseDet.url, caption: "First Floor Interior (Library) · Exterior View of Dining Room · Rhino model views rendered in Enscape" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_AXONX2.png", caption: "Axonometric" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER12.jpg" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER3.jpg" },
     ],
   },
   {

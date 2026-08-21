@@ -184,6 +184,8 @@ function ProjectPage() {
 
   const isStaging = project.slug === "staging-aesthetics";
   const isTab = project.slug === "tab-renaissance";
+  const isFieldHouse = project.slug === "field-house";
+  const isTownhouse = project.slug === "townhouse";
   const isYctiwy = project.slug === "you-cant-take-it-with-you";
   const isTrueWest = project.slug === "true-west";
   const isAnneFrank = project.slug === "the-diary-of-anne-frank";
@@ -611,8 +613,11 @@ function ProjectPage() {
           that graphic's lower half is solid white, so the page is meant to
           stay white from there down. .light-zone redefines the theme tokens
           for this subtree, so the sections inside adapt without each needing
-          its own light styling. A no-op on every other project. */}
-      <div className={isTab ? "light-zone" : undefined}>
+          its own light styling. A no-op on every other project — except
+          Field House, which uses the same light theme for its whole body
+          with no transition graphic (its hero sits above this point and
+          stays on the site's usual dark chrome). */}
+      <div className={isTab || isFieldHouse || isTownhouse ? "light-zone" : undefined}>
 
       {/* TaB: Renaissance — the PINK FOUNTAIN technical drawing, directly under
           the transition animation where the page turns white.
@@ -1030,6 +1035,59 @@ function ProjectPage() {
                   />
                 </button>
               </figure>
+              )}
+            </div>
+          </div>
+        ) : isTownhouse ? (
+          // Custom Townhouse layout: the axonometric upright (its own
+          // natural proportions, not rotated) on the left, and the three
+          // renders stacked as a centered column on the right — nothing
+          // else follows it. The wrapper's aspect-ratio matches the axon's
+          // real dimensions exactly, so it's never cropped and never grows
+          // taller than the picture itself.
+          <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-3 md:gap-6">
+            {!project.media[0]?.hidden && (
+              <figure className="group overflow-hidden rounded-md" style={{ aspectRatio: "1865 / 1143" }}>
+                <button
+                  type="button"
+                  onClick={() => setLightbox(0)}
+                  className="block w-full h-full"
+                  aria-label={project.media[0].caption ?? "Axonometric"}
+                >
+                  <img
+                    data-design-id={designId.projectMedia(project.slug, project.media[0].id ?? "0")}
+                    data-design-kind="image"
+                    src={project.media[0].src}
+                    alt={project.media[0].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+            )}
+
+            <div className="flex flex-col justify-center items-end gap-6 md:gap-8">
+              {[1, 2, 3].map(
+                (idx) =>
+                  !project.media[idx]?.hidden && (
+                    <figure key={idx} className="group w-full max-w-[220px] md:max-w-[240px]">
+                      <button
+                        type="button"
+                        onClick={() => setLightbox(idx)}
+                        className="block w-full aspect-square overflow-hidden rounded-md bg-secondary"
+                        aria-label={project.media[idx].caption ?? `Render ${idx}`}
+                      >
+                        <img
+                          data-design-id={designId.projectMedia(project.slug, project.media[idx].id ?? String(idx))}
+                          data-design-kind="image"
+                          src={project.media[idx].src}
+                          alt={project.media[idx].caption ?? project.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                        />
+                      </button>
+                    </figure>
+                  ),
               )}
             </div>
           </div>
