@@ -133,11 +133,17 @@
   "project.field-house.media.0": {
     "base": {
       "src": "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg"
+    },
+    "desktop": {
+      "layoutShiftY": 16
     }
   },
   "project.field-house.media.1": {
     "base": {
       "src": "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg"
+    },
+    "desktop": {
+      "layoutShiftY": 548
     }
   },
   "project.field-house.media.0.caption": {
@@ -148,6 +154,44 @@
   "project.field-house.media.1.caption": {
     "base": {
       "text": ""
+    }
+  },
+  "project.field-house.media.media-mt3hzh9j-3lmxw": {
+    "desktop": {
+      "layoutShiftY": 578
+    }
+  },
+  "project.field-house.media.media-mt3hz80d-j9bbl": {
+    "desktop": {
+      "layoutShiftY": 576
+    }
+  },
+  "project.field-house.media.media-mt3i8mh1-0i3vo": {
+    "desktop": {
+      "layoutShiftY": -2193
+    }
+  },
+  "project.townhouse.media.0": {
+    "base": {
+      "src": "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg"
+    },
+    "desktop": {
+      "layoutShiftY": -4
+    }
+  },
+  "project.townhouse.media.media-mt3ifinf-qi0fw": {
+    "desktop": {
+      "layoutShiftY": 1
+    }
+  },
+  "project.townhouse.media.media-mt3ijjmr-pbkat": {
+    "desktop": {
+      "layoutShiftY": 3
+    }
+  },
+  "project.townhouse.media.1": {
+    "desktop": {
+      "layoutShiftY": 0
     }
   }
 }

@@ -24,9 +24,18 @@ export type ElementSnapshot = {
     src: string;
     filename: string;
     alt?: string;
+    caption?: string;
+    type?: "image" | "video";
+    decorative?: boolean;
     link?: string;
     layout?: "full" | "half";
     addedByDesignMode: boolean;
+    /** Raw id inside the project's media-additions array — distinct from
+        `id` above (the composed "project.<slug>.media.<rawId>" designId
+        used for selection/overrides). store.patchMedia needs this exact
+        raw id to find the entry; passing the composed id silently matches
+        nothing. Only set for addedByDesignMode media. */
+    mediaId?: string;
   };
 };
 

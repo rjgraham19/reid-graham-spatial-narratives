@@ -311,9 +311,12 @@ export default function DesignShell() {
                 <button style={styles.btn} onClick={() => setAddMediaOpen(true)}>+ Add Media</button>
                 {(store.working.media[page.slug] ?? []).length > 0 && (
                   <div style={{ marginTop: 10 }}>
-                    {(store.working.media[page.slug] ?? []).map((m) => (
+                    {(store.working.media[page.slug] ?? []).map((m) => {
+                      const invalid = m.type === "image" && !m.decorative && !m.alt?.trim() && !m.caption?.trim();
+                      return (
                       <div key={m.id} style={styles.hiddenItem}>
                         <span style={{ wordBreak: "break-all", fontSize: 11 }}>
+                          {invalid && <span title="Missing caption, alt text, or Decorative — Save will fail" style={{ color: "#ffb84f" }}>⚠ </span>}
                           {m.filename ?? m.id} ({m.layout})
                         </span>
                         <div style={{ display: "flex", gap: 4 }}>
@@ -322,7 +325,8 @@ export default function DesignShell() {
                           <button style={styles.linkBtn} onClick={() => store.removeMedia(page.slug!, m.id)}>Remove</button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -432,6 +436,55 @@ export default function DesignShell() {
                     >
                       Half Width
                     </button>
+                  </div>
+                )}
+
+                {selMedia.addedByDesignMode && page.slug && (
+                  <div style={{ marginTop: 12 }}>
+                    <label style={styles.fieldLabel}>Caption</label>
+                    <textarea
+                      style={styles.textarea}
+                      rows={2}
+                      value={selMedia.caption ?? ""}
+                      onChange={(e) =>
+                        store.patchMedia(page.slug!, store.selection!.id, { caption: e.target.value || undefined }, "Caption edit")
+                      }
+                    />
+                    {selMedia.type === "image" && (
+                      <>
+                        <label style={styles.fieldLabel}>
+                          Alt text {selMedia.decorative ? "(skipped — decorative)" : "(required unless decorative)"}
+                        </label>
+                        <input
+                          style={styles.input}
+                          value={selMedia.alt ?? ""}
+                          disabled={selMedia.decorative}
+                          onChange={(e) =>
+                            store.patchMedia(page.slug!, store.selection!.id, { alt: e.target.value || undefined }, "Alt text edit")
+                          }
+                        />
+                        <label style={{ ...styles.fieldLabel, display: "flex", alignItems: "center", gap: 6 }}>
+                          <input
+                            type="checkbox"
+                            checked={!!selMedia.decorative}
+                            onChange={(e) =>
+                              store.patchMedia(
+                                page.slug!,
+                                store.selection!.id,
+                                { decorative: e.target.checked, alt: e.target.checked ? undefined : selMedia.alt },
+                                "Decorative toggle",
+                              )
+                            }
+                          />
+                          Decorative (no meaningful content — skip alt text)
+                        </label>
+                        {!selMedia.decorative && !selMedia.alt?.trim() && !selMedia.caption?.trim() && (
+                          <p style={{ color: "#ffb84f", fontSize: 12, marginTop: 4 }}>
+                            This image needs a caption, alt text, or "Decorative" checked before Save will accept it.
+                          </p>
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
               </div>

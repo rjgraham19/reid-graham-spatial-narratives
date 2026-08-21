@@ -15,6 +15,40 @@
       "decorative": true,
       "layout": "half",
       "filename": "FIELDHOUSE_RESIZED_GP2.jpg"
+    },
+    {
+      "id": "media-mt3i8mh1-0i3vo",
+      "type": "image",
+      "src": "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg",
+      "decorative": true,
+      "layout": "half",
+      "filename": "FIELDHOUSE_AXONPERSPECTIVE.jpg"
+    }
+  ],
+  "townhouse": [
+    {
+      "id": "media-mt3iivl2-o1sz9",
+      "type": "image",
+      "src": "/design-media/townhouse/TOWNHOUSE_AXONX2.png",
+      "decorative": true,
+      "layout": "half",
+      "filename": "TOWNHOUSE_AXONX2.png"
+    },
+    {
+      "id": "media-mt3ij5fc-x6p0j",
+      "type": "image",
+      "src": "/design-media/townhouse/TOWNHOUSE_RENDER12.jpg",
+      "decorative": true,
+      "layout": "half",
+      "filename": "TOWNHOUSE_RENDER12.jpg"
+    },
+    {
+      "id": "media-mt3ijjmr-pbkat",
+      "type": "image",
+      "src": "/design-media/townhouse/TOWNHOUSE_RENDER3.jpg",
+      "decorative": true,
+      "layout": "half",
+      "filename": "TOWNHOUSE_RENDER3.jpg"
     }
   ]
 }
