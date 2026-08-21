@@ -513,33 +513,6 @@ export const PROJECTS: Project[] = [
     media: [
       { type: "image", src: stagingFull, caption: "Physical model — day condition and night projection-mapped facade" },
     ],
-    philosophyCards: [
-      {
-        title: "Modernism",
-        time: "Early–mid 20th century. Forward-looking; embracing technological progress and new materials.",
-        space: "Functional, simple, devoid of ornamentation.",
-      },
-      {
-        title: "Neoclassicism",
-        time: "18th–19th century. Backward-looking; seeks revival of Classical Greek and Ancient Roman antiquity as a model for enduring order.",
-        space: "Symmetrical, balanced, hierarchical, monumental.",
-      },
-      {
-        title: "Constructivism",
-        time: "1915–1930. Agency in the present, active revolution and societal transformation.",
-        space: "Kinetic, utilitarian, collectively engaged.",
-      },
-      {
-        title: "Futurism",
-        time: "1909–1914. Future-oriented; glorifies speed, dynamism, technological advancement; rejects harping on the past.",
-        space: "Expanding, dynamic, constantly evolving.",
-      },
-      {
-        title: "Dadaism",
-        time: "1916–1924. Rejects traditional notions of time; embraces spontaneity and absurdity over fixed history.",
-        space: "Fragmented, chaotic, deconstructed.",
-      },
-    ],
   },
 
   // ─── Visualizations (order per spec: Renderings first) ───────────
