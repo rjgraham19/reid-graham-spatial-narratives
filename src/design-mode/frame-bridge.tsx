@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 import type { DesignOverridesFile, ElementOverride, Scope } from "@/lib/design-overrides.types";
-import type { MediaAdditionsFile } from "@/lib/media-additions.types";
+import type { MediaAdditionsFile, MediaOrderFile } from "@/lib/media-additions.types";
 
 /**
  * Mounted from every page that wants Design Mode support. Outside
@@ -16,15 +16,17 @@ const InnerFrameBridge =
 export function DesignFrameBridge({
   liveOverrides,
   liveMedia,
+  liveMediaOrder,
   onLocalPatch,
   onLocalReset,
   onSyncAll,
 }: {
   liveOverrides: DesignOverridesFile;
   liveMedia: MediaAdditionsFile;
+  liveMediaOrder: MediaOrderFile;
   onLocalPatch: (id: string, scope: Scope, patch: ElementOverride) => void;
   onLocalReset: (id: string) => void;
-  onSyncAll: (overrides: DesignOverridesFile, media: MediaAdditionsFile) => void;
+  onSyncAll: (overrides: DesignOverridesFile, media: MediaAdditionsFile, mediaOrder: MediaOrderFile) => void;
 }) {
   if (import.meta.env.MODE !== "design" || !InnerFrameBridge) return null;
   return (
@@ -32,6 +34,7 @@ export function DesignFrameBridge({
       <InnerFrameBridge
         liveOverrides={liveOverrides}
         liveMedia={liveMedia}
+        liveMediaOrder={liveMediaOrder}
         onLocalPatch={onLocalPatch}
         onLocalReset={onLocalReset}
         onSyncAll={onSyncAll}

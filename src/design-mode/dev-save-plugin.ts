@@ -3,6 +3,7 @@ import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import type { DesignOverridesFile, ElementOverride } from "../lib/design-overrides.types";
 import { WHITELISTED_IMAGE_PROPS, WHITELISTED_TEXT_PROPS, WHITELISTED_SCOPES } from "../lib/design-overrides.types";
+import { MEDIA_ORDER_ID_PATTERN, type MediaOrderFile } from "../lib/media-additions.types";
 
 /**
  * Element IDs are self-describing (see src/lib/design-ids.ts) and can name
@@ -128,6 +129,18 @@ function validateMediaEntry(o: unknown): o is RawMediaEntry {
   return true;
 }
 
+function validateMediaOrderFile(o: unknown): o is MediaOrderFile {
+  if (!isPlainObject(o)) return false;
+  for (const [slug, order] of Object.entries(o)) {
+    if (!SLUG_PATTERN.test(slug)) return false;
+    if (!Array.isArray(order)) return false;
+    for (const id of order) {
+      if (typeof id !== "string" || !MEDIA_ORDER_ID_PATTERN.test(id)) return false;
+    }
+  }
+  return true;
+}
+
 function validateMediaFile(o: unknown): o is Record<string, RawMediaEntry[]> {
   if (!isPlainObject(o)) return false;
   for (const [slug, list] of Object.entries(o)) {
@@ -170,7 +183,13 @@ function promoteStagedFile(stagedUrl: string, stagingDir: string, publicMediaDir
  * Never present in the production build (see vite.config.ts) and never
  * imported by anything under src/routes/** or src/server.ts.
  */
-export function designModeSavePlugin(overridesFilePath: string, mediaAdditionsFilePath: string, stagingDir: string, publicMediaDir: string): Plugin {
+export function designModeSavePlugin(
+  overridesFilePath: string,
+  mediaAdditionsFilePath: string,
+  mediaOrderFilePath: string,
+  stagingDir: string,
+  publicMediaDir: string,
+): Plugin {
   let mode = "";
   return {
     name: "design-mode-save-endpoint",
@@ -192,7 +211,7 @@ export function designModeSavePlugin(overridesFilePath: string, mediaAdditionsFi
         });
         req.on("end", () => {
           try {
-            const payload = JSON.parse(body) as { overrides?: unknown; media?: unknown };
+            const payload = JSON.parse(body) as { overrides?: unknown; media?: unknown; mediaOrder?: unknown };
             if (!validateOverridesFile(payload.overrides)) {
               res.statusCode = 400;
               res.end("Invalid overrides payload");
@@ -204,6 +223,12 @@ export function designModeSavePlugin(overridesFilePath: string, mediaAdditionsFi
               res.end(
                 "Invalid media payload — check that every added image has alt text (or is marked decorative) and every entry has a valid id, type, and layout.",
               );
+              return;
+            }
+            const mediaOrderPayload = payload.mediaOrder ?? {};
+            if (!validateMediaOrderFile(mediaOrderPayload)) {
+              res.statusCode = 400;
+              res.end("Invalid media order payload");
               return;
             }
 
@@ -237,6 +262,9 @@ export function designModeSavePlugin(overridesFilePath: string, mediaAdditionsFi
             writeFileSync(overridesAbs, JSON.stringify(overrides, null, 2) + "\n", "utf-8");
             const mediaAbs = path.resolve(mediaAdditionsFilePath);
             writeFileSync(mediaAbs, JSON.stringify(media, null, 2) + "\n", "utf-8");
+            const mediaOrder = mediaOrderPayload as MediaOrderFile;
+            const mediaOrderAbs = path.resolve(mediaOrderFilePath);
+            writeFileSync(mediaOrderAbs, JSON.stringify(mediaOrder, null, 2) + "\n", "utf-8");
 
             // The client reloads its canvas iframe right after this request
             // resolves, expecting the freshly-written files. Vite's own file
@@ -244,7 +272,7 @@ export function designModeSavePlugin(overridesFilePath: string, mediaAdditionsFi
             // ordering guarantee against that reload — invalidating both
             // module graphs here makes the next request deterministic
             // instead of racing the watcher.
-            for (const abs of [overridesAbs, mediaAbs]) {
+            for (const abs of [overridesAbs, mediaAbs, mediaOrderAbs]) {
               const clientMod = server.moduleGraph.getModuleById(abs);
               if (clientMod) server.moduleGraph.invalidateModule(clientMod);
               const ssrGraph = server.environments?.ssr?.moduleGraph;
@@ -253,7 +281,7 @@ export function designModeSavePlugin(overridesFilePath: string, mediaAdditionsFi
             }
 
             res.setHeader("content-type", "application/json");
-            res.end(JSON.stringify({ ok: true, overrides, media }));
+            res.end(JSON.stringify({ ok: true, overrides, media, mediaOrder }));
           } catch (err) {
             res.statusCode = 400;
             res.end(`Bad request: ${(err as Error).message}`);

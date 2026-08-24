@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import type { DesignOverridesFile, ElementOverride, Scope } from "@/lib/design-overrides.types";
-import type { MediaAdditionsFile } from "@/lib/media-additions.types";
+import type { MediaAdditionsFile, MediaOrderFile } from "@/lib/media-additions.types";
 
 /**
  * Holds this page's in-memory, unsaved Design Mode edits — both property
@@ -11,6 +11,7 @@ import type { MediaAdditionsFile } from "@/lib/media-additions.types";
 export function useLiveOverrides() {
   const [live, setLive] = useState<DesignOverridesFile>({});
   const [liveMedia, setLiveMedia] = useState<MediaAdditionsFile>({});
+  const [liveMediaOrder, setLiveMediaOrder] = useState<MediaOrderFile>({});
 
   const onLocalPatch = useCallback((id: string, scope: Scope, patch: ElementOverride) => {
     setLive((prev) => ({
@@ -31,10 +32,11 @@ export function useLiveOverrides() {
   /** Full replace — used to mirror the parent shell's authoritative working
       state after Undo/Redo/Discard/Resume/media changes, none of which know
       which individual fields changed, only the end result. */
-  const onSyncAll = useCallback((overrides: DesignOverridesFile, media: MediaAdditionsFile) => {
+  const onSyncAll = useCallback((overrides: DesignOverridesFile, media: MediaAdditionsFile, mediaOrder: MediaOrderFile) => {
     setLive(overrides);
     setLiveMedia(media);
+    setLiveMediaOrder(mediaOrder);
   }, []);
 
-  return { live, liveMedia, onLocalPatch, onLocalReset, onSyncAll };
+  return { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll };
 }

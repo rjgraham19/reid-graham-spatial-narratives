@@ -27,6 +27,20 @@ export type AddedMediaEntry = {
 
 export type MediaAdditionsFile = Record<string /* project slug */, AddedMediaEntry[]>;
 
+/**
+ * Explicit display order for a project's gallery, keyed by the same media
+ * ids `applyOverrides`/`applyMediaAdditions` already assign (hand-authored
+ * items keyed by their `id` or index-as-string; added items by their own
+ * id). Only read by the generic two-column gallery grid — the several
+ * bespoke per-project layouts address media by fixed index and are
+ * untouched by this. Ids not listed keep their original relative order,
+ * appended after the listed ones; listed ids that no longer exist are
+ * ignored rather than erroring.
+ */
+export type MediaOrderFile = Record<string /* project slug */, string[]>;
+
+export const MEDIA_ORDER_ID_PATTERN = /^[a-zA-Z0-9_-]{1,80}$/;
+
 export const ALLOWED_MEDIA_EXTENSIONS = [".png", ".jpg", ".jpeg", ".mp4"] as const;
 export const ALLOWED_MEDIA_MIME_TYPES = ["image/png", "image/jpeg", "video/mp4"] as const;
 

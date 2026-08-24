@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { DESKTOP_BREAKPOINT_PX } from "@/lib/apply-overrides";
 import type { DesignOverridesFile, ElementOverride, Scope } from "@/lib/design-overrides.types";
-import type { MediaAdditionsFile } from "@/lib/media-additions.types";
+import type { MediaAdditionsFile, MediaOrderFile } from "@/lib/media-additions.types";
 import {
   DESIGN_BRIDGE_SOURCE,
   isDesignMessage,
@@ -121,6 +121,36 @@ function makeGuides(): GuideOverlay {
 
 const SNAP_THRESHOLD = 7;
 
+/** One of the on-canvas contextual handles rendered next to a selected
+    element — Move (text, Free Position), Reorder (image, content-order
+    splice), Vertical Offset (image, same-row nudge). Positioned in fixed
+    viewport coordinates, matching how the selection outline's own
+    `getBoundingClientRect()` reads. */
+type HandleKind = "move" | "reorder" | "offset";
+
+function makeHandleEl(label: string, title: string): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = label;
+  btn.title = title;
+  btn.style.cssText =
+    "position:fixed;z-index:2147483001;width:22px;height:22px;line-height:20px;text-align:center;" +
+    "border-radius:6px;background:#4f8cff;color:#fff;border:1px solid #2f6ddb;font:12px system-ui,sans-serif;" +
+    "cursor:grab;display:none;padding:0;box-shadow:0 1px 4px rgba(0,0,0,0.4);user-select:none;";
+  btn.dataset.designHandle = "1";
+  document.body.appendChild(btn);
+  return btn;
+}
+
+/** Positions a set of handle buttons along the top edge of `rect`, evenly
+    spaced from the left so multiple handles never overlap each other. */
+function layoutHandles(rect: DOMRect, handles: HTMLButtonElement[]) {
+  handles.forEach((h, i) => {
+    h.style.top = `${Math.max(2, rect.top - 26)}px`;
+    h.style.left = `${rect.left + i * 26}px`;
+  });
+}
+
 /**
  * Mounted only inside the Design Mode canvas iframe. Delegates all click /
  * drag / keyboard handling for `[data-design-id]` elements. Text and
@@ -133,18 +163,19 @@ const SNAP_THRESHOLD = 7;
 export default function InnerFrameBridge({
   liveOverrides,
   liveMedia: _liveMedia,
+  liveMediaOrder: _liveMediaOrder,
   onLocalPatch,
   onLocalReset,
   onSyncAll,
 }: {
   liveOverrides: DesignOverridesFile;
   liveMedia: MediaAdditionsFile;
+  liveMediaOrder: MediaOrderFile;
   onLocalPatch: (id: string, scope: Scope, patch: ElementOverride) => void;
   onLocalReset: (id: string) => void;
-  onSyncAll: (overrides: DesignOverridesFile, media: MediaAdditionsFile) => void;
+  onSyncAll: (overrides: DesignOverridesFile, media: MediaAdditionsFile, mediaOrder: MediaOrderFile) => void;
 }) {
-  const modeRef = useRef<InteractionMode>("browse");
-  const moveKindRef = useRef<MoveKind>("layout");
+  const modeRef = useRef<InteractionMode>("navigate");
   const selectedRef = useRef<HTMLElement | null>(null);
   const clipFixRef = useRef<{ el: HTMLElement; overflow: string; position: string; zIndex: string } | null>(null);
   const dragRef = useRef<{
@@ -162,18 +193,42 @@ export default function InnerFrameBridge({
     kind: MoveKind;
     scope: "mobile" | "desktop";
   } | null>(null);
+  const reorderRef = useRef<{
+    target: HTMLElement;
+    container: HTMLElement;
+    siblings: HTMLElement[];
+    startIndex: number;
+    hoverIndex: number;
+  } | null>(null);
   const guidesRef = useRef<GuideOverlay | null>(null);
+  const handlesRef = useRef<Record<HandleKind, HTMLButtonElement> | null>(null);
+  const insertionLineRef = useRef<HTMLDivElement | null>(null);
   // `liveOverrides` isn't read directly here — a drag/nudge's starting point
   // comes from `currentOffset()` (computed style) instead, since that's the
   // one place guaranteed to reflect whatever's actually on screen, saved or
-  // not. The prop still documents that this component's writes flow through
-  // the page's live-override state, not raw DOM mutation.
+  // not. `liveMedia`/`liveMediaOrder` aren't read directly either — reorder
+  // reads sibling order straight from the DOM. The props still document that
+  // this component's writes flow through the page's live-override state,
+  // not raw DOM mutation.
   void liveOverrides;
   void _liveMedia;
+  void _liveMediaOrder;
 
   useEffect(() => {
     if (window.self === window.top) return; // only active embedded in the Design Mode canvas
     guidesRef.current = makeGuides();
+
+    const insertionLine = document.createElement("div");
+    insertionLine.style.cssText =
+      "position:fixed;z-index:2147483000;height:3px;background:#4f8cff;border-radius:2px;pointer-events:none;display:none;" +
+      "box-shadow:0 0 0 3px rgba(79,140,255,0.25);";
+    document.body.appendChild(insertionLine);
+    insertionLineRef.current = insertionLine;
+
+    const moveHandle = makeHandleEl("⠿", "Drag to move");
+    const reorderHandle = makeHandleEl("⠿", "Drag to reorder within the gallery");
+    const offsetHandle = makeHandleEl("⇕", "Drag to offset vertically within this row — double-click to reset");
+    handlesRef.current = { move: moveHandle, reorder: reorderHandle, offset: offsetHandle };
 
     const restoreClipFix = () => {
       const fix = clipFixRef.current;
@@ -187,6 +242,27 @@ export default function InnerFrameBridge({
     const clearHighlight = (el: HTMLElement | null) => {
       if (el) el.style.outline = "";
       restoreClipFix();
+    };
+
+    const hideHandles = () => {
+      moveHandle.style.display = "none";
+      reorderHandle.style.display = "none";
+      offsetHandle.style.display = "none";
+    };
+
+    const positionHandles = (el: HTMLElement) => {
+      const rect = el.getBoundingClientRect();
+      if (el.dataset.designKind === "image") {
+        moveHandle.style.display = "none";
+        reorderHandle.style.display = "block";
+        offsetHandle.style.display = "block";
+        layoutHandles(rect, [reorderHandle, offsetHandle]);
+      } else {
+        reorderHandle.style.display = "none";
+        offsetHandle.style.display = "none";
+        moveHandle.style.display = "block";
+        layoutHandles(rect, [moveHandle]);
+      }
     };
 
     const select = (el: HTMLElement) => {
@@ -213,12 +289,14 @@ export default function InnerFrameBridge({
         }
       }
 
+      positionHandles(el);
       post({ source: DESIGN_BRIDGE_SOURCE, type: "select", snapshot: snapshotFor(el) });
     };
 
     const deselect = () => {
       clearHighlight(selectedRef.current);
       selectedRef.current = null;
+      hideHandles();
       post({ source: DESIGN_BRIDGE_SOURCE, type: "deselect" });
     };
 
@@ -237,7 +315,12 @@ export default function InnerFrameBridge({
     };
 
     const onClick = (e: MouseEvent) => {
-      if (modeRef.current === "browse") return;
+      if (modeRef.current !== "edit") return;
+      // A click landing on one of the floating handle buttons (appended to
+      // document.body, outside any [data-design-id]) must not fall through
+      // to the deselect branch below — this listener runs in the capture
+      // phase, before the click ever reaches the button itself.
+      if ((e.target as HTMLElement)?.closest?.("[data-design-handle]")) return;
       const target = (e.target as HTMLElement).closest<HTMLElement>("[data-design-id]");
       const protectedEl = (e.target as HTMLElement).closest<HTMLElement>("[data-design-protected]");
       if (protectedEl && !target) {
@@ -291,7 +374,8 @@ export default function InnerFrameBridge({
     };
 
     const onDblClick = (e: MouseEvent) => {
-      if (modeRef.current !== "content" && modeRef.current !== "arrange") return;
+      if (modeRef.current !== "edit") return;
+      if ((e.target as HTMLElement)?.closest?.("[data-design-handle]")) return;
       const target = (e.target as HTMLElement).closest<HTMLElement>("[data-design-id]");
       if (!target) {
         const raw = e.target as HTMLElement;
@@ -303,26 +387,34 @@ export default function InnerFrameBridge({
       beginTextEdit(target);
     };
 
-    const onMouseDown = (e: MouseEvent) => {
-      if (modeRef.current !== "arrange" || !selectedRef.current) return;
-      if (selectedRef.current.isContentEditable) return;
-      if (!selectedRef.current.contains(e.target as Node) && e.target !== selectedRef.current) return;
-      e.preventDefault();
+    // Drag handling is intentionally handle-only, not "grab the selected
+    // element anywhere" — a raw grab-anywhere model fought with click-to-
+    // select and double-click-to-edit-text, which is exactly the kind of
+    // ambiguity the Navigate/Edit consolidation is meant to remove.
+    const startDrag = (e: MouseEvent, kind: MoveKind) => {
       const target = selectedRef.current;
-      const kind: MoveKind = target.dataset.designKind === "image" ? moveKindRef.current : "free";
+      if (!target) return;
+      e.preventDefault();
+      e.stopPropagation();
       const scope = currentScope();
       const base = currentOffset(target, kind);
-      dragRef.current = {
-        startX: e.clientX,
-        startY: e.clientY,
-        baseX: base.x,
-        baseY: base.y,
-        dx: 0,
-        dy: 0,
-        target,
-        kind,
-        scope,
-      };
+      dragRef.current = { startX: e.clientX, startY: e.clientY, baseX: base.x, baseY: base.y, dx: 0, dy: 0, target, kind, scope };
+    };
+
+    const startReorder = (e: MouseEvent) => {
+      const target = selectedRef.current;
+      if (!target) return;
+      const container = target.closest("figure")?.parentElement;
+      if (!container) return;
+      const siblings = Array.from(container.children)
+        .filter((c): c is HTMLElement => c instanceof HTMLElement && c.tagName === "FIGURE")
+        .map((fig) => fig.querySelector<HTMLElement>("[data-design-id][data-design-kind='image']"))
+        .filter((el): el is HTMLElement => !!el);
+      const startIndex = siblings.indexOf(target);
+      if (startIndex === -1) return;
+      e.preventDefault();
+      e.stopPropagation();
+      reorderRef.current = { target, container, siblings, startIndex, hoverIndex: startIndex };
     };
 
     const hideGuides = () => {
@@ -351,6 +443,32 @@ export default function InnerFrameBridge({
     };
 
     const onMouseMove = (e: MouseEvent) => {
+      if (reorderRef.current) {
+        const ro = reorderRef.current;
+        const line = insertionLineRef.current;
+        // Find which sibling gap the pointer is nearest to, by midpoint.
+        let hoverIndex = ro.siblings.length;
+        for (let i = 0; i < ro.siblings.length; i++) {
+          const r = ro.siblings[i].getBoundingClientRect();
+          if (e.clientY < r.top + r.height / 2) {
+            hoverIndex = i;
+            break;
+          }
+        }
+        ro.hoverIndex = hoverIndex;
+        if (line) {
+          const refEl = ro.siblings[hoverIndex] ?? ro.siblings[ro.siblings.length - 1];
+          const r = refEl.getBoundingClientRect();
+          const atEnd = hoverIndex >= ro.siblings.length;
+          line.style.top = `${atEnd ? r.bottom + 4 : r.top - 4}px`;
+          line.style.left = `${r.left}px`;
+          line.style.width = `${r.width}px`;
+          line.style.display = "block";
+        }
+        ro.target.style.opacity = "0.5";
+        return;
+      }
+
       if (!dragRef.current) return;
       const drag = dragRef.current;
       const rawDx = e.clientX - drag.startX;
@@ -433,18 +551,54 @@ export default function InnerFrameBridge({
         drag.dx = tx - drag.baseX;
         drag.dy = ty - drag.baseY;
       } else {
-        // Move with Layout: nudge margin-top on the figure ancestor so the
-        // page actually reflows while dragging, not just visually shifts.
-        // Same base-relative logic — start from what's already committed.
+        // Vertical Offset: nudge margin-top on the figure ancestor so the
+        // row actually reflows while dragging (a lowered image can't
+        // overlap the next section — the row's own auto height grows with
+        // it), not just visually shifts. Snaps back toward 0 (aligned with
+        // its natural position) so realigning a staggered pair is easy
+        // without forcing it.
         const figure = drag.target.closest("figure") as HTMLElement | null;
-        const newMarginTop = drag.baseY + rawDy;
+        let newMarginTop = drag.baseY + rawDy;
+        const snappedToZero = Math.abs(newMarginTop) <= SNAP_THRESHOLD;
+        if (snappedToZero) newMarginTop = 0;
         if (figure) figure.style.marginTop = `${newMarginTop}px`;
+        if (guidesRef.current) {
+          if (snappedToZero && figure) {
+            const r = figure.getBoundingClientRect();
+            guidesRef.current.h.style.top = `${r.top - newMarginTop}px`;
+            guidesRef.current.h.style.display = "block";
+          } else {
+            guidesRef.current.h.style.display = "none";
+          }
+        }
         drag.dx = 0;
         drag.dy = newMarginTop - drag.baseY;
       }
+      if (selectedRef.current) positionHandles(selectedRef.current);
     };
 
     const onMouseUp = () => {
+      if (reorderRef.current) {
+        const ro = reorderRef.current;
+        reorderRef.current = null;
+        ro.target.style.opacity = "";
+        if (insertionLineRef.current) insertionLineRef.current.style.display = "none";
+        if (ro.hoverIndex !== ro.startIndex && ro.hoverIndex !== ro.startIndex + 1) {
+          const next = ro.siblings.filter((s) => s !== ro.target);
+          const insertAt = ro.hoverIndex > ro.startIndex ? ro.hoverIndex - 1 : ro.hoverIndex;
+          next.splice(insertAt, 0, ro.target);
+          const slug = ro.target.dataset.designProject ?? "";
+          const order = next.map((el) => {
+            const id = el.dataset.designId ?? "";
+            const prefix = `project.${slug}.media.`;
+            return id.startsWith(prefix) ? id.slice(prefix.length) : id;
+          });
+          post({ source: DESIGN_BRIDGE_SOURCE, type: "reorderMedia", slug, order });
+        }
+        if (selectedRef.current) positionHandles(selectedRef.current);
+        return;
+      }
+
       const drag = dragRef.current;
       dragRef.current = null;
       hideGuides();
@@ -455,6 +609,7 @@ export default function InnerFrameBridge({
           if (figure) figure.style.marginTop = "";
         }
       }
+      if (drag && selectedRef.current) positionHandles(selectedRef.current);
       if (!drag || (drag.dx === 0 && drag.dy === 0)) return;
       const id = drag.target.dataset.designId!;
       // drag.dx/dy are already deltas relative to baseX/baseY, so adding
@@ -478,6 +633,30 @@ export default function InnerFrameBridge({
       });
     };
 
+    const onHandleMouseDown = (kind: HandleKind) => (e: MouseEvent) => {
+      if (kind === "reorder") startReorder(e);
+      else startDrag(e, kind === "offset" ? "layout" : "free");
+    };
+    const onOffsetDblClick = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const target = selectedRef.current;
+      if (!target) return;
+      const scope = currentScope();
+      const base = currentOffset(target, "layout");
+      if (base.y === 0) return;
+      onLocalPatch(target.dataset.designId!, scope, { layoutShiftY: 0 });
+      post({ source: DESIGN_BRIDGE_SOURCE, type: "moved", id: target.dataset.designId!, scope, kind: "layout", dx: 0, dy: -base.y });
+    };
+    moveHandle.addEventListener("mousedown", onHandleMouseDown("move"));
+    reorderHandle.addEventListener("mousedown", onHandleMouseDown("reorder"));
+    offsetHandle.addEventListener("mousedown", onHandleMouseDown("offset"));
+    offsetHandle.addEventListener("dblclick", onOffsetDblClick);
+
+    const onScrollOrResize = () => {
+      if (selectedRef.current) positionHandles(selectedRef.current);
+    };
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         deselect();
@@ -494,7 +673,15 @@ export default function InnerFrameBridge({
         post({ source: DESIGN_BRIDGE_SOURCE, type: "requestRedo" });
         return;
       }
-      if (modeRef.current !== "arrange" || !selectedRef.current || selectedRef.current.isContentEditable) return;
+      if (modeRef.current !== "edit" || !selectedRef.current || selectedRef.current.isContentEditable) return;
+      // Keyboard delete for the selected image — never fires while typing
+      // (guarded above by the isContentEditable check) and only for images.
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedRef.current.dataset.designKind === "image") {
+        e.preventDefault();
+        post({ source: DESIGN_BRIDGE_SOURCE, type: "deleteSelected" });
+        deselect();
+        return;
+      }
       const step = e.shiftKey ? 10 : 1;
       let dx = 0;
       let dy = 0;
@@ -506,7 +693,7 @@ export default function InnerFrameBridge({
       e.preventDefault();
       const target = selectedRef.current;
       const id = target.dataset.designId!;
-      const kind: MoveKind = target.dataset.designKind === "image" ? moveKindRef.current : "free";
+      const kind: MoveKind = target.dataset.designKind === "image" ? "layout" : "free";
       const scope = currentScope();
       const base = currentOffset(target, kind);
       onLocalPatch(
@@ -515,6 +702,7 @@ export default function InnerFrameBridge({
         kind === "layout" ? { layoutShiftY: base.y + dy } : { offsetX: base.x + dx, offsetY: base.y + dy },
       );
       post({ source: DESIGN_BRIDGE_SOURCE, type: "moved", id, scope, kind, dx, dy });
+      positionHandles(target);
     };
 
     const onMessage = (e: MessageEvent) => {
@@ -523,27 +711,35 @@ export default function InnerFrameBridge({
       if (msg.type === "init" || msg.type === "setInteractionMode") {
         modeRef.current = msg.interactionMode;
         document.body.dataset.designMode = msg.interactionMode;
-        if (msg.interactionMode === "browse") deselect();
+        if (msg.interactionMode === "navigate") deselect();
       } else if (msg.type === "clearSelection") {
         deselect();
-      } else if (msg.type === "setMoveKind") {
-        moveKindRef.current = msg.moveKind;
       } else if (msg.type === "applyOverride") {
         if (msg.patch.fontFamily) ensureFontLoadedByLabel(document, msg.patch.fontFamily);
         onLocalPatch(msg.id, msg.scope, msg.patch);
       } else if (msg.type === "resetElement") {
         onLocalReset(msg.id);
       } else if (msg.type === "syncState") {
-        onSyncAll(msg.overrides, msg.media);
+        // Undo/Redo/Discard/Resume can bring a fontFamily choice back into
+        // view without ever passing through "applyOverride" (which is the
+        // only other place a font gets preloaded) — preload here too, or
+        // the CSS re-applies while the font file was never (re)requested.
+        for (const scoped of Object.values(msg.overrides)) {
+          for (const patch of Object.values(scoped)) {
+            if (patch.fontFamily) ensureFontLoadedByLabel(document, patch.fontFamily);
+          }
+        }
+        onSyncAll(msg.overrides, msg.media, msg.mediaOrder);
       }
     };
 
     document.addEventListener("click", onClick, true);
     document.addEventListener("dblclick", onDblClick, true);
-    document.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("scroll", onScrollOrResize, true);
+    window.addEventListener("resize", onScrollOrResize);
     window.addEventListener("message", onMessage);
 
     post({ source: DESIGN_BRIDGE_SOURCE, type: "ready" });
@@ -551,13 +747,23 @@ export default function InnerFrameBridge({
     return () => {
       document.removeEventListener("click", onClick, true);
       document.removeEventListener("dblclick", onDblClick, true);
-      document.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("scroll", onScrollOrResize, true);
+      window.removeEventListener("resize", onScrollOrResize);
       window.removeEventListener("message", onMessage);
+      // Clears a lingering selection outline this instance applied directly
+      // to a page element — style state that lives outside React, so it
+      // would otherwise survive this component being torn down and re-init'd
+      // (e.g. dev-mode Fast Refresh) with a fresh, unaware `selectedRef`.
+      clearHighlight(selectedRef.current);
       guidesRef.current?.v.remove();
       guidesRef.current?.h.remove();
+      insertionLineRef.current?.remove();
+      moveHandle.remove();
+      reorderHandle.remove();
+      offsetHandle.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -569,24 +775,22 @@ export default function InnerFrameBridge({
          set pointer-events:none on the text's own container so ordinary
          clicks fall through to the image below it — intentional on the
          public site, but it also swallows Design Mode's own click handling
-         in Content/Arrange, making that text unselectable and impossible to
+         in Edit mode, making that text unselectable and impossible to
          double-click into. An explicit "auto" directly on the tagged
          element re-enables clicks for it specifically without touching the
          production pointer-events behavior anywhere else (only these two
          body-scoped selectors exist at all, and only inside npm run design). */
-      body[data-design-mode="content"] [data-design-id],
-      body[data-design-mode="arrange"] [data-design-id] {
+      body[data-design-mode="edit"] [data-design-id] {
         pointer-events: auto !important;
       }
-      body[data-design-mode="content"] [data-design-id][data-design-kind="text"]:hover,
-      body[data-design-mode="content"] [data-design-id][data-design-kind="heading"]:hover,
-      body[data-design-mode="arrange"] [data-design-id]:hover {
+      body[data-design-mode="edit"] [data-design-id][data-design-kind="text"]:hover,
+      body[data-design-mode="edit"] [data-design-id][data-design-kind="heading"]:hover,
+      body[data-design-mode="edit"] [data-design-id][data-design-kind="image"]:hover {
         outline: 1.5px dashed rgba(79,140,255,0.6);
         outline-offset: 2px;
         cursor: pointer;
       }
-      body[data-design-mode="content"] [data-design-protected]:hover,
-      body[data-design-mode="arrange"] [data-design-protected]:hover {
+      body[data-design-mode="edit"] [data-design-protected]:hover {
         outline: 1.5px dashed rgba(255,140,79,0.6);
         outline-offset: 2px;
         cursor: not-allowed;

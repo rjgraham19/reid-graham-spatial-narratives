@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DesignOverridesFile, ElementOverride, Scope } from "@/lib/design-overrides.types";
-import type { AddedMediaEntry, MediaAdditionsFile } from "@/lib/media-additions.types";
+import type { AddedMediaEntry, MediaAdditionsFile, MediaOrderFile } from "@/lib/media-additions.types";
 import type { ElementSnapshot, InteractionMode, MoveKind } from "./protocol";
 
 export type DevicePreset = "iphone" | "desktop";
@@ -8,6 +8,7 @@ export type DevicePreset = "iphone" | "desktop";
 export type DraftState = {
   overrides: DesignOverridesFile;
   media: MediaAdditionsFile;
+  mediaOrder: MediaOrderFile;
 };
 
 const DRAFT_KEY = "design-draft";
@@ -50,7 +51,7 @@ function labelFor(patch: ElementOverride): string {
 export function useDesignStore(saved: DraftState) {
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [working, setWorking] = useState<DraftState>(() => clone(saved));
-  const [mode, setMode] = useState<InteractionMode>("browse");
+  const [mode, setMode] = useState<InteractionMode>("navigate");
   const [device, setDevice] = useState<DevicePreset>("desktop");
   const [selection, setSelection] = useState<ElementSnapshot | null>(null);
   const past = useRef<{ state: DraftState; label: string }[]>([]);
@@ -207,6 +208,21 @@ export function useDesignStore(saved: DraftState) {
     [mutate],
   );
 
+  /** Sets a project's full gallery display order (hand-authored and added
+      media alike) — the Reorder drag handle's endpoint. Distinct from
+      `reorderMedia` below, which only swaps Design-Mode-added blocks
+      relative to each other via the sidebar's Up/Down buttons. */
+  const setMediaOrder = useCallback(
+    (slug: string, order: string[]) => {
+      mutate(
+        (prev) => ({ ...prev, mediaOrder: { ...prev.mediaOrder, [slug]: order } }),
+        "Reorder",
+        `media-order:${slug}`,
+      );
+    },
+    [mutate],
+  );
+
   /** Swaps an added block with its earlier/later sibling among *other added
       blocks anchored to the same point* — existing hand-authored media stays
       exactly where it is; this only reorders Design-Mode-added ones relative
@@ -273,6 +289,7 @@ export function useDesignStore(saved: DraftState) {
     patchMedia,
     removeMedia,
     reorderMedia,
+    setMediaOrder,
     undo,
     redo,
     canUndo: past.current.length > 0,

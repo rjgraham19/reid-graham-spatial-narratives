@@ -39,9 +39,13 @@ export type ElementSnapshot = {
   };
 };
 
-/** Only three real modes now — Browse, Content, Arrange. */
-export type InteractionMode = "browse" | "content" | "arrange";
+/** Exactly two real modes — Navigate (the site behaves normally) and Edit
+    (everything supported is selectable, with contextual controls). */
+export type InteractionMode = "navigate" | "edit";
 
+/** "layout" nudges the image's own row (Vertical Offset); "free" is an
+    arbitrary transform offset (used for text placement). Chosen per-drag by
+    which contextual handle was grabbed, not by a global mode toggle. */
 export type MoveKind = "free" | "layout";
 
 export type ParentToFrame =
@@ -51,12 +55,18 @@ export type ParentToFrame =
       every instance of that ID in the iframe (e.g. a caption shown twice) in sync. */
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "applyOverride"; id: string; scope: Scope; patch: ElementOverride }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "resetElement"; id: string }
-  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "setMoveKind"; moveKind: MoveKind }
-  /** Full replace of the frame's live state (overrides + media additions)
-      with the parent's authoritative working state — the single source of
-      truth for Undo/Redo/Discard/Resume/media-add/media-edit, none of which
-      tell the frame which individual fields changed, only the end result. */
-  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "syncState"; overrides: DesignOverridesFile; media: MediaAdditionsFile }
+  /** Full replace of the frame's live state (overrides + media additions +
+      media order) with the parent's authoritative working state — the single
+      source of truth for Undo/Redo/Discard/Resume/media-add/media-edit/
+      reorder, none of which tell the frame which individual fields changed,
+      only the end result. */
+  | {
+      source: typeof DESIGN_BRIDGE_SOURCE;
+      type: "syncState";
+      overrides: DesignOverridesFile;
+      media: MediaAdditionsFile;
+      mediaOrder: Record<string, string[]>;
+    }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "clearSelection" };
 
 export type FrameToParent =
@@ -65,6 +75,11 @@ export type FrameToParent =
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "deselect" }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "textCommitted"; id: string; text: string }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "moved"; id: string; scope: Scope; kind: MoveKind; dx: number; dy: number }
+  /** Emitted when a Reorder-handle drag is dropped on a new position — carries
+      the gallery's complete new id order for that project slug. */
+  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "reorderMedia"; slug: string; order: string[] }
+  /** A selected image was removed via the Delete/Backspace key inside the canvas. */
+  | { source: typeof DESIGN_BRIDGE_SOURCE; type: "deleteSelected" }
   | { source: typeof DESIGN_BRIDGE_SOURCE; type: "unmapped"; role: string }
   /** Ctrl/Cmd+Z etc. pressed while focus is inside the canvas iframe — key
       events don't cross the iframe boundary, so the frame has to ask. */

@@ -1,7 +1,7 @@
 import type { Project, MediaItem, Credit } from "@/lib/projects";
 import type { DesignOverridesFile, ElementOverride, Scope } from "@/lib/design-overrides.types";
 import { designId } from "@/lib/design-ids";
-import type { AddedMediaEntry, MediaAdditionsFile } from "@/lib/media-additions.types";
+import type { AddedMediaEntry, MediaAdditionsFile, MediaOrderFile } from "@/lib/media-additions.types";
 
 /**
  * The site's own "desktop" breakpoint (Tailwind's `md:`). Design Mode's
@@ -179,7 +179,17 @@ function cssDeclsFor(o: ElementOverride): { structural: string; typography: stri
   if (o.letterSpacing != null) typography.push(`letter-spacing:${o.letterSpacing}px !important`);
   if (o.color != null) typography.push(`color:${o.color} !important`);
   if (o.align != null) typography.push(`text-align:${o.align} !important`);
-  if (o.fontFamily != null) typography.push(`font-family:${o.fontFamily},inherit !important`);
+  // `inherit` is a CSS-wide keyword, not a generic-family name — appending
+  // it as a comma-separated fallback here (as the previous version of this
+  // line did) is invalid CSS. A font-family value's comma list only accepts
+  // <family-name> or <generic-family> per entry; one CSS-wide keyword
+  // anywhere in that list makes the browser drop the *entire* declaration,
+  // silently, with no console warning — which is why every font-family
+  // override, for every element kind, never actually rendered. Quoting the
+  // value (needed for any multi-word name, e.g. "Space Grotesk") and
+  // dropping the invalid fallback fixes it; `!important` alone already
+  // covers what the fallback was trying to achieve.
+  if (o.fontFamily != null) typography.push(`font-family:"${o.fontFamily}" !important`);
 
   return { structural: structural.join(";"), typography: typography.join(";") };
 }
@@ -271,6 +281,41 @@ export function applyMediaAdditions(
   }
 
   return { ...project, media: result };
+}
+
+/** Live (unsaved) per-project media order wins wholesale over saved. */
+export function mergeMediaOrder(saved: MediaOrderFile, live: MediaOrderFile): MediaOrderFile {
+  return { ...saved, ...live };
+}
+
+/**
+ * Reorders a rendered list of gallery items to match an explicit id order,
+ * for the generic two-column gallery grid only (see `MediaOrderFile`). Items
+ * whose id isn't listed keep their original relative order, appended after
+ * the listed ones. Purely a display-order concern — never mutates
+ * `project.media` itself, so index-addressed bespoke layouts elsewhere on
+ * the page are unaffected.
+ */
+export function applyMediaOrder<T extends { item: { id?: string } }>(
+  items: T[],
+  order: string[] | undefined,
+): T[] {
+  if (!order || order.length === 0) return items;
+  const byId = new Map(items.map((entry) => [entry.item.id, entry]));
+  const ordered: T[] = [];
+  const used = new Set<string>();
+  for (const id of order) {
+    const entry = byId.get(id);
+    if (entry && !used.has(id)) {
+      ordered.push(entry);
+      used.add(id);
+    }
+  }
+  for (const entry of items) {
+    const id = entry.item.id;
+    if (!id || !used.has(id)) ordered.push(entry);
+  }
+  return ordered;
 }
 
 /** Reads a single text-ish role directly by ID — used by non-project pages (Connect, hubs). */

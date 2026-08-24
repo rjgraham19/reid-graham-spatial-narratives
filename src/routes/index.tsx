@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { live, liveMedia, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
+  const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const responsiveCss = designModeStyleTag(overridesFile);
   const brandingId = designId.home("branding");
@@ -42,6 +42,7 @@ function Home() {
       <DesignFrameBridge
         liveOverrides={live}
         liveMedia={liveMedia}
+        liveMediaOrder={liveMediaOrder}
         onLocalPatch={onLocalPatch}
         onLocalReset={onLocalReset}
         onSyncAll={onSyncAll}

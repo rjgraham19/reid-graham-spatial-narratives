@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import designOverrides from "@/lib/design-overrides.json";
 import designMediaAdditions from "@/lib/design-media-additions.json";
+import designMediaOrder from "@/lib/design-media-order.json";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
-import type { AddedMediaEntry, MediaAdditionsFile, MediaLayout } from "@/lib/media-additions.types";
+import type { AddedMediaEntry, MediaAdditionsFile, MediaLayout, MediaOrderFile } from "@/lib/media-additions.types";
 import { useDesignStore, type DevicePreset, type DraftState } from "./use-design-store";
-import { DESIGN_BRIDGE_SOURCE, isDesignMessage, type FrameToParent, type InteractionMode, type MoveKind } from "./protocol";
+import { DESIGN_BRIDGE_SOURCE, isDesignMessage, type FrameToParent, type InteractionMode } from "./protocol";
 import { PropertyPanel } from "./PropertyPanel";
 import { uploadMediaFile, mediaTypeFor, type StagedUpload } from "./media-client";
 
@@ -28,9 +29,8 @@ const PAGES: { label: string; url: string; slug?: string }[] = [
 ];
 
 const MODES: { id: InteractionMode; label: string }[] = [
-  { id: "browse", label: "Browse" },
-  { id: "content", label: "Content" },
-  { id: "arrange", label: "Arrange" },
+  { id: "navigate", label: "Navigate" },
+  { id: "edit", label: "Edit" },
 ];
 
 const DEVICE_SIZE: Record<DevicePreset, { width: number; height: string }> = {
@@ -53,11 +53,11 @@ export default function DesignShell() {
   const savedDraft: DraftState = {
     overrides: designOverrides as DesignOverridesFile,
     media: designMediaAdditions as MediaAdditionsFile,
+    mediaOrder: designMediaOrder as MediaOrderFile,
   };
   const store = useDesignStore(savedDraft);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [saving, setSaving] = useState<"idle" | "saving" | "saved" | "error">("idle");
-  const [moveKind, setMoveKind] = useState<MoveKind>("layout");
   const [publish, setPublish] = useState<PublishStatus>({ phase: "idle" });
   const [addMediaOpen, setAddMediaOpen] = useState(false);
 
@@ -68,10 +68,6 @@ export default function DesignShell() {
   useEffect(() => {
     postToFrame({ source: DESIGN_BRIDGE_SOURCE, type: "setInteractionMode", interactionMode: store.mode });
   }, [store.mode]);
-
-  useEffect(() => {
-    postToFrame({ source: DESIGN_BRIDGE_SOURCE, type: "setMoveKind", moveKind });
-  }, [moveKind]);
 
   // The single source of truth for what the canvas renders. Undo, Redo,
   // Discard Draft, Resume Draft, and every media add/replace/reorder all
@@ -85,6 +81,7 @@ export default function DesignShell() {
       type: "syncState",
       overrides: store.working.overrides,
       media: store.working.media,
+      mediaOrder: store.working.mediaOrder,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.working]);
@@ -107,12 +104,16 @@ export default function DesignShell() {
         store.undo();
       } else if (msg.type === "requestRedo") {
         store.redo();
+      } else if (msg.type === "reorderMedia") {
+        store.setMediaOrder(msg.slug, msg.order);
+      } else if (msg.type === "deleteSelected") {
+        deleteSelectedMedia();
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store.mode]);
+  }, [store.mode, store.selection]);
 
   // Shortcuts for when focus is in the shell itself (toolbar, property
   // panel) — key events from inside the canvas iframe are a separate
@@ -121,20 +122,32 @@ export default function DesignShell() {
     const onKeyDown = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey;
       const target = e.target as HTMLElement;
-      if (target?.isContentEditable) return;
+      const typing = target?.isContentEditable || target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
+      if (typing) return;
       if (mod && (e.key === "z" || e.key === "Z")) {
         e.preventDefault();
         if (e.shiftKey) store.redo();
         else store.undo();
-      } else if (e.ctrlKey && (e.key === "y" || e.key === "Y")) {
+        return;
+      }
+      if (e.ctrlKey && (e.key === "y" || e.key === "Y")) {
         e.preventDefault();
         store.redo();
+        return;
+      }
+      // Keyboard delete for the selected image — only fires when focus is in
+      // the shell itself (toolbar, property panel) and never while typing;
+      // the equivalent for focus inside the canvas iframe is wired in
+      // inner-frame-bridge.tsx and arrives as a "deleteSelected" message.
+      if ((e.key === "Delete" || e.key === "Backspace") && store.mode === "edit" && store.selection?.kind === "image") {
+        e.preventDefault();
+        deleteSelectedMedia();
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [store.mode, store.selection]);
 
   const save = async () => {
     setSaving("saving");
@@ -142,15 +155,23 @@ export default function DesignShell() {
       const res = await fetch("/__design-mode/save", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ overrides: store.working.overrides, media: store.working.media }),
+        body: JSON.stringify({
+          overrides: store.working.overrides,
+          media: store.working.media,
+          mediaOrder: store.working.mediaOrder,
+        }),
       });
       if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { overrides: DesignOverridesFile; media: MediaAdditionsFile };
+      const data = (await res.json()) as {
+        overrides: DesignOverridesFile;
+        media: MediaAdditionsFile;
+        mediaOrder: MediaOrderFile;
+      };
       // The server may have rewritten staged src paths to their approved
       // /design-media/... location — adopt that as the new saved baseline
       // rather than the pre-save draft, or the next edit's Undo could step
       // back to a staged path that no longer exists.
-      store.markSaved({ overrides: data.overrides, media: data.media });
+      store.markSaved({ overrides: data.overrides, media: data.media, mediaOrder: data.mediaOrder });
       setSaving("saved");
       if (iframeRef.current) iframeRef.current.src = iframeRef.current.src;
       setTimeout(() => setSaving("idle"), 2000);
@@ -190,6 +211,23 @@ export default function DesignShell() {
     }
   };
 
+  // Added media (uploaded through Design Mode) can be structurally removed
+  // outright — its whole entry, caption included, is one object, so Undo
+  // restores it exactly as it was. Hand-authored media (from projects.ts)
+  // can't be spliced out of the source data, so "delete" there reuses the
+  // existing Hide flag — Undo un-hides it, which preserves everything
+  // (order, offsets, caption) since nothing was actually removed.
+  const deleteSelectedMedia = () => {
+    const sel = store.selection;
+    if (!sel?.media) return;
+    if (sel.media.addedByDesignMode && sel.media.mediaId && page.slug) {
+      store.removeMedia(page.slug, sel.media.mediaId);
+    } else {
+      store.setHidden(sel.id, true);
+    }
+    store.setSelection(null);
+  };
+
   const replaceSelectedMedia = async (file: File) => {
     const sel = store.selection;
     if (!sel?.media) return;
@@ -222,13 +260,13 @@ export default function DesignShell() {
   }
 
   const size = DEVICE_SIZE[store.device];
-  const inCanvasChrome = store.mode !== "browse";
+  const inCanvasChrome = store.mode !== "navigate";
   const selMedia = store.selection?.media;
 
   return (
     <div style={styles.root}>
-      {/* The toolbar stays visible in all three modes — Browse included —
-          so switching back to Content or Arrange is never a dead end. */}
+      {/* The toolbar stays visible in both modes — Navigate included — so
+          switching back to Edit is never a dead end. */}
       <header style={styles.toolbar}>
         <div style={styles.toolbarGroup}>
           {MODES.map((m) => (
@@ -353,6 +391,25 @@ export default function DesignShell() {
           <div
             style={{
               width: store.device === "iphone" ? size.width : "100%",
+              // The "desktop" scope this canvas edits isn't just a label —
+              // designModeStyleTag() emits a real `@media (min-width:768px)`
+              // rule, the exact same one the live site itself uses, and the
+              // iframe's own physical width is what that query is evaluated
+              // against. With the page sidebar + property panel open, the
+              // canvas area can easily be narrower than 768px even at a
+              // normal laptop window size, which silently made every
+              // "desktop"-scoped edit (including font family/size) apply to
+              // a media query that never matched anything on screen — not a
+              // font-loading bug, a viewport-mismatch bug. Forcing a 768px
+              // floor (with horizontal scroll on `canvasArea` as the
+              // fallback on a narrow window) guarantees Desktop-mode edits
+              // are always previewed at a width where the desktop query is
+              // actually in effect.
+              // A couple of px above the 768 breakpoint itself, not exactly
+              // on it — the wrapper's own 1px border eats into the iframe's
+              // content width, and landing exactly on the boundary is the
+              // one width where the query silently fails again.
+              minWidth: store.device === "iphone" ? undefined : 772,
               maxWidth: store.device === "iphone" ? size.width : 1280,
               height: store.device === "iphone" ? size.height : "100%",
               margin: "0 auto",
@@ -373,22 +430,12 @@ export default function DesignShell() {
 
         {inCanvasChrome && (
           <aside style={styles.rightPanel}>
-            {store.mode === "arrange" && selMedia && (
+            {selMedia && (
               <div style={styles.panelSection}>
-                <div style={styles.panelHeading}>Move behaviour</div>
-                <div style={{ display: "flex", gap: 4 }}>
-                  <button
-                    style={{ ...styles.chip, ...(moveKind === "layout" ? styles.chipActive : {}) }}
-                    onClick={() => setMoveKind("layout")}
-                  >
-                    Move with Layout
-                  </button>
-                  <button
-                    style={{ ...styles.chip, ...(moveKind === "free" ? styles.chipActive : {}) }}
-                    onClick={() => setMoveKind("free")}
-                  >
-                    Free Position
-                  </button>
+                <div style={styles.muted}>
+                  Drag the grip handle to reorder, or the vertical-arrows
+                  handle to offset within a side-by-side row — both appear on
+                  the image itself once selected.
                 </div>
               </div>
             )}
@@ -403,25 +450,34 @@ export default function DesignShell() {
                 <div style={styles.inspectorRow}><span>Source</span><span style={{ wordBreak: "break-all" }}>{selMedia.src}</span></div>
                 <div style={styles.inspectorRow}><span>Filename</span><span>{selMedia.filename}</span></div>
                 {selMedia.layout && <div style={styles.inspectorRow}><span>Layout</span><span>{selMedia.layout}</span></div>}
-                <label style={{ display: "block", marginTop: 8 }}>
-                  <input
-                    type="file"
-                    accept=".png,.jpg,.jpeg,.mp4,image/png,image/jpeg,video/mp4"
-                    style={{ display: "none" }}
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) replaceSelectedMedia(f);
-                      e.target.value = "";
-                    }}
-                    id="replace-media-input"
-                  />
-                  <span
-                    style={{ ...styles.btn, display: "inline-block", textAlign: "center", cursor: "pointer" }}
-                    onClick={() => document.getElementById("replace-media-input")?.click()}
+                <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                  <label style={{ flex: 1 }}>
+                    <input
+                      type="file"
+                      accept=".png,.jpg,.jpeg,.mp4,image/png,image/jpeg,video/mp4"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) replaceSelectedMedia(f);
+                        e.target.value = "";
+                      }}
+                      id="replace-media-input"
+                    />
+                    <span
+                      style={{ ...styles.btn, display: "block", textAlign: "center", cursor: "pointer" }}
+                      onClick={() => document.getElementById("replace-media-input")?.click()}
+                    >
+                      Replace Image
+                    </span>
+                  </label>
+                  <button
+                    style={{ ...styles.btn, flex: 1, color: "#ff8f8f", border: "1px solid #4a2a2a" }}
+                    onClick={deleteSelectedMedia}
+                    title="Delete key / Backspace also works while an image is selected"
                   >
-                    Replace Media
-                  </span>
-                </label>
+                    Delete Image
+                  </button>
+                </div>
                 {selMedia.addedByDesignMode && selMedia.layout && selMedia.mediaId && page.slug && (
                   <div style={{ display: "flex", gap: 4, marginTop: 8 }}>
                     <button

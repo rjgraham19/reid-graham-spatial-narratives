@@ -32,6 +32,7 @@ export default defineConfig({
       designModeSavePlugin(
         "./src/lib/design-overrides.json",
         "./src/lib/design-media-additions.json",
+        "./src/lib/design-media-order.json",
         "./.design-mode-staging",
         "./public/design-media",
       ),

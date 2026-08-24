@@ -36,14 +36,17 @@ import {
 import {
   applyOverrides,
   applyMediaAdditions,
+  applyMediaOrder,
   designModeStyleTag,
   mergeOverridesFiles,
   mergeMediaAdditions,
+  mergeMediaOrder,
 } from "@/lib/apply-overrides";
 import designOverrides from "@/lib/design-overrides.json";
 import designMediaAdditions from "@/lib/design-media-additions.json";
+import designMediaOrder from "@/lib/design-media-order.json";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
-import type { MediaAdditionsFile } from "@/lib/media-additions.types";
+import type { MediaAdditionsFile, MediaOrderFile } from "@/lib/media-additions.types";
 import { designId } from "@/lib/design-ids";
 import { useLiveOverrides } from "@/lib/use-live-overrides";
 import { DesignFrameBridge } from "@/design-mode/frame-bridge";
@@ -115,9 +118,10 @@ function CreditRow({ slug, credit }: { slug: string; credit: Credit }) {
 
 function ProjectPage() {
   const { project: rawProject } = Route.useLoaderData();
-  const { live, liveMedia, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
+  const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const mediaAdditionsFile = mergeMediaAdditions(designMediaAdditions as MediaAdditionsFile, liveMedia);
+  const mediaOrderFile = mergeMediaOrder(designMediaOrder as MediaOrderFile, liveMediaOrder);
   const project = applyMediaAdditions(applyOverrides(rawProject, overridesFile), mediaAdditionsFile, overridesFile);
   const responsiveCss = designModeStyleTag(overridesFile);
   const { panel } = Route.useSearch();
@@ -198,12 +202,19 @@ function ProjectPage() {
      both halves of the PINK FOUNTAIN drawing their own sections higher up the
      page, so only the opening contact sheet is left to show here. The original
      index travels with each item, since that's what the lightbox counts by. */
-  const galleryMedia = project.media
-    .map((item: MediaItem, index: number) => ({ item, index }))
-    .filter(
-      ({ item, index }: { item: MediaItem; index: number }) =>
-        !(isTab && index !== 0) && !item.hidden,
-    );
+  // The generic two-column gallery grid's own display order can additionally
+  // be overridden by a Design Mode Reorder drag (`applyMediaOrder`) — the
+  // several bespoke per-project layouts below address `project.media` by
+  // fixed index and never read this, so they're unaffected.
+  const galleryMedia = applyMediaOrder(
+    project.media
+      .map((item: MediaItem, index: number) => ({ item, index }))
+      .filter(
+        ({ item, index }: { item: MediaItem; index: number }) =>
+          !(isTab && index !== 0) && !item.hidden,
+      ),
+    mediaOrderFile[project.slug],
+  );
 
   const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
   const recordScrubVideoRef = useRef<HTMLVideoElement>(null);
@@ -224,6 +235,7 @@ function ProjectPage() {
       <DesignFrameBridge
         liveOverrides={live}
         liveMedia={liveMedia}
+        liveMediaOrder={liveMediaOrder}
         onLocalPatch={onLocalPatch}
         onLocalReset={onLocalReset}
         onSyncAll={onSyncAll}
