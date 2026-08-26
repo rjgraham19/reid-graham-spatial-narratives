@@ -333,10 +333,6 @@ export const PROJECTS: Project[] = [
       "The Wild West is honest — untamed and uncivilized. Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery. A suburban kitchen unravels as the wild west comes pouring in.",
     pullQuote:
       "A suburban kitchen unravels as the wild west comes pouring in.",
-    dualityLines: [
-      "The Wild West is honest — untamed and uncivilized.",
-      "Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery.",
-    ],
     cover: trueWest,
     collage: [trueWestDet],
     media: [
@@ -362,8 +358,6 @@ export const PROJECTS: Project[] = [
     ],
     description:
       "The rawness of the space is conveyed through skeletal framing and deteriorating wood slatting. Reflecting historical reference to the original annex, the design pays tribute to Anne and her diary's enduring legacy.",
-    pullQuote:
-      "Skeletal framing and deteriorating wood slatting — a tribute to Anne and her diary's enduring legacy.",
     cover: anne,
     collage: [anneDet],
     // Order matters: the custom layout on this page addresses these by index.
