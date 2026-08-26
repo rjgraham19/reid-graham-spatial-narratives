@@ -465,6 +465,29 @@
     right: calc(var(--panel-gutter) + 28px);
   }
 
+  /* Prev/Next: sit in the gutter itself — centred both vertically on the
+     screen and horizontally in the strip of glass between the viewport edge
+     and the panel edge, rather than pinned to either one. Centring on
+     `--panel-gutter / 2` (not a fixed inset) means they stay centred in that
+     strip at any --panel-width, the same way the panel and its own close
+     control already track the gutter. Bigger than the standard icon button —
+     a screen-edge control reads as secondary chrome at that size; the larger
+     mark plus the whole gutter as its hit area makes it read as a primary
+     way to move through the feed. */
+  .project-overlay-scope .panel-nav {
+    top: 50%;
+    width: 48px;
+    height: 48px;
+  }
+  .project-overlay-scope .panel-nav-prev {
+    left: calc(var(--panel-gutter) / 2);
+    transform: translate(-50%, -50%);
+  }
+  .project-overlay-scope .panel-nav-next {
+    right: calc(var(--panel-gutter) / 2);
+    transform: translate(50%, -50%);
+  }
+
   /* One continuous sheet of smoked glass across the whole perimeter,
      including behind the controls.
 

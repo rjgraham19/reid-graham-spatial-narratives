@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { CloseMark, GlassButton } from "./glass-button";
+import { BackChevron, CloseMark, GlassButton } from "./glass-button";
 
 /**
  * How long the panel takes to fade out before unmounting.
@@ -46,6 +46,8 @@ export function ProjectPanel({
   title,
   onClose,
   accentColor,
+  onPrev,
+  onNext,
 }: {
   url: string;
   title: string;
@@ -56,6 +58,15 @@ export function ProjectPanel({
    * needs no accent at all to open correctly.
    */
   accentColor?: string;
+  /**
+   * Shuffle to the previous/next project without leaving the panel — the
+   * caller decides what "next" means (e.g. the active tag filter) and just
+   * swaps `url`/`title`/`accentColor`, so this component only has to render
+   * the two controls. Omitted (or both undefined) when there's nothing to
+   * shuffle to, which hides them rather than showing dead arrows.
+   */
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLButtonElement>(null);
@@ -175,6 +186,12 @@ export function ProjectPanel({
         const doc = e.currentTarget.contentDocument;
         if (!doc) return;
 
+        // The frame reloads in place when Prev/Next swaps `url` — same panel
+        // instance, new document — so without this the observer from the
+        // project just left behind keeps watching its now-detached `doc.body`
+        // forever, one extra live observer per shuffle.
+        observerRef.current?.disconnect();
+
         doc.addEventListener("keydown", (ev) => {
           if ((ev as KeyboardEvent).key === "Escape") requestClose();
         });
@@ -273,6 +290,36 @@ export function ProjectPanel({
           className="panel-close absolute z-10"
         >
           <CloseMark />
+        </GlassButton>
+      )}
+
+      {/* Shuffle to the previous/next project, screen edges rather than
+          panel edges — they belong to browsing the feed, not to this one
+          project's own window, the same way the site nav sits outside it.
+          Hidden with the close control while the image viewer is open, so
+          the same three-dialogs-stacked ambiguity doesn't reappear here. */}
+      {!viewerOpen && onPrev && (
+        <GlassButton
+          icon
+          onClick={onPrev}
+          aria-label="Previous project"
+          className="panel-nav panel-nav-prev absolute z-10"
+        >
+          <span className="inline-flex" style={{ transform: "scale(1.6)" }}>
+            <BackChevron />
+          </span>
+        </GlassButton>
+      )}
+      {!viewerOpen && onNext && (
+        <GlassButton
+          icon
+          onClick={onNext}
+          aria-label="Next project"
+          className="panel-nav panel-nav-next absolute z-10"
+        >
+          <span className="inline-flex" style={{ transform: "scale(1.6) scaleX(-1)" }}>
+            <BackChevron />
+          </span>
         </GlassButton>
       )}
     </div>,

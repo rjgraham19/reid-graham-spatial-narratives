@@ -84,6 +84,24 @@ function ProjectsPage() {
     });
   }, [navigate]);
 
+  /* Shuffling to the next/previous project while the panel is open — same
+     search-param swap as opening one from a tile, so the panel itself never
+     remounts, only the iframe's `url` prop changes and it navigates to the
+     new project. Steps through `projects` — the currently active tag filter,
+     if any — so the arrows move through what's actually in the feed behind
+     the panel, not the unfiltered catalogue. Wraps at both ends, mirroring
+     the same-hub "Next" link's modulo pattern on the full project page. */
+  const openIndex = open ? projects.findIndex((p) => p.slug === open.slug) : -1;
+  const showPanelNav = open != null && openIndex !== -1 && projects.length > 1;
+  const openPrev = useCallback(() => {
+    if (openIndex === -1) return;
+    openProject(projects[(openIndex - 1 + projects.length) % projects.length]);
+  }, [openIndex, openProject, projects]);
+  const openNext = useCallback(() => {
+    if (openIndex === -1) return;
+    openProject(projects[(openIndex + 1) % projects.length]);
+  }, [openIndex, openProject, projects]);
+
   /* A ?project= link opened on a phone — shared from a desktop, or the window
      narrowed while the panel was up. There's no panel at this width to show
      it in, so the project takes over as its own full page, which is what it
@@ -153,6 +171,8 @@ function ProjectsPage() {
           /* Straight from the project data. Projects with no accentColor get
              the neutral smoked glass, so nothing needs adding for them. */
           accentColor={open.accentColor}
+          onPrev={showPanelNav ? openPrev : undefined}
+          onNext={showPanelNav ? openNext : undefined}
         />
       )}
 
