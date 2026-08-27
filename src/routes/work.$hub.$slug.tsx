@@ -211,10 +211,21 @@ function ProjectPage() {
       .map((item: MediaItem, index: number) => ({ item, index }))
       .filter(
         ({ item, index }: { item: MediaItem; index: number }) =>
-          !(isTab && index !== 0) && !item.hidden,
+          !(isTab && index !== 0) &&
+          !(isLollapalooza && item.id?.startsWith("gallery-")) &&
+          !item.hidden,
       ),
     mediaOrderFile[project.slug],
   );
+
+  /* The closing hover-row gallery's own slice of `project.media` — same
+     array, same lightbox, just excluded from the standard grid above and
+     given the wider hover-to-expand treatment instead. */
+  const lollapaloozaGalleryMedia = isLollapalooza
+    ? project.media
+        .map((item: MediaItem, index: number) => ({ item, index }))
+        .filter(({ item }: { item: MediaItem; index: number }) => item.id?.startsWith("gallery-") && !item.hidden)
+    : [];
 
   const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
   const recordScrubVideoRef = useRef<HTMLVideoElement>(null);
@@ -368,14 +379,22 @@ function ProjectPage() {
             {project.tags && project.tags.length > 0 && (
               /* Lollapalooza desktop: the tag sits ~40% closer to the title,
                  so the three lines read as one lockup rather than three
-                 stacked items. */
-              <div className={`mb-4 flex flex-wrap gap-2 ${isLollapalooza ? "lg:mb-2.5" : ""}`}>
+                 stacked items.
+
+                 The same glass-pill surface as the tag filters on /work and
+                 every other real link styled as a button — before this it
+                 was plain tracked-out text with only a hover color change,
+                 which read as a caption rather than a working link to its
+                 hub. `glassButton()` is the shared class string for exactly
+                 this case: a real `<Link>` that needs to look like one of
+                 the site's buttons. */
+              <div className={`mb-2 flex flex-wrap gap-2 ${isLollapalooza ? "lg:mb-1" : ""}`}>
                 {project.tags.map((t: ProjectTag) => (
                   <Link
                     key={t}
                     to="/work"
                     search={{ tag: t }}
-                    className="pointer-events-auto text-[10px] tracking-[0.3em] uppercase text-foreground/70 hover:text-accent transition-colors"
+                    className={`pointer-events-auto hub-tag-pill ${glassButton({ quiet: true, touch: true })}`}
                   >
                     {t.replace("/", " ")}
                   </Link>
@@ -1202,6 +1221,38 @@ function ProjectPage() {
       )}
 
 
+      {/* Lollapalooza — closing beat. A hover-to-expand row, placeholder
+          Unsplash photos until Reid supplies the real set (swap `src` on the
+          `gallery-N` media items in projects.ts, nothing here changes).
+          Opens in the same lightbox as every other image on the page —
+          same single-image view, same caption placement underneath — since
+          these are ordinary `project.media` entries under the hood, just
+          excluded from the standard grid above. */}
+      {isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
+        <section className="px-6 md:px-12 lg:px-16 pb-12">
+          <div className="flex items-center gap-2 h-[400px] w-full">
+            {lollapaloozaGalleryMedia.map(({ item: m, index: i }) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setLightbox(i)}
+                aria-label={m.caption ?? `Gallery image`}
+                className="relative group flex-grow transition-all w-56 rounded-lg overflow-hidden h-[400px] duration-500 hover:w-full bg-secondary"
+              >
+                <img
+                  data-design-id={designId.projectMedia(project.slug, m.id!)}
+                  data-design-kind="image"
+                  src={m.src}
+                  alt={m.caption ?? project.title}
+                  loading="lazy"
+                  className="h-full w-full object-cover object-center"
+                />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* TaB: Renaissance — closing beat. A rendered frame sequence of the can,
           scrubbed by scroll so it spins forward on the way down and backward on
           the way up. Last content section on the page. */}
@@ -1286,10 +1337,15 @@ function ProjectPage() {
 
       </div>{/* end light-zone */}
 
-      {/* Lightbox — deliberately outside the light region so it stays dark. */}
+      {/* Lightbox — deliberately outside the light region so it stays dark.
+          `--accent-color` drives the Prev/Next arrows' hover tint (see
+          `.nav-arrow`) — this project's own accent, same as the panel view's
+          gradient, so stepping through photos here and shuffling projects in
+          the panel read as the same control everywhere it appears. */}
       {lightbox != null && (
         <div
           className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-2xl flex flex-col cursor-zoom-out"
+          style={project.accentColor ? ({ "--accent-color": project.accentColor } as React.CSSProperties) : undefined}
           onClick={close}
           role="dialog"
           aria-modal="true"
@@ -1351,7 +1407,7 @@ function ProjectPage() {
                 step(-1);
               }}
               aria-label="Previous"
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-2xl font-light flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
+              className="nav-arrow absolute left-4 md:left-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 opacity-0 group-hover/lb:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100"
             >
               ‹
             </button>
@@ -1362,7 +1418,7 @@ function ProjectPage() {
                 step(1);
               }}
               aria-label="Next"
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-foreground text-2xl font-light flex items-center justify-center opacity-0 group-hover/lb:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100 hover:bg-black/80 hover:text-accent transition-opacity"
+              className="nav-arrow absolute right-4 md:right-8 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 opacity-0 group-hover/lb:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100"
             >
               ›
             </button>

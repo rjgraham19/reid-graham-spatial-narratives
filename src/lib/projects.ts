@@ -285,6 +285,17 @@ export const PROJECTS: Project[] = [
     cover: lollaClubMagenta,
     media: [
       { type: "image", src: lollaClubMagenta, caption: "Club Magenta — night view, full front elevation" },
+      // Closing gallery row — placeholder photos until Reid supplies the
+      // real set; swap `src` (and `caption`) on each once they're in hand.
+      // Stable `id`s so the hover-row section below can find them by name
+      // rather than by position, and kept out of the standard gallery grid
+      // by the `isLollapalooza` index exclusion in work.$hub.$slug.tsx.
+      { id: "gallery-1", type: "image", src: "https://images.unsplash.com/photo-1719368472026-dc26f70a9b76?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
+      { id: "gallery-2", type: "image", src: "https://images.unsplash.com/photo-1649265825072-f7dd6942baed?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
+      { id: "gallery-3", type: "image", src: "https://images.unsplash.com/photo-1555212697-194d092e3b8f?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
+      { id: "gallery-4", type: "image", src: "https://images.unsplash.com/photo-1729086046027-09979ade13fd?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
+      { id: "gallery-5", type: "image", src: "https://images.unsplash.com/photo-1601568494843-772eb04aca5d?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
+      { id: "gallery-6", type: "image", src: "https://images.unsplash.com/photo-1585687501004-615dfdfde7f1?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
     ],
   },
 

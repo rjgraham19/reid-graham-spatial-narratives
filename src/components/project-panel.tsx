@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { BackChevron, CloseMark, GlassButton } from "./glass-button";
+import { CloseMark, GlassButton } from "./glass-button";
 
 /**
  * How long the panel takes to fade out before unmounting.
@@ -297,30 +297,33 @@ export function ProjectPanel({
           panel edges — they belong to browsing the feed, not to this one
           project's own window, the same way the site nav sits outside it.
           Hidden with the close control while the image viewer is open, so
-          the same three-dialogs-stacked ambiguity doesn't reappear here. */}
+          the same three-dialogs-stacked ambiguity doesn't reappear here.
+
+          `.nav-arrow` is the same circular control the image lightbox uses
+          on every project page — same shape, same glyph, same hover-to-
+          accent color — so shuffling projects and stepping through a
+          project's own photos read as one consistent control, not two. Its
+          hover color reads `--accent-color`, already set on this scope from
+          the project's `accentColor`, so it needs no wiring of its own. */}
       {!viewerOpen && onPrev && (
-        <GlassButton
-          icon
+        <button
+          type="button"
           onClick={onPrev}
           aria-label="Previous project"
-          className="panel-nav panel-nav-prev absolute z-10"
+          className="nav-arrow panel-nav panel-nav-prev absolute z-10 h-12 w-12 md:h-14 md:w-14"
         >
-          <span className="inline-flex" style={{ transform: "scale(1.6)" }}>
-            <BackChevron />
-          </span>
-        </GlassButton>
+          ‹
+        </button>
       )}
       {!viewerOpen && onNext && (
-        <GlassButton
-          icon
+        <button
+          type="button"
           onClick={onNext}
           aria-label="Next project"
-          className="panel-nav panel-nav-next absolute z-10"
+          className="nav-arrow panel-nav panel-nav-next absolute z-10 h-12 w-12 md:h-14 md:w-14"
         >
-          <span className="inline-flex" style={{ transform: "scale(1.6) scaleX(-1)" }}>
-            <BackChevron />
-          </span>
-        </GlassButton>
+          ›
+        </button>
       )}
     </div>,
     document.body,

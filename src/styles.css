@@ -321,6 +321,39 @@
     inset 2px 2px rgb(158, 158, 158);
 }
 
+/* The circular Prev/Next control — used for both stepping through a
+   project's own photos in the image lightbox, and shuffling between whole
+   projects in the panel view. One class so the two can never drift apart.
+   Reads `--accent-color` for its hover tint, which each context sets from
+   that project's own accent (the panel's overlay scope already carries it;
+   the lightbox sets it directly) — falling back to the site's generic
+   accent when a project has none, so the control never has an undefined
+   hover color. */
+.nav-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--color-foreground);
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 1;
+  /* Opacity's here too, not just color/background: the lightbox fades this
+     control in on hover of the image area, and folding all three into one
+     declared `transition` avoids a shorthand fight with a second utility
+     class also trying to own `transition-property`. */
+  transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+.nav-arrow:hover,
+.nav-arrow:focus-visible {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: var(--accent-color, var(--color-accent));
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -470,14 +503,10 @@
      and the panel edge, rather than pinned to either one. Centring on
      `--panel-gutter / 2` (not a fixed inset) means they stay centred in that
      strip at any --panel-width, the same way the panel and its own close
-     control already track the gutter. Bigger than the standard icon button —
-     a screen-edge control reads as secondary chrome at that size; the larger
-     mark plus the whole gutter as its hit area makes it read as a primary
-     way to move through the feed. */
+     control already track the gutter. Sizing and appearance come from
+     `.nav-arrow` — this only positions the control. */
   .project-overlay-scope .panel-nav {
     top: 50%;
-    width: 48px;
-    height: 48px;
   }
   .project-overlay-scope .panel-nav-prev {
     left: calc(var(--panel-gutter) / 2);
@@ -770,6 +799,14 @@
     padding-left: 1.05rem;
     padding-right: 1.05rem;
   }
+}
+
+/* The hub tag above a project title — same glass surface as every other
+   button, just a heavier outline so it still reads as clearly bordered
+   sitting on its own above the big display type, where the standard
+   hairline is easy to lose. */
+.hub-tag-pill {
+  border-width: 1.5px;
 }
 
 @media (prefers-reduced-motion: reduce) {
