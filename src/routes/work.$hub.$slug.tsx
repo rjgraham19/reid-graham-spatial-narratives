@@ -1099,10 +1099,12 @@ function ProjectPage() {
           // renders stacked as a centered column on the right — nothing
           // else follows it. The wrapper's aspect-ratio matches the axon's
           // real dimensions exactly, so it's never cropped and never grows
-          // taller than the picture itself.
+          // taller than the picture itself. Portrait now — the previous
+          // export of this same view was sideways (1865/1143, landscape);
+          // this one is the identical image rotated upright (1143/1865).
           <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 md:gap-10 md:items-center">
             {!project.media[0]?.hidden && (
-              <figure className="group overflow-hidden rounded-md" style={{ aspectRatio: "1865 / 1143" }}>
+              <figure className="group overflow-hidden rounded-md" style={{ aspectRatio: "1143 / 1865" }}>
                 <button
                   type="button"
                   onClick={() => setLightbox(0)}

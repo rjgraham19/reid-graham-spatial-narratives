@@ -501,7 +501,7 @@ export const PROJECTS: Project[] = [
     cover: townhouseFull,
     collage: [townHouseDet.url],
     media: [
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_AXONX2.png", caption: "Axonometric" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_AXON_UPRIGHT.jpg", caption: "Axonometric" },
       { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg" },
       { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER12.jpg" },
       { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER3.jpg" },
