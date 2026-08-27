@@ -212,7 +212,7 @@ function ProjectPage() {
       .filter(
         ({ item, index }: { item: MediaItem; index: number }) =>
           !(isTab && index !== 0) &&
-          !(isLollapalooza && item.id?.startsWith("gallery-")) &&
+          !(isLollapalooza && (item.id?.startsWith("gallery-") || item.id?.startsWith("drafting-"))) &&
           !item.hidden,
       ),
     mediaOrderFile[project.slug],
@@ -225,6 +225,15 @@ function ProjectPage() {
     ? project.media
         .map((item: MediaItem, index: number) => ({ item, index }))
         .filter(({ item }: { item: MediaItem; index: number }) => item.id?.startsWith("gallery-") && !item.hidden)
+    : [];
+
+  /* Technical Drafting Package — same idea, its own id prefix so it can sit
+     in its own section (directly above the photo row) with its own card
+     styling, while still opening in the one shared lightbox. */
+  const lollapaloozaDraftingMedia = isLollapalooza
+    ? project.media
+        .map((item: MediaItem, index: number) => ({ item, index }))
+        .filter(({ item }: { item: MediaItem; index: number }) => item.id?.startsWith("drafting-") && !item.hidden)
     : [];
 
   const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
@@ -387,13 +396,25 @@ function ProjectPage() {
                  which read as a caption rather than a working link to its
                  hub. `glassButton()` is the shared class string for exactly
                  this case: a real `<Link>` that needs to look like one of
-                 the site's buttons. */
+                 the site's buttons.
+
+                 `target="_top"` only inside the panel: this page can be
+                 rendered two ways — as itself, or inset in an iframe inside
+                 the panel over the feed (`?panel=1`). A plain in-app Link
+                 navigates whichever document it's actually running in, so
+                 without this, clicking the tag while inside the panel
+                 navigated the *iframe* to /work — opening the whole feed,
+                 panel and all, nested inside the panel already open one
+                 level up. `_top` breaks out and navigates the real window
+                 instead, landing on the actual filtered feed with the panel
+                 closed, the same as clicking it from the full page does. */
               <div className={`mb-2 flex flex-wrap gap-2 ${isLollapalooza ? "lg:mb-1" : ""}`}>
                 {project.tags.map((t: ProjectTag) => (
                   <Link
                     key={t}
                     to="/work"
                     search={{ tag: t }}
+                    target={panel ? "_top" : undefined}
                     className={`pointer-events-auto hub-tag-pill ${glassButton({ quiet: true, touch: true })}`}
                   >
                     {t.replace("/", " ")}
@@ -907,8 +928,11 @@ function ProjectPage() {
 
       {/* Media gallery */}
       {/* Skipped where every media item already appears in a bespoke layout
-          above, which would otherwise repeat the whole set. */}
-      {!isTrueWest && !isReshuffling && (
+          above, which would otherwise repeat the whole set — and, for the
+          default (non-bespoke) branch, where there's simply nothing left in
+          `galleryMedia` to show, so the section doesn't sit there as an
+          empty band of padding. */}
+      {!isTrueWest && !isReshuffling && (isAnneFrank || isYctiwy || isTownhouse || galleryMedia.length > 0) && (
       <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
         {isAnneFrank ? (
           /* Anne Frank layout, per the supplied reference:
@@ -1125,7 +1149,7 @@ function ProjectPage() {
               )}
             </div>
           </div>
-        ) : (
+        ) : galleryMedia.length === 0 ? null : (
           // grid-cols-2 lets a "half" item's md:col-span-1 sit next to
           // another half item automatically (standard grid auto-flow) while
           // a "full" item's md:col-span-2 takes the whole row — no manual
@@ -1221,13 +1245,47 @@ function ProjectPage() {
       )}
 
 
-      {/* Lollapalooza — closing beat. A hover-to-expand row, placeholder
-          Unsplash photos until Reid supplies the real set (swap `src` on the
-          `gallery-N` media items in projects.ts, nothing here changes).
-          Opens in the same lightbox as every other image on the page —
-          same single-image view, same caption placement underneath — since
-          these are ordinary `project.media` entries under the hood, just
-          excluded from the standard grid above. */}
+      {/* Lollapalooza — Technical Drafting Package. CAA's construction
+          drawings for the build, directly above the event-photo row below.
+          White backgrounds throughout, unlike the photos — cropping one
+          would cut a dimension string or a title block off, so these stay
+          `object-contain` at all times (not just on hover) and sit inset
+          inside a white card rather than filling it edge to edge, so a
+          drawing's own square corner reads as sitting just inside the
+          card's rounded one instead of colliding with the curve. */}
+      {isLollapalooza && lollapaloozaDraftingMedia.length > 0 && (
+        <section className="px-6 md:px-12 lg:px-16 pt-12">
+          <h2 className="font-display font-light text-2xl md:text-4xl mb-6">
+            Technical Drafting Package
+          </h2>
+          <div className="flex items-center gap-2 h-[400px] w-full">
+            {lollapaloozaDraftingMedia.map(({ item: m, index: i }) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setLightbox(i)}
+                aria-label={m.caption ?? "Drafting sheet"}
+                className="relative group w-56 shrink-0 rounded-2xl overflow-hidden h-[400px] bg-white border border-black/10 p-4 transition-transform duration-500 ease-out hover:z-20 hover:scale-150 focus-visible:z-20 focus-visible:scale-150"
+              >
+                <img
+                  data-design-id={designId.projectMedia(project.slug, m.id!)}
+                  data-design-kind="image"
+                  src={m.src}
+                  alt={m.caption ?? project.title}
+                  loading="lazy"
+                  className="h-full w-full object-contain object-center"
+                />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Lollapalooza — closing beat. A hover-to-expand row of real event
+          photography. Opens in the same lightbox as every other image on
+          the page — same single-image view, same caption placement
+          underneath — since these are ordinary `project.media` entries
+          under the hood, just excluded from the standard grid above. */}
       {isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pb-12">
           <div className="flex items-center gap-2 h-[400px] w-full">
@@ -1237,15 +1295,29 @@ function ProjectPage() {
                 type="button"
                 onClick={() => setLightbox(i)}
                 aria-label={m.caption ?? `Gallery image`}
-                className="relative group flex-grow transition-all w-56 rounded-lg overflow-hidden h-[400px] duration-500 hover:w-full bg-secondary"
+                /* Grows via `transform: scale`, not by taking width away from
+                   its neighbors — a layout-based grow (the flex-basis this
+                   used before) pushed the row around, and for a portrait
+                   photo boxed to this row's fixed height, "wider" never
+                   actually read as "bigger." Scaling instead pops the tile
+                   up over its neighbors, so it visibly enlarges regardless
+                   of the source photo's own proportions. `z-20` lifts it
+                   above the rest of the row while hovered/focused. */
+                className="relative group w-56 shrink-0 rounded-lg overflow-hidden h-[400px] bg-secondary transition-transform duration-500 ease-out hover:z-20 hover:scale-150 focus-visible:z-20 focus-visible:scale-150"
               >
+                {/* Cropped to fill the square at rest — these are mixed
+                    portrait/landscape source photos, and `object-cover`
+                    is what makes an uneven row of them read as one strip.
+                    On hover it switches to `object-contain`, so the scaled-up
+                    tile shows the complete photo at its own proportions
+                    instead of a bigger crop of the same square. */}
                 <img
                   data-design-id={designId.projectMedia(project.slug, m.id!)}
                   data-design-kind="image"
                   src={m.src}
                   alt={m.caption ?? project.title}
                   loading="lazy"
-                  className="h-full w-full object-cover object-center"
+                  className="h-full w-full object-cover object-center group-hover:object-contain"
                 />
               </button>
             ))}

@@ -26,6 +26,17 @@ import tab from "@/assets/rg/tab-full.jpg";
 import tabDrawingLeft from "@/assets/rg/tab-drawing-left.jpg";
 import tabDrawingRight from "@/assets/rg/tab-drawing-right.jpg";
 import lollaClubMagenta from "@/assets/rg/lollapalooza-clubmagenta.jpg";
+import lollaGalleryDj from "@/assets/rg/lollapalooza-gallery-dj-booth.jpg";
+import lollaGalleryLoungePath from "@/assets/rg/lollapalooza-gallery-lounge-path.jpg";
+import lollaGalleryRecordInstall from "@/assets/rg/lollapalooza-gallery-record-install.jpg";
+import lollaGalleryLoungeInterior from "@/assets/rg/lollapalooza-gallery-lounge-interior.jpg";
+import lollaGalleryFriendsGroup from "@/assets/rg/lollapalooza-gallery-friends-group.jpg";
+import lollaDraftingBackBar from "@/assets/rg/lollapalooza-drafting-back-bar.png";
+import lollaDraftingFrontBarViews from "@/assets/rg/lollapalooza-drafting-front-bar-views.png";
+import lollaDraftingFrontBarOverview from "@/assets/rg/lollapalooza-drafting-front-bar-overview.png";
+import lollaDraftingMirrorWall from "@/assets/rg/lollapalooza-drafting-mirror-wall.jpg";
+import lollaDraftingRecordPlayer from "@/assets/rg/lollapalooza-drafting-record-player.jpg";
+import lollaDraftingSofaGroundplan from "@/assets/rg/lollapalooza-drafting-sofa-groundplan.jpg";
 
 // Square-thumbnail highlight images (full/uncropped; framed via CSS).
 import hlTrueWest from "@/assets/rg/highlight-true-west.jpg";
@@ -283,19 +294,34 @@ export const PROJECTS: Project[] = [
     description:
       "PLACEHOLDER description — Y2K/futurism-themed experiential work. Replace with real project copy.",
     cover: lollaClubMagenta,
+    // The CGI render (formerly project.media[0]) that used to open the
+    // gallery grid was cut — it's the same view as the hero image up top
+    // (which reads `cover`, not `media`, so removing it here doesn't touch
+    // the hero) and, once the real event photos existed, just repeated
+    // itself a second time immediately above them.
     media: [
-      { type: "image", src: lollaClubMagenta, caption: "Club Magenta — night view, full front elevation" },
-      // Closing gallery row — placeholder photos until Reid supplies the
-      // real set; swap `src` (and `caption`) on each once they're in hand.
-      // Stable `id`s so the hover-row section below can find them by name
-      // rather than by position, and kept out of the standard gallery grid
-      // by the `isLollapalooza` index exclusion in work.$hub.$slug.tsx.
-      { id: "gallery-1", type: "image", src: "https://images.unsplash.com/photo-1719368472026-dc26f70a9b76?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
-      { id: "gallery-2", type: "image", src: "https://images.unsplash.com/photo-1649265825072-f7dd6942baed?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
-      { id: "gallery-3", type: "image", src: "https://images.unsplash.com/photo-1555212697-194d092e3b8f?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
-      { id: "gallery-4", type: "image", src: "https://images.unsplash.com/photo-1729086046027-09979ade13fd?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
-      { id: "gallery-5", type: "image", src: "https://images.unsplash.com/photo-1601568494843-772eb04aca5d?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
-      { id: "gallery-6", type: "image", src: "https://images.unsplash.com/photo-1585687501004-615dfdfde7f1?q=80&h=800&w=800&auto=format&fit=crop", caption: "Placeholder — swap for a real photo" },
+      // Closing gallery row — real event photography. Stable `id`s so the
+      // hover-row section below can find them by name rather than by
+      // position, and kept out of the standard gallery grid by the
+      // `isLollapalooza` index exclusion in work.$hub.$slug.tsx. The wide
+      // daytime tent shot from this same batch is deliberately not included
+      // here — it's the same view as the hero render was, just as a photo
+      // instead of a render, so adding it made the row open with a repeat.
+      { id: "gallery-1", type: "image", src: lollaGalleryDj, caption: "DJ set at Club Magenta" },
+      { id: "gallery-2", type: "image", src: lollaGalleryLoungePath, caption: "Lounge seating along the entry path" },
+      { id: "gallery-3", type: "image", src: lollaGalleryRecordInstall, caption: "The record-player photo installation" },
+      { id: "gallery-4", type: "image", src: lollaGalleryLoungeInterior, caption: "Lounge interior, under the tent" },
+      { id: "gallery-5", type: "image", src: lollaGalleryFriendsGroup, caption: "Festivalgoers on the record-player stage" },
+      // Technical Drafting Package — CAA's own construction drawings for the
+      // build, rendered from the source PDFs. Same id-prefix convention as
+      // the photo row above (kept out of the standard grid the same way),
+      // shown in its own section directly above the photos.
+      { id: "drafting-1", type: "image", src: lollaDraftingBackBar, caption: "Back Bar — Overview" },
+      { id: "drafting-2", type: "image", src: lollaDraftingFrontBarViews, caption: "Front Bar — Additional Views" },
+      { id: "drafting-3", type: "image", src: lollaDraftingFrontBarOverview, caption: "Front Bar — Overview" },
+      { id: "drafting-4", type: "image", src: lollaDraftingMirrorWall, caption: "Activation Mirror Wall" },
+      { id: "drafting-5", type: "image", src: lollaDraftingRecordPlayer, caption: "CD Record Player" },
+      { id: "drafting-6", type: "image", src: lollaDraftingSofaGroundplan, caption: "Built-In Sofa Cap Groundplan" },
     ],
   },
 
