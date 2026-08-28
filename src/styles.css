@@ -807,6 +807,17 @@
    hairline is easy to lose. */
 .hub-tag-pill {
   border-width: 1.5px;
+  transition: color 0.18s var(--ease-cinematic);
+}
+/* Unlike the other quiet glass buttons, whose label just brightens to white
+   on hover, this one takes the project's own accent — the same colour that
+   tints the overlay gradient and the Prev/Next arrows. Two classes plus the
+   state so it outranks `.glass-button--quiet:hover` regardless of order;
+   falls back to the site accent for a project with no accent of its own. */
+.hub-tag-pill.glass-button--quiet:hover,
+.hub-tag-pill.glass-button--quiet:focus-visible,
+.hub-tag-pill.glass-button--quiet.is-active {
+  color: var(--accent-color, var(--color-accent));
 }
 
 @media (prefers-reduced-motion: reduce) {

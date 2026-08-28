@@ -250,6 +250,12 @@ function ProjectPage() {
       className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor" : ""}${
         panel ? " is-panel-frame" : ""
       }`}
+      /* This project's own accent, exposed page-wide so controls that tint on
+         hover — the hub-tag pill above the title, and anything else reading
+         `--accent-color` — pick up the same colour the overlay gradient and
+         the lightbox arrows use. Projects with no accent fall back to the
+         site accent at the point of use. */
+      style={project.accentColor ? ({ "--accent-color": project.accentColor } as React.CSSProperties) : undefined}
     >
       {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
       <DesignFrameBridge
