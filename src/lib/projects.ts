@@ -316,9 +316,11 @@ export const PROJECTS: Project[] = [
       // build, rendered from the source PDFs. Same id-prefix convention as
       // the photo row above (kept out of the standard grid the same way),
       // shown in its own section directly above the photos.
-      { id: "drafting-1", type: "image", src: lollaDraftingBackBar, caption: "Back Bar — Overview" },
+      // Both "Front Bar" sheets lead the row, left to right, ahead of the
+      // Back Bar and the rest.
+      { id: "drafting-1", type: "image", src: lollaDraftingFrontBarOverview, caption: "Front Bar — Overview" },
       { id: "drafting-2", type: "image", src: lollaDraftingFrontBarViews, caption: "Front Bar — Additional Views" },
-      { id: "drafting-3", type: "image", src: lollaDraftingFrontBarOverview, caption: "Front Bar — Overview" },
+      { id: "drafting-3", type: "image", src: lollaDraftingBackBar, caption: "Back Bar — Overview" },
       { id: "drafting-4", type: "image", src: lollaDraftingMirrorWall, caption: "Activation Mirror Wall" },
       { id: "drafting-5", type: "image", src: lollaDraftingRecordPlayer, caption: "CD Record Player" },
       { id: "drafting-6", type: "image", src: lollaDraftingSofaGroundplan, caption: "Built-In Sofa Cap Groundplan" },

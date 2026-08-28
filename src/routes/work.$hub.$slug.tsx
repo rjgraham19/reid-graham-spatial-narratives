@@ -1251,23 +1251,28 @@ function ProjectPage() {
           drawings for the build, directly above the event-photo row below.
           White backgrounds throughout, unlike the photos — cropping one
           would cut a dimension string or a title block off, so these stay
-          `object-contain` at all times (not just on hover) and sit inset
-          inside a white card rather than filling it edge to edge, so a
-          drawing's own square corner reads as sitting just inside the
-          card's rounded one instead of colliding with the curve. */}
+          `object-contain` at all times (not just on hover). The source
+          sheets are all landscape (roughly 1.3–1.6 : 1), so each card is a
+          wide `aspect-[3/2]` rectangle rather than a tall box — that keeps
+          the drawing nearly filling its card instead of floating in a band
+          of empty space top and bottom. The row is six `flex-1` cards that
+          divide the full content width between them, so it reaches edge to
+          edge with no dead space on the right. On hover a card scales up in
+          place (same wide proportions) and lifts above its neighbours with
+          `z-20`; it's fine for it to overlap the cards beside it. */}
       {isLollapalooza && lollapaloozaDraftingMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pt-12">
           <h2 className="font-display font-light text-2xl md:text-4xl mb-6">
             Technical Drafting Package
           </h2>
-          <div className="flex items-center gap-2 h-[400px] w-full">
+          <div className="flex items-center gap-2 w-full">
             {lollapaloozaDraftingMedia.map(({ item: m, index: i }) => (
               <button
                 key={m.id}
                 type="button"
                 onClick={() => setLightbox(i)}
                 aria-label={m.caption ?? "Drafting sheet"}
-                className="relative group w-56 shrink-0 rounded-2xl overflow-hidden h-[400px] bg-white border border-black/10 p-4 transition-transform duration-500 ease-out hover:z-20 hover:scale-150 focus-visible:z-20 focus-visible:scale-150"
+                className="relative group flex-1 min-w-0 rounded-2xl overflow-hidden aspect-[3/2] bg-white border border-black/10 p-2 transition-transform duration-500 ease-out hover:z-20 hover:scale-[1.8] focus-visible:z-20 focus-visible:scale-[1.8]"
               >
                 <img
                   data-design-id={designId.projectMedia(project.slug, m.id!)}
