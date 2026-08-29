@@ -7,19 +7,20 @@ type SlideControls = {
   goNext: () => void;
   isFirst: boolean;
   isLast: boolean;
+  /** True for the slide currently in view. Render per-slide arrows only when
+   *  this is set, or every slide's arrows bleed in around the active one. */
+  isActive: boolean;
 };
 
 /**
- * One-slide-at-a-time carousel with a spring slide between slides and a row
- * of progress pills beneath. The caller owns each slide's markup via
- * `renderSlide`, including its prev/next arrows — passed in through
- * `SlideControls` — so the arrows can be anchored to the slide's own content
- * box (e.g. just off a centred card's edges) rather than stranded out at the
- * full-width frame margins.
+ * One-slide-at-a-time carousel with a spring slide between slides. The caller
+ * owns each slide's markup via `renderSlide`, including its prev/next arrows
+ * (gated on `controls.isActive`) so they can be anchored to the slide's own
+ * card edges rather than stranded at the full-width frame margins.
  *
- * The frame clips with `overflow: clip` + a `overflow-clip-margin`, so the
- * off-screen slides are hidden while an arrow that sits a little outside the
- * card is still allowed to show.
+ * Beneath the frame: a thumbnail strip when `thumbnails` is supplied — small
+ * previews of every slide, the current one lit and the rest dimmed — else a
+ * plain row of progress pills.
  *
  * SSR-safe: the track renders at offset 0 (first slide) on the server; the
  * spring only ever runs in an effect.
@@ -27,10 +28,13 @@ type SlideControls = {
 export function FramerCarousel({
   count,
   renderSlide,
+  thumbnails,
   className,
 }: {
   count: number;
   renderSlide: (index: number, controls: SlideControls) => ReactNode;
+  /** One image URL per slide — renders the preview strip instead of pills. */
+  thumbnails?: string[];
   className?: string;
 }) {
   const [index, setIndex] = useState(0);
@@ -55,44 +59,62 @@ export function FramerCarousel({
   }, [index, x]);
 
   const go = (i: number) => setIndex(Math.max(0, Math.min(count - 1, i)));
-  const controls: SlideControls = {
-    goPrev: () => go(index - 1),
-    goNext: () => go(index + 1),
-    isFirst: index === 0,
-    isLast: index === count - 1,
-  };
 
   return (
     <div className={className}>
-      <div
-        ref={frameRef}
-        className="relative rounded-2xl [overflow-clip-margin:52px] [overflow:clip]"
-      >
+      <div ref={frameRef} className="relative overflow-hidden rounded-2xl">
         <motion.div className="flex" style={{ x }}>
           {Array.from({ length: count }, (_, i) => (
             <div key={i} className="w-full shrink-0">
-              {renderSlide(i, controls)}
+              {renderSlide(i, {
+                goPrev: () => go(index - 1),
+                goNext: () => go(index + 1),
+                isFirst: index === 0,
+                isLast: index === count - 1,
+                isActive: i === index,
+              })}
             </div>
           ))}
         </motion.div>
       </div>
 
-      {count > 1 && (
-        <div className="mt-3 flex justify-center gap-2">
-          {Array.from({ length: count }, (_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => go(i)}
-              className={cn(
-                "h-1.5 rounded-full transition-all",
-                i === index ? "w-6 bg-foreground" : "w-1.5 bg-foreground/30",
-              )}
-            />
-          ))}
-        </div>
-      )}
+      {count > 1 &&
+        (thumbnails ? (
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            {thumbnails.slice(0, count).map((src, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => go(i)}
+                aria-label={`View ${i + 1} of ${count}`}
+                aria-current={i === index}
+                className={cn(
+                  "h-14 w-20 shrink-0 overflow-hidden rounded-md bg-secondary transition-all duration-300 ease-out",
+                  i === index
+                    ? "scale-105 opacity-100 ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                    : "opacity-40 grayscale hover:opacity-80 hover:grayscale-0",
+                )}
+              >
+                <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-3 flex justify-center gap-2">
+            {Array.from({ length: count }, (_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => go(i)}
+                className={cn(
+                  "h-1.5 rounded-full transition-all",
+                  i === index ? "w-6 bg-foreground" : "w-1.5 bg-foreground/30",
+                )}
+              />
+            ))}
+          </div>
+        ))}
     </div>
   );
 }

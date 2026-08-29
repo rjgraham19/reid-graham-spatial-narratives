@@ -1282,51 +1282,51 @@ function ProjectPage() {
 
           <div className="hidden md:block">
             <FramerCarousel
-              className="mx-auto max-w-[1120px]"
+              className="mx-auto max-w-[1200px]"
               count={lollapaloozaDraftingMedia.length}
+              thumbnails={lollapaloozaDraftingMedia.map(({ item }) => item.src)}
               renderSlide={(i, ctrl) => {
-                const { item: m, index } = lollapaloozaDraftingMedia[i];
+                const { item: m } = lollapaloozaDraftingMedia[i];
                 return (
                   /* The white sheet wraps only the drawing (plus a thin
                      mount) and sits centred, so the page's black shows down
-                     both sides. The arrows are anchored to the card itself
-                     (`right-full` / `left-full`), so they sit just off its
-                     edges whatever the sheet's proportions. */
+                     both sides. Not clickable — these read fine at this size
+                     and there's no isolated view to open. Arrows sit just off
+                     the card's edges and only render for the active slide. */
                   <div className="flex w-full justify-center py-8">
                     <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setLightbox(index)}
-                        aria-label={m.caption ?? "Drafting sheet"}
-                        className="block rounded-xl bg-white p-3 shadow-lg transition-transform duration-300 hover:scale-[1.01]"
-                      >
+                      <div className="block rounded-xl bg-white p-3 shadow-lg">
                         <img
                           data-design-id={designId.projectMedia(project.slug, m.id!)}
                           data-design-kind="image"
                           src={m.src}
                           alt={m.caption ?? project.title}
                           loading="lazy"
-                          className="block max-h-[74vh] w-auto max-w-[min(1040px,86vw)] object-contain"
+                          className="block max-h-[74vh] w-auto max-w-[min(1000px,84vw)] object-contain"
                         />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={ctrl.goPrev}
-                        disabled={ctrl.isFirst}
-                        aria-label="Previous"
-                        className="nav-arrow absolute right-full top-1/2 mr-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
-                      >
-                        ‹
-                      </button>
-                      <button
-                        type="button"
-                        onClick={ctrl.goNext}
-                        disabled={ctrl.isLast}
-                        aria-label="Next"
-                        className="nav-arrow absolute left-full top-1/2 ml-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
-                      >
-                        ›
-                      </button>
+                      </div>
+                      {ctrl.isActive && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={ctrl.goPrev}
+                            disabled={ctrl.isFirst}
+                            aria-label="Previous drafting sheet"
+                            className="nav-arrow absolute right-full top-1/2 mr-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                          >
+                            ‹
+                          </button>
+                          <button
+                            type="button"
+                            onClick={ctrl.goNext}
+                            disabled={ctrl.isLast}
+                            aria-label="Next drafting sheet"
+                            className="nav-arrow absolute left-full top-1/2 ml-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                          >
+                            ›
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 );
@@ -1338,11 +1338,10 @@ function ProjectPage() {
 
       {/* Lollapalooza — closing beat. Real event photography from Club
           Magenta, shown one at a time: the spring-slide carousel on desktop,
-          the plain swipe carousel on mobile — matching the drafting package
-          above. Mixed portrait/landscape, each at its own aspect ratio and
-          centred so the page's black frames it. Every frame opens in the
-          shared lightbox — ordinary `project.media` entries, just excluded
-          from the standard grid. */}
+          the plain swipe carousel on mobile. Mixed portrait/landscape, each
+          at its own aspect ratio and centred so the page's black frames it.
+          Tapping a photo opens the shared lightbox; the drafting sheets above
+          don't, since there's nothing extra to see. */}
       {isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pb-12">
           <div className="md:hidden">
@@ -1356,8 +1355,9 @@ function ProjectPage() {
 
           <div className="hidden md:block">
             <FramerCarousel
-              className="mx-auto max-w-[1120px]"
+              className="mx-auto max-w-[1200px]"
               count={lollapaloozaGalleryMedia.length}
+              thumbnails={lollapaloozaGalleryMedia.map(({ item }) => item.src)}
               renderSlide={(i, ctrl) => {
                 const { item: m, index } = lollapaloozaGalleryMedia[i];
                 return (
@@ -1366,7 +1366,7 @@ function ProjectPage() {
                       <button
                         type="button"
                         onClick={() => setLightbox(index)}
-                        aria-label={m.caption ?? "Event photo"}
+                        aria-label={m.caption ?? "Open photo"}
                         className="block overflow-hidden rounded-lg bg-secondary shadow-lg transition-transform duration-300 hover:scale-[1.01]"
                       >
                         <img
@@ -1375,27 +1375,31 @@ function ProjectPage() {
                           src={m.src}
                           alt={m.caption ?? project.title}
                           loading="lazy"
-                          className="block max-h-[74vh] w-auto max-w-[min(1040px,86vw)] object-contain"
+                          className="block max-h-[74vh] w-auto max-w-[min(1000px,84vw)] object-contain"
                         />
                       </button>
-                      <button
-                        type="button"
-                        onClick={ctrl.goPrev}
-                        disabled={ctrl.isFirst}
-                        aria-label="Previous"
-                        className="nav-arrow absolute right-full top-1/2 mr-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
-                      >
-                        ‹
-                      </button>
-                      <button
-                        type="button"
-                        onClick={ctrl.goNext}
-                        disabled={ctrl.isLast}
-                        aria-label="Next"
-                        className="nav-arrow absolute left-full top-1/2 ml-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
-                      >
-                        ›
-                      </button>
+                      {ctrl.isActive && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={ctrl.goPrev}
+                            disabled={ctrl.isFirst}
+                            aria-label="Previous photo"
+                            className="nav-arrow absolute right-full top-1/2 mr-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                          >
+                            ‹
+                          </button>
+                          <button
+                            type="button"
+                            onClick={ctrl.goNext}
+                            disabled={ctrl.isLast}
+                            aria-label="Next photo"
+                            className="nav-arrow absolute left-full top-1/2 ml-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                          >
+                            ›
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 );
