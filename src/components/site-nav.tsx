@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { GlassButton, glassButton, trackSheen } from "./glass-button";
+import { CloseMark, GlassButton, glassButton, trackSheen } from "./glass-button";
 
 /** Everything the nav offers, in one place, so the desktop bar and the phone
  *  overlay can't drift apart. `sub` items are the discipline filters that hang
@@ -188,11 +188,13 @@ export function SiteNav({
             </span>
             <GlassButton
               quiet
+              sheen
+              onMouseMove={trackSheen}
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
               className="glass-button--touch"
             >
-              CLOSE ✕
+              <CloseMark />
             </GlassButton>
           </div>
 

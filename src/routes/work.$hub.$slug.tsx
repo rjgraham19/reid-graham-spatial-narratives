@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { ScrollFrameSequence } from "@/components/scroll-frame-sequence";
-import { BackChevron, glassButton, trackSheen } from "@/components/glass-button";
+import { BackChevron, CloseMark, glassButton, trackSheen } from "@/components/glass-button";
 import { LightboxVideo } from "@/components/lightbox-video";
 import { SwipeGallery } from "@/components/swipe-gallery";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
@@ -1530,10 +1530,11 @@ function ProjectPage() {
                 e.stopPropagation();
                 close();
               }}
-              className={glassButton({ touch: true })}
+              onMouseMove={trackSheen}
+              className={`lightbox-close ${glassButton({ touch: true, sheen: true })}`}
               aria-label="Close"
             >
-              CLOSE ✕
+              <CloseMark />
             </button>
           </div>
 

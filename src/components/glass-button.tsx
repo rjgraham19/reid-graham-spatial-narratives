@@ -39,6 +39,7 @@ export function GlassButton({
   type = "button",
   quiet = false,
   icon = false,
+  sheen = false,
   ...props
 }: {
   children: ReactNode;
@@ -47,9 +48,11 @@ export function GlassButton({
   quiet?: boolean;
   /** Square, for a single mark rather than a label. */
   icon?: boolean;
+  /** Cursor-following sheen on hover. Pair with `onMouseMove={trackSheen}`. */
+  sheen?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button type={type} className={glassButton({ quiet, icon, className })} {...props}>
+    <button type={type} className={glassButton({ quiet, icon, sheen, className })} {...props}>
       {children}
     </button>
   );

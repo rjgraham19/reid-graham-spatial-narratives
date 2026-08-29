@@ -1,5 +1,5 @@
 import { Component, Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { glassButton, CloseMark } from "@/components/glass-button";
+import { glassButton, CloseMark, trackSheen } from "@/components/glass-button";
 import resumeMetaJson from "@/lib/resume-meta.json";
 
 export type ResumeMeta = { updatedAt: string | null; originalFilename: string | null };
@@ -204,7 +204,12 @@ export function ResumeSection() {
               e.stopPropagation();
               close();
             }}
-            className={glassButton({ touch: true, className: "fixed top-4 right-4 md:top-6 md:right-6 z-[110]" })}
+            onMouseMove={trackSheen}
+            className={glassButton({
+              touch: true,
+              sheen: true,
+              className: "fixed top-4 right-4 md:top-6 md:right-6 z-[110]",
+            })}
             aria-label="Close resume"
           >
             <CloseMark />

@@ -853,6 +853,17 @@
   --sheen-strength: 46%;
 }
 
+/* The close (✕) controls that live inside a project's own scope — the inset
+   panel's corner close, and the image lightbox's close — light their sheen in
+   that project's accent on hover, the same as the hub-tag pill. `--accent-color`
+   is set on the panel/lightbox root from the project's `accentColor`; a project
+   with none falls back to the site accent. */
+.panel-close.glass-button--sheen,
+.lightbox-close.glass-button--sheen {
+  --sheen-color: var(--accent-color, var(--color-accent));
+  --sheen-strength: 44%;
+}
+
 /* Cursor sheen — a soft light-grey highlight that follows the pointer across
    the glass, the way a real pane catches a light source as you move past it.
    Opt-in via `glassButton({ sheen: true })`; the caller feeds it the cursor

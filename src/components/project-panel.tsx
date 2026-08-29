@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { CloseMark, GlassButton } from "./glass-button";
+import { CloseMark, GlassButton, trackSheen } from "./glass-button";
 
 /**
  * How long the panel takes to fade out before unmounting.
@@ -285,6 +285,8 @@ export function ProjectPanel({
       {!viewerOpen && (
         <GlassButton
           icon
+          sheen
+          onMouseMove={trackSheen}
           onClick={requestClose}
           aria-label="Close project"
           className="panel-close absolute z-10"
