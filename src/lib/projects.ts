@@ -371,7 +371,11 @@ export const PROJECTS: Project[] = [
     description:
       "The Wild West is honest — untamed and uncivilized. Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery. A suburban kitchen unravels as the wild west comes pouring in.",
     pullQuote:
-      "A suburban kitchen unravels as the wild west comes pouring in.",
+      "A 1980s suburban kitchen unravels as the wild west comes pouring in...",
+    dualityLines: [
+      "The Wild West is honest—untamed and uncivilized.",
+      "Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery.",
+    ],
     cover: trueWest,
     collage: [trueWestDet],
     media: [

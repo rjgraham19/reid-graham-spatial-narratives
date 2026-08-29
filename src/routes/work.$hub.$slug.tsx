@@ -740,9 +740,12 @@ function ProjectPage() {
       {!isPortraitHero && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
-          {/* Skipped on TaB, where the description already appears alongside
-              the closeup animation higher up the page. */}
-          {!isYctiwy && !isTab && !isAnneFrank && (
+          {/* Skipped on TaB (the description sits by the closeup animation
+              higher up) and on True West, where the two lines of the
+              description now run as the pull quotes flanking the image trio
+              below — printing it here as well just repeats them. Credits keep
+              their usual place on the right either way. */}
+          {!isYctiwy && !isTab && !isAnneFrank && !isTrueWest && (
             <RevealBlock>
               <p
                 data-design-id={designId.projectDescription(project.slug)}
@@ -768,7 +771,14 @@ function ProjectPage() {
 
       {/* Pull quote */}
       {project.pullQuote && (
-        <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
+        <section
+          className={`px-6 md:px-12 lg:px-16 ${
+            /* True West runs this straight into the image trio below it, so
+               the quote reads as their caption rather than a stranded line
+               with a screen of black under it. */
+            isTrueWest ? "pt-8 md:pt-10 pb-2 md:pb-3" : "py-8 md:py-10"
+          }`}
+        >
           <RevealBlock>
             <blockquote
               data-design-id={designId.projectPullQuote(project.slug)}
@@ -784,7 +794,7 @@ function ProjectPage() {
       {/* Special: True West — dual-world comparison + plan diagrams */}
       {isTrueWest && (
         <>
-          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
+          <section className="px-6 md:px-12 lg:px-16 pt-3 md:pt-4 pb-6 md:pb-8">
             <div className="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-3 md:gap-4">
               <figure className="group h-full animate-slide-from-left">
                 <button
@@ -843,18 +853,17 @@ function ProjectPage() {
             </div>
 
             {project.dualityLines && (
-              <div className="mt-8 md:mt-10 max-w-3xl space-y-3">
-                <p className="font-serif italic text-lg md:text-xl leading-relaxed text-foreground/90">
-                  {project.dualityLines[0]}
-                </p>
-                <p className="font-serif italic text-lg md:text-xl leading-relaxed text-foreground/90">
-                  {project.dualityLines[1]}
-                </p>
-              </div>
+              /* Second pull quote — same weight and size as the one above the
+                 image trio, sitting just under it and before the final
+                 diagram. */
+              <blockquote className="mt-10 md:mt-12 max-w-4xl space-y-2 font-display font-light text-2xl md:text-4xl leading-snug text-balance">
+                <span className="block">{project.dualityLines[0]}</span>
+                <span className="block">{project.dualityLines[1]}</span>
+              </blockquote>
             )}
           </section>
 
-          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
+          <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-8 md:pb-10">
             <figure className="group">
               <button
                 type="button"
