@@ -122,11 +122,6 @@
       "align": "right"
     }
   },
-  "project.lollapalooza.title": {
-    "base": {
-      "text": "\nLollapalooza"
-    }
-  },
   "project.lollapalooza.subtitle": {
     "base": {
       "text": "T-Mobile Club Magenta, Chicago, IL"
@@ -187,11 +182,6 @@
   "project.staging-aesthetics.media.0.caption": {
     "base": {
       "text": ""
-    }
-  },
-  "project.renderings.title": {
-    "base": {
-      "text": "RenderingsRenderings"
     }
   },
   "project.reshuffling-the-deck.subtitle": {
