@@ -544,6 +544,11 @@ export const PROJECTS: Project[] = [
     cover: stagingFull,
     media: [
       { type: "image", src: stagingFull, caption: "Physical model — day condition and night projection-mapped facade" },
+      // Physical-model video, sits in the gallery between the hero image and
+      // the closing still. Served from public/ like the other project videos
+      // (TaB, Lollapalooza); the gallery loop already renders `type: "video"`
+      // as a muted, looping, autoplaying clip.
+      { id: "staging-model-video", type: "video", src: "/staging-model.mp4" },
     ],
   },
 

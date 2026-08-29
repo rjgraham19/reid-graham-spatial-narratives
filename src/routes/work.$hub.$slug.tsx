@@ -6,6 +6,9 @@ import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { ScrollFrameSequence } from "@/components/scroll-frame-sequence";
 import { BackChevron, glassButton } from "@/components/glass-button";
+import { LightboxVideo } from "@/components/lightbox-video";
+import { SwipeGallery } from "@/components/swipe-gallery";
+import { FramerCarousel } from "@/components/ui/framer-carousel";
 
 /**
  * TaB can spin frames. The export intentionally kept only every other frame
@@ -735,7 +738,7 @@ function ProjectPage() {
       {/* Description + credits — skipped on portrait-hero pages, where both
           already appear in the column beside the hero. */}
       {!isPortraitHero && (
-      <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6 border-b border-border">
+      <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
           {/* Skipped on TaB, where the description already appears alongside
               the closeup animation higher up the page. */}
@@ -765,7 +768,7 @@ function ProjectPage() {
 
       {/* Pull quote */}
       {project.pullQuote && (
-        <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
+        <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
           <RevealBlock>
             <blockquote
               data-design-id={designId.projectPullQuote(project.slug)}
@@ -781,7 +784,7 @@ function ProjectPage() {
       {/* Special: True West — dual-world comparison + plan diagrams */}
       {isTrueWest && (
         <>
-          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
+          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
             <div className="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-3 md:gap-4">
               <figure className="group h-full animate-slide-from-left">
                 <button
@@ -851,7 +854,7 @@ function ProjectPage() {
             )}
           </section>
 
-          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10 border-b border-border">
+          <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
             <figure className="group">
               <button
                 type="button"
@@ -876,7 +879,7 @@ function ProjectPage() {
       {isStaging && (
         <>
           {project.video && (
-            <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-border">
+            <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
               <video
                 src={project.video.src}
                 poster={project.video.poster}
@@ -893,7 +896,7 @@ function ProjectPage() {
           )}
 
           {project.philosophyCards && (
-            <section className="px-6 md:px-12 lg:px-16 py-20 md:py-28 border-b border-border">
+            <section className="px-6 md:px-12 lg:px-16 py-20 md:py-28">
               <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
                 Time / Space
               </p>
@@ -1254,85 +1257,150 @@ function ProjectPage() {
 
       {/* Lollapalooza — Technical Drafting Package. CAA's construction
           drawings for the build, directly above the event-photo row below.
-          White backgrounds throughout, unlike the photos — cropping one
-          would cut a dimension string or a title block off, so these stay
-          `object-contain` at all times (not just on hover). The source
-          sheets are all landscape (roughly 1.3–1.6 : 1), so each card is a
-          wide `aspect-[3/2]` rectangle rather than a tall box — that keeps
-          the drawing nearly filling its card instead of floating in a band
-          of empty space top and bottom. The row is six `flex-1` cards that
-          divide the full content width between them, so it reaches edge to
-          edge with no dead space on the right. On hover a card scales up in
-          place (same wide proportions) and lifts above its neighbours with
-          `z-20`; it's fine for it to overlap the cards beside it. */}
+
+          One sheet at a time on every screen — the drawings carry too much
+          fine detail to survive being shown six-across. Desktop gets a
+          spring-slide carousel with arrows + progress pills; mobile a plain
+          swipe carousel. Both put each sheet whole on a white card
+          (`object-contain`, fixed frame height) so nothing crops a dimension
+          string or title block, and tapping a sheet opens the shared
+          lightbox. */}
       {isLollapalooza && lollapaloozaDraftingMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pt-12">
           <h2 className="font-display font-light text-2xl md:text-4xl mb-6">
             Technical Drafting Package
           </h2>
-          <div className="flex items-center gap-2 w-full">
-            {lollapaloozaDraftingMedia.map(({ item: m, index: i }) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => setLightbox(i)}
-                aria-label={m.caption ?? "Drafting sheet"}
-                className="relative group flex-1 min-w-0 rounded-2xl overflow-hidden aspect-[3/2] bg-white border border-black/10 p-2 transition-transform duration-500 ease-out hover:z-20 hover:scale-[1.8] focus-visible:z-20 focus-visible:scale-[1.8]"
-              >
-                <img
-                  data-design-id={designId.projectMedia(project.slug, m.id!)}
-                  data-design-kind="image"
-                  src={m.src}
-                  alt={m.caption ?? project.title}
-                  loading="lazy"
-                  className="h-full w-full object-contain object-center"
-                />
-              </button>
-            ))}
+
+          <div className="md:hidden">
+            <SwipeGallery
+              slug={project.slug}
+              items={lollapaloozaDraftingMedia}
+              onOpen={setLightbox}
+              slideClassName="rounded-xl bg-white p-2"
+            />
+          </div>
+
+          <div className="hidden md:block">
+            <FramerCarousel
+              className="mx-auto max-w-[1120px]"
+              count={lollapaloozaDraftingMedia.length}
+              renderSlide={(i, ctrl) => {
+                const { item: m, index } = lollapaloozaDraftingMedia[i];
+                return (
+                  /* The white sheet wraps only the drawing (plus a thin
+                     mount) and sits centred, so the page's black shows down
+                     both sides. The arrows are anchored to the card itself
+                     (`right-full` / `left-full`), so they sit just off its
+                     edges whatever the sheet's proportions. */
+                  <div className="flex w-full justify-center py-8">
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setLightbox(index)}
+                        aria-label={m.caption ?? "Drafting sheet"}
+                        className="block rounded-xl bg-white p-3 shadow-lg transition-transform duration-300 hover:scale-[1.01]"
+                      >
+                        <img
+                          data-design-id={designId.projectMedia(project.slug, m.id!)}
+                          data-design-kind="image"
+                          src={m.src}
+                          alt={m.caption ?? project.title}
+                          loading="lazy"
+                          className="block max-h-[74vh] w-auto max-w-[min(1040px,86vw)] object-contain"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={ctrl.goPrev}
+                        disabled={ctrl.isFirst}
+                        aria-label="Previous"
+                        className="nav-arrow absolute right-full top-1/2 mr-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        onClick={ctrl.goNext}
+                        disabled={ctrl.isLast}
+                        aria-label="Next"
+                        className="nav-arrow absolute left-full top-1/2 ml-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </div>
+                );
+              }}
+            />
           </div>
         </section>
       )}
 
-      {/* Lollapalooza — closing beat. A hover-to-expand row of real event
-          photography. Opens in the same lightbox as every other image on
-          the page — same single-image view, same caption placement
-          underneath — since these are ordinary `project.media` entries
-          under the hood, just excluded from the standard grid above. */}
+      {/* Lollapalooza — closing beat. Real event photography from Club
+          Magenta, shown one at a time: the spring-slide carousel on desktop,
+          the plain swipe carousel on mobile — matching the drafting package
+          above. Mixed portrait/landscape, each at its own aspect ratio and
+          centred so the page's black frames it. Every frame opens in the
+          shared lightbox — ordinary `project.media` entries, just excluded
+          from the standard grid. */}
       {isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pb-12">
-          <div className="flex items-center gap-2 h-[400px] w-full">
-            {lollapaloozaGalleryMedia.map(({ item: m, index: i }) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => setLightbox(i)}
-                aria-label={m.caption ?? `Gallery image`}
-                /* Grows via `transform: scale`, not by taking width away from
-                   its neighbors — a layout-based grow (the flex-basis this
-                   used before) pushed the row around, and for a portrait
-                   photo boxed to this row's fixed height, "wider" never
-                   actually read as "bigger." Scaling instead pops the tile
-                   up over its neighbors, so it visibly enlarges regardless
-                   of the source photo's own proportions. `z-20` lifts it
-                   above the rest of the row while hovered/focused. */
-                className="relative group w-56 shrink-0 rounded-lg overflow-hidden h-[400px] bg-secondary transition-transform duration-500 ease-out hover:z-20 hover:scale-150 focus-visible:z-20 focus-visible:scale-150"
-              >
-                {/* Cropped to fill the square at rest — these are mixed
-                    portrait/landscape source photos, and `object-cover`
-                    is what makes an uneven row of them read as one strip.
-                    On hover it switches to `object-contain`, so the scaled-up
-                    tile shows the complete photo at its own proportions
-                    instead of a bigger crop of the same square. */}
-                <img
-                  data-design-id={designId.projectMedia(project.slug, m.id!)}
-                  data-design-kind="image"
-                  src={m.src}
-                  alt={m.caption ?? project.title}
-                  loading="lazy"
-                  className="h-full w-full object-cover object-center group-hover:object-contain"
-                />
-              </button>
-            ))}
+          <div className="md:hidden">
+            <SwipeGallery
+              slug={project.slug}
+              items={lollapaloozaGalleryMedia}
+              onOpen={setLightbox}
+              slideClassName="rounded-lg overflow-hidden bg-secondary"
+            />
+          </div>
+
+          <div className="hidden md:block">
+            <FramerCarousel
+              className="mx-auto max-w-[1120px]"
+              count={lollapaloozaGalleryMedia.length}
+              renderSlide={(i, ctrl) => {
+                const { item: m, index } = lollapaloozaGalleryMedia[i];
+                return (
+                  <div className="flex w-full justify-center py-8">
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setLightbox(index)}
+                        aria-label={m.caption ?? "Event photo"}
+                        className="block overflow-hidden rounded-lg bg-secondary shadow-lg transition-transform duration-300 hover:scale-[1.01]"
+                      >
+                        <img
+                          data-design-id={designId.projectMedia(project.slug, m.id!)}
+                          data-design-kind="image"
+                          src={m.src}
+                          alt={m.caption ?? project.title}
+                          loading="lazy"
+                          className="block max-h-[74vh] w-auto max-w-[min(1040px,86vw)] object-contain"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={ctrl.goPrev}
+                        disabled={ctrl.isFirst}
+                        aria-label="Previous"
+                        className="nav-arrow absolute right-full top-1/2 mr-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        onClick={ctrl.goNext}
+                        disabled={ctrl.isLast}
+                        aria-label="Next"
+                        className="nav-arrow absolute left-full top-1/2 ml-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </div>
+                );
+              }}
+            />
           </div>
         </section>
       )}
@@ -1368,7 +1436,7 @@ function ProjectPage() {
           not to a window floating over it. In the panel the project simply
           ends with its last section. */}
       {!panel && (
-      <section className="border-t border-border px-6 md:px-12 lg:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="px-6 md:px-12 lg:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
         {project.tags && project.tags.length > 0 ? (
           <Link
             to="/work"
@@ -1459,18 +1527,14 @@ function ProjectPage() {
             onTouchEnd={onTouchEnd}
           >
             {project.media[lightbox].type === "video" ? (
-              /* Enlarged video: autoplays, loops, no controls — it reads as a
-                 moving image rather than a video player, same as inline. */
-              <video
-                key={project.media[lightbox].src}
+              /* Enlarged video: gains a minimal, auto-hiding play/pause +
+                 scrub bar here — the one place a project video is a player
+                 rather than a moving image. Clicking it toggles play/pause,
+                 so closing is via the ✕ or the dark margin. */
+              <LightboxVideo
                 src={project.media[lightbox].src}
-                autoPlay
-                loop
-                muted
-                playsInline
-                onClick={close}
-                style={{ transform: `scale(${zoom})`, transition: pinchStart.current ? "none" : "transform 120ms ease-out" }}
-                className="max-h-full max-w-full object-contain cursor-zoom-out select-none"
+                zoom={zoom}
+                animateZoom={!pinchStart.current}
               />
             ) : (
               <img
