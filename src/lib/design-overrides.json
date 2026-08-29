@@ -6,7 +6,10 @@
   },
   "project.you-cant-take-it-with-you.media.drawing": {
     "desktop": {
-      "layoutShiftY": -153
+      "layoutShiftY": -198
+    },
+    "mobile": {
+      "layoutShiftY": -68
     }
   },
   "project.you-cant-take-it-with-you.media.drawing.caption": {
@@ -19,20 +22,32 @@
       "text": "Reid Graham"
     },
     "desktop": {
-      "offsetX": 158,
-      "offsetY": -77
+      "offsetX": 7,
+      "offsetY": -81,
+      "align": "right"
+    },
+    "mobile": {
+      "align": "right",
+      "offsetX": 8.807054300170874,
+      "offsetY": -87
     }
   },
   "project.you-cant-take-it-with-you.credit.technical-director": {
     "desktop": {
-      "offsetX": 160,
-      "offsetY": -44
+      "offsetX": 7,
+      "offsetY": -44,
+      "align": "right"
+    },
+    "mobile": {
+      "align": "right",
+      "offsetX": 8,
+      "offsetY": -55
     }
   },
   "home.branding": {
     "mobile": {
       "offsetX": 0,
-      "offsetY": -128
+      "offsetY": -159
     },
     "desktop": {
       "offsetX": 0,
@@ -41,26 +56,30 @@
   },
   "project.true-west.credit.scenic-designer": {
     "desktop": {
-      "offsetX": 122,
-      "offsetY": -66
+      "offsetX": -3,
+      "offsetY": -66,
+      "align": "right"
     }
   },
   "project.true-west.credit.technical-director": {
     "desktop": {
-      "offsetX": 124,
-      "offsetY": -32
+      "offsetX": -4,
+      "offsetY": -32,
+      "align": "right"
     }
   },
   "project.the-diary-of-anne-frank.credit.scenic-designer": {
     "desktop": {
       "offsetX": 0,
-      "offsetY": -12
+      "offsetY": -74,
+      "align": "right"
     }
   },
   "project.the-diary-of-anne-frank.credit.technical-director": {
     "desktop": {
       "offsetX": 0,
-      "offsetY": -24
+      "offsetY": -37,
+      "align": "right"
     }
   },
   "project.reshuffling-the-deck.media.2.caption": {
@@ -76,7 +95,7 @@
   },
   "project.true-west.media.0": {
     "desktop": {
-      "layoutShiftY": 131
+      "layoutShiftY": 150
     }
   },
   "project.you-cant-take-it-with-you.media.full": {
@@ -86,14 +105,21 @@
   },
   "project.you-cant-take-it-with-you.credit.director": {
     "desktop": {
-      "offsetX": 159,
-      "offsetY": 16
+      "offsetX": 7,
+      "offsetY": 15,
+      "align": "right"
+    },
+    "mobile": {
+      "align": "right",
+      "offsetX": 7.66666,
+      "offsetY": 7
     }
   },
   "project.true-west.credit.director": {
     "desktop": {
-      "offsetX": 123,
-      "offsetY": 28
+      "offsetX": -4,
+      "offsetY": 28,
+      "align": "right"
     }
   },
   "project.lollapalooza.title": {
@@ -106,8 +132,8 @@
       "text": "T-Mobile Club Magenta, Chicago, IL"
     },
     "desktop": {
-      "offsetX": 0,
-      "offsetY": -15.999984741210938
+      "offsetX": 4,
+      "offsetY": -4.9999847412109375
     },
     "mobile": {
       "offsetX": 0,
@@ -122,6 +148,13 @@
   "project.lollapalooza.description": {
     "base": {
       "text": "A giant CD player channels the early-2000s as an oversized photo backdrop for festivalgoers, with a spinning translucent magenta compact disc. At night, its chrome and brushed aluminum finishes pop against the glowing crescent moon inside the flip-open lid."
+    },
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": -62
+    },
+    "desktop": {
+      "align": "left"
     }
   },
   "project.field-house.description": {
@@ -181,7 +214,7 @@
     },
     "mobile": {
       "offsetX": 0,
-      "offsetY": -16.00000762939453
+      "offsetY": -13.000007629394531
     }
   },
   "project.the-diary-of-anne-frank.subtitle": {
@@ -211,7 +244,7 @@
     },
     "mobile": {
       "offsetX": 0,
-      "offsetY": -16.00000762939453
+      "offsetY": -14.000007629394531
     }
   },
   "project.field-house.subtitle": {
@@ -231,7 +264,7 @@
     },
     "mobile": {
       "offsetX": 0,
-      "offsetY": -16.000003814697266
+      "offsetY": -0.9999809265136719
     }
   },
   "project.the-exchange-facility.subtitle": {
@@ -247,17 +280,11 @@
   "project.staging-aesthetics.subtitle": {
     "desktop": {
       "offsetX": 0,
-      "offsetY": -16
+      "offsetY": -13
     },
     "mobile": {
       "offsetX": 0,
       "offsetY": -16.00000762939453
-    }
-  },
-  "project.staging-aesthetics.note.0": {
-    "base": {
-      "text": "",
-      "hidden": true
     }
   },
   "project.staging-aesthetics.description": {
@@ -265,9 +292,10 @@
       "text": "Projecting National Culture, The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. This interactive installation utilizes animation software, projection mapping technology, and spatialized audio design to explore various alternative facades for the building, immersing viewers in the political stakes of architectural aesthetics."
     },
     "desktop": {
-      "fontSize": 14,
-      "offsetX": -3,
-      "offsetY": 54
+      "fontSize": 20,
+      "offsetX": -9,
+      "offsetY": 352,
+      "align": "left"
     }
   },
   "project.reshuffling-the-deck.media.0": {
@@ -278,7 +306,7 @@
   "project.reshuffling-the-deck.credit.thesis-director": {
     "desktop": {
       "offsetX": -1,
-      "offsetY": 3
+      "offsetY": 2
     }
   },
   "project.reshuffling-the-deck.credit.production-designer-scenic-painter": {
@@ -290,7 +318,7 @@
   "project.reshuffling-the-deck.description": {
     "desktop": {
       "offsetX": 4,
-      "offsetY": -748,
+      "offsetY": -761,
       "align": "left",
       "fontSize": 18
     }
@@ -313,11 +341,103 @@
   "project.staging-aesthetics.media.0": {
     "base": {
       "hidden": true
+    },
+    "desktop": {
+      "offsetX": -64,
+      "offsetY": -142,
+      "widthPct": 100
     }
   },
   "project.staging-aesthetics.media.media-mt3ipvcu-itx0k": {
     "desktop": {
       "layoutShiftY": -137
+    }
+  },
+  "project.you-cant-take-it-with-you.title": {
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": 3
+    }
+  },
+  "project.you-cant-take-it-with-you.media.sketch": {
+    "mobile": {
+      "layoutShiftY": -22
+    }
+  },
+  "project.true-west.pull-quote": {
+    "desktop": {
+      "offsetX": -18,
+      "offsetY": 665,
+      "align": "center"
+    }
+  },
+  "project.the-diary-of-anne-frank.credit.director": {
+    "desktop": {
+      "align": "right",
+      "offsetX": 0,
+      "offsetY": 21
+    }
+  },
+  "project.the-diary-of-anne-frank.media.1": {
+    "desktop": {
+      "layoutShiftY": 0
+    }
+  },
+  "project.the-diary-of-anne-frank.description": {
+    "desktop": {
+      "offsetX": 0.0000152587890625,
+      "offsetY": -76,
+      "align": "right"
+    }
+  },
+  "project.the-diary-of-anne-frank.media.2": {
+    "desktop": {
+      "layoutShiftY": 237
+    }
+  },
+  "project.tab-renaissance.media.0": {
+    "base": {
+      "hidden": true
+    },
+    "desktop": {
+      "layoutShiftY": -379
+    }
+  },
+  "project.tab-renaissance.description": {
+    "base": {
+      "text": "An immersive, experiential design for Taubman College’s annual Beaux-Arts Ball,\n\nreimagining the Renaissance as a timeless expression of creative transformation and continual innovation."
+    }
+  },
+  "project.townhouse.description": {
+    "base": {
+      "text": "Inspired by W.G. Clark and Charles Menefee’s Croffead House, this residential design creates portals of varying material transparency—from solid concrete to translucent glass block to transparent glass—in an exploration of public versus private space within the domestic footprint."
+    },
+    "desktop": {
+      "offsetX": -11,
+      "offsetY": 179
+    }
+  },
+  "project.townhouse.media.0": {
+    "desktop": {
+      "widthPct": 66,
+      "offsetX": 2,
+      "layoutShiftY": 150,
+      "offsetY": -10,
+      "align": "right"
+    },
+    "mobile": {
+      "layoutShiftY": -10
+    }
+  },
+  "project.townhouse.title": {
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": 13
+    }
+  },
+  "project.lollapalooza.media.gallery-1": {
+    "desktop": {
+      "layoutShiftY": 114
     }
   }
 }

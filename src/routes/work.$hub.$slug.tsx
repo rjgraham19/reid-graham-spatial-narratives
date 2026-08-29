@@ -1209,9 +1209,8 @@ function ProjectPage() {
                 <figure
                   key={m.id}
                   className={`group ${isHalf ? "md:col-span-1" : "md:col-span-2"} ${
-                    isStaging ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"} animate-twitch` : ""
+                    isStaging ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"}` : ""
                   }`}
-                  style={isStaging ? { animationDelay: `${i * 0.9}s` } : undefined}
                 >
                   {/* A link makes the media clickable to navigate instead of
                       opening the lightbox — never both, since an anchor

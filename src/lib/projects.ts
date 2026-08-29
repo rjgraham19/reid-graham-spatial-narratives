@@ -539,7 +539,6 @@ export const PROJECTS: Project[] = [
     subtitle: "Projecting the Politics of Time + Space",
     mood: "theatrical",
     weight: "right",
-    notes: ["Honorable Mention, Wallenberg Foundation Awards"],
     description:
       "Projecting National Culture, The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. This interactive installation utilizes animation software, projection mapping technology, and spatialized audio design to explore various alternative facades for the building, immersing viewers in the political stakes of architectural aesthetics.",
     cover: stagingFull,

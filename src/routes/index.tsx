@@ -78,21 +78,25 @@ function Home() {
         </div>
 
         {/* RIGHT — phone booth, clickable easter-egg → /contact */}
-        <div className="relative order-first md:order-last min-h-[56svh] md:min-h-[100svh]">
+        <div className="relative order-first md:order-last min-h-[56svh] md:min-h-[100svh] overflow-hidden">
+          <img
+            src={HERO_URL}
+            alt="Payphone booth in an overgrown, neon-lit environment — pick up to reach Reid"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Ambient darken toward the split line */}
+          <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-background via-background/40 to-transparent hidden md:block" />
+          <div className="absolute inset-0 md:hidden bg-background/50" />
+          {/* Hit target scoped to the payphone itself. The image is a wide crop
+              whose left half is the lit portal and jungle — a full-bleed link
+              there meant every tap on that empty scenery navigated to /contact.
+              These insets track the phone unit and its post across both the
+              mobile (more horizontal crop) and desktop columns. */}
           <Link
             to="/contact"
             aria-label="Contact — pick up the phone"
-            className="absolute inset-0 block overflow-hidden"
-          >
-            <img
-              src={HERO_URL}
-              alt="Payphone booth in an overgrown, neon-lit environment — pick up to reach Reid"
-              className="w-full h-full object-cover"
-            />
-            {/* Ambient darken toward the split line */}
-            <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-background via-background/40 to-transparent hidden md:block" />
-            <div className="absolute inset-0 md:hidden bg-background/50" />
-          </Link>
+            className="absolute left-[56%] right-[6%] top-[28%] bottom-[8%] block"
+          />
         </div>
       </div>
     </div>
