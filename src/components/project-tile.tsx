@@ -89,8 +89,17 @@ export function ProjectTile({
               gaps come out level. */}
           <div className="absolute bottom-2.5 left-1.5 right-3 md:bottom-3 md:left-1.5 md:right-4">
             {/* No transition-colors here — the scale and the colour share one
-                transition in .project-title so they can't drift apart. */}
-            <h2 className="project-title font-display font-black uppercase tracking-tight text-base sm:text-xl md:text-2xl lg:text-3xl leading-[0.95] text-balance text-foreground line-clamp-3">
+                transition in .project-title so they can't drift apart.
+
+                One flat size from the sm breakpoint up (was a ramp to
+                text-3xl): the grid narrows the tile as it adds columns, so a
+                size that looked right at three columns overflowed a ~185px
+                title box at four and five, and line-clamp's overflow:hidden
+                clipped the longest single words — "Lollapalooza",
+                "Reshuffling" — rather than wrapping. 1.35rem clears every
+                column count with room to spare; overflow-wrap:anywhere is the
+                last-ditch floor so nothing is ever cut, only wrapped. */}
+            <h2 className="project-title font-display font-black uppercase tracking-tight text-base sm:text-[1.4rem] leading-[0.95] text-balance text-foreground line-clamp-3 [overflow-wrap:anywhere]">
               {project.title}
             </h2>
           </div>

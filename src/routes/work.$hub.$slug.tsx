@@ -448,7 +448,8 @@ function ProjectPage() {
             <div data-design-id={designId.projectTitle(project.slug)} data-design-kind="heading">
               <AnimatedHeading
                 text={project.title}
-                className="font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-[clamp(2.25rem,8vw,4.75rem)] lg:text-[clamp(3rem,8.5vw,6rem)] text-balance max-w-5xl"
+                fit
+                className="project-hero-title font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-balance max-w-5xl"
               />
             </div>
 

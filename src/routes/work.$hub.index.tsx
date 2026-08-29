@@ -53,7 +53,10 @@ function HubPage() {
 
       {/* Header + grid — mirrors the /work feed so the two read consistently */}
       <section className="px-6 md:px-12 lg:px-16 pt-32 md:pt-40 pb-16 md:pb-24">
-        <h1 className="font-display font-black uppercase tracking-tight text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-foreground mb-8 md:mb-10">
+        {/* clamp on the phone end so a long one-word hub name ("Visualizations")
+            scales with the screen instead of running under the clipped edge;
+            overflow-wrap is the last-ditch guard if it still can't fit. */}
+        <h1 className="font-display font-black uppercase tracking-tight text-[clamp(1.9rem,6.5vw,3rem)] md:text-7xl lg:text-8xl leading-[0.9] text-foreground mb-8 md:mb-10 [overflow-wrap:anywhere]">
           {hub.title}
         </h1>
 

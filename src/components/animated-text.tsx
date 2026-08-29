@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type CSSProperties, type ReactNode } from "react";
+import { useFitText } from "@/hooks/use-fit-text";
 
 /**
  * Per-letter reveal for standout headline moments only (project titles).
@@ -16,10 +17,19 @@ export function AnimatedHeading({
   text,
   className,
   as: Tag = "h1",
+  fit = false,
 }: {
   text: string;
   className?: string;
   as?: "h1" | "h2";
+  /**
+   * When true, the heading trims its own font size if it would overflow its
+   * container's width — so a long single word ("Renaissance", "Lollapalooza")
+   * can never be clipped at any viewport, zoom, or device-pixel ratio. Pair
+   * with a font size expressed as `calc(<clamp> * var(--fit-scale, 1))`
+   * (see `.project-hero-title` in styles.css).
+   */
+  fit?: boolean;
 }) {
   // Precompute each word's starting letter index so the stagger stays
   // continuous across the title instead of restarting on every word.
@@ -31,8 +41,15 @@ export function AnimatedHeading({
     return { word, offset };
   });
 
+  const { ref, scale } = useFitText<HTMLHeadingElement>([text, fit]);
+
   return (
-    <Tag className={className} aria-label={text}>
+    <Tag
+      ref={fit ? ref : undefined}
+      className={className}
+      style={fit ? ({ "--fit-scale": scale } as CSSProperties) : undefined}
+      aria-label={text}
+    >
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">
         {wordsWithOffset.map(({ word, offset }, wordIndex) => (

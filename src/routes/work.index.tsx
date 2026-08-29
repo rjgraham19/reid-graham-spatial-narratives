@@ -129,7 +129,7 @@ function ProjectsPage() {
       <SiteNav variant={canPanel && open ? "top-transparent" : "top"} />
 
       <section className="px-6 md:px-12 lg:px-16 pt-32 md:pt-40 pb-16 md:pb-24">
-        <h1 className="font-display font-black uppercase tracking-tight text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-foreground mb-8 md:mb-10">
+        <h1 className="font-display font-black uppercase tracking-tight text-[clamp(1.9rem,6.5vw,3rem)] md:text-7xl lg:text-8xl leading-[0.9] text-foreground mb-8 md:mb-10 [overflow-wrap:anywhere]">
           Projects
         </h1>
 

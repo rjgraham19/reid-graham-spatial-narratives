@@ -669,7 +669,11 @@
     color 900ms var(--ease-cinematic);
 }
 .group:hover .project-title {
-  transform: translateY(-0.25em) scale(1.06);
+  /* 1.035, down from 1.06: on the tightest grid (five columns, a ~186px title
+     box) the old stretch pushed a long single word — "Lollapalooza" — past
+     the tile's clipped edge on hover. The lift still carries the response;
+     the width nudge just no longer overflows. */
+  transform: translateY(-0.25em) scale(1.035);
   color: var(--project-accent, var(--color-accent));
 }
 
@@ -680,6 +684,23 @@
   }
   .group:hover .project-title {
     transform: none;
+  }
+}
+
+/* The big project-page title. Size is the responsive clamp multiplied by
+   `--fit-scale`, a number AnimatedHeading (with `fit`) drives down from 1 only
+   when the title — a single unbreakable word at worst — would otherwise spill
+   its padded column at some width, zoom, or device-pixel ratio. At scale 1
+   this is just the clamp, which is what the server renders and what a
+   no-JS reader gets; the `vw` terms are a touch gentler than the old inline
+   values so that baseline already fits in almost every case.
+
+   Because it trims the real font size (not a transform), the heading's box
+   shrinks with it — no phantom gap opens under a scaled-down title. */
+@utility project-hero-title {
+  font-size: calc(clamp(2.25rem, 7.4vw, 4.75rem) * var(--fit-scale, 1));
+  @media (min-width: 1024px) {
+    font-size: calc(clamp(3rem, 7.6vw, 6rem) * var(--fit-scale, 1));
   }
 }
 
