@@ -148,14 +148,23 @@ function ProjectsPage() {
         {projects.length === 0 ? (
           <p className="text-foreground/60">No projects match this filter yet.</p>
         ) : (
-          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-            {projects.map((p) => (
+          /* Keyed on the active filter so switching disciplines remounts the
+             whole list — that's what replays the staggered tile entrance for
+             each new set. It deliberately does NOT depend on `project`, so
+             opening or closing a project panel leaves the grid mounted and
+             still. */
+          <ul
+            key={tag ?? "all"}
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
+          >
+            {projects.map((p, i) => (
               /* onOpen only on a wide screen. Without it the tile stays the
                  plain link it renders as, so a tap goes straight to the full
-                 project page. */
+                 project page. `appearIndex` drives the left-to-right fade-in. */
               <ProjectTile
                 key={p.slug}
                 project={p}
+                appearIndex={i}
                 onOpen={canPanel ? openProject : undefined}
               />
             ))}
@@ -206,7 +215,21 @@ function FilterPill({
     <Link
       to="/work"
       search={to}
-      className={glassButton({ quiet: true, touch: true, className: active ? "is-active" : "" })}
+      className={glassButton({
+        quiet: true,
+        touch: true,
+        sheen: true,
+        className: active ? "is-active" : "",
+      })}
+      /* Feed the cursor position to the sheen layer as percentages. Cheap —
+         two custom-property writes, no React state, no re-render. Skipped on
+         coarse pointers, where there's no cursor to follow. */
+      onMouseMove={(e) => {
+        const el = e.currentTarget;
+        const r = el.getBoundingClientRect();
+        el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+        el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+      }}
     >
       {label}
     </Link>

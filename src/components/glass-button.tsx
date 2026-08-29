@@ -1,4 +1,19 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
+
+/**
+ * Pointer tracker for the cursor sheen (`glassButton({ sheen: true })` /
+ * `.glass-button--sheen`). Drop it on the element as `onMouseMove={trackSheen}`
+ * and it writes the cursor position to `--mx` / `--my` as percentages, which
+ * the `::after` highlight follows. Pure DOM writes — no state, no re-render —
+ * and it no-ops harmlessly on coarse pointers, where the CSS falls back to a
+ * static glow.
+ */
+export function trackSheen(e: MouseEvent<HTMLElement>) {
+  const el = e.currentTarget;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+  el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+}
 
 /**
  * A small glass tile, for controls that sit on top of a page rather than in
@@ -78,13 +93,23 @@ export function glassButton({
   quiet = false,
   touch = false,
   icon = false,
+  sheen = false,
   className = "",
-}: { quiet?: boolean; touch?: boolean; icon?: boolean; className?: string } = {}) {
+}: {
+  quiet?: boolean;
+  touch?: boolean;
+  icon?: boolean;
+  /** Adds the cursor-following light-grey sheen (see `.glass-button--sheen`).
+   *  The caller must feed pointer position as `--mx` / `--my` on mouse move. */
+  sheen?: boolean;
+  className?: string;
+} = {}) {
   return [
     "glass-button",
     quiet ? "glass-button--quiet" : "",
     touch ? "glass-button--touch" : "",
     icon ? "glass-button--icon" : "",
+    sheen ? "glass-button--sheen" : "",
     className,
   ]
     .filter(Boolean)

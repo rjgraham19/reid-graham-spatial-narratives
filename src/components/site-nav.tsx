@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { GlassButton, glassButton } from "./glass-button";
+import { GlassButton, glassButton, trackSheen } from "./glass-button";
 
 /** Everything the nav offers, in one place, so the desktop bar and the phone
  *  overlay can't drift apart. `sub` items are the discipline filters that hang
@@ -101,9 +101,12 @@ export function SiteNav({
           <li className="relative group">
             <Link
               to="/work"
-              activeProps={{ className: glassButton({ quiet: true, className: "is-active" }) }}
+              activeProps={{
+                className: glassButton({ quiet: true, sheen: true, className: "is-active" }),
+              }}
               activeOptions={{ exact: false }}
-              className={glassButton({ quiet: true })}
+              onMouseMove={trackSheen}
+              className={glassButton({ quiet: true, sheen: true })}
             >
               PROJECTS
             </Link>
@@ -122,7 +125,12 @@ export function SiteNav({
                     <Link
                       to="/work"
                       search={{ tag: p.tag }}
-                      className={glassButton({ quiet: true, className: "w-full justify-center" })}
+                      onMouseMove={trackSheen}
+                      className={glassButton({
+                        quiet: true,
+                        sheen: true,
+                        className: "w-full justify-center",
+                      })}
                     >
                       {p.label}
                     </Link>
@@ -135,8 +143,11 @@ export function SiteNav({
             <Link
               to="/work/$hub"
               params={{ hub: "visualizations" }}
-              activeProps={{ className: glassButton({ quiet: true, className: "is-active" }) }}
-              className={glassButton({ quiet: true })}
+              activeProps={{
+                className: glassButton({ quiet: true, sheen: true, className: "is-active" }),
+              }}
+              onMouseMove={trackSheen}
+              className={glassButton({ quiet: true, sheen: true })}
             >
               VISUALIZATIONS
             </Link>
@@ -144,8 +155,11 @@ export function SiteNav({
           <li>
             <Link
               to="/contact"
-              activeProps={{ className: glassButton({ quiet: true, className: "is-active" }) }}
-              className={glassButton({ quiet: true })}
+              activeProps={{
+                className: glassButton({ quiet: true, sheen: true, className: "is-active" }),
+              }}
+              onMouseMove={trackSheen}
+              className={glassButton({ quiet: true, sheen: true })}
             >
               CONNECT
             </Link>
@@ -198,7 +212,12 @@ export function SiteNav({
                       <Link
                         to="/work"
                         search={{ tag: p.tag }}
-                        className={glassButton({ touch: true, className: "animate-title-lr" })}
+                        onMouseMove={trackSheen}
+                        className={glassButton({
+                          touch: true,
+                          sheen: true,
+                          className: "animate-title-lr",
+                        })}
                         style={{ animationDelay: `${0.08 + i * 0.06}s` }}
                       >
                         {p.label}

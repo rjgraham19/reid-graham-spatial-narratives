@@ -202,6 +202,36 @@
   opacity: 0;
 }
 
+/* Grid-tile entrance — the square project thumbnails on /work and the
+   Visualizations hub fade and lift in, each one delayed a little more than the
+   last so a grid resolves left-to-right, top-to-bottom in a quick run rather
+   than snapping in all at once.
+
+   Applied by ProjectTile only when the grid hands it an `appearIndex`; the
+   per-tile delay is set inline from that index (and capped there, so a large
+   filter like "All" still finishes fast). The /work feed remounts its <ul> on
+   a filter change, so the run replays each time a new set of squares comes in
+   — opening or closing a project doesn't remount it, so that never retriggers.
+
+   `both` fill so the first frame is already the hidden state: server-rendered
+   markup carries opacity:0, so there's no flash of the grid before it plays,
+   and no JS is needed for it to run. Opacity + translate only — it composites
+   on its own layer and never reflows the grid. */
+@keyframes tile-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@utility animate-tile-in {
+  animation: tile-in 0.42s var(--ease-cinematic) both;
+}
+/* Motion carries nothing essential here — the tiles are just as legible
+   arriving instantly — so a reduced-motion reader gets them with no move. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-tile-in {
+    animation: none;
+  }
+}
+
 /* Reference-style pill nav buttons */
 @utility pill {
   display: inline-flex;
@@ -804,20 +834,73 @@
 /* The hub tag above a project title — same glass surface as every other
    button, just a heavier outline so it still reads as clearly bordered
    sitting on its own above the big display type, where the standard
-   hairline is easy to lose. */
+   hairline is easy to lose.
+
+   The label stays white through every state (it inherits the plain
+   `.glass-button--quiet:hover` brighten). What carries this project's colour
+   is the sheen: it's a `.glass-button--sheen` whose highlight is mixed from
+   `--accent-color` instead of white, so hovering the tag lights it in that
+   project's own hue while the text is left alone. Colour reads weaker than
+   white, so the strength is lifted well above the neutral 18%. Falls back to
+   the site accent for a project with no accent of its own. */
 .hub-tag-pill {
   border-width: 1.5px;
-  transition: color 0.18s var(--ease-cinematic);
 }
-/* Unlike the other quiet glass buttons, whose label just brightens to white
-   on hover, this one takes the project's own accent — the same colour that
-   tints the overlay gradient and the Prev/Next arrows. Two classes plus the
-   state so it outranks `.glass-button--quiet:hover` regardless of order;
-   falls back to the site accent for a project with no accent of its own. */
-.hub-tag-pill.glass-button--quiet:hover,
-.hub-tag-pill.glass-button--quiet:focus-visible,
-.hub-tag-pill.glass-button--quiet.is-active {
-  color: var(--accent-color, var(--color-accent));
+/* Compound selector so these win over `.glass-button--sheen`'s own neutral
+   defaults regardless of source order. */
+.hub-tag-pill.glass-button--sheen {
+  --sheen-color: var(--accent-color, var(--color-accent));
+  --sheen-strength: 46%;
+}
+
+/* Cursor sheen — a soft light-grey highlight that follows the pointer across
+   the glass, the way a real pane catches a light source as you move past it.
+   Opt-in via `glassButton({ sheen: true })`; the caller feeds it the cursor
+   position as `--mx` / `--my` on pointer move (percentages). Off at rest, eased
+   in on hover/focus. Deliberately faint — 0.12 white over the dark glass — so
+   it never competes with the label sitting over it. Pointer-events none so the
+   layer never eats a click; `border-radius: inherit` + `overflow: hidden` keep
+   it inside the pane's corners. */
+.glass-button--sheen {
+  /* Sheen colour + strength as variables so the same effect can be neutral
+     (white, the default — for nav and filters) or carry a project's accent
+     (the hub-tag pill below). Strength is the color-mix amount, i.e. the peak
+     alpha of the highlight. */
+  --sheen-color: #ffffff;
+  --sheen-strength: 18%;
+  position: relative;
+  overflow: hidden;
+}
+.glass-button--sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    120px 120px at var(--mx, 50%) var(--my, 120%),
+    color-mix(in srgb, var(--sheen-color) var(--sheen-strength), transparent),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity 0.28s var(--ease-cinematic);
+}
+.glass-button--sheen:hover::after,
+.glass-button--sheen:focus-visible::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* The sheen tracks the cursor, so a reduced-motion reader gets a plain
+     static brighten from the bottom edge instead — the pane still responds,
+     it just doesn't chase the pointer. Keeps whatever colour it was given. */
+  .glass-button--sheen::after {
+    background: radial-gradient(
+      150px 150px at 50% 120%,
+      color-mix(in srgb, var(--sheen-color) var(--sheen-strength), transparent),
+      transparent 66%
+    );
+    transition: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

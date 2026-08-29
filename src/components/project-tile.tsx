@@ -12,6 +12,7 @@ import { accentTitleColor, type Project } from "@/lib/projects";
 export function ProjectTile({
   project,
   onOpen,
+  appearIndex,
 }: {
   project: Project;
   /**
@@ -25,22 +26,33 @@ export function ProjectTile({
    * as its own full page.
    */
   onOpen?: (project: Project) => void;
+  /**
+   * This tile's position in its grid. When set, the tile fades and lifts in on
+   * mount with a delay proportional to the index, so a grid resolves
+   * left-to-right, top-to-bottom in a quick run (see `animate-tile-in` in
+   * styles.css). The /work feed remounts the list on a filter change so it
+   * replays for each new set; omit it and the tile renders statically.
+   */
+  appearIndex?: number;
 }) {
+  /* The project's accent, from the same `accentColor` that tints its overlay —
+     used as given, except where it is too dark to read as a hover, which
+     accentTitleColor lifts. Set here so the title inherits it; left unset the
+     title falls through to the site accent, which is what it has always used.
+     The entrance delay rides on the same style object when the grid asked for
+     one — capped so a large filter ("All") still finishes quickly instead of
+     trailing a visible tail. */
+  const style = {
+    ...(project.accentColor
+      ? { "--project-accent": accentTitleColor(project.accentColor) }
+      : {}),
+    ...(appearIndex != null ? { animationDelay: `${Math.min(appearIndex, 12) * 35}ms` } : {}),
+  } as React.CSSProperties;
+
   return (
     <li
-      className="relative"
-      /* The project's accent, from the same `accentColor` that tints its
-         overlay — used as given, except where it is too dark to read as a
-         hover, which accentTitleColor lifts. Set here so the title inherits
-         it; left unset the title falls through to the site accent, which is
-         what it has always used. */
-      style={
-        project.accentColor
-          ? ({
-              "--project-accent": accentTitleColor(project.accentColor),
-            } as React.CSSProperties)
-          : undefined
-      }
+      className={appearIndex != null ? "relative animate-tile-in" : "relative"}
+      style={Object.keys(style).length ? style : undefined}
     >
       <Link
         to="/work/$hub/$slug"

@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { ScrollFrameSequence } from "@/components/scroll-frame-sequence";
-import { BackChevron, glassButton } from "@/components/glass-button";
+import { BackChevron, glassButton, trackSheen } from "@/components/glass-button";
 import { LightboxVideo } from "@/components/lightbox-video";
 import { SwipeGallery } from "@/components/swipe-gallery";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
@@ -424,7 +424,12 @@ function ProjectPage() {
                     to="/work"
                     search={{ tag: t }}
                     target={panel ? "_top" : undefined}
-                    className={`pointer-events-auto hub-tag-pill ${glassButton({ quiet: true, touch: true })}`}
+                    onMouseMove={trackSheen}
+                    className={`pointer-events-auto hub-tag-pill ${glassButton({
+                      quiet: true,
+                      touch: true,
+                      sheen: true,
+                    })}`}
                   >
                     {t.replace("/", " ")}
                   </Link>

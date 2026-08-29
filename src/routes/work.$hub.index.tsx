@@ -62,8 +62,8 @@ function HubPage() {
         </p>
 
         <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-          {projects.map((p: Project) => (
-            <ProjectTile key={p.slug} project={p} />
+          {projects.map((p: Project, i: number) => (
+            <ProjectTile key={p.slug} project={p} appearIndex={i} />
           ))}
         </ul>
       </section>
