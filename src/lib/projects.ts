@@ -339,7 +339,9 @@ export const PROJECTS: Project[] = [
     ],
   },
 
-  // ─── Production / Scenic (order per spec) ────────────────────────
+  // ─── /work grid order — hand-set. Mostly Production/Scenic first, then
+  //     Architecture, but Reid has swapped a few across that line for the grid
+  //     composition (Staging Aesthetics sits here; Anne Frank sits below). ──
   {
     slug: "you-cant-take-it-with-you",
     hub: "production-scenic",
@@ -399,29 +401,27 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    slug: "the-diary-of-anne-frank",
-    accentColor: "#d7d9e6",
-    hub: "production-scenic",
-    title: "The Diary of Anne Frank",
-    subtitle: "Deerfield Studio Theatre",
-    mood: "noir",
+    slug: "staging-aesthetics",
+    accentColor: "#b89bec",
+    heroTitleAbove: true,
+    heroPortrait: true,
+    highlight: hlStaging,
+    highlightPosition: "50% 55%",
+    hub: "architecture",
+    title: "Staging Aesthetics",
+    subtitle: "Projecting the Politics of Time + Space",
+    mood: "theatrical",
     weight: "right",
-    credits: [
-      { role: "Director", name: "Helen Crowley" },
-      { role: "Scenic Designer", name: "Reid Graham" },
-      { role: "Technical Director", name: "Michael Clack" },
-    ],
     description:
-      "The rawness of the space is conveyed through skeletal framing and deteriorating wood slatting. Reflecting historical reference to the original annex, the design pays tribute to Anne and her diary's enduring legacy.",
-    cover: anne,
-    collage: [anneDet],
-    // Order matters: the custom layout on this page addresses these by index.
+      "Projecting National Culture, The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. This interactive installation utilizes animation software, projection mapping technology, and spatialized audio design to explore various alternative facades for the building, immersing viewers in the political stakes of architectural aesthetics.",
+    cover: stagingFull,
     media: [
-      { type: "image", src: anne, caption: "Full attic set — skeletal framing over the annex" },
-      { type: "image", src: anneSketch, caption: "Conceptual sketch by Reid Graham" },
-      { type: "image", src: anneDet, caption: "Kitchen detail — stove, sink and stacked slatting" },
-      { type: "image", src: anneDrawingLeft, caption: "Section — skeletal framing and stair" },
-      { type: "image", src: anneDrawingRight, caption: "Ground plan" },
+      { type: "image", src: stagingFull, caption: "Physical model — day condition and night projection-mapped facade" },
+      // Physical-model video, sits in the gallery between the hero image and
+      // the closing still. Served from public/ like the other project videos
+      // (TaB, Lollapalooza); the gallery loop already renders `type: "video"`
+      // as a muted, looping, autoplaying clip.
+      { id: "staging-model-video", type: "video", src: "/staging-model.mp4" },
     ],
   },
   {
@@ -474,7 +474,7 @@ export const PROJECTS: Project[] = [
     ],
   },
 
-  // ─── Architecture (order per spec) ───────────────────────────────
+  // ─── Architecture (Anne Frank, Production/Scenic, is slotted in here) ────
   {
     slug: "field-house",
     accentColor: "#98A633",
@@ -504,25 +504,29 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    slug: "townhouse",
-    accentColor: "#3c9aab",
-    heroPortrait: true,
-    highlight: hlTownhouse,
-    highlightPosition: "50% 50%",
-    hub: "architecture",
-    title: "Townhouse",
-    subtitle: "Inspired by the Croffead House by W.G. Clark",
-    mood: "concrete",
+    slug: "the-diary-of-anne-frank",
+    accentColor: "#d7d9e6",
+    hub: "production-scenic",
+    title: "The Diary of Anne Frank",
+    subtitle: "Deerfield Studio Theatre",
+    mood: "noir",
     weight: "right",
+    credits: [
+      { role: "Director", name: "Helen Crowley" },
+      { role: "Scenic Designer", name: "Reid Graham" },
+      { role: "Technical Director", name: "Michael Clack" },
+    ],
     description:
-      "A narrow town house inspired by the Croffead House by W.G. Clark. A shifted floor plate divides interior life: a library at grade, a dining room that overhangs the street, and blue-cast interiors that echo the precedent while framing everyday domestic ritual.",
-    cover: townhouseFull,
-    collage: [townHouseDet.url],
+      "The rawness of the space is conveyed through skeletal framing and deteriorating wood slatting. Reflecting historical reference to the original annex, the design pays tribute to Anne and her diary's enduring legacy.",
+    cover: anne,
+    collage: [anneDet],
+    // Order matters: the custom layout on this page addresses these by index.
     media: [
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_AXON_UPRIGHT.jpg", caption: "Axonometric" },
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg" },
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER12.jpg" },
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER3.jpg" },
+      { type: "image", src: anne, caption: "Full attic set — skeletal framing over the annex" },
+      { type: "image", src: anneSketch, caption: "Conceptual sketch by Reid Graham" },
+      { type: "image", src: anneDet, caption: "Kitchen detail — stove, sink and stacked slatting" },
+      { type: "image", src: anneDrawingLeft, caption: "Section — skeletal framing and stair" },
+      { type: "image", src: anneDrawingRight, caption: "Ground plan" },
     ],
   },
   {
@@ -544,27 +548,25 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    slug: "staging-aesthetics",
-    accentColor: "#b89bec",
-    heroTitleAbove: true,
+    slug: "townhouse",
+    accentColor: "#3c9aab",
     heroPortrait: true,
-    highlight: hlStaging,
-    highlightPosition: "50% 55%",
+    highlight: hlTownhouse,
+    highlightPosition: "50% 50%",
     hub: "architecture",
-    title: "Staging Aesthetics",
-    subtitle: "Projecting the Politics of Time + Space",
-    mood: "theatrical",
+    title: "Townhouse",
+    subtitle: "Inspired by the Croffead House by W.G. Clark",
+    mood: "concrete",
     weight: "right",
     description:
-      "Projecting National Culture, The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. This interactive installation utilizes animation software, projection mapping technology, and spatialized audio design to explore various alternative facades for the building, immersing viewers in the political stakes of architectural aesthetics.",
-    cover: stagingFull,
+      "A narrow town house inspired by the Croffead House by W.G. Clark. A shifted floor plate divides interior life: a library at grade, a dining room that overhangs the street, and blue-cast interiors that echo the precedent while framing everyday domestic ritual.",
+    cover: townhouseFull,
+    collage: [townHouseDet.url],
     media: [
-      { type: "image", src: stagingFull, caption: "Physical model — day condition and night projection-mapped facade" },
-      // Physical-model video, sits in the gallery between the hero image and
-      // the closing still. Served from public/ like the other project videos
-      // (TaB, Lollapalooza); the gallery loop already renders `type: "video"`
-      // as a muted, looping, autoplaying clip.
-      { id: "staging-model-video", type: "video", src: "/staging-model.mp4" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_AXON_UPRIGHT.jpg", caption: "Axonometric" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER12.jpg" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER3.jpg" },
     ],
   },
 
