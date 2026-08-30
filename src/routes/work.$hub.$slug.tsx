@@ -1515,7 +1515,11 @@ function ProjectPage() {
           the panel read as the same control everywhere it appears. */}
       {lightbox != null && (
         <div
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-2xl flex flex-col cursor-zoom-out"
+          /* Fully opaque. At bg-black/60 the page behind — a project's
+             description, its other images — bled through the blur and read as
+             ghost text and shapes over the enlarged photo. An image opened
+             full-screen should show nothing but that image. */
+          className="fixed inset-0 z-[100] bg-black flex flex-col cursor-zoom-out animate-fade-in-fast"
           style={project.accentColor ? ({ "--accent-color": project.accentColor } as React.CSSProperties) : undefined}
           onClick={close}
           role="dialog"

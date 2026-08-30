@@ -307,8 +307,6 @@
   },
   "project.reshuffling-the-deck.description": {
     "desktop": {
-      "offsetX": 4,
-      "offsetY": -761,
       "align": "left",
       "fontSize": 18
     }
