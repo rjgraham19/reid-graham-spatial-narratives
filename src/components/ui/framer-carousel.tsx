@@ -30,12 +30,15 @@ export function FramerCarousel({
   renderSlide,
   thumbnails,
   className,
+  accentColor = "#ffffff",
 }: {
   count: number;
   renderSlide: (index: number, controls: SlideControls) => ReactNode;
   /** One image URL per slide — renders the preview strip instead of pills. */
   thumbnails?: string[];
   className?: string;
+  /** Hex the active thumbnail's gradient frame is mixed from. */
+  accentColor?: string;
 }) {
   const [index, setIndex] = useState(0);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -62,6 +65,7 @@ export function FramerCarousel({
 
   return (
     <div className={className}>
+      <style>{FC_CSS}</style>
       <div ref={frameRef} className="relative overflow-hidden rounded-2xl">
         <motion.div className="flex" style={{ x }}>
           {Array.from({ length: count }, (_, i) => (
@@ -80,7 +84,7 @@ export function FramerCarousel({
 
       {count > 1 &&
         (thumbnails ? (
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <div className="mt-2 flex flex-wrap justify-center gap-2.5">
             {thumbnails.slice(0, count).map((src, i) => (
               <button
                 key={i}
@@ -88,10 +92,11 @@ export function FramerCarousel({
                 onClick={() => go(i)}
                 aria-label={`View ${i + 1} of ${count}`}
                 aria-current={i === index}
+                style={{ ["--fc-accent" as string]: accentColor }}
                 className={cn(
-                  "h-14 w-20 shrink-0 overflow-hidden rounded-md bg-secondary transition-all duration-300 ease-out",
+                  "fc-thumb h-16 w-24 shrink-0 overflow-hidden rounded-md bg-secondary transition-all duration-300 ease-out sm:h-20 sm:w-32",
                   i === index
-                    ? "scale-105 opacity-100 ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                    ? "fc-thumb--active scale-[1.06] opacity-100"
                     : "opacity-40 grayscale hover:opacity-80 hover:grayscale-0",
                 )}
               >
@@ -118,3 +123,24 @@ export function FramerCarousel({
     </div>
   );
 }
+
+/* The active thumbnail's frame — a 2px gradient mixed from `--fc-accent`
+   instead of the hard white ring it used to carry, so it reads as the
+   project's own colour lifting the current sheet rather than a boxed
+   outline. The padding-box layer is the page black behind the (loading)
+   image; the border-box layer is the gradient. */
+const FC_CSS = `
+.fc-thumb--active {
+  border: 2px solid transparent;
+  background-image:
+    linear-gradient(var(--background, #000), var(--background, #000)),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--fc-accent, #fff) 92%, white),
+      color-mix(in srgb, var(--fc-accent, #fff) 45%, black)
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 8px 24px -10px color-mix(in srgb, var(--fc-accent, #fff) 55%, transparent);
+}
+`;

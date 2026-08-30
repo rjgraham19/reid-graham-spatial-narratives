@@ -1352,11 +1352,7 @@ function ProjectPage() {
           string or title block, and tapping a sheet opens the shared
           lightbox. */}
       {isLollapalooza && lollapaloozaDraftingMedia.length > 0 && (
-        <section className="px-6 md:px-12 lg:px-16 pt-12">
-          <h2 className="font-display font-light text-2xl md:text-4xl mb-6">
-            Technical Drafting Package
-          </h2>
-
+        <section className="px-6 md:px-12 lg:px-16 pt-10">
           <div className="md:hidden">
             <SwipeGallery
               slug={project.slug}
@@ -1370,6 +1366,7 @@ function ProjectPage() {
             <FramerCarousel
               className="mx-auto max-w-[1200px]"
               count={lollapaloozaDraftingMedia.length}
+              accentColor={project.accentColor}
               thumbnails={lollapaloozaDraftingMedia.map(({ item }) => item.src)}
               renderSlide={(i, ctrl) => {
                 const { item: m } = lollapaloozaDraftingMedia[i];
@@ -1379,7 +1376,7 @@ function ProjectPage() {
                      both sides. Not clickable — these read fine at this size
                      and there's no isolated view to open. Arrows sit just off
                      the card's edges and only render for the active slide. */
-                  <div className="flex w-full justify-center py-8">
+                  <div className="flex w-full justify-center pt-6 pb-2">
                     <div className="relative">
                       <div className="block rounded-xl bg-white p-3 shadow-lg">
                         <img
