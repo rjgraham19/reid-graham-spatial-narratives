@@ -617,13 +617,13 @@ function ProjectPage() {
           the time on screen it simply reads as a still. Clicking opens it in
           the lightbox like any other media on the page. */}
       {isTab && (
-        <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
-          <div className="md:grid md:grid-cols-[1fr_1fr] md:gap-8 lg:gap-12 md:items-start">
+        <section className="px-6 md:px-12 lg:px-16 pt-2 md:pt-4 pb-4 md:pb-6">
+          <div className="md:grid md:grid-cols-[minmax(0,300px)_1fr] md:gap-8 lg:gap-12 md:items-start">
             <figure className="group">
               <button
                 type="button"
                 onClick={() => setLightbox(1)}
-                className="block w-full overflow-hidden rounded-md bg-secondary md:max-w-[92%]"
+                className="block w-full overflow-hidden rounded-md bg-secondary"
                 aria-label="Enlarge TaB closeup animation"
               >
                 <InViewVideo
@@ -636,11 +636,13 @@ function ProjectPage() {
 
             {/* Right column: credits sit up here beside the closeup animation,
                 above the description — they used to be stranded far down the
-                page in the white lower section. */}
-            <div className="mt-8 md:mt-0">
+                page in the white lower section. space-y-2 to match the tighter
+                credit spacing on True West / Anne Frank / YCTIWU. Capped width
+                so the two text blocks keep a readable measure. */}
+            <div className="mt-6 md:mt-0 md:max-w-xl lg:max-w-2xl">
               {project.credits && project.credits.length > 0 && (
                 <RevealBlock>
-                  <ul className="mb-8 space-y-3 md:mb-10">
+                  <ul className="mb-5 space-y-2 md:mb-6">
                     {project.credits
                       .filter((c: Credit) => !c.hidden)
                       .map((c: Credit) => (
@@ -699,7 +701,7 @@ function ProjectPage() {
           The gap is wider than the drawing's own internal spacing, per Reid —
           enough to read as two enlargeable pieces without breaking the sheet. */}
       {isTab && (
-        <section className="px-6 md:px-12 lg:px-16 pt-10 md:pt-16 pb-8 md:pb-12">
+        <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-8 md:pb-12">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-[1584fr_2400fr] md:gap-16 lg:gap-20 md:items-start">
             {[2, 3].map((idx) => (
               <figure key={idx} className="group">
