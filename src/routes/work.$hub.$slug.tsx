@@ -618,12 +618,16 @@ function ProjectPage() {
           the lightbox like any other media on the page. */}
       {isTab && (
         <section className="px-6 md:px-12 lg:px-16 pt-2 md:pt-4 pb-4 md:pb-6">
-          <div className="md:grid md:grid-cols-[minmax(0,300px)_1fr] md:gap-8 lg:gap-12 md:items-start">
+          {/* A straight half-and-half split: the closeup animation fills the
+              left half (just under half the page), credits + description hold
+              the right half on their own — the text column is a fixed half,
+              not sized off the video. */}
+          <div className="md:grid md:grid-cols-2 md:gap-8 lg:gap-12 md:items-start">
             <figure className="group">
               <button
                 type="button"
                 onClick={() => setLightbox(1)}
-                className="block w-full overflow-hidden rounded-md bg-secondary"
+                className="block w-full overflow-hidden rounded-md bg-secondary md:max-w-[95%]"
                 aria-label="Enlarge TaB closeup animation"
               >
                 <InViewVideo
@@ -634,12 +638,10 @@ function ProjectPage() {
               </button>
             </figure>
 
-            {/* Right column: credits sit up here beside the closeup animation,
-                above the description — they used to be stranded far down the
-                page in the white lower section. space-y-2 to match the tighter
-                credit spacing on True West / Anne Frank / YCTIWU. Capped width
-                so the two text blocks keep a readable measure. */}
-            <div className="mt-6 md:mt-0 md:max-w-xl lg:max-w-2xl">
+            {/* Right column: credits sit up here above the description.
+                space-y-2 to match the tighter credit spacing on True West /
+                Anne Frank / YCTIWU. */}
+            <div className="mt-6 md:mt-0">
               {project.credits && project.credits.length > 0 && (
                 <RevealBlock>
                   <ul className="mb-5 space-y-2 md:mb-6">
