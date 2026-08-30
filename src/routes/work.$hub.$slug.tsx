@@ -1375,17 +1375,26 @@ function ProjectPage() {
                      mount) and sits centred, so the page's black shows down
                      both sides. Not clickable — these read fine at this size
                      and there's no isolated view to open. Arrows sit just off
-                     the card's edges and only render for the active slide. */
-                  <div className="flex w-full justify-center pt-6 pb-2">
+                     the card's edges and only render for the active slide.
+
+                     Every sheet renders at one fixed height so the frame is
+                     the same on every slide — the wider sheets used to hit the
+                     max-width cap first and come out shorter, leaving a gap
+                     above the thumbnail strip. The height is low enough that
+                     even the widest sheet stays under the width cap, so
+                     nothing crops; where a sheet is a touch narrower than the
+                     box it just gets white margins, invisible on the white
+                     card. */
+                  <div className="flex w-full justify-center pt-4 pb-2">
                     <div className="relative">
-                      <div className="block rounded-xl bg-white p-3 shadow-lg">
+                      <div className="flex items-center justify-center rounded-xl bg-white p-3 shadow-lg">
                         <img
                           data-design-id={designId.projectMedia(project.slug, m.id!)}
                           data-design-kind="image"
                           src={m.src}
                           alt={m.caption ?? project.title}
                           loading="lazy"
-                          className="block max-h-[74vh] w-auto max-w-[min(1000px,84vw)] object-contain"
+                          className="block h-[min(600px,64vh)] w-auto max-w-[min(1000px,84vw)] object-contain"
                         />
                       </div>
                       {ctrl.isActive && (
