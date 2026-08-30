@@ -535,6 +535,25 @@ function ProjectPage() {
 
       </div>
 
+      {/* Lollapalooza — credits, on the right, directly under the hero. Kept
+          out of the shared description+credits section further down (see the
+          `!isLollapalooza` guard there) so they don't repeat. */}
+      {isLollapalooza && project.credits && project.credits.length > 0 && (
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <RevealBlock className="md:col-span-4 md:col-start-9">
+              <ul className="space-y-3">
+                {project.credits
+                  .filter((c: Credit) => !c.hidden)
+                  .map((c: Credit) => (
+                    <CreditRow key={c.role} slug={project.slug} credit={c} />
+                  ))}
+              </ul>
+            </RevealBlock>
+          </div>
+        </section>
+      )}
+
       {/* Portrait heroes only: description sits beside the image, filling the
           space a tall hero leaves empty, rather than below it. Sticky so it
           stays in view alongside the image as it scrolls. */}
@@ -767,7 +786,8 @@ function ProjectPage() {
             </RevealBlock>
           )}
         </div>
-        {project.credits && project.credits.length > 0 && (
+        {/* Lollapalooza's credits render up beside the hero instead. */}
+        {project.credits && project.credits.length > 0 && !isLollapalooza && (
           <RevealBlock className="md:col-span-4" delay={0.1}>
             <ul className="space-y-3">
               {project.credits.filter((c: Credit) => !c.hidden).map((c: Credit) => (

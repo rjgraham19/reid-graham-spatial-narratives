@@ -290,6 +290,12 @@ export const PROJECTS: Project[] = [
     mood: "pop",
     weight: "right",
     tags: ["Experiential"],
+    credits: [
+      { role: "Experiential Designer", name: "Reid Graham" },
+      { role: "Art Director", name: "Rachel Roth" },
+      { role: "Creative Director", name: "Brie Crash" },
+      { role: "Graphic Designer", name: "Selene" },
+    ],
     // PLACEHOLDER copy — replace once real project copy is provided.
     description:
       "PLACEHOLDER description — Y2K/futurism-themed experiential work. Replace with real project copy.",
