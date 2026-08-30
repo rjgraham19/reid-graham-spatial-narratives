@@ -40,6 +40,16 @@ import { designId } from "@/lib/design-ids";
 import { useLiveOverrides } from "@/lib/use-live-overrides";
 import { DesignFrameBridge } from "@/design-mode/frame-bridge";
 
+/**
+ * Show the caption under an enlarged image in the lightbox.
+ *
+ * Off for now — the per-image caption copy still needs a pass and the site is
+ * going public before there's time for it. The caption markup below is left
+ * intact (and Design Mode still targets it), so flipping this back to `true`
+ * brings the captions back with no other change.
+ */
+const SHOW_LIGHTBOX_CAPTIONS = false as boolean;
+
 export const Route = createFileRoute("/work/$hub/$slug")({
   /* panel=1 is set only when this page is rendered inset over the feed, which
      only happens on a wide screen. It suppresses the site nav: the wordmark
@@ -1594,7 +1604,7 @@ function ProjectPage() {
             </button>
           </div>
 
-          {project.media[lightbox].caption && (
+          {SHOW_LIGHTBOX_CAPTIONS && project.media[lightbox].caption && (
             <p
               className="text-xs md:text-sm text-foreground/80 text-center px-6 pb-6"
               onClick={(e) => e.stopPropagation()}
