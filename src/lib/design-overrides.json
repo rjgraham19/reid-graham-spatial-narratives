@@ -308,7 +308,9 @@
   "project.reshuffling-the-deck.description": {
     "desktop": {
       "align": "left",
-      "fontSize": 18
+      "fontSize": 18,
+      "offsetX": -2,
+      "offsetY": -777
     }
   },
   "project.townhouse.media.1": {
@@ -361,7 +363,7 @@
   },
   "project.the-diary-of-anne-frank.media.1": {
     "desktop": {
-      "layoutShiftY": 0
+      "layoutShiftY": -207
     }
   },
   "project.the-diary-of-anne-frank.description": {
@@ -373,7 +375,8 @@
   },
   "project.the-diary-of-anne-frank.media.2": {
     "desktop": {
-      "layoutShiftY": 237
+      "layoutShiftY": 181,
+      "maxWidth": 819
     }
   },
   "project.tab-renaissance.media.0": {
@@ -381,12 +384,16 @@
       "hidden": true
     },
     "desktop": {
-      "layoutShiftY": -379
+      "layoutShiftY": -449
     }
   },
   "project.tab-renaissance.description": {
     "base": {
       "text": "An immersive, experiential design for Taubman College’s annual Beaux-Arts Ball,\n\nreimagining the Renaissance as a timeless expression of creative transformation and continual innovation."
+    },
+    "desktop": {
+      "offsetX": 1.5000210351562373,
+      "offsetY": -26
     }
   },
   "project.townhouse.description": {
@@ -414,6 +421,106 @@
     "mobile": {
       "offsetX": 0,
       "offsetY": 13
+    }
+  },
+  "project.tab-renaissance.credit.creative-director": {
+    "desktop": {
+      "offsetX": -60,
+      "offsetY": 629
+    }
+  },
+  "project.tab-renaissance.credit.event-coordinator": {
+    "desktop": {
+      "offsetX": -60,
+      "offsetY": 618.9999847412109
+    },
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": -10
+    }
+  },
+  "project.tab-renaissance.credit.technical-coordinator": {
+    "desktop": {
+      "offsetX": -60,
+      "offsetY": 613
+    },
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": -19
+    }
+  },
+  "project.tab-renaissance.credit.installation-design-team": {
+    "desktop": {
+      "offsetX": -61,
+      "offsetY": 606
+    },
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": -28
+    }
+  },
+  "project.lollapalooza.credit.art-director": {
+    "base": {
+      "text": "\nRachel Roth"
+    },
+    "desktop": {
+      "align": "right",
+      "offsetX": 0,
+      "offsetY": -32
+    }
+  },
+  "project.lollapalooza.credit.creative-director": {
+    "base": {
+      "text": "\nBry Crasch"
+    },
+    "desktop": {
+      "align": "right",
+      "offsetX": 0,
+      "offsetY": -39
+    }
+  },
+  "project.lollapalooza.credit.graphic-designer": {
+    "base": {
+      "text": "Celine To"
+    },
+    "desktop": {
+      "align": "right",
+      "offsetX": 0,
+      "offsetY": -48
+    }
+  },
+  "project.lollapalooza.credit.experiential-designer": {
+    "desktop": {
+      "align": "right",
+      "offsetX": 0,
+      "offsetY": -22
+    }
+  },
+  "project.lollapalooza.media.gallery-1": {
+    "desktop": {
+      "layoutShiftY": -363
+    }
+  },
+  "project.true-west.pull-quote": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -127
+    }
+  },
+  "project.true-west.media.1": {
+    "desktop": {
+      "layoutShiftY": -55,
+      "offsetY": 10
+    }
+  },
+  "project.true-west.media.2": {
+    "desktop": {
+      "layoutShiftY": -83
+    }
+  },
+  "project.the-diary-of-anne-frank.media.0": {
+    "desktop": {
+      "layoutShiftY": 66
     }
   }
 }

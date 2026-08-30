@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkRouteImport } from './routes/work'
+import { Route as InteractionLabRouteImport } from './routes/interaction-lab'
 import { Route as DesignRouteImport } from './routes/design'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
@@ -22,6 +23,11 @@ import { Route as WorkHubSlugRouteImport } from './routes/work.$hub.$slug'
 const WorkRoute = WorkRouteImport.update({
   id: '/work',
   path: '/work',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InteractionLabRoute = InteractionLabRouteImport.update({
+  id: '/interaction-lab',
+  path: '/interaction-lab',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignRoute = DesignRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/design': typeof DesignRoute
+  '/interaction-lab': typeof InteractionLabRoute
   '/work': typeof WorkRouteWithChildren
   '/work/$hub': typeof WorkHubRouteWithChildren
   '/work/': typeof WorkIndexRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/design': typeof DesignRoute
+  '/interaction-lab': typeof InteractionLabRoute
   '/work': typeof WorkIndexRoute
   '/work/$hub/$slug': typeof WorkHubSlugRoute
   '/work/$hub': typeof WorkHubIndexRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/design': typeof DesignRoute
+  '/interaction-lab': typeof InteractionLabRoute
   '/work': typeof WorkRouteWithChildren
   '/work/$hub': typeof WorkHubRouteWithChildren
   '/work/': typeof WorkIndexRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/design'
+    | '/interaction-lab'
     | '/work'
     | '/work/$hub'
     | '/work/'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/design'
+    | '/interaction-lab'
     | '/work'
     | '/work/$hub/$slug'
     | '/work/$hub'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/design'
+    | '/interaction-lab'
     | '/work'
     | '/work/$hub'
     | '/work/'
@@ -136,6 +148,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   DesignRoute: typeof DesignRoute
+  InteractionLabRoute: typeof InteractionLabRoute
   WorkRoute: typeof WorkRouteWithChildren
 }
 
@@ -146,6 +159,13 @@ declare module '@tanstack/react-router' {
       path: '/work'
       fullPath: '/work'
       preLoaderRoute: typeof WorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interaction-lab': {
+      id: '/interaction-lab'
+      path: '/interaction-lab'
+      fullPath: '/interaction-lab'
+      preLoaderRoute: typeof InteractionLabRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design': {
@@ -237,6 +257,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   DesignRoute: DesignRoute,
+  InteractionLabRoute: InteractionLabRoute,
   WorkRoute: WorkRouteWithChildren,
 }
 export const routeTree = rootRouteImport
