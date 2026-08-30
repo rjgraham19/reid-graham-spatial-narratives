@@ -4,26 +4,12 @@ import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
-import { ScrollFrameSequence } from "@/components/scroll-frame-sequence";
 import { BackChevron, CloseMark, glassButton, trackSheen } from "@/components/glass-button";
 import { LightboxVideo } from "@/components/lightbox-video";
 import { SwipeGallery } from "@/components/swipe-gallery";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
 
-/**
- * TaB can spin frames. The export intentionally kept only every other frame
- * to halve the payload, so the numbering runs 0, 1, then odds up to 61 —
- * hence building the list explicitly rather than by a stride.
- */
-const TAB_SPIN_FRAMES = [
-  "/tab-spin/00000.webp",
-  ...Array.from({ length: 31 }, (_, i) => {
-    const n = i * 2 + 1; // 1, 3, 5 … 61
-    return `/tab-spin/${String(n).padStart(5, "0")}.webp`;
-  }),
-];
 import tabAnimation from "@/assets/rg/tab-animation.svg";
-import tabBanner from "@/assets/rg/tab-banner.webp";
 import { InlineAnimatedSvg } from "@/components/inline-animated-svg";
 import { InViewVideo } from "@/components/in-view-video";
 import {
@@ -632,7 +618,7 @@ function ProjectPage() {
           the lightbox like any other media on the page. */}
       {isTab && (
         <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
-          <div className="md:grid md:grid-cols-[1fr_1fr] md:gap-8 lg:gap-12 md:items-center">
+          <div className="md:grid md:grid-cols-[1fr_1fr] md:gap-8 lg:gap-12 md:items-start">
             <figure className="group">
               <button
                 type="button"
@@ -648,8 +634,22 @@ function ProjectPage() {
               </button>
             </figure>
 
+            {/* Right column: credits sit up here beside the closeup animation,
+                above the description — they used to be stranded far down the
+                page in the white lower section. */}
             <div className="mt-8 md:mt-0">
-              <RevealBlock>
+              {project.credits && project.credits.length > 0 && (
+                <RevealBlock>
+                  <ul className="mb-8 space-y-3 md:mb-10">
+                    {project.credits
+                      .filter((c: Credit) => !c.hidden)
+                      .map((c: Credit) => (
+                        <CreditRow key={c.role} slug={project.slug} credit={c} />
+                      ))}
+                  </ul>
+                </RevealBlock>
+              )}
+              <RevealBlock delay={0.1}>
                 <p
                   data-design-id={designId.projectDescription(project.slug)}
                   data-design-kind="text"
@@ -742,16 +742,16 @@ function ProjectPage() {
       )}
 
       {/* Description + credits — skipped on portrait-hero pages, where both
-          already appear in the column beside the hero. */}
-      {!isPortraitHero && (
+          already appear in the column beside the hero, and on TaB, where both
+          now sit up beside the closeup animation. */}
+      {!isPortraitHero && !isTab && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
-          {/* Skipped on TaB (the description sits by the closeup animation
-              higher up) and on True West, where the two lines of the
-              description now run as the pull quotes flanking the image trio
-              below — printing it here as well just repeats them. Credits keep
-              their usual place on the right either way. */}
-          {!isYctiwy && !isTab && !isAnneFrank && !isTrueWest && (
+          {/* Skipped on True West, where the two lines of the description now
+              run as the pull quotes flanking the image trio below — printing
+              it here as well just repeats them. Credits keep their usual place
+              on the right either way. */}
+          {!isYctiwy && !isAnneFrank && !isTrueWest && (
             <RevealBlock>
               <p
                 data-design-id={designId.projectDescription(project.slug)}
@@ -1421,32 +1421,6 @@ function ProjectPage() {
               }}
             />
           </div>
-        </section>
-      )}
-
-      {/* TaB: Renaissance — closing beat. A rendered frame sequence of the can,
-          scrubbed by scroll so it spins forward on the way down and backward on
-          the way up. Last content section on the page. */}
-      {isTab && (
-        <section className="bg-background">
-          <ScrollFrameSequence
-            frames={TAB_SPIN_FRAMES}
-            alt="TaB soda can rotating"
-            className="relative h-[300vh]"
-            backdrop={
-              /* Event banner as a full-bleed strip behind the can. It's inside
-                 the sticky frame, so it holds still while the can turns over
-                 it. Edge to edge and vertically centred, which leaves the
-                 can — taller than the strip — overhanging above and below,
-                 and keeps it clear of the logo on the strip's left third. */
-              <img
-                src={tabBanner}
-                alt=""
-                aria-hidden
-                className="pointer-events-none absolute left-0 right-0 top-1/2 w-full -translate-y-1/2 select-none"
-              />
-            }
-          />
         </section>
       )}
 
