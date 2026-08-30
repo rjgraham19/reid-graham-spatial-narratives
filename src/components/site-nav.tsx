@@ -8,9 +8,9 @@ import { CloseMark, GlassButton, glassButton, trackSheen } from "./glass-button"
  *  off PROJECTS — a hover dropdown on desktop, indented pills on the phone. */
 const NAV = {
   projects: [
+    { label: "Experiential", tag: "Experiential" as const },
     { label: "Production / Scenic", tag: "Production/Scenic" as const },
     { label: "Architecture", tag: "Architecture" as const },
-    { label: "Experiential", tag: "Experiential" as const },
   ],
 };
 

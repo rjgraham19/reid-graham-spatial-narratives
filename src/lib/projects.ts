@@ -71,12 +71,18 @@ void ycttiwy; void ycttiwyDet;
 
 export type Hub = "production-scenic" | "architecture" | "visualizations";
 
-export type ProjectTag = "Production/Scenic" | "Architecture" | "Experiential";
+export type ProjectTag = "Experiential" | "Production/Scenic" | "Architecture";
 
+/**
+ * Display order of the discipline filters — on the /work filter row and in
+ * the PROJECTS nav dropdown (SiteNav mirrors this order). Purely presentational:
+ * every filter matches projects by tag value (`p.tags.includes(tag)`), so
+ * reordering here never changes which projects a tag pulls up.
+ */
 export const PROJECT_TAGS: ProjectTag[] = [
+  "Experiential",
   "Production/Scenic",
   "Architecture",
-  "Experiential",
 ];
 
 export function tagToSlug(tag: ProjectTag): string {
