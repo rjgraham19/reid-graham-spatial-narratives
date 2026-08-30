@@ -7,6 +7,7 @@ import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { BackChevron, CloseMark, glassButton, trackSheen } from "@/components/glass-button";
 import { LightboxVideo } from "@/components/lightbox-video";
 import { SwipeGallery } from "@/components/swipe-gallery";
+import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
 
 import tabAnimation from "@/assets/rg/tab-animation.svg";
@@ -485,9 +486,31 @@ function ProjectPage() {
               the image scrolls under it. It only has a job in the overlaid
               arrangement, so below lg it collapses: with no reserved height
               there is nothing for the hero to be pulled back across, and the
-              title block's own height becomes the spacing. */}
-          <div className="h-0 lg:h-[300px]" />
+              title block's own height becomes the spacing.
+
+              Lollapalooza has no runway: the scrolling photo band sits between
+              the title and the hero, so there's nothing to pin the title over. */}
+          <div className={isLollapalooza ? "hidden" : "h-0 lg:h-[300px]"} />
         </div>
+
+        {/* Lollapalooza — the gallery-* event photos as an endless, clickable
+            band between the title and the hero. The same photos still sit in
+            the carousel at the foot of the page (kept for now); this is the
+            up-front showcase. Tapping one opens the shared lightbox by its
+            real media index. */}
+        {isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
+          <div className="py-8 md:py-12">
+            <ImageAutoSlider
+              speedSeconds={22}
+              paused={lightbox != null}
+              images={lollapaloozaGalleryMedia.map(({ item }: { item: MediaItem }) => item.src)}
+              imageAlts={lollapaloozaGalleryMedia.map(
+                ({ item }: { item: MediaItem }) => item.caption ?? "",
+              )}
+              onImageClick={(i: number) => setLightbox(lollapaloozaGalleryMedia[i].index)}
+            />
+          </div>
+        )}
 
         <figure
           className={`z-0 ${
@@ -502,10 +525,15 @@ function ProjectPage() {
                    Both are lg-only. Below it the runway is collapsed, so there
                    is nothing to cancel — and TaB's deeper tuck would be pulling
                    the image up over the title rather than behind a scrim that
-                   has room to fade. */
+                   has room to fade.
+
+                   Lollapalooza pulls nothing back: its runway is gone and the
+                   photo band sits above, so the hero just flows under it. */
                 isTab
                 ? "relative mt-0 lg:-mt-[540px]"
-                : "relative mt-0 lg:-mt-[300px]"
+                : isLollapalooza
+                  ? "relative mt-0"
+                  : "relative mt-0 lg:-mt-[300px]"
               : "lg:col-start-1 lg:row-start-1"
           } ${
             /* Full bleed in the panel. The standard 64px gutter left the hero
