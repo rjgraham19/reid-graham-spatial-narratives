@@ -51,6 +51,15 @@ import { DesignFrameBridge } from "@/design-mode/frame-bridge";
  */
 const SHOW_LIGHTBOX_CAPTIONS = false as boolean;
 
+/**
+ * The photo carousel at the foot of the Lollapalooza page.
+ *
+ * Off — the scrolling photo band up near the title now shows the same event
+ * photos, so this repeated them. The section markup is left intact; flip to
+ * `true` to bring the bottom carousel back.
+ */
+const SHOW_LOLLAPALOOZA_PHOTO_CAROUSEL = false as boolean;
+
 export const Route = createFileRoute("/work/$hub/$slug")({
   /* panel=1 is set only when this page is rendered inset over the feed, which
      only happens on a wide screen. It suppresses the site nav: the wordmark
@@ -1418,8 +1427,11 @@ function ProjectPage() {
           the plain swipe carousel on mobile. Mixed portrait/landscape, each
           at its own aspect ratio and centred so the page's black frames it.
           Tapping a photo opens the shared lightbox; the drafting sheets above
-          don't, since there's nothing extra to see. */}
-      {isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
+          don't, since there's nothing extra to see.
+
+          Off (SHOW_LOLLAPALOOZA_PHOTO_CAROUSEL) — the scrolling band up by the
+          title carries these same photos now. */}
+      {SHOW_LOLLAPALOOZA_PHOTO_CAROUSEL && isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pb-12">
           <div className="md:hidden">
             <SwipeGallery
