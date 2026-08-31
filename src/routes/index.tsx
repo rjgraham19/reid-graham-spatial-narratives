@@ -56,8 +56,10 @@ function Home() {
           shows with its address bar up — in vh the wordmark is pushed below the
           fold and the entrance reads as a page you have to scroll to see. */}
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[100svh]">
-        {/* LEFT — text */}
-        <div className="relative z-10 flex flex-col justify-end px-6 md:px-12 lg:px-16 py-10 md:py-14 pt-28 md:pt-32">
+        {/* LEFT — text. Bottom-anchored on a phone (the svh reasoning above);
+            vertically centred from md up, so on a monitor the wordmark sits
+            mid-height rather than down in the corner. */}
+        <div className="relative z-10 flex flex-col justify-end md:justify-center px-6 md:px-12 lg:px-16 py-10 md:py-14 pt-28 md:pt-14">
           {/* The wrapper (not the h1) carries the design ID: typography
               overrides need to reach the h1's own classes (see
               apply-overrides.ts), but *positioning* — what this element is
