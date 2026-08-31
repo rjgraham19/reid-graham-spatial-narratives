@@ -3,7 +3,7 @@ import type { PointerEvent as ReactPointerEvent } from "react";
 import { PROJECTS, HERO_URL } from "@/lib/projects";
 
 /**
- * First-visit entrance for the homepage.
+ * Homepage entrance sequence.
  *
  * Black takeover: the wordmark wipes in left-to-right, centred and large. A
  * self-running trail drops project images every ~380ms along a slow arc (and
@@ -12,35 +12,26 @@ import { PROJECTS, HERO_URL } from "@/lib/projects";
  * payphone fades in on the right. It holds, then the whole layer cross-fades
  * out over the real homepage sitting underneath.
  *
- * Plays once per browser — a flag in localStorage suppresses it on every
- * later visit. Renders nothing on the server and for returning visitors, so
- * there is no hydration mismatch. Honours prefers-reduced-motion (short,
- * static path) and skips the pointer trail on coarse pointers.
+ * Plays on every full load of "/" — opening the URL fresh, a refresh, or
+ * re-typing the address all replay it. A module-level flag stops it from
+ * replaying on client-side navigation back to the homepage within the same
+ * page load (e.g. clicking the wordmark from another route). Renders nothing
+ * on the server / first hydration frame, so there is no hydration mismatch.
+ * Honours prefers-reduced-motion (short, static path) and skips the pointer
+ * trail on coarse pointers.
  */
 
-const SEEN_KEY = "rg:entrance-v1";
 const WORDMARK = "REID GRAHAM DESIGN";
+
+// Resets on every real document load; survives SPA route changes. Keeps the
+// takeover to once per page load, not once per mount of this component.
+let playedThisPageLoad = false;
 
 // Discipline-tagged projects ship real bundled cover images; the
 // visualization entries use remote-only assets, so they are left out.
 const REEL: string[] = PROJECTS.filter((p) => p.tags && p.tags.length > 0)
   .map((p) => p.cover)
   .slice(0, 10);
-
-function hasSeen(): boolean {
-  try {
-    return localStorage.getItem(SEEN_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-function markSeen(): void {
-  try {
-    localStorage.setItem(SEEN_KEY, "1");
-  } catch {
-    /* private mode / storage disabled — just play every time, no worse */
-  }
-}
 
 export function EntranceSequence() {
   const [active, setActive] = useState(false);
@@ -52,9 +43,13 @@ export function EntranceSequence() {
   const lastAt = useRef(0);
   const nextImg = useRef(0);
 
-  // Client-only decision: SSR and returning visitors render nothing.
+  // Client-only decision: SSR renders nothing; an SPA nav back to "/" within
+  // the same page load renders nothing; a fresh document load plays it.
   useEffect(() => {
-    if (!hasSeen()) setActive(true);
+    if (!playedThisPageLoad) {
+      playedThisPageLoad = true;
+      setActive(true);
+    }
   }, []);
 
   const spawn = useCallback((clientX: number, clientY: number, rot: number) => {
@@ -81,7 +76,6 @@ export function EntranceSequence() {
     document.body.style.overflow = "hidden";
 
     const finish = () => {
-      markSeen();
       setLeaving(true);
       window.setTimeout(() => setActive(false), 620);
     };
