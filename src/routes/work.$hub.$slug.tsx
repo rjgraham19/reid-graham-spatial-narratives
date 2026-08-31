@@ -366,7 +366,13 @@ function ProjectPage() {
           }
         >
           <div
-            className={`sticky bg-gradient-to-b from-black via-black/70 to-transparent ${
+            className={`sticky bg-gradient-to-b ${
+              /* Field House fades from a light blue rather than black behind
+                 its title, per Reid. */
+              isFieldHouse
+                ? "from-[#84a8ed] via-[#84a8ed]/70 to-transparent"
+                : "from-black via-black/70 to-transparent"
+            } ${
               /* Two cases, and they want opposite things.
 
                  In the panel there is no site nav, so the offset and padding
