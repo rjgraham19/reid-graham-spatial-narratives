@@ -70,6 +70,19 @@ const DOCS: Record<string, Doc> = {
     preload: "Reel images (repeated to 8), preloaded.",
     reference: "21st.dev image-trail / marquee patterns, adapted to a spatial filmstrip.",
   },
+  "INTRO-06": {
+    duration: "≈ 4.7s (desktop only)",
+    sequencing:
+      "Black; the wordmark wipes in left-to-right, centred and large. A self-playing trail drops one square project image every ~380ms along a slow left-to-right arc, so the sequence reads with no input; moving the cursor adds to the same trail (throttled to ~120ms, capped at 6, each image in slow / held / gently faded over 1.25s, pointer hidden). At 2.0s the wordmark glides centre→left and a matching nav fades in; at 2.9s the payphone fades in on the right. It then holds ~0.9s on that finished frame before handing over.",
+    desktop:
+      "Wordmark clamp(3.4rem, 10vw, 9rem) centred, settling to clamp(3rem, 9vw, 8rem) docked — matched to the real homepage lockup. Trail squares clamp(150px, 19vw, 300px); reposition is a 1s transition on left/transform/font-size. The docked wordmark, nav and payphone are laid out to MiniHome's exact geometry and the handoff fade is disabled for this intro, so the swap to the homepage preview is a clean cut with nothing shifting or re-animating.",
+    mobile:
+      "Trail is skipped on coarse pointers; the self-play arc, reposition, nav and payphone fade still play.",
+    reduced:
+      "No trail, no glide — wordmark starts docked and the payphone is in from the first frame; ~1.6s.",
+    preload: "Reel images + the payphone, all via useLabPreload.",
+    reference: "21st.dev image-trail, plus a centre→dock wordmark move. Original.",
+  },
 };
 
 function DocBlock({ id }: { id: string }) {
@@ -96,7 +109,7 @@ function DocBlock({ id }: { id: string }) {
 
 export function SectionEntrance() {
   const [live, setLive] = useState<string | null>(null);
-  const ids = ["INTRO-01", "INTRO-02", "INTRO-03", "INTRO-04", "INTRO-05"];
+  const ids = ["INTRO-01", "INTRO-02", "INTRO-03", "INTRO-04", "INTRO-05", "INTRO-06"];
   const poster = LAB_IMAGES;
 
   return (

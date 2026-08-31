@@ -1,7 +1,7 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
 import { FullscreenStage, LabButton, useLabPreload } from "./ui";
 import { MiniHome } from "./MiniHome";
-import { LAB_IMAGES, LAB_HIGHLIGHTS, LAB_WORDMARK, type LabImage } from "./data";
+import { LAB_IMAGES, LAB_HIGHLIGHTS, LAB_HERO, LAB_WORDMARK, type LabImage } from "./data";
 
 /* ─────────────────────────────────────────────────────────────────────
    ENTRANCE SIMULATIONS
@@ -186,12 +186,127 @@ function Intro05({ playKey, reduced, onResolve }: IntroProps) {
   );
 }
 
+/* ── INTRO-06 · Cursor Trail Entrance ──────────────────────────────
+   Black screen, the wordmark centred. The sequence lays a slow, drifting
+   trail of square project images on its own, so it reads even if the visitor
+   never touches the mouse; moving the cursor simply adds to the same trail
+   (the pointer itself is hidden). Partway through, the wordmark glides from
+   centre to its resting spot on the left and a matching nav fades in, then
+   the payphone fades in on the right. It holds on that finished frame — which
+   is geometry-matched to <MiniHome/> — before handing over, so the swap to
+   the homepage preview is imperceptible. */
+function Intro06({ playKey, reduced, onResolve }: IntroProps) {
+  const trail = REEL;
+  const poolRef = useRef<HTMLDivElement>(null);
+  const lastAt = useRef(0);
+  const nextImg = useRef(0);
+  const [phase, setPhase] = useState<"centre" | "docked">("centre");
+  const [payphone, setPayphone] = useState(false);
+
+  useResolveTimer(reduced ? 1600 : 4700, onResolve, [playKey]);
+
+  // One spawn path for both the self-playing trail and pointer motion.
+  const spawn = useCallback(
+    (clientX: number, clientY: number, rot: number) => {
+      const host = poolRef.current;
+      if (!host) return;
+      const r = host.getBoundingClientRect();
+      const node = document.createElement("img");
+      node.src = trail[nextImg.current % trail.length].src;
+      nextImg.current += 1;
+      node.className = "lab-intro-c6-node";
+      node.style.left = `${clientX - r.left}px`;
+      node.style.top = `${clientY - r.top}px`;
+      node.style.setProperty("--rot", `${rot.toFixed(1)}deg`);
+      host.appendChild(node);
+      while (host.children.length > 6) host.removeChild(host.firstChild as Node);
+      window.setTimeout(() => node.remove(), 1250);
+    },
+    [trail],
+  );
+
+  useEffect(() => {
+    setPhase("centre");
+    setPayphone(false);
+    if (reduced) {
+      setPhase("docked");
+      setPayphone(true);
+      return;
+    }
+    // Self-play: drop an image every ~440ms along a slow left-to-right arc
+    // through the middle of the screen until the wordmark starts docking.
+    const start = performance.now();
+    const auto = window.setInterval(() => {
+      const host = poolRef.current;
+      if (!host) return;
+      const r = host.getBoundingClientRect();
+      const t = Math.min((performance.now() - start) / 2400, 1);
+      const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const x = r.left + r.width * (0.18 + 0.64 * ease);
+      const y = r.top + r.height * (0.46 + 0.1 * Math.sin(t * Math.PI * 2.4));
+      spawn(x, y, Math.random() * 7 - 3.5);
+    }, 380);
+    const t1 = window.setTimeout(() => {
+      setPhase("docked");
+      window.clearInterval(auto);
+    }, 2000);
+    const t2 = window.setTimeout(() => setPayphone(true), 2900);
+    return () => {
+      window.clearInterval(auto);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [playKey, reduced, spawn]);
+
+  const onMove = (e: React.PointerEvent) => {
+    if (reduced || window.matchMedia("(pointer: coarse)").matches) return;
+    const now = performance.now();
+    if (now - lastAt.current < 120) return;
+    lastAt.current = now;
+    spawn(e.clientX, e.clientY, Math.random() * 8 - 4);
+  };
+
+  const [a, b, c] = LAB_WORDMARK.split(" ");
+  return (
+    <div className="lab-intro lab-intro-c6" key={playKey} onPointerMove={onMove}>
+      <div className="lab-intro-c6-pool" ref={poolRef} aria-hidden />
+
+      <div
+        className="lab-intro-c6-nav"
+        data-in={phase === "docked" ? "true" : undefined}
+        aria-hidden
+      >
+        <span className="lab-intro-c6-navwm">
+          Reid Graham <span>Design</span>
+        </span>
+        <span className="lab-intro-c6-navlinks">
+          <span>Projects</span>
+          <span>Visualizations</span>
+          <span>Connect</span>
+        </span>
+      </div>
+
+      <div className="lab-intro-c6-wm" data-phase={phase} aria-label={LAB_WORDMARK}>
+        <span>{a}</span>
+        <span>{b}</span>
+        <span className="thin">{c}</span>
+      </div>
+
+      <div className="lab-intro-c6-payphone" data-in={payphone ? "true" : undefined}>
+        <img src={LAB_HERO} alt="" />
+        <div className="lab-intro-c6-scrim" />
+      </div>
+    </div>
+  );
+}
+
 const INTROS: Record<string, (p: IntroProps) => ReactElement> = {
   "INTRO-01": Intro01,
   "INTRO-02": Intro02,
   "INTRO-03": Intro03,
   "INTRO-04": Intro04,
   "INTRO-05": Intro05,
+  "INTRO-06": Intro06,
 };
 
 /* ── The launch shell ──────────────────────────────────────────────── */
@@ -260,8 +375,8 @@ export function IntroLaunch({
       ) : phase === "intro" ? (
         <Intro playKey={playKey} reduced={reduced} onResolve={() => setPhase("home")} />
       ) : (
-        <div className="lab-intro-home">
-          <MiniHome entered />
+        <div className="lab-intro-home" data-intro={effectiveId}>
+          <MiniHome entered animateIn={effectiveId !== "INTRO-06"} />
         </div>
       )}
       <IntroCss />
@@ -309,6 +424,9 @@ const css = `
    pure enhancement layered on a visible base. */
 .lab-intro-home { position: absolute; inset: 0; opacity: 1; }
 .lab-intro-home > * { animation: lab-fade 0.5s ease; }
+/* INTRO-06 hands off on a static, geometry-matched frame — no fade in, so the
+   swap to the homepage preview is imperceptible. */
+.lab-intro-home[data-intro="INTRO-06"] > * { animation: none; }
 
 .lab-intro-loading {
   position: absolute; inset: 0; display: flex; flex-direction: column;
@@ -448,5 +566,115 @@ const css = `
   0% { opacity: 0; transform: translateZ(-1800px); }
   40% { opacity: 1; }
   100% { opacity: 1; transform: translateZ(0); }
+}
+
+/* INTRO-06 Cursor Trail Entrance */
+.lab-intro-c6 { cursor: none; }
+.lab-intro-c6-pool { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.lab-intro-c6-node {
+  position: absolute;
+  width: clamp(150px, 19vw, 300px);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.85);
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(0.62);
+  opacity: 0;
+  animation: c6-node 1.25s var(--lab-ease, ease) forwards;
+}
+/* Slow in, long hold, gentle fade — reads as a calm trail, not a flicker. */
+@keyframes c6-node {
+  12% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(1); }
+  68% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -48%) rotate(var(--rot, 0deg)) scale(0.99); }
+}
+
+.lab-intro-c6-wm {
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display, "Poppins", sans-serif);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  font-size: clamp(3.4rem, 10vw, 9rem);
+  transition:
+    left 1s var(--lab-ease, ease),
+    transform 1s var(--lab-ease, ease),
+    font-size 1s var(--lab-ease, ease);
+}
+.lab-intro-c6-wm span {
+  display: block;
+  opacity: 0;
+  animation: c6-in 0.9s var(--lab-ease, ease) forwards;
+}
+.lab-intro-c6-wm span:nth-child(1) { animation-delay: 0.12s; }
+.lab-intro-c6-wm span:nth-child(2) { animation-delay: 0.24s; }
+.lab-intro-c6-wm span:nth-child(3) { animation-delay: 0.38s; }
+.lab-intro-c6-wm .thin { font-weight: 100; color: rgba(255, 255, 255, 0.85); }
+@keyframes c6-in {
+  from { opacity: 0; transform: translateX(-52px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+/* Resting spot: left inset, vertically centred, at MiniHome's exact size —
+   so when the stage swaps to the homepage preview nothing shifts. */
+.lab-intro-c6-wm[data-phase="docked"] {
+  left: clamp(14px, 4vw, 54px);
+  transform: translate(0, -50%);
+  font-size: clamp(3rem, 9vw, 8rem);
+}
+
+/* Matches MiniHome's .lab-mh-nav so it is already present at handoff. */
+.lab-intro-c6-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(10px, 2.4vw, 22px) clamp(14px, 3vw, 40px);
+  opacity: 0;
+  transition: opacity 0.6s var(--lab-ease, ease);
+}
+.lab-intro-c6-nav[data-in="true"] { opacity: 1; }
+.lab-intro-c6-navwm {
+  font-family: var(--font-display, "Poppins", sans-serif);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: clamp(0.7rem, 1.4vw, 0.95rem);
+}
+.lab-intro-c6-navwm span { font-weight: 100; }
+.lab-intro-c6-navlinks { display: flex; gap: clamp(8px, 1.6vw, 18px); }
+.lab-intro-c6-navlinks span {
+  font-family: var(--font-display, "Poppins", sans-serif);
+  font-weight: 200;
+  font-size: clamp(0.55rem, 1vw, 0.7rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.lab-intro-c6-payphone {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  opacity: 0;
+  transition: opacity 0.9s var(--lab-ease, ease);
+}
+.lab-intro-c6-payphone[data-in="true"] { opacity: 1; }
+.lab-intro-c6-payphone img { width: 100%; height: 100%; object-fit: cover; }
+.lab-intro-c6-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.4) 40%, transparent 70%);
 }
 `;

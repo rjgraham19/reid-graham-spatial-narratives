@@ -11,9 +11,15 @@ import { LAB_HERO } from "./data";
  * fades its chrome up rather than snapping in, so the handoff reads as one
  * continuous move.
  */
-export function MiniHome({ entered = true }: { entered?: boolean }) {
+export function MiniHome({
+  entered = true,
+  animateIn = true,
+}: {
+  entered?: boolean;
+  animateIn?: boolean;
+}) {
   return (
-    <div className="lab-minihome" data-entered={entered ? "true" : "false"}>
+    <div className="lab-minihome" data-entered={entered && animateIn ? "true" : "false"}>
       <style>{miniHomeCss}</style>
 
       <header className="lab-mh-nav">
@@ -105,7 +111,7 @@ const miniHomeCss = `
   z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   padding: clamp(14px, 4vw, 54px);
 }
 .lab-mh-title {
@@ -114,7 +120,7 @@ const miniHomeCss = `
   text-transform: uppercase;
   line-height: 0.85;
   letter-spacing: -0.04em;
-  font-size: clamp(2rem, 8vw, 5.5rem);
+  font-size: clamp(3rem, 9vw, 8rem);
   margin: 0;
 }
 .lab-mh-title span { display: block; }

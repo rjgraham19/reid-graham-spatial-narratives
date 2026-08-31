@@ -277,6 +277,16 @@ export const EXPERIMENTS: ExperimentMeta[] = [
     reference: "21st.dev image-trail / marquee patterns, adapted",
     perf: "Moderate: CSS 3D transforms on 8 planes. Mobile falls back to INTRO-01. ~3.6s.",
   },
+  {
+    id: "INTRO-06",
+    category: "entrance",
+    name: "Cursor Trail Entrance",
+    blurb:
+      "A slow trail of square project images plays on its own (and follows the cursor if it moves); the wordmark starts centred, glides to its left resting spot as a matching nav fades in, then the payphone fades in on the right — holding on a MiniHome-matched frame so the handoff is seamless.",
+    platform: "desktop",
+    reference: "21st.dev image-trail + a centre-to-dock wordmark move; original",
+    perf: "Moderate: pooled trail nodes capped at 7, one-shot; the wordmark move is a CSS transition. Mobile skips the trail. ~3.8s.",
+  },
 
   // 02 NAVIGATION
   {
