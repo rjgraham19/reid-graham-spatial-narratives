@@ -344,6 +344,7 @@ export const PROJECTS: Project[] = [
   //     composition (Staging Aesthetics sits here; Anne Frank sits below). ──
   {
     slug: "you-cant-take-it-with-you",
+    accentColor: "#68691c",
     hub: "production-scenic",
     title: "You Can't Take It With You!",
     subtitle: "Deerfield Studio Theatre",
