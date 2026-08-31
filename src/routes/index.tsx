@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HERO_URL } from "@/lib/projects";
 import { SiteNav } from "@/components/site-nav";
+import { EntranceSequence } from "@/components/entrance-sequence";
 import designOverrides from "@/lib/design-overrides.json";
 import { mergeOverridesFiles, designModeStyleTag } from "@/lib/apply-overrides";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
@@ -39,6 +40,7 @@ function Home() {
   return (
     <div className="relative min-h-[100svh] bg-background text-foreground">
       {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
+      <EntranceSequence />
       <DesignFrameBridge
         liveOverrides={live}
         liveMedia={liveMedia}

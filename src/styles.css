@@ -973,3 +973,159 @@
   background-color: var(--background);
   color: var(--foreground);
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   First-visit entrance takeover (src/components/entrance-sequence.tsx).
+   Plays once per browser over the real homepage, then cross-fades out.
+   ───────────────────────────────────────────────────────────────────── */
+.rg-entrance {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  color: hsl(0 0% 98%);
+  overflow: hidden;
+  cursor: none;
+  opacity: 1;
+  transition: opacity 0.58s var(--ease-cinematic);
+}
+.rg-entrance--leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rg-entr-pool {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.rg-entr-node {
+  position: absolute;
+  width: clamp(150px, 19vw, 300px);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.85);
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(0.62);
+  opacity: 0;
+  animation: rg-entr-node 1.25s var(--ease-cinematic) forwards;
+}
+/* Slow in, long hold, gentle fade — a calm trail, not a flicker. */
+@keyframes rg-entr-node {
+  12% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(1);
+  }
+  68% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -48%) rotate(var(--rot, 0deg)) scale(0.99);
+  }
+}
+
+.rg-entr-wm {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display, "Poppins", sans-serif);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  font-size: clamp(3.4rem, 10vw, 9rem);
+  transition:
+    left 0.95s var(--ease-cinematic),
+    transform 0.95s var(--ease-cinematic),
+    font-size 0.95s var(--ease-cinematic);
+}
+.rg-entr-wm span {
+  display: block;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  animation: rg-entr-wipe 0.9s var(--ease-cinematic) forwards;
+}
+.rg-entr-wm span:nth-child(1) {
+  animation-delay: 0.12s;
+}
+.rg-entr-wm span:nth-child(2) {
+  animation-delay: 0.24s;
+}
+.rg-entr-wm span:nth-child(3) {
+  animation-delay: 0.38s;
+}
+.rg-entr-thin {
+  font-weight: 100;
+  color: rgba(255, 255, 255, 0.85);
+}
+/* Same left→right reveal the rest of the site uses for titles. */
+@keyframes rg-entr-wipe {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* Resting spot: left inset, vertically centred — close to the real
+   homepage lockup; the closing cross-fade covers any sub-pixel drift. */
+.rg-entr-wm[data-phase="docked"] {
+  left: clamp(24px, 6.5vw, 64px);
+  transform: translate(0, -50%);
+  font-size: clamp(3rem, 9vw, 8rem);
+}
+
+.rg-entr-payphone {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 50%;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-cinematic);
+}
+.rg-entr-payphone[data-in="true"] {
+  opacity: 1;
+}
+.rg-entr-payphone img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.rg-entr-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.4) 40%, transparent 70%);
+}
+@media (max-width: 767px) {
+  .rg-entr-payphone {
+    width: 100%;
+  }
+  .rg-entr-scrim {
+    background: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, 0.45) 42%, transparent 72%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rg-entr-wm,
+  .rg-entr-payphone {
+    transition: none;
+  }
+  .rg-entr-wm span {
+    animation: none;
+    opacity: 1;
+    clip-path: none;
+  }
+  .rg-entr-node {
+    animation: none;
+    opacity: 0;
+  }
+}
