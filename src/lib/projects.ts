@@ -402,7 +402,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "staging-aesthetics",
-    accentColor: "#b89bec",
+    accentColor: "#008bff",
     heroTitleAbove: true,
     heroPortrait: true,
     highlight: hlStaging,
