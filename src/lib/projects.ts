@@ -494,8 +494,6 @@ export const PROJECTS: Project[] = [
       {
         type: "image",
         src: "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg",
-        caption:
-          "Guided by accessibility and inclusive play for individuals of all ages and physical abilities, the Community Tennis and Recreational Building incorporates ramps to facilitate activity and motion around the courts — watching the game becomes as dynamic as playing it.",
         layout: "half",
       },
       { type: "image", src: "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg", layout: "half" },

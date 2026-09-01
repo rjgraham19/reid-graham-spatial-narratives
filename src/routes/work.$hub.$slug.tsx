@@ -756,6 +756,25 @@ function ProjectPage() {
           stays on the site's usual dark chrome). */}
       <div className={isTab || isFieldHouse || isTownhouse ? "light-zone" : undefined}>
 
+      {/* Field House — the project blurb sits directly under the hero image,
+          at the same size and weight as the descriptive lines on True West /
+          YCTIWU. Its own media[0] caption (which repeated this text with an
+          "01 — " index) was dropped, and it's skipped in the generic
+          description section below, so it shows here once. */}
+      {isFieldHouse && (
+        <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
+          <RevealBlock>
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl"
+            >
+              {project.description}
+            </p>
+          </RevealBlock>
+        </section>
+      )}
+
       {/* TaB: Renaissance — the PINK FOUNTAIN technical drawing, directly under
           the transition animation where the page turns white.
 
@@ -813,8 +832,10 @@ function ProjectPage() {
 
       {/* Description + credits — skipped on portrait-hero pages, where both
           already appear in the column beside the hero, and on TaB, where both
-          now sit up beside the closeup animation. */}
-      {!isPortraitHero && !isTab && (
+          now sit up beside the closeup animation. Field House renders its
+          blurb directly under the hero (above) and has no credits, so the
+          whole band is skipped for it rather than sitting empty. */}
+      {!isPortraitHero && !isTab && !isFieldHouse && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
           {/* Skipped on True West, where the two lines of the description now
