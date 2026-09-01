@@ -299,9 +299,7 @@
   "project.reshuffling-the-deck.description": {
     "desktop": {
       "align": "left",
-      "fontSize": 18,
-      "offsetX": -2,
-      "offsetY": -777
+      "fontSize": 18
     }
   },
   "project.townhouse.media.1": {
