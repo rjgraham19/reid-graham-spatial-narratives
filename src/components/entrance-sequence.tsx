@@ -6,19 +6,20 @@ import { PROJECTS, HERO_URL } from "@/lib/projects";
  * Homepage entrance sequence.
  *
  * Black takeover: the wordmark wipes in left-to-right, centred and large. A
- * self-running trail drops project images every ~380ms along a slow arc (and
- * follows the cursor if it moves — pointer hidden), so it reads with no input.
- * At 2.0s the wordmark glides centre -> its left resting spot; at 2.9s the
- * payphone fades in on the right. It holds, then the whole layer cross-fades
- * out over the real homepage sitting underneath.
+ * self-running trail drops project images every ~380ms clustered around the
+ * wordmark (on desktop it also follows the cursor — pointer hidden), so it
+ * reads with no input on any device. At 2.0s the trail hard-stops and clears,
+ * the wordmark glides centre -> its left resting spot; at 2.9s the payphone
+ * fades in on the right over an already-clean frame. It holds, then the whole
+ * layer cross-fades out over the real homepage sitting underneath.
  *
  * Plays on every full load of "/" — opening the URL fresh, a refresh, or
  * re-typing the address all replay it. A module-level flag stops it from
  * replaying on client-side navigation back to the homepage within the same
  * page load (e.g. clicking the wordmark from another route). Renders nothing
  * on the server / first hydration frame, so there is no hydration mismatch.
- * Honours prefers-reduced-motion (short, static path) and skips the pointer
- * trail on coarse pointers.
+ * Honours prefers-reduced-motion (short, static path); the cursor-follow
+ * spawns are desktop-only, the auto trail runs everywhere.
  */
 
 const WORDMARK = "REID GRAHAM DESIGN";
@@ -42,6 +43,9 @@ export function EntranceSequence() {
   const poolRef = useRef<HTMLDivElement>(null);
   const lastAt = useRef(0);
   const nextImg = useRef(0);
+  // Gate on spawning trail images. Flipped off the instant the wordmark
+  // starts docking, so nothing new can land over the incoming payphone.
+  const spawnable = useRef(true);
 
   // Client-only decision: SSR renders nothing; an SPA nav back to "/" within
   // the same page load renders nothing; a fresh document load plays it.
@@ -53,6 +57,7 @@ export function EntranceSequence() {
   }, []);
 
   const spawn = useCallback((clientX: number, clientY: number, rot: number) => {
+    if (!spawnable.current) return;
     const host = poolRef.current;
     if (!host) return;
     const r = host.getBoundingClientRect();
@@ -74,6 +79,22 @@ export function EntranceSequence() {
     // Lock the page behind the takeover while it plays.
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    spawnable.current = true;
+
+    // Hard-stop the trail: no more spawns, and fade out whatever is still
+    // on screen fast, so the payphone comes in over a clean frame.
+    const endTrail = () => {
+      spawnable.current = false;
+      const host = poolRef.current;
+      if (!host) return;
+      Array.from(host.children).forEach((child) => {
+        const el = child as HTMLElement;
+        el.style.animation = "none";
+        el.style.transition = "opacity 0.28s linear";
+        el.style.opacity = "0";
+        window.setTimeout(() => el.remove(), 320);
+      });
+    };
 
     const finish = () => {
       setLeaving(true);
@@ -82,6 +103,7 @@ export function EntranceSequence() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
+      spawnable.current = false;
       setPhase("docked");
       setPayphone(true);
       const t = window.setTimeout(finish, 1500);
@@ -91,31 +113,31 @@ export function EntranceSequence() {
       };
     }
 
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    let auto: number | undefined;
-    if (!coarse) {
-      const start = performance.now();
-      auto = window.setInterval(() => {
-        const host = poolRef.current;
-        if (!host) return;
-        const rr = host.getBoundingClientRect();
-        const t = Math.min((performance.now() - start) / 2400, 1);
-        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        const x = rr.left + rr.width * (0.18 + 0.64 * ease);
-        const y = rr.top + rr.height * (0.46 + 0.1 * Math.sin(t * Math.PI * 2.4));
-        spawn(x, y, Math.random() * 7 - 3.5);
-      }, 380);
-    }
+    // The self-running trail plays on every device — on a touch screen it is
+    // the whole show (there is no cursor to follow). Images cluster around
+    // the centred wordmark, then this stops the moment the wordmark docks.
+    const start = performance.now();
+    const auto = window.setInterval(() => {
+      const host = poolRef.current;
+      if (!host) return;
+      const rr = host.getBoundingClientRect();
+      const t = Math.min((performance.now() - start) / 2000, 1);
+      const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const x = rr.left + rr.width * (0.28 + 0.44 * ease);
+      const y = rr.top + rr.height * (0.42 + 0.12 * Math.sin(t * Math.PI * 2.4));
+      spawn(x, y, Math.random() * 7 - 3.5);
+    }, 380);
 
     const t1 = window.setTimeout(() => {
+      window.clearInterval(auto);
+      endTrail();
       setPhase("docked");
-      if (auto) window.clearInterval(auto);
     }, 2000);
     const t2 = window.setTimeout(() => setPayphone(true), 2900);
     const t3 = window.setTimeout(finish, 4700);
 
     return () => {
-      if (auto) window.clearInterval(auto);
+      window.clearInterval(auto);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
       window.clearTimeout(t3);
