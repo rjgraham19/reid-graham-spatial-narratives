@@ -834,7 +834,7 @@ function ProjectPage() {
               muted
               playsInline
               preload="auto"
-              className="absolute inset-0 h-full w-full object-cover md:-translate-x-[19%]"
+              className="absolute inset-0 h-full w-full object-cover md:-translate-x-[13%]"
             />
             {/* Desktop only: the blurb, pinned mid-height in the black space to
                 the right of the record player. It's inside the sticky frame, so
@@ -846,7 +846,7 @@ function ProjectPage() {
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
               style={{ opacity: 0 }}
-              className="hidden md:block absolute right-[10%] top-[46%] max-w-[29rem] -translate-y-1/2 rounded-sm bg-black/70 px-5 py-4 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
+              className="hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 rounded-sm bg-black/70 px-5 py-4 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
             >
               {project.description}
             </p>
