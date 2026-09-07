@@ -842,16 +842,20 @@ function ProjectPage() {
               actually visible with the address bar showing, or its bottom is cut
               off. vh measures the tall viewport the bar is hidden in. */}
           <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
-            {/* Desktop: nudged left of centre so the record player clears the
-                right third of the frame; the overflow-hidden parent crops the
-                left edge. Untouched on phones, where there's no room to spare. */}
+            {/* Desktop: scaled up and pushed left of centre so the record
+                player clears the right of the frame for the blurb — and, being
+                scaled past 100%, the video still covers the whole viewport, so
+                no page colour ever shows at its edge (its rendered near-black
+                doesn't paint quite the same as a CSS value). Untouched on
+                phones, where there's no room to spare. translateX must come
+                first so the scale still covers the right edge. */}
             <video
               ref={recordScrubVideoRef}
               src="/lollapalooza-recordplayer.mp4"
               muted
               playsInline
               preload="auto"
-              className="absolute inset-0 h-full w-full object-cover md:-translate-x-[13%]"
+              className="absolute inset-0 h-full w-full object-cover md:[transform:translateX(-10%)_scale(1.3)]"
             />
             {/* Desktop only: the blurb, pinned mid-height in the black space to
                 the right of the record player. It's inside the sticky frame, so
