@@ -247,8 +247,14 @@ function ProjectPage() {
 
   const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
   const recordScrubVideoRef = useRef<HTMLVideoElement>(null);
-  const [, setRecordScrubProgress] = useState(0);
-  useScrollScrubVideo(recordScrubWrapperRef, recordScrubVideoRef, setRecordScrubProgress);
+  // The blurb pinned beside the record player fades in a beat after the
+  // scrub starts, then holds. Opacity is written straight to the node from
+  // the scroll-progress callback so the page doesn't re-render every frame.
+  const recordCaptionRef = useRef<HTMLParagraphElement>(null);
+  useScrollScrubVideo(recordScrubWrapperRef, recordScrubVideoRef, (p: number) => {
+    const el = recordCaptionRef.current;
+    if (el) el.style.opacity = String(Math.min(1, Math.max(0, (p - 0.04) / 0.12)));
+  });
 
   return (
     /* `is-panel-frame` marks this document as the one rendered inside the
@@ -811,21 +817,39 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Lollapalooza — record-player scroll-scrub video, full-bleed background with text overlaid on top */}
+      {/* Lollapalooza — record-player scroll-scrub video, full-bleed background
+          with the project blurb pinned in the black space beside it (desktop). */}
       {isLollapalooza && (
         <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] bg-black">
           {/* svh, not vh: on a phone the sticky frame must fit the space that's
               actually visible with the address bar showing, or its bottom is cut
               off. vh measures the tall viewport the bar is hidden in. */}
           <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
+            {/* Desktop: nudged left of centre so the record player clears the
+                right third of the frame; the overflow-hidden parent crops the
+                left edge. Untouched on phones, where there's no room to spare. */}
             <video
               ref={recordScrubVideoRef}
               src="/lollapalooza-recordplayer.mp4"
               muted
               playsInline
               preload="auto"
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover md:-translate-x-[19%]"
             />
+            {/* Desktop only: the blurb, pinned mid-height in the black space to
+                the right of the record player. It's inside the sticky frame, so
+                it holds its spot for the whole scrub; opacity is driven by
+                scroll progress (see recordCaptionRef above) so it fades in just
+                after the animation starts and then stays. */}
+            <p
+              ref={recordCaptionRef}
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              style={{ opacity: 0 }}
+              className="hidden md:block absolute right-[10%] top-[46%] max-w-[29rem] -translate-y-1/2 rounded-sm bg-black/70 px-5 py-4 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
+            >
+              {project.description}
+            </p>
           </div>
         </div>
       )}
@@ -834,8 +858,10 @@ function ProjectPage() {
           already appear in the column beside the hero, and on TaB, where both
           now sit up beside the closeup animation. Field House renders its
           blurb directly under the hero (above) and has no credits, so the
-          whole band is skipped for it rather than sitting empty. */}
-      {!isPortraitHero && !isTab && !isFieldHouse && (
+          whole band is skipped for it rather than sitting empty. Lollapalooza
+          likewise: its blurb is pinned on the record-player animation and its
+          credits sit up by the hero, so nothing is left for this band. */}
+      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
           {/* Skipped on True West, where the two lines of the description now
