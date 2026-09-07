@@ -207,6 +207,23 @@ function ProjectPage() {
   const isPortraitHero = project.heroPortrait === true;
   const isTitleAbove = project.heroTitleAbove === true;
 
+  // Lollapalooza's record animation renders on a near-black (~#0a0908), not
+  // pure #000, so against a #000 page the scrub video reads as a separate
+  // panel. Take the html/body (behind any overscroll, and the panel it can
+  // open inside) to that same off-black; `.lolla-bg` handles the in-markup
+  // page wrappers.
+  useEffect(() => {
+    if (!isLollapalooza) return;
+    const prevBody = document.body.style.backgroundColor;
+    const prevHtml = document.documentElement.style.backgroundColor;
+    document.body.style.backgroundColor = "#0a0908";
+    document.documentElement.style.backgroundColor = "#0a0908";
+    return () => {
+      document.body.style.backgroundColor = prevBody;
+      document.documentElement.style.backgroundColor = prevHtml;
+    };
+  }, [isLollapalooza]);
+
   /* What the standard gallery should list. TaB gives its closeup video and
      both halves of the PINK FOUNTAIN drawing their own sections higher up the
      page, so only the opening contact sheet is left to show here. The original
@@ -262,7 +279,7 @@ function ProjectPage() {
        the very first HTML the frame parses, which is what lets the stylesheet
        hide the frame's scrollbar before anything is painted. */
     <div
-      className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor" : ""}${
+      className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
         panel ? " is-panel-frame" : ""
       }`}
       /* This project's own accent, exposed page-wide so controls that tint on
@@ -820,7 +837,7 @@ function ProjectPage() {
       {/* Lollapalooza — record-player scroll-scrub video, full-bleed background
           with the project blurb pinned in the black space beside it (desktop). */}
       {isLollapalooza && (
-        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] bg-black">
+        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] lolla-bg">
           {/* svh, not vh: on a phone the sticky frame must fit the space that's
               actually visible with the address bar showing, or its bottom is cut
               off. vh measures the tall viewport the bar is hidden in. */}
@@ -846,7 +863,7 @@ function ProjectPage() {
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
               style={{ opacity: 0 }}
-              className="hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 rounded-sm bg-black/70 px-5 py-4 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
+              className="hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
             >
               {project.description}
             </p>

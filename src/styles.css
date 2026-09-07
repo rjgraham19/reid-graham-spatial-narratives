@@ -974,6 +974,16 @@
   color: var(--foreground);
 }
 
+/* Lollapalooza — the record-player scrub video renders on a near-black
+   (~#0a0908), not pure #000. The page wrappers take that same colour so the
+   video blends into the page instead of reading as an inset panel. Applied
+   to the outer page div and the scrub section; html/body are set to match
+   from the route (for overscroll). !important to beat the `bg-black` utility
+   that also lands on the outer div via the mood style. */
+.lolla-bg {
+  background-color: #0a0908 !important;
+}
+
 /* ─────────────────────────────────────────────────────────────────────
    First-visit entrance takeover (src/components/entrance-sequence.tsx).
    Plays once per browser over the real homepage, then cross-fades out.
