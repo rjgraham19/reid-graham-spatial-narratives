@@ -10,8 +10,10 @@ import { PROJECTS, HERO_URL } from "@/lib/projects";
  * wordmark (on desktop it also follows the cursor — pointer hidden), so it
  * reads with no input on any device. At 2.0s the trail hard-stops and clears,
  * the wordmark glides centre -> its left resting spot; at 2.9s the payphone
- * fades in on the right over an already-clean frame. It holds, then the whole
- * layer cross-fades out over the real homepage sitting underneath.
+ * fades in on the right AND a stand-in top nav (small wordmark + PROJECTS /
+ * VISUALIZATIONS / CONNECT) fades in with it, so nothing lands late. It holds,
+ * then the whole layer cross-fades out over the real homepage — whose real
+ * nav is already in the same place — sitting underneath.
  *
  * Plays on every full load of "/" — opening the URL fresh, a refresh, or
  * re-typing the address all replay it. A module-level flag stops it from
@@ -173,6 +175,32 @@ export function EntranceSequence() {
       <div className="rg-entr-payphone" data-in={payphone ? "true" : undefined}>
         <img src={HERO_URL} alt="" />
         <div className="rg-entr-scrim" />
+      </div>
+
+      {/* A stand-in for the real top nav, so PROJECTS / VISUALIZATIONS /
+          CONNECT and the small wordmark arrive at the same moment the
+          payphone does — not a beat later when the whole layer lifts. It's
+          laid out like <SiteNav variant="top-transparent"> and reuses the
+          real .glass-button classes, so the cross-fade to the live nav
+          underneath is seamless. */}
+      <div className="rg-entr-nav" data-in={payphone ? "true" : undefined}>
+        <span className="rg-entr-nav-wm">
+          Reid Graham <span>Design</span>
+        </span>
+        <span className="glass-button glass-button--quiet glass-button--touch rg-entr-nav-menu">
+          Menu
+        </span>
+        <ul className="rg-entr-nav-links">
+          <li>
+            <span className="glass-button glass-button--quiet">Projects</span>
+          </li>
+          <li>
+            <span className="glass-button glass-button--quiet">Visualizations</span>
+          </li>
+          <li>
+            <span className="glass-button glass-button--quiet">Connect</span>
+          </li>
+        </ul>
       </div>
     </div>
   );

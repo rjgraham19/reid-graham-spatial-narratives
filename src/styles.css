@@ -1114,9 +1114,68 @@
   }
 }
 
+/* Stand-in top nav — laid out like <SiteNav variant="top-transparent">
+   (px-6 md:px-10 / py-4 md:py-6, small bold wordmark left, glass pills right)
+   so it fades in with the payphone and hands off to the real nav cleanly. */
+.rg-entr-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-cinematic);
+}
+.rg-entr-nav[data-in="true"] {
+  opacity: 1;
+}
+.rg-entr-nav-wm {
+  font-family: var(--font-display, "Poppins", sans-serif);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.97);
+}
+.rg-entr-nav-wm span {
+  font-weight: 100;
+}
+.rg-entr-nav-links {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) {
+  .rg-entr-nav {
+    padding: 1.5rem 2.5rem;
+    gap: 1.5rem;
+  }
+  .rg-entr-nav-wm {
+    font-size: 1rem;
+  }
+  .rg-entr-nav-links {
+    display: flex;
+  }
+  .rg-entr-nav-menu {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rg-entr-wm,
-  .rg-entr-payphone {
+  .rg-entr-payphone,
+  .rg-entr-nav {
     transition: none;
   }
   .rg-entr-wm span {
