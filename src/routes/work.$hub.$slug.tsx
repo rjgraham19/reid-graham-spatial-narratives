@@ -9,6 +9,7 @@ import { LightboxVideo } from "@/components/lightbox-video";
 import { SwipeGallery } from "@/components/swipe-gallery";
 import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
+import { TownhouseViewer } from "@/components/townhouse-viewer";
 
 import tabAnimation from "@/assets/rg/tab-animation.svg";
 import { InlineAnimatedSvg } from "@/components/inline-animated-svg";
@@ -1090,6 +1091,7 @@ function ProjectPage() {
       )}
 
       {/* Media gallery */}
+      {isTownhouse && <TownhouseViewer />}
       {/* Skipped where every media item already appears in a bespoke layout
           above, which would otherwise repeat the whole set — and, for the
           default (non-bespoke) branch, where there's simply nothing left in
