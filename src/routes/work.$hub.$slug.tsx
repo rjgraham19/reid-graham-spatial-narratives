@@ -225,6 +225,21 @@ function ProjectPage() {
     };
   }, [isLollapalooza]);
 
+  // Townhouse runs light from the hero down, so take the html/body behind
+  // any overscroll (and the panel it can open inside) to white to match —
+  // the same mechanism Lollapalooza uses for its off-black.
+  useEffect(() => {
+    if (!isTownhouse) return;
+    const prevBody = document.body.style.backgroundColor;
+    const prevHtml = document.documentElement.style.backgroundColor;
+    document.body.style.backgroundColor = "#ffffff";
+    document.documentElement.style.backgroundColor = "#ffffff";
+    return () => {
+      document.body.style.backgroundColor = prevBody;
+      document.documentElement.style.backgroundColor = prevHtml;
+    };
+  }, [isTownhouse]);
+
   /* What the standard gallery should list. TaB gives its closeup video and
      both halves of the PINK FOUNTAIN drawing their own sections higher up the
      page, so only the opening contact sheet is left to show here. The original
@@ -280,7 +295,7 @@ function ProjectPage() {
        the very first HTML the frame parses, which is what lets the stylesheet
        hide the frame's scrollbar before anything is painted. */
     <div
-      className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
+      className={`relative ${isTownhouse ? "light-zone" : mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
         panel ? " is-panel-frame" : ""
       }`}
       /* This project's own accent, exposed page-wide so controls that tint on
@@ -390,7 +405,11 @@ function ProjectPage() {
           }
         >
           <div
-            className={`sticky bg-gradient-to-b from-black via-black/70 to-transparent ${
+            className={`sticky bg-gradient-to-b ${
+              /* Townhouse runs on a white page — the scrim behind the title
+                 fades from the page's own background, not from black. */
+              isTownhouse ? "from-background via-background/70" : "from-black via-black/70"
+            } to-transparent ${
               /* Two cases, and they want opposite things.
 
                  In the panel there is no site nav, so the offset and padding
@@ -680,7 +699,9 @@ function ProjectPage() {
 
       {isPortraitHero && !isReshuffling && (
         <aside className="px-6 md:px-0 pt-8 md:pt-14 pb-4 md:pb-0">
-          <div className="md:sticky md:top-32">
+          {/* Townhouse: no sticky — the blurb scrolls away with the hero
+              rather than trailing the viewport down the page. */}
+          <div className={isTownhouse ? undefined : "md:sticky md:top-32"}>
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
@@ -1259,21 +1280,21 @@ function ProjectPage() {
             </div>
           </div>
         ) : isTownhouse ? (
-          // Custom Townhouse layout: the axonometric upright (its own
-          // natural proportions, not rotated) on the left, and the three
-          // renders stacked as a centered column on the right — nothing
-          // else follows it. The wrapper's aspect-ratio matches the axon's
-          // real dimensions exactly, so it's never cropped and never grows
-          // taller than the picture itself. Portrait now — the previous
-          // export of this same view was sideways (1865/1143, landscape);
-          // this one is the identical image rotated upright (1143/1865).
-          <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 md:gap-10 md:items-center">
+          // Custom Townhouse layout: the axonometric upright on the left,
+          // the three renders stacked as a column on the right — nothing
+          // else follows it. The axon is given the larger share of the row
+          // and shown at its own natural proportions (w-full h-auto, no
+          // object-cover and no fixed aspect-ratio box), so it can never be
+          // cropped — whatever the file's real dimensions. items-start tops
+          // both columns on the same line, closing the vertical gap the old
+          // centered layout left when the render column ran taller.
+          <div className="grid grid-cols-1 md:grid-cols-[5fr_3fr] gap-6 md:gap-10 md:items-start">
             {!project.media[0]?.hidden && (
-              <figure className="group overflow-hidden rounded-md" style={{ aspectRatio: "1143 / 1865" }}>
+              <figure className="group overflow-hidden rounded-md">
                 <button
                   type="button"
                   onClick={() => setLightbox(0)}
-                  className="block w-full h-full"
+                  className="block w-full"
                   aria-label={project.media[0].caption ?? "Axonometric"}
                 >
                   <img
@@ -1282,7 +1303,7 @@ function ProjectPage() {
                     src={project.media[0].src}
                     alt={project.media[0].caption ?? project.title}
                     loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-cinematic"
+                    className="w-full h-auto group-hover:scale-[1.03] transition-transform duration-700 ease-cinematic"
                   />
                 </button>
               </figure>
