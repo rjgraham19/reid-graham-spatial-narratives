@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HERO_URL, PROJECT_TAGS } from "@/lib/projects";
 import { SiteNav } from "@/components/site-nav";
+import { trackSheen } from "@/components/glass-button";
 import { EntranceSequence } from "@/components/entrance-sequence";
 import designOverrides from "@/lib/design-overrides.json";
 import { mergeOverridesFiles, designModeStyleTag } from "@/lib/apply-overrides";
@@ -99,7 +100,8 @@ function Home() {
                   key={t}
                   to="/work"
                   search={{ tag: t }}
-                  className="glass-button glass-button--quiet md:grow md:basis-0 md:min-w-max"
+                  onMouseMove={trackSheen}
+                  className="home-discipline-link glass-button glass-button--quiet glass-button--sheen md:grow md:basis-0 md:min-w-max"
                 >
                   {t.replace("/", " / ")}
                 </Link>

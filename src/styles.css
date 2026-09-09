@@ -885,6 +885,14 @@
   --sheen-strength: 44%;
 }
 
+/* The homepage discipline links light their hover sheen in a saturated
+   light blue sampled from the payphone hero's neon glow, so the row picks
+   up the image beside it on hover. */
+.home-discipline-link.glass-button--sheen {
+  --sheen-color: #38a8f0;
+  --sheen-strength: 42%;
+}
+
 /* Cursor sheen — a soft light-grey highlight that follows the pointer across
    the glass, the way a real pane catches a light source as you move past it.
    Opt-in via `glassButton({ sheen: true })`; the caller feeds it the cursor
