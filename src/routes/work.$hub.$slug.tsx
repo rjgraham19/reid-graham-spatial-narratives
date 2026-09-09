@@ -225,21 +225,6 @@ function ProjectPage() {
     };
   }, [isLollapalooza]);
 
-  // Townhouse runs light from the hero down, so take the html/body behind
-  // any overscroll (and the panel it can open inside) to white to match —
-  // the same mechanism Lollapalooza uses for its off-black.
-  useEffect(() => {
-    if (!isTownhouse) return;
-    const prevBody = document.body.style.backgroundColor;
-    const prevHtml = document.documentElement.style.backgroundColor;
-    document.body.style.backgroundColor = "#ffffff";
-    document.documentElement.style.backgroundColor = "#ffffff";
-    return () => {
-      document.body.style.backgroundColor = prevBody;
-      document.documentElement.style.backgroundColor = prevHtml;
-    };
-  }, [isTownhouse]);
-
   /* What the standard gallery should list. TaB gives its closeup video and
      both halves of the PINK FOUNTAIN drawing their own sections higher up the
      page, so only the opening contact sheet is left to show here. The original
@@ -295,7 +280,7 @@ function ProjectPage() {
        the very first HTML the frame parses, which is what lets the stylesheet
        hide the frame's scrollbar before anything is painted. */
     <div
-      className={`relative ${isTownhouse ? "light-zone" : mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
+      className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
         panel ? " is-panel-frame" : ""
       }`}
       /* This project's own accent, exposed page-wide so controls that tint on
@@ -405,11 +390,7 @@ function ProjectPage() {
           }
         >
           <div
-            className={`sticky bg-gradient-to-b ${
-              /* Townhouse runs on a white page — the scrim behind the title
-                 fades from the page's own background, not from black. */
-              isTownhouse ? "from-background via-background/70" : "from-black via-black/70"
-            } to-transparent ${
+            className={`sticky bg-gradient-to-b from-black via-black/70 to-transparent ${
               /* Two cases, and they want opposite things.
 
                  In the panel there is no site nav, so the offset and padding
@@ -1282,13 +1263,15 @@ function ProjectPage() {
         ) : isTownhouse ? (
           // Custom Townhouse layout: the axonometric upright on the left,
           // the three renders stacked as a column on the right — nothing
-          // else follows it. The axon is given the larger share of the row
-          // and shown at its own natural proportions (w-full h-auto, no
-          // object-cover and no fixed aspect-ratio box), so it can never be
-          // cropped — whatever the file's real dimensions. items-start tops
-          // both columns on the same line, closing the vertical gap the old
-          // centered layout left when the render column ran taller.
-          <div className="grid grid-cols-1 md:grid-cols-[5fr_3fr] gap-6 md:gap-10 md:items-start">
+          // else follows it. The axon is shown at its own natural
+          // proportions (w-full h-auto, no object-cover and no fixed
+          // aspect-ratio box), so it can never be cropped whatever the
+          // file's real dimensions. The 19/10 column split is tuned so the
+          // portrait axon renders about as tall as the three stacked
+          // squares beside it — it fills the row rather than ending short
+          // and leaving black beside the lower renders. items-start keeps
+          // both columns starting on the same line.
+          <div className="grid grid-cols-1 md:grid-cols-[19fr_10fr] gap-6 md:gap-10 md:items-start">
             {!project.media[0]?.hidden && (
               <figure className="group overflow-hidden rounded-md">
                 <button
