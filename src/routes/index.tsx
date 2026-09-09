@@ -69,35 +69,41 @@ function Home() {
               whole three-line lockup as one block via a transform, leaving
               its reserved layout space untouched rather than switching the
               header to absolute positioning. */}
-          <div data-design-id={brandingId} data-design-kind="heading">
-            <h1
-              className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
-              aria-label="Reid Graham Design"
-            >
-              <span className="block">Reid</span>
-              <span className="block">Graham</span>
-              <span className="block font-thin text-foreground/85">Design</span>
-            </h1>
-          </div>
-
-          {/* Discipline shortcuts, under the wordmark. The entrance sequence
-              renders a matching stand-in set (see .rg-entr-disciplines) that
-              rises in with the top nav, then cross-fades onto these. */}
-          <nav
-            aria-label="Project disciplines"
-            className="mt-7 md:mt-9 flex flex-col items-start gap-2"
-          >
-            {PROJECT_TAGS.map((t) => (
-              <Link
-                key={t}
-                to="/work"
-                search={{ tag: t }}
-                className="glass-button glass-button--quiet"
+          {/* w-fit shrink-wraps this block to the wordmark's widest line
+              ("Graham"), so the discipline row below can be exactly that
+              wide. */}
+          <div className="w-fit">
+            <div data-design-id={brandingId} data-design-kind="heading">
+              <h1
+                className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
+                aria-label="Reid Graham Design"
               >
-                {t.replace("/", " / ")}
-              </Link>
-            ))}
-          </nav>
+                <span className="block">Reid</span>
+                <span className="block">Graham</span>
+                <span className="block font-thin text-foreground/85">Design</span>
+              </h1>
+            </div>
+
+            {/* Discipline shortcuts, spanning the width of "Graham" as one
+                row of equal buttons. The entrance sequence renders a matching
+                stand-in set (see .rg-entr-disciplines) that rises in with the
+                top nav, then cross-fades onto these. */}
+            <nav
+              aria-label="Project disciplines"
+              className="mt-7 md:mt-9 flex w-full flex-col gap-2 md:flex-row"
+            >
+              {PROJECT_TAGS.map((t) => (
+                <Link
+                  key={t}
+                  to="/work"
+                  search={{ tag: t }}
+                  className="glass-button glass-button--quiet md:grow md:basis-0 md:min-w-max"
+                >
+                  {t.replace("/", " / ")}
+                </Link>
+              ))}
+            </nav>
+          </div>
         </div>
 
         {/* RIGHT — phone booth, clickable easter-egg → /contact */}

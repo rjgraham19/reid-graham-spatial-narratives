@@ -1207,6 +1207,19 @@
   opacity: 1;
   transform: translateY(0);
 }
+@media (min-width: 768px) {
+  /* Match the real page: one row, roughly the width of the "GRAHAM" line
+     above it, equal-width buttons — so the cross-fade lines up. */
+  .rg-entr-disciplines {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: calc(3.6 * clamp(3rem, 9vw, 8rem));
+  }
+  .rg-entr-disciplines > .glass-button {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .rg-entr-wm,
