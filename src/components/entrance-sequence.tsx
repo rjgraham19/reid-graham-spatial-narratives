@@ -170,6 +170,15 @@ export function EntranceSequence() {
         <span>{a}</span>
         <span>{b}</span>
         <span className="rg-entr-thin">{c}</span>
+
+        {/* Child of the wordmark so it inherits the exact "GRAHAM" width and
+            the docked position — no estimated offsets to drift against the
+            real row it cross-fades onto. */}
+        <div className="rg-entr-disciplines" data-in={payphone ? "true" : undefined}>
+          <span className="glass-button glass-button--quiet">Experiential</span>
+          <span className="glass-button glass-button--quiet">Production / Scenic</span>
+          <span className="glass-button glass-button--quiet">Architecture</span>
+        </div>
       </div>
 
       <div className="rg-entr-payphone" data-in={payphone ? "true" : undefined}>
@@ -203,15 +212,6 @@ export function EntranceSequence() {
         </ul>
       </div>
 
-      {/* Stand-in discipline links under the docked wordmark. They rise in a
-          beat after the payphone / nav so they read as arriving together,
-          then the closing cross-fade hands off to the real <Link>s on the
-          homepage underneath. Same .glass-button classes for a clean seam. */}
-      <div className="rg-entr-disciplines" data-in={payphone ? "true" : undefined}>
-        <span className="glass-button glass-button--quiet">Experiential</span>
-        <span className="glass-button glass-button--quiet">Production / Scenic</span>
-        <span className="glass-button glass-button--quiet">Architecture</span>
-      </div>
     </div>
   );
 }

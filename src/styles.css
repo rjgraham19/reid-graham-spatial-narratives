@@ -1054,19 +1054,19 @@
     transform 0.95s var(--ease-cinematic),
     font-size 0.95s var(--ease-cinematic);
 }
-.rg-entr-wm span {
+.rg-entr-wm > span {
   display: block;
   opacity: 0;
   clip-path: inset(0 100% 0 0);
   animation: rg-entr-wipe 0.9s var(--ease-cinematic) forwards;
 }
-.rg-entr-wm span:nth-child(1) {
+.rg-entr-wm > span:nth-child(1) {
   animation-delay: 0.12s;
 }
-.rg-entr-wm span:nth-child(2) {
+.rg-entr-wm > span:nth-child(2) {
   animation-delay: 0.24s;
 }
-.rg-entr-wm span:nth-child(3) {
+.rg-entr-wm > span:nth-child(3) {
   animation-delay: 0.38s;
 }
 .rg-entr-thin {
@@ -1182,17 +1182,20 @@
   }
 }
 
-/* Stand-in discipline links under the docked wordmark. Anchored to the same
-   left inset as the docked wordmark and pushed down past roughly half the
-   three-line lockup so they sit just under it. They rise in a fraction after
-   .rg-entr-nav / .rg-entr-payphone, then the closing cross-fade hands off to
-   the real <Link>s on the homepage underneath. */
+/* Stand-in discipline links. A child of .rg-entr-wm, so it takes that
+   element's exact "GRAHAM" width and rides its docked position — nothing is
+   estimated, so it lines up with the real row it cross-fades onto instead of
+   jumping when the takeover lifts. Rises in a fraction after .rg-entr-nav /
+   .rg-entr-payphone. */
 .rg-entr-disciplines {
   position: absolute;
-  z-index: 3;
-  left: clamp(24px, 6.5vw, 64px);
-  top: 50%;
-  margin-top: calc(1.28 * clamp(3rem, 9vw, 8rem) + 1.6rem);
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin-top: 1.75rem;
+  /* Reset the wordmark's display type — the glass buttons style their own. */
+  line-height: normal;
+  letter-spacing: normal;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -1208,12 +1211,11 @@
   transform: translateY(0);
 }
 @media (min-width: 768px) {
-  /* Match the real page: one row, roughly the width of the "GRAHAM" line
-     above it, equal-width buttons — so the cross-fade lines up. */
+  /* Match the real page: one equal-width row spanning "GRAHAM", 2.25rem
+     (mt-9) below the lockup. */
   .rg-entr-disciplines {
     flex-direction: row;
-    flex-wrap: wrap;
-    width: calc(3.6 * clamp(3rem, 9vw, 8rem));
+    margin-top: 2.25rem;
   }
   .rg-entr-disciplines > .glass-button {
     flex: 1 1 0;
@@ -1228,7 +1230,7 @@
   .rg-entr-disciplines {
     transition: none;
   }
-  .rg-entr-wm span {
+  .rg-entr-wm > span {
     animation: none;
     opacity: 1;
     clip-path: none;

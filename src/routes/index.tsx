@@ -71,8 +71,10 @@ function Home() {
               header to absolute positioning. */}
           {/* w-fit shrink-wraps this block to the wordmark's widest line
               ("Graham"), so the discipline row below can be exactly that
-              wide. */}
-          <div className="w-fit">
+              wide. From md the row is positioned absolutely under the
+              wordmark so it doesn't push the lockup off-centre — that shift
+              is what made the entrance hand-off visibly jump. */}
+          <div className="relative w-fit">
             <div data-design-id={brandingId} data-design-kind="heading">
               <h1
                 className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
@@ -90,7 +92,7 @@ function Home() {
                 top nav, then cross-fades onto these. */}
             <nav
               aria-label="Project disciplines"
-              className="mt-7 md:mt-9 flex w-full flex-col gap-2 md:flex-row"
+              className="mt-7 flex w-full flex-col gap-2 md:absolute md:left-0 md:top-full md:mt-9 md:flex-row"
             >
               {PROJECT_TAGS.map((t) => (
                 <Link
