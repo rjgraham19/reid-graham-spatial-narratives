@@ -1182,10 +1182,37 @@
   }
 }
 
+/* Stand-in discipline links under the docked wordmark. Anchored to the same
+   left inset as the docked wordmark and pushed down past roughly half the
+   three-line lockup so they sit just under it. They rise in a fraction after
+   .rg-entr-nav / .rg-entr-payphone, then the closing cross-fade hands off to
+   the real <Link>s on the homepage underneath. */
+.rg-entr-disciplines {
+  position: absolute;
+  z-index: 3;
+  left: clamp(24px, 6.5vw, 64px);
+  top: 50%;
+  margin-top: calc(1.28 * clamp(3rem, 9vw, 8rem) + 1.6rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition:
+    opacity 0.7s var(--ease-cinematic) 0.16s,
+    transform 0.7s var(--ease-cinematic) 0.16s;
+}
+.rg-entr-disciplines[data-in="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rg-entr-wm,
   .rg-entr-payphone,
-  .rg-entr-nav {
+  .rg-entr-nav,
+  .rg-entr-disciplines {
     transition: none;
   }
   .rg-entr-wm span {

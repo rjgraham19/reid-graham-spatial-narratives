@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { HERO_URL } from "@/lib/projects";
+import { HERO_URL, PROJECT_TAGS } from "@/lib/projects";
 import { SiteNav } from "@/components/site-nav";
 import { EntranceSequence } from "@/components/entrance-sequence";
 import designOverrides from "@/lib/design-overrides.json";
@@ -79,6 +79,25 @@ function Home() {
               <span className="block font-thin text-foreground/85">Design</span>
             </h1>
           </div>
+
+          {/* Discipline shortcuts, under the wordmark. The entrance sequence
+              renders a matching stand-in set (see .rg-entr-disciplines) that
+              rises in with the top nav, then cross-fades onto these. */}
+          <nav
+            aria-label="Project disciplines"
+            className="mt-7 md:mt-9 flex flex-col items-start gap-2"
+          >
+            {PROJECT_TAGS.map((t) => (
+              <Link
+                key={t}
+                to="/work"
+                search={{ tag: t }}
+                className="glass-button glass-button--quiet"
+              >
+                {t.replace("/", " / ")}
+              </Link>
+            ))}
+          </nav>
         </div>
 
         {/* RIGHT — phone booth, clickable easter-egg → /contact */}
