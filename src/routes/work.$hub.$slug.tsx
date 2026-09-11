@@ -9,6 +9,8 @@ import { LightboxVideo } from "@/components/lightbox-video";
 import { SwipeGallery } from "@/components/swipe-gallery";
 import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
+import { ExchangeViewer } from "@/components/exchange-viewer";
+import { LollaViewer } from "@/components/lolla-viewer";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 
 import tabAnimation from "@/assets/rg/tab-animation.svg";
@@ -390,7 +392,19 @@ function ProjectPage() {
           }
         >
           <div
-            className={`sticky bg-gradient-to-b from-black via-black/70 to-transparent ${
+            className={`${
+              /* Overlay heroes pin the title over the photo for the length of
+                 the runway, then let it fade off — that's the whole overlay
+                 effect. Title-above heroes are the opposite case by
+                 definition: the title sits above its own image precisely so
+                 it never covers it, so pinning it (with its black scrim)
+                 back down over the hero as you scroll is the one thing it
+                 must not do. Static there instead — it scrolls away with the
+                 page. The runway below still reserves its height and the
+                 figure's negative margin still cancels it, so the layout is
+                 unchanged; only the pin is gone. */
+              isTitleAbove ? "" : "sticky"
+            } bg-gradient-to-b from-black via-black/70 to-transparent ${
               /* Two cases, and they want opposite things.
 
                  In the panel there is no site nav, so the offset and padding
@@ -680,9 +694,13 @@ function ProjectPage() {
 
       {isPortraitHero && !isReshuffling && (
         <aside className="px-6 md:px-0 pt-8 md:pt-14 pb-4 md:pb-0">
-          {/* Townhouse: no sticky — the blurb scrolls away with the hero
-              rather than trailing the viewport down the page. */}
-          <div className={isTownhouse ? undefined : "md:sticky md:top-32"}>
+          {/* No sticky: the blurb scrolls away with the hero rather than
+              trailing the viewport down the page. Pinning it made it drift
+              over later sections (the model video) on the way out, and
+              nudged the whole column into looking unstable on scroll and
+              resize — a portrait hero already gives the text room to sit
+              beside without it. */}
+          <div>
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
@@ -1094,6 +1112,8 @@ function ProjectPage() {
 
       {/* Media gallery */}
       {isTownhouse && <TownhouseViewer />}
+      {project.slug === "the-exchange-facility" && <ExchangeViewer />}
+      {isLollapalooza && <LollaViewer />}
       {/* Skipped where every media item already appears in a bespoke layout
           above, which would otherwise repeat the whole set — and, for the
           default (non-bespoke) branch, where there's simply nothing left in
