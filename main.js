@@ -61,17 +61,20 @@ export async function createPavilion(stage, navigation, status) {
   controls.maxZoom = 3;
   controls.maxPolarAngle = Math.PI * 0.49;
   controls.update();
-  scene.add(new THREE.AmbientLight(0xffffff, Math.PI * 0.85));
-  const key = new THREE.DirectionalLight(0xffffff, Math.PI * 0.25);
+  scene.add(new THREE.AmbientLight(0xffffff, Math.PI * 0.4));
+  const key = new THREE.DirectionalLight(0xffffff, Math.PI * 0.7);
   key.position.set(-15, 35, -20);
   key.castShadow = true;
   Object.assign(key.shadow.camera, { left: -25, right: 25, top: 25, bottom: -25, near: 1, far: 100 });
-  key.shadow.mapSize.set(1024, 1024);
-  key.shadow.radius = 4;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.radius = 2.5;
   key.shadow.blurSamples = 8;
   key.shadow.bias = -0.0003;
-  key.shadow.normalBias = 0.035;
+  key.shadow.normalBias = 0.012;
   scene.add(key);
+  const fill = new THREE.DirectionalLight(0xe5edff, Math.PI * 0.12);
+  fill.position.set(18, 12, 24);
+  scene.add(fill);
   const pmrem = new THREE.PMREMGenerator(renderer);
   let environment;
   try {
@@ -105,7 +108,7 @@ export async function createPavilion(stage, navigation, status) {
   }
   const palette = {
     TENT_ANIMATED: '#E20074', MAGENTA_ANIMATED: '#B5005D',
-    GRASS_ANIMATED: '#B5B5B8', RAILING_ANIMATED: '#B5B5B8',
+    GRASS_ANIMATED: '#B5B5B8', RAILING_ANIMATED: '#87878E',
     FURNITURE_ANIMATED: '#F2F2F2', ANIMATED_CHROME: '#D6D6DA'
   };
   gltf.scene.traverse(mesh => {
@@ -117,7 +120,7 @@ export async function createPavilion(stage, navigation, status) {
       : new THREE.MeshLambertMaterial({ color: palette[name] || '#B5B5B8', side: THREE.DoubleSide });
     if (Array.isArray(old)) old.forEach(m => m.dispose()); else old.dispose();
     mesh.castShadow = name !== 'GRASS_ANIMATED';
-    mesh.receiveShadow = name === 'GRASS_ANIMATED';
+    mesh.receiveShadow = true;
   });
   scene.add(gltf.scene);
   const roof = gltf.scene.getObjectByName('TENT_ANIMATED');
@@ -131,16 +134,22 @@ export async function createPavilion(stage, navigation, status) {
   const roofMaterials = [];
   roof.traverse(node => { if (node.isMesh) roofMaterials.push(node.material); });
   let phase = 'waiting', inView = false, cameraTween = null, roofTween = null;
-  let gableShown = false, frame = 0, disposed = false;
+  let gableShown = false, roofFlight = false, frame = 0, disposed = false;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const gable = navigation.querySelector('#gable');
   const viewButtons = [...navigation.querySelectorAll('[data-view]')];
   const ease = t => t * t * (3 - 2 * t);
-  function finishReveal() {
-    if (phase === 'revealed') return;
+  function hideRoof() {
     action.stop();
     roof.position.copy(roofHome);
     roof.visible = false;
+    roofFlight = false;
+    gable.disabled = false;
+    renderer.shadowMap.needsUpdate = true;
+  }
+  function finishReveal() {
+    if (phase === 'revealed') return;
+    hideRoof();
     phase = 'revealed';
     controls.enabled = true;
     stage.classList.add('revealed');
@@ -179,19 +188,35 @@ export async function createPavilion(stage, navigation, status) {
   controls.addEventListener('start', interruptCamera);
   viewButtons.forEach(button => button.addEventListener('click', selectView));
   function toggleGable() {
+    if (gable.disabled) return;
     gableShown = !gableShown;
-    const wasHidden = !roof.visible;
-    roof.visible = true;
-    roofTween = {
-      time: performance.now(), y: roof.position.y,
-      opacity: roofMaterials[0].opacity, show: gableShown
-    };
-    if (gableShown && wasHidden) {
-      roofTween.y = roofHome.y + 1.2; roofTween.opacity = 0;
-    }
-    roofMaterials.forEach(material => { material.transparent = true; material.depthWrite = false; material.needsUpdate = true; });
+    gable.disabled = true;
     gable.setAttribute('aria-pressed', String(gableShown));
     gable.textContent = gableShown ? 'Hide gable' : 'Show gable';
+    if (!gableShown) {
+      // Reuse the complete baked upward flight, without fading it away.
+      roofTween = null;
+      roofMaterials.forEach(material => {
+        material.opacity = 1;
+        material.transparent = false;
+        material.depthWrite = true;
+        material.needsUpdate = true;
+      });
+      roofFlight = true;
+      action.reset().play();
+      if (reducedMotion) hideRoof();
+      return;
+    }
+    roof.visible = true;
+    roofTween = {
+      time: performance.now(), y: roofHome.y + 1.2,
+      opacity: 0, show: true
+    };
+    roofMaterials.forEach(material => {
+      material.transparent = true;
+      material.depthWrite = false;
+      material.needsUpdate = true;
+    });
   }
   gable.addEventListener('click', toggleGable);
   let previous = performance.now();
@@ -200,11 +225,15 @@ export async function createPavilion(stage, navigation, status) {
     frame = requestAnimationFrame(tick);
     const dt = Math.min((now - previous) / 1000, 0.05);
     previous = now;
-    if (phase === 'rising' && inView && !document.hidden) {
+    if (((phase === 'rising' && inView) || roofFlight) && !document.hidden) {
       mixer.update(dt);
       renderer.shadowMap.needsUpdate = true;
     }
-    if (revealFinished) { revealFinished = false; finishReveal(); }
+    if (revealFinished) {
+      revealFinished = false;
+      if (phase === 'rising') finishReveal();
+      else if (roofFlight) hideRoof();
+    }
     if (cameraTween) {
       const t = ease(Math.min(1, (now - cameraTween.time) / (reducedMotion ? 1 : 1000)));
       controls.target.lerpVectors(cameraTween.target, cameraTween.look, t);
@@ -227,7 +256,7 @@ export async function createPavilion(stage, navigation, status) {
         material.opacity = THREE.MathUtils.lerp(roofTween.opacity, roofTween.show ? 1 : 0, t);
         if (t === 1) { material.transparent = false; material.depthWrite = true; material.needsUpdate = true; }
       });
-      if (t === 1) { roof.visible = roofTween.show; roofTween = null; }
+      if (t === 1) { roof.visible = roofTween.show; roofTween = null; gable.disabled = false; }
     }
     controls.update();
     if (!document.hidden) renderer.render(scene, camera);
