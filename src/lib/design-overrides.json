@@ -274,8 +274,6 @@
     },
     "desktop": {
       "fontSize": 20,
-      "offsetX": -9,
-      "offsetY": 352,
       "align": "left"
     }
   },
@@ -322,8 +320,6 @@
       "hidden": true
     },
     "desktop": {
-      "offsetX": -64,
-      "offsetY": -142,
       "widthPct": 100
     }
   },
