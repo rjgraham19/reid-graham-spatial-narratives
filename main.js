@@ -107,7 +107,7 @@ export async function createPavilion(stage, navigation, status) {
     throw error;
   }
   const palette = {
-    TENT_ANIMATED: '#E20074', MAGENTA_ANIMATED: '#B5005D',
+    TENT_ANIMATED: '#CD007F', MAGENTA_ANIMATED: '#CD007F',
     GRASS_ANIMATED: '#B5B5B8', RAILING_ANIMATED: '#87878E',
     FURNITURE_ANIMATED: '#F2F2F2', ANIMATED_CHROME: '#D6D6DA'
   };
