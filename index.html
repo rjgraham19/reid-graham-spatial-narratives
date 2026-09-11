@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lolla — Pavilion study</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"}}
+  </script>
+</head>
+<body>
+  <main>
+    <header><p>Spatial studies</p><h1>Lolla</h1></header>
+    <section id="pavilion" aria-label="Lolla pavilion">
+      <div id="stage" role="img" aria-label="Magenta pavilion, three-quarter view">
+        <img id="poster" src="./reference.jpg" alt="Magenta pavilion with white curved seating">
+      </div>
+      <nav id="navigation" aria-label="Pavilion views" hidden>
+        <div class="views">
+          <button data-view="SE">SE isometric</button>
+          <button data-view="SW">SW isometric</button>
+          <button data-view="NE">NE isometric</button>
+          <button data-view="NW">NW isometric</button>
+        </div>
+        <button id="gable" aria-pressed="false">Show gable</button>
+      </nav>
+      <p id="status" class="sr-only" role="status"></p>
+    </section>
+    <footer><p>A study in gathering, rhythm, and color.</p></footer>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
+
