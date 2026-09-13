@@ -652,7 +652,21 @@ function ProjectPage() {
           explicit, so the two are free to differ. */}
       {isReshuffling && (
         <>
-          <div className="px-6 md:px-0 pt-8 md:pt-0 space-y-4 md:space-y-6 md:col-start-2 md:row-start-1 md:self-end">
+          {/* Premise paragraph now leads the column — self-start so it sits
+              level with the title/location line over on the left, rather
+              than self-end, which bottom-aligned the old paragraph-below-
+              images arrangement to the hero's foot instead. */}
+          <div className="px-6 md:px-0 pt-8 md:pt-0 space-y-4 md:space-y-6 md:col-start-2 md:row-start-1 md:self-start">
+            <RevealBlock>
+              <p
+                data-design-id={designId.projectDescription(project.slug)}
+                data-design-kind="text"
+                className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance md:text-right"
+              >
+                {project.description}
+              </p>
+            </RevealBlock>
+
             {[1, 2].map((idx) => (
               <figure key={idx} className="group">
                 <button
@@ -671,16 +685,6 @@ function ProjectPage() {
               </figure>
             ))}
           </div>
-
-          <RevealBlock className="px-6 md:px-0 mt-6 md:mt-0 md:col-start-2 md:row-start-2">
-            <p
-              data-design-id={designId.projectDescription(project.slug)}
-              data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance md:text-right"
-            >
-              {project.description}
-            </p>
-          </RevealBlock>
 
           {project.credits && project.credits.length > 0 && (
             <ul className="px-6 md:px-0 mt-8 md:mt-0 space-y-3 md:col-start-1 md:row-start-2">
@@ -1129,32 +1133,40 @@ function ProjectPage() {
              technical drawings side by side, each independently clickable but
              sharing a row so they read as a matched pair. */
           <div className="space-y-10 md:space-y-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-14 md:items-start">
+            {/* Columns run 5fr/9fr rather than an even split — the equal
+                grid-cols-2 was what was capping the kitchen photo's width to
+                match the sketch's, not any deliberate overlap guard. Nothing
+                elsewhere in this layout keeps the two apart, so there's
+                nothing to loosen there; widening this column is the whole
+                fix. */}
+            <div className="grid grid-cols-1 md:grid-cols-[5fr_9fr] gap-6 md:gap-10 lg:gap-14 md:items-start">
               {/* Left: sketch, then the description beneath it */}
               <div className="md:pt-4">
-                <figure className="group">
-                  <button
-                    type="button"
-                    onClick={() => setLightbox(1)}
-                    className="block w-full overflow-hidden rounded-md"
-                    aria-label={project.media[1].caption ?? "Conceptual sketch"}
-                  >
-                    <img
-                      data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
-                      data-design-kind="image"
-                      src={project.media[1].src}
-                      alt={project.media[1].caption ?? project.title}
-                      loading="lazy"
-                      className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                    />
-                  </button>
-                </figure>
+                <RevealBlock from="left">
+                  <figure className="group">
+                    <button
+                      type="button"
+                      onClick={() => setLightbox(1)}
+                      className="block w-full overflow-hidden rounded-md"
+                      aria-label={project.media[1].caption ?? "Conceptual sketch"}
+                    >
+                      <img
+                        data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
+                        data-design-kind="image"
+                        src={project.media[1].src}
+                        alt={project.media[1].caption ?? project.title}
+                        loading="lazy"
+                        className="w-full h-auto object-contain group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                      />
+                    </button>
+                  </figure>
+                </RevealBlock>
 
                 <RevealBlock>
                   <p
                     data-design-id={designId.projectDescription(project.slug)}
                     data-design-kind="text"
-                    className="mt-6 md:mt-8 font-display font-light text-base md:text-lg leading-relaxed text-balance text-foreground/85 md:max-w-sm md:ml-auto md:text-right"
+                    className="mt-6 md:mt-8 font-display font-light text-sm md:text-base leading-relaxed text-balance text-foreground/85 text-center"
                   >
                     {project.description}
                   </p>
@@ -1162,23 +1174,25 @@ function ProjectPage() {
               </div>
 
               {/* Right: kitchen closeup, dropped lower than the sketch */}
-              <figure className="group md:mt-24 lg:mt-32">
-                <button
-                  type="button"
-                  onClick={() => setLightbox(2)}
-                  className="block w-full overflow-hidden rounded-md bg-secondary"
-                  aria-label={project.media[2].caption ?? "Set closeup"}
-                >
-                  <img
-                    data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
-                    data-design-kind="image"
-                    src={project.media[2].src}
-                    alt={project.media[2].caption ?? project.title}
-                    loading="lazy"
-                    className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                  />
-                </button>
-              </figure>
+              <RevealBlock from="right" className="md:mt-24 lg:mt-32">
+                <figure className="group">
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(2)}
+                    className="block w-full overflow-hidden rounded-md bg-secondary"
+                    aria-label={project.media[2].caption ?? "Set closeup"}
+                  >
+                    <img
+                      data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
+                      data-design-kind="image"
+                      src={project.media[2].src}
+                      alt={project.media[2].caption ?? project.title}
+                      loading="lazy"
+                      className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                    />
+                  </button>
+                </figure>
+              </RevealBlock>
             </div>
 
             {/* Technical drawings — separate images so each opens on its own,
@@ -1335,6 +1349,15 @@ function ProjectPage() {
                           className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                         />
                       </button>
+                      {project.media[idx].caption && (
+                        <figcaption
+                          data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
+                          data-design-kind="text"
+                          className="mt-2 text-xs text-foreground/60 tracking-wide leading-relaxed"
+                        >
+                          {project.media[idx].caption}
+                        </figcaption>
+                      )}
                     </figure>
                   ),
               )}

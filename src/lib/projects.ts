@@ -562,9 +562,9 @@ export const PROJECTS: Project[] = [
     collage: [townHouseDet.url],
     media: [
       { type: "image", src: "/design-media/townhouse/TOWNHOUSE_AXON_UPRIGHT.jpg", caption: "Axonometric" },
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg" },
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER12.jpg" },
-      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER3.jpg" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg", caption: "Front Exterior Entry" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER12.jpg", caption: "First Floor Interior" },
+      { type: "image", src: "/design-media/townhouse/TOWNHOUSE_RENDER3.jpg", caption: "Exterior View of Dining Room" },
     ],
   },
 

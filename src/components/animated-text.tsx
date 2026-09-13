@@ -85,16 +85,24 @@ export function RevealBlock({
   children,
   className,
   delay = 0,
+  from = "up",
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
+  /** Direction the block travels in from as it reveals. "up" (default) is
+   *  the original subtle lift; "left"/"right" instead slide in from the
+   *  side — for pairing two images that should read as converging toward
+   *  each other (see the Anne Frank sketch/photo pair). */
+  from?: "up" | "left" | "right";
 }) {
+  const offset =
+    from === "left" ? { x: -32 } : from === "right" ? { x: 32 } : { y: 16 };
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, ...offset }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
     >
