@@ -14,21 +14,21 @@ const ZONES: {
     overline: "ZONE 1",
     label: "Nibi Oasis",
     subtitle: "Exchange of Vitality",
-    text: "A public commons in the former retention basin, where cascading water and cedar walkways offer purification and renewal.",
+    text: "This space acts as a public commons or ‘watering hole,’ enabling equitable access to clean water and occupying the former sewage facility’s cylindrical retention basin.",
   },
   {
     id: "wavescape",
     overline: "ZONE 2",
     label: "Wavescapes",
     subtitle: "Exchange of Rejuvenation",
-    text: "Rippling water, resting pods, and illuminated channels create a place for healing and restoration.",
+    text: "Reimagined copper sewage pipes form rippling modulations and private resting pods, creating spaces for healing and restoration as heated water cascades over and beneath the body.",
   },
   {
     id: "steam",
     overline: "ZONE 3",
     label: "Steam Sanctuary",
     subtitle: "Exchange of Power",
-    text: "The deepest gathering space, where cedar-infused steam supports listening, communication, and water stewardship.",
+    text: "Inspired by the Anishinaabe sweat lodge, the Steam Sanctuary is a communal gathering space where hot water and cedar leaves produce an enveloping steam, creating a profound sensory experience that nurtures a deeper understanding of interconnection with Nibi.",
   },
 ];
 
