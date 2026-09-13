@@ -241,12 +241,13 @@ export function createExchangeScene(host: HTMLDivElement) {
         if (["nibi", "wavescape", "steam"].includes(zone)) boxes.overall.union(box);
         meshes.push({ mesh, base: mesh.position.clone(), zone, opacity, edgeOpacity, edge });
       }
-      // Auto-loading (no click gate) means this can resolve before the host
-      // element's own layout has settled, so the very first frame — drawn
-      // off whatever size getBoundingClientRect() reports at that instant —
-      // can land on a stale zero/partial size and paint nothing. A couple of
-      // rAFs guarantees layout has actually committed before the first
-      // camera framing is computed.
+      // Every mesh gets its own MeshBasicMaterial instance (each with its
+      // own onBeforeCompile closure), so the very first render() has to
+      // lazily compile well over a hundred separate GL programs — with no
+      // click to gate on, that first render can otherwise land mid-compile
+      // and paint nothing. renderer.compile() forces all of that ahead of
+      // time, before the facility is ever asked to actually draw.
+      renderer.compile(scene, camera);
       select("overall", true);
       renderLoop();
     },
