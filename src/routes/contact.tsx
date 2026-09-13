@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ResumeSection } from "@/components/resume-viewer";
@@ -28,10 +29,28 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
 });
 
+const EMAIL = "reidjgraham@gmail.com";
+
 function Contact() {
   const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const responsiveCss = designModeStyleTag(overridesFile);
+  // mailto: hands off to whatever mail app the visitor's OS/browser has
+  // registered as the default — correct, standard behavior, but on a
+  // machine with nothing registered for it, clicking does nothing visible
+  // at all. This is the fallback for that: a plain copy so the address is
+  // always reachable one way or another.
+  const [copied, setCopied] = useState(false);
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API unavailable (very old browser, or blocked) — the
+      // mailto link right beside this is still there as the primary path.
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -67,15 +86,24 @@ function Contact() {
           <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
             Email
           </p>
-          <a
-            href="mailto:reidjgraham@gmail.com"
-            className="font-display font-medium text-3xl md:text-5xl tracking-tight underline underline-offset-8 decoration-foreground/25 hover:decoration-foreground transition-colors break-words"
-          >
-            {/* Wraps after the @ on a narrow phone instead of splitting
-                mid-word ("gmail.c" / "om") the way break-all did. */}
-            reidjgraham@<wbr />
-            gmail.com
-          </a>
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+            <a
+              href={`mailto:${EMAIL}`}
+              className="font-display font-medium text-3xl md:text-5xl tracking-tight underline underline-offset-8 decoration-foreground/25 hover:decoration-foreground transition-colors break-words"
+            >
+              {/* Wraps after the @ on a narrow phone instead of splitting
+                  mid-word ("gmail.c" / "om") the way break-all did. */}
+              reidjgraham@<wbr />
+              gmail.com
+            </a>
+            <button
+              type="button"
+              onClick={copyEmail}
+              className="text-xs uppercase tracking-[0.2em] text-foreground/40 hover:text-foreground/80 transition-colors"
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
         </div>
 
         {/* Resume + About */}
