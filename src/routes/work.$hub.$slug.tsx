@@ -652,21 +652,23 @@ function ProjectPage() {
           explicit, so the two are free to differ. */}
       {isReshuffling && (
         <>
-          {/* Premise paragraph now leads the column — self-start so it sits
-              level with the title/location line over on the left, rather
-              than self-end, which bottom-aligned the old paragraph-below-
-              images arrangement to the hero's foot instead. */}
-          <div className="px-6 md:px-0 pt-8 md:pt-0 space-y-4 md:space-y-6 md:col-start-2 md:row-start-1 md:self-start">
-            <RevealBlock>
-              <p
-                data-design-id={designId.projectDescription(project.slug)}
-                data-design-kind="text"
-                className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance md:text-right"
-              >
-                {project.description}
-              </p>
-            </RevealBlock>
+          {/* Paragraph and images are two independent grid items sharing
+              col-2/row-1 (not one stacked block) so each can carry its own
+              align-self: the paragraph self-start, level with the title/
+              location line on the left, and the images self-end, docked to
+              the hero's foot the way they always were — moving the
+              paragraph up didn't drag the images up with it. */}
+          <RevealBlock className="px-6 md:px-0 md:col-start-2 md:row-start-1 md:self-start">
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance md:text-right"
+            >
+              {project.description}
+            </p>
+          </RevealBlock>
 
+          <div className="px-6 md:px-0 pt-8 md:pt-0 space-y-4 md:space-y-6 md:col-start-2 md:row-start-1 md:self-end">
             {[1, 2].map((idx) => (
               <figure key={idx} className="group">
                 <button
@@ -1133,13 +1135,11 @@ function ProjectPage() {
              technical drawings side by side, each independently clickable but
              sharing a row so they read as a matched pair. */
           <div className="space-y-10 md:space-y-16">
-            {/* Columns run 5fr/9fr rather than an even split — the equal
-                grid-cols-2 was what was capping the kitchen photo's width to
-                match the sketch's, not any deliberate overlap guard. Nothing
-                elsewhere in this layout keeps the two apart, so there's
-                nothing to loosen there; widening this column is the whole
-                fix. */}
-            <div className="grid grid-cols-1 md:grid-cols-[5fr_9fr] gap-6 md:gap-10 lg:gap-14 md:items-start">
+            {/* Back to an even split — the wider 5fr/9fr run made the photo
+                read too large against the sketch. Sketch and photo still
+                fade in from opposite sides (RevealBlock's `from` prop) on
+                scroll into view; only the column proportions changed. */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-14 md:items-start">
               {/* Left: sketch, then the description beneath it */}
               <div className="md:pt-4">
                 <RevealBlock from="left">
@@ -1353,7 +1353,7 @@ function ProjectPage() {
                         <figcaption
                           data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
                           data-design-kind="text"
-                          className="mt-2 text-xs text-foreground/60 tracking-wide leading-relaxed"
+                          className="mt-2 text-xs text-foreground/60 tracking-wide leading-relaxed text-right"
                         >
                           {project.media[idx].caption}
                         </figcaption>

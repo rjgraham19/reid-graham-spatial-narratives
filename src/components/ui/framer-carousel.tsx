@@ -43,12 +43,8 @@ export function FramerCarousel({
   const [index, setIndex] = useState(0);
   const frameRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
-  // Tracks whether a drag is in progress so the index-driven snap effect
-  // below doesn't fight the drag gesture's own live position.
-  const dragging = useRef(false);
 
   useEffect(() => {
-    if (dragging.current) return;
     const width = frameRef.current?.offsetWidth ?? 1;
     const controls = animate(x, -index * width, {
       type: "spring",
@@ -67,44 +63,11 @@ export function FramerCarousel({
 
   const go = (i: number) => setIndex(Math.max(0, Math.min(count - 1, i)));
 
-  // Swipe/drag to change slides — mouse or touch. A quick flick (high
-  // velocity) advances even if the drag distance itself was short; otherwise
-  // it takes a real drag past a quarter of the frame's width. Either way the
-  // track always springs back to a resolved slide, even when that's the one
-  // it started on (setIndex alone wouldn't re-run the snap effect above if
-  // the index doesn't actually change).
-  const onDragEnd = (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
-    dragging.current = false;
-    const width = frameRef.current?.offsetWidth || 1;
-    const { offset, velocity } = info;
-    let next = index;
-    if (offset.x < -width / 4 || velocity.x < -500) next = index + 1;
-    else if (offset.x > width / 4 || velocity.x > 500) next = index - 1;
-    next = Math.max(0, Math.min(count - 1, next));
-    setIndex(next);
-    animate(x, -next * width, { type: "spring", stiffness: 300, damping: 30 });
-  };
-
   return (
     <div className={className}>
       <style>{FC_CSS}</style>
-      <div ref={frameRef} className="fc-frame relative overflow-hidden rounded-2xl">
-        <motion.div
-          className="flex cursor-grab active:cursor-grabbing"
-          style={{ x }}
-          drag={count > 1 ? "x" : false}
-          /* A ref rather than a computed {left,right} pixel box — Motion
-             measures against it live at drag start, so it's correct
-             immediately on mount and stays correct through any resize
-             without a manual recompute. */
-          dragConstraints={frameRef}
-          dragElastic={0.15}
-          dragMomentum={false}
-          onDragStart={() => {
-            dragging.current = true;
-          }}
-          onDragEnd={onDragEnd}
-        >
+      <div ref={frameRef} className="relative overflow-hidden rounded-2xl">
+        <motion.div className="flex" style={{ x }}>
           {Array.from({ length: count }, (_, i) => (
             <div key={i} className="w-full shrink-0">
               {renderSlide(i, {
@@ -167,15 +130,6 @@ export function FramerCarousel({
    outline. The padding-box layer is the page black behind the (loading)
    image; the border-box layer is the gradient. */
 const FC_CSS = `
-/* Without this, a mouse-down-and-move on an <img> inside the frame starts
-   the browser's own native "drag this image out" gesture (HTML5 DnD)
-   instead of — and before — Motion's pointer-based drag ever sees it, so
-   the slide never budges. Scoped to the frame rather than a global img
-   rule, which would kill drag-out of any other image on the page too. */
-.fc-frame img {
-  -webkit-user-drag: none;
-  user-select: none;
-}
 .fc-thumb--active {
   border: 2px solid transparent;
   background-image:
