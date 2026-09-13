@@ -75,7 +75,7 @@ export function ExchangeViewer() {
       </p>
       <h2 className="font-display text-2xl md:text-4xl mb-5">Beneath the surface</h2>
       <div
-        className="relative overflow-hidden rounded-md bg-[#101526]"
+        className="relative overflow-hidden bg-black"
         style={{ height: "clamp(420px, 72svh, 850px)" }}
       >
         {!active && (
@@ -124,7 +124,7 @@ export function ExchangeViewer() {
                   setView(v.id);
                   controls.current?.select(v.id);
                 }}
-                className={`px-4 py-3 rounded-md border text-sm transition-colors ${view === v.id ? "bg-[#b8baff] text-[#101526] border-[#b8baff]" : "border-white/20 hover:bg-white/10"}`}
+                className={`px-4 py-3 rounded-md border text-sm transition-colors ${view === v.id ? "bg-[#84a8ed] text-black border-[#84a8ed]" : "border-white/20 hover:bg-white/10"}`}
               >
                 {v.label}
               </button>

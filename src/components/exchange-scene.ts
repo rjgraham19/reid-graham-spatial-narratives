@@ -6,7 +6,7 @@ export type ExchangeView = "overall" | "section" | "nibi" | "wavescape" | "steam
 export function createExchangeScene(host: HTMLDivElement) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setClearColor("#101526");
+  renderer.setClearColor("#000000");
   host.appendChild(renderer.domElement);
   renderer.domElement.tabIndex = 0;
   renderer.domElement.setAttribute(
@@ -14,10 +14,6 @@ export function createExchangeScene(host: HTMLDivElement) {
     "Exchange Facility model. Drag to rotate, scroll to zoom.",
   );
   const scene = new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xe7efff, 0x7779a6, 2));
-  const key = new THREE.DirectionalLight(0xffffff, 2);
-  key.position.set(20, 40, 25);
-  scene.add(key);
   const camera = new THREE.OrthographicCamera(-20, 20, 20, -20, 0.1, 500);
   const orbit = new OrbitControls(camera, renderer.domElement);
   orbit.enableDamping = false;
@@ -31,7 +27,7 @@ export function createExchangeScene(host: HTMLDivElement) {
     base: THREE.Vector3;
     zone: string;
     opacity: number;
-    seating: boolean;
+    edgeOpacity: number;
     edge: THREE.LineSegments;
   }[] = [];
   const boxes: Record<string, THREE.Box3> = {};
@@ -91,7 +87,7 @@ export function createExchangeScene(host: HTMLDivElement) {
     orbit.enabled = false;
     const states = meshes.map((item) => ({
       position: item.mesh.position.clone(),
-      opacity: (item.mesh.material as THREE.MeshStandardMaterial).opacity,
+      opacity: (item.mesh.material as THREE.MeshBasicMaterial).opacity,
       edgeOpacity: (item.edge.material as THREE.LineBasicMaterial).opacity,
       end: item.base.clone().add(item.zone === view ? offset : new THREE.Vector3()),
     }));
@@ -108,25 +104,17 @@ export function createExchangeScene(host: HTMLDivElement) {
       meshes.forEach((item, i) => {
         item.mesh.position.lerpVectors(states[i].position, states[i].end, e);
         const selected = !isolated || item.zone === view;
-        const opacity = selected ? item.opacity : 0.025;
-        (item.mesh.material as THREE.MeshStandardMaterial).opacity = THREE.MathUtils.lerp(
+        const opacity = selected ? item.opacity : 0.006;
+        (item.mesh.material as THREE.MeshBasicMaterial).opacity = THREE.MathUtils.lerp(
           states[i].opacity,
           opacity,
           e,
         );
         (item.edge.material as THREE.LineBasicMaterial).opacity = THREE.MathUtils.lerp(
           states[i].edgeOpacity,
-          selected ? 0.3 : 0.025,
+          selected ? item.edgeOpacity : 0.035,
           e,
         );
-        // Opaque seating writes depth; the ghosted vessel cannot erase its silhouette.
-        const material = item.mesh.material as THREE.Material;
-        const opaque = item.seating && selected && t === 1;
-        if (material.transparent === opaque) {
-          material.transparent = !opaque;
-          material.needsUpdate = true;
-        }
-        material.depthWrite = opaque;
         item.mesh.visible = item.zone !== "ground" || groundVisible;
       });
       orbit.update();
@@ -157,61 +145,59 @@ export function createExchangeScene(host: HTMLDivElement) {
         const existing = mesh.userData.visual_role === "existing";
         const seating = mesh.userData.visual_role === "seating";
         const color = existing
-          ? "#c6c8ce"
+          ? "#e4e8f0"
           : seating
-            ? "#c5b8e8"
+            ? "#f1f4fc"
             : zone === "ground"
-              ? "#7b959d"
-              : zone === "infrastructure"
-                ? "#99d6dd"
-                : zone === "nibi"
-                  ? "#7188ff"
-                  : zone === "wavescape"
-                    ? "#a78aff"
-                    : "#df8ddd";
+              ? "#7788aa"
+              : "#84a8ed";
         for (const mat of Array.isArray(mesh.material) ? mesh.material : [mesh.material])
           mat.dispose();
-        const opacity = seating ? 1 : zone === "ground" ? 0.1 : shell ? 0.16 : 0.76;
-        mesh.material = new THREE.MeshStandardMaterial({
+        const opacity = zone === "ground" ? 0.018 : shell ? 0.1 : seating ? 0.32 : 0.24;
+        const edgeOpacity = zone === "ground" ? 0.12 : existing ? 0.32 : shell ? 0.42 : 0.72;
+        mesh.material = new THREE.MeshBasicMaterial({
           color,
-          roughness: 0.8,
-          metalness: 0,
           transparent: true,
           opacity,
           depthWrite: false,
+          blending: THREE.AdditiveBlending,
           side: THREE.DoubleSide,
         });
-        // Existing sewage fabric stays neutral regardless of the colored scene lights.
-        if (existing) {
-          mesh.material.dispose();
-          mesh.material = new THREE.MeshBasicMaterial({
-            color,
-            transparent: true,
-            opacity,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-          });
-        }
+        // Grazing surfaces glow like a radiograph; face-on surfaces remain ghosted.
+        // The camera is orthographic, so its view direction is constant in view space.
+        mesh.material.onBeforeCompile = (shader) => {
+          shader.vertexShader = `varying vec3 vExchangeNormal;\n${shader.vertexShader}`.replace(
+            "#include <begin_vertex>",
+            "#include <begin_vertex>\nvExchangeNormal = normalize(normalMatrix * normal);",
+          );
+          shader.fragmentShader = `varying vec3 vExchangeNormal;\n${shader.fragmentShader}`.replace(
+            "#include <color_fragment>",
+            `#include <color_fragment>
+            float rim = pow(1.0 - abs(normalize(vExchangeNormal).z), 2.2);
+            diffuseColor.a *= 0.16 + 0.84 * rim;`,
+          );
+        };
         const edge = new THREE.LineSegments(
           new THREE.EdgesGeometry(mesh.geometry, 35),
           new THREE.LineBasicMaterial({
             color: existing
-              ? "#e1e3e7"
+              ? "#edf0f7"
               : seating
-                ? "#e6ddff"
+                ? "#ffffff"
                 : zone === "ground"
-                  ? "#6c8595"
-                  : "#c3dcff",
+                  ? "#7788aa"
+                  : color,
             transparent: true,
-            opacity: 0.3,
+            opacity: edgeOpacity,
             depthWrite: false,
+            blending: THREE.AdditiveBlending,
           }),
         );
         mesh.add(edge);
         const box = new THREE.Box3().setFromObject(mesh);
         (boxes[zone] ||= new THREE.Box3()).union(box);
         if (["nibi", "wavescape", "steam"].includes(zone)) boxes.overall.union(box);
-        meshes.push({ mesh, base: mesh.position.clone(), zone, opacity, seating, edge });
+        meshes.push({ mesh, base: mesh.position.clone(), zone, opacity, edgeOpacity, edge });
       }
       select("overall", true);
     },
