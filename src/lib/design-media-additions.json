@@ -3,26 +3,34 @@
     {
       "id": "media-mt3ils39-2501u",
       "type": "image",
-      "src": "/design-media/the-exchange-facility/EXCHANGE_NIBIOASIS.jpg",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_NIBI_EDITEDRENDER.png",
       "decorative": true,
       "layout": "half",
-      "filename": "EXCHANGE_NIBIOASIS.jpg"
+      "filename": "EXCHANGE_NIBI_EDITEDRENDER.png"
     },
     {
       "id": "media-mt3imc31-91zcc",
       "type": "image",
-      "src": "/design-media/the-exchange-facility/EXCHANGE_STEAMSANCTUARY.jpg",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_STEAM_EDITEDRENDER.png",
       "decorative": true,
       "layout": "half",
-      "filename": "EXCHANGE_STEAMSANCTUARY.jpg"
+      "filename": "EXCHANGE_STEAM_EDITEDRENDER.png"
     },
     {
       "id": "media-mt3imlov-ot5ov",
       "type": "image",
-      "src": "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE.jpg",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE_EDITEDRENDER.png",
       "decorative": true,
       "layout": "half",
-      "filename": "EXCHANGE_WAVESCAPE.jpg"
+      "filename": "EXCHANGE_WAVESCAPE_EDITEDRENDER.png"
+    },
+    {
+      "id": "media-mt3ivsec-xchng1",
+      "type": "image",
+      "src": "/design-media/the-exchange-facility/EXCHANGE_VERTICALSECTION.png",
+      "decorative": true,
+      "layout": "full",
+      "filename": "EXCHANGE_VERTICALSECTION.png"
     },
     {
       "id": "media-mt3imyu8-nau7g",
