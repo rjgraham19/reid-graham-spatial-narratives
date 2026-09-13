@@ -292,7 +292,7 @@ export const PROJECTS: Project[] = [
     accentColor: "#E20074",
     hub: "production-scenic",
     title: "Lollapalooza",
-    subtitle: "PLACEHOLDER — venue/context line pending",
+    subtitle: "T-Mobile Club Magenta, Chicago, IL",
     mood: "pop",
     weight: "right",
     tags: ["Experiential"],
@@ -302,9 +302,8 @@ export const PROJECTS: Project[] = [
       { role: "Creative Director", name: "Brie Crash" },
       { role: "Graphic Designer", name: "Selene" },
     ],
-    // PLACEHOLDER copy — replace once real project copy is provided.
     description:
-      "PLACEHOLDER description — Y2K/futurism-themed experiential work. Replace with real project copy.",
+      "A giant CD player channels the early-2000s as an oversized photo backdrop for festivalgoers, with a spinning translucent magenta compact disc. At night, its chrome and brushed aluminum finishes pop against the glowing crescent moon inside the flip-open lid.",
     cover: lollaClubMagenta,
     // The CGI render (formerly project.media[0]) that used to open the
     // gallery grid was cut — it's the same view as the hero image up top

@@ -14,7 +14,7 @@ export function SiteFooter() {
             Design what you want the world to feel like.
           </h2>
         </div>
-        <div className="md:col-span-3 space-y-3 text-sm text-foreground/70">
+        <div className="md:col-span-6 space-y-3 text-sm text-foreground/70">
           <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50">Contact</p>
           <a
             href="mailto:reidjgraham@gmail.com"
@@ -25,14 +25,6 @@ export function SiteFooter() {
           <Link to="/contact" className={glassButton({ className: "mt-3" })}>
             Start a conversation
           </Link>
-        </div>
-        <div className="md:col-span-3 space-y-3 text-sm text-foreground/70">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50">Elsewhere</p>
-          <ul className="space-y-2">
-            <li><a href="#" className="hover:text-accent transition-colors">Instagram</a></li>
-            <li><a href="#" className="hover:text-accent transition-colors">LinkedIn</a></li>
-            <li><a href="#" className="hover:text-accent transition-colors">Vimeo</a></li>
-          </ul>
         </div>
       </div>
       <div className="mt-12 pt-6 border-t border-border flex flex-wrap justify-between items-center text-[10px] tracking-[0.3em] uppercase text-foreground/50">

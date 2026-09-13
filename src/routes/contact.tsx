@@ -21,7 +21,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:title", content: "Contact — Reid Graham" },
       {
         property: "og:description",
-        content: "Say hello :) — reidgraham@gmail.com",
+        content: "Say hello :) — reidjgraham@gmail.com",
       },
     ],
   }),
@@ -87,10 +87,10 @@ function Contact() {
                 Email
               </p>
               <a
-                href="mailto:reidgraham@gmail.com"
+                href="mailto:reidjgraham@gmail.com"
                 className="font-serif italic text-3xl md:text-5xl underline underline-offset-8 decoration-accent/40 hover:text-accent transition-colors break-all"
               >
-                reidgraham@gmail.com
+                reidjgraham@gmail.com
               </a>
             </div>
 
