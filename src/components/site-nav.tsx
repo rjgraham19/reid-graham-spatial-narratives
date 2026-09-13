@@ -139,19 +139,11 @@ export function SiteNav({
               </ul>
             </div>
           </li>
-          <li>
-            <Link
-              to="/work/$hub"
-              params={{ hub: "visualizations" }}
-              activeProps={{
-                className: glassButton({ quiet: true, sheen: true, className: "is-active" }),
-              }}
-              onMouseMove={trackSheen}
-              className={glassButton({ quiet: true, sheen: true })}
-            >
-              VISUALIZATIONS
-            </Link>
-          </li>
+          {/* Visualizations: nav entry pulled while that section is still a
+              work in progress. The route, its pages, and every link into it
+              from elsewhere on the site are untouched — this only removes
+              the one path a visitor browsing normally would find it through.
+              Restore by putting this <li> back. */}
           <li>
             <Link
               to="/contact"
@@ -230,19 +222,9 @@ export function SiteNav({
               </li>
               <li>
                 <Link
-                  to="/work/$hub"
-                  params={{ hub: "visualizations" }}
-                  className="font-display font-black uppercase tracking-[-0.02em] leading-none text-4xl hover:text-accent transition-colors animate-title-lr block"
-                  style={{ animationDelay: "0.26s" }}
-                >
-                  Visualizations
-                </Link>
-              </li>
-              <li>
-                <Link
                   to="/contact"
                   className="font-display font-black uppercase tracking-[-0.02em] leading-none text-4xl hover:text-accent transition-colors animate-title-lr block"
-                  style={{ animationDelay: "0.34s" }}
+                  style={{ animationDelay: "0.26s" }}
                 >
                   Connect
                 </Link>
