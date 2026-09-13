@@ -44,6 +44,21 @@ import { designId } from "@/lib/design-ids";
 import { useLiveOverrides } from "@/lib/use-live-overrides";
 import { DesignFrameBridge } from "@/design-mode/frame-bridge";
 
+/** Wraps one phrase (e.g. a work's title) in <em> wherever it appears in a
+ *  plain-text field, so a single italicized run inside otherwise-plain body
+ *  copy doesn't need its own hardcoded JSX every time it comes up. */
+function italicizePhrase(text: string, phrase: string) {
+  const i = text.indexOf(phrase);
+  if (i === -1) return text;
+  return (
+    <>
+      {text.slice(0, i)}
+      <em>{phrase}</em>
+      {text.slice(i + phrase.length)}
+    </>
+  );
+}
+
 /**
  * Show the caption under an enlarged image in the lightbox.
  *
@@ -207,6 +222,7 @@ function ProjectPage() {
   const isAnneFrank = project.slug === "the-diary-of-anne-frank";
   const isReshuffling = project.slug === "reshuffling-the-deck";
   const isLollapalooza = project.slug === "lollapalooza";
+  const isExchange = project.slug === "the-exchange-facility";
   const isPortraitHero = project.heroPortrait === true;
   const isTitleAbove = project.heroTitleAbove === true;
 
@@ -276,6 +292,24 @@ function ProjectPage() {
     if (el) el.style.opacity = String(Math.min(1, Math.max(0, (p - 0.04) / 0.12)));
   });
 
+  // The fixed nav's own translucent/blurred backdrop sits at the very top of
+  // the viewport throughout the 400vh record-scrub, over ~66px the circular
+  // record itself scrolls through — reading as the animation's top getting
+  // clipped by an opaque bar. Dropping the backdrop only while this section
+  // is actually on screen fixes that without touching nav elsewhere on the
+  // page, where the drafting sheets below are white and need it back.
+  const [scrubInView, setScrubInView] = useState(false);
+  useEffect(() => {
+    if (!isLollapalooza) return;
+    const el = recordScrubWrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setScrubInView(entry.isIntersecting), {
+      threshold: 0,
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isLollapalooza]);
+
   return (
     /* `is-panel-frame` marks this document as the one rendered inside the
        panel. It's server-rendered from the panel=1 search param, so it's in
@@ -304,7 +338,7 @@ function ProjectPage() {
 
       {!panel && (
         <div data-design-protected="Protected navigation">
-          <SiteNav />
+          <SiteNav variant={isLollapalooza && scrubInView ? "top-transparent" : "top"} />
         </div>
       )}
 
@@ -559,6 +593,11 @@ function ProjectPage() {
           </div>
         )}
 
+        {/* Exchange Facility — no static hero photo. The live 3D model fills
+            this slot instead (rendered further down, directly under the
+            description), so nothing repeats a rendering the model already
+            shows moving. */}
+        {!isExchange && (
         <figure
           className={`z-0 ${
             isTitleAbove
@@ -617,6 +656,7 @@ function ProjectPage() {
             />
           </button>
         </figure>
+        )}
 
       </div>
 
@@ -775,7 +815,7 @@ function ProjectPage() {
                   data-design-kind="text"
                   className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance"
                 >
-                  {project.description}
+                  {italicizePhrase(project.description, "The Garden of Earthly Delights")}
                 </p>
               </RevealBlock>
             </div>
@@ -824,6 +864,25 @@ function ProjectPage() {
           </RevealBlock>
         </section>
       )}
+
+      {/* Exchange Facility — the description sits directly under the hero
+          title, above the live model (which renders immediately below in
+          its own section, ExchangeViewer). Skipped in the generic
+          description+credits band further down so it doesn't repeat. */}
+      {isExchange && (
+        <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
+          <RevealBlock>
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-4xl"
+            >
+              {project.description}
+            </p>
+          </RevealBlock>
+        </section>
+      )}
+      {isExchange && <ExchangeViewer />}
 
       {/* TaB: Renaissance — the PINK FOUNTAIN technical drawing, directly under
           the transition animation where the page turns white.
@@ -909,7 +968,7 @@ function ProjectPage() {
           whole band is skipped for it rather than sitting empty. Lollapalooza
           likewise: its blurb is pinned on the record-player animation and its
           credits sit up by the hero, so nothing is left for this band. */}
-      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && (
+      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
           {/* Skipped on True West, where the two lines of the description now
@@ -1118,7 +1177,6 @@ function ProjectPage() {
 
       {/* Media gallery */}
       {isTownhouse && <TownhouseViewer />}
-      {project.slug === "the-exchange-facility" && <ExchangeViewer />}
       {isLollapalooza && <LollaViewer />}
       {/* Skipped where every media item already appears in a bespoke layout
           above, which would otherwise repeat the whole set — and, for the
@@ -1439,8 +1497,16 @@ function ProjectPage() {
                     </button>
                   )}
                   {m.caption && (
-                    <figcaption className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
-                      {!m.addedByDesignMode && `${String(i + 1).padStart(2, "0")} — `}
+                    <figcaption
+                      className={`mt-3 text-xs md:text-sm text-foreground/60 tracking-wide ${
+                        // Field House and Exchange match the plain, un-numbered,
+                        // right-aligned caption style established on Townhouse —
+                        // the numbered "01 — " prefix is this generic gallery's
+                        // own default, not something every project should carry.
+                        isFieldHouse || isExchange ? "text-right leading-relaxed" : ""
+                      }`}
+                    >
+                      {!m.addedByDesignMode && !isFieldHouse && !isExchange && `${String(i + 1).padStart(2, "0")} — `}
                       <span
                         data-design-id={designId.projectMediaCaption(project.slug, m.id!)}
                         data-design-kind="text"

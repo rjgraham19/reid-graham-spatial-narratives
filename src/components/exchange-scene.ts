@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
-export type ExchangeView = "overall" | "section" | "nibi" | "wavescape" | "steam";
+export type ExchangeView = "overall" | "nibi" | "wavescape" | "steam";
 export function createExchangeScene(host: HTMLDivElement) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -20,6 +20,10 @@ export function createExchangeScene(host: HTMLDivElement) {
   orbit.listenToKeyEvents(renderer.domElement);
   orbit.minZoom = 0.4;
   orbit.maxZoom = 6;
+  // Scroll must keep scrolling the page, not zoom the model — with
+  // enableZoom off, OrbitControls' wheel handler returns before calling
+  // preventDefault, so the wheel event passes straight through to the page.
+  orbit.enableZoom = false;
   const decoder = new DRACOLoader().setDecoderPath("/draco/");
   decoder.setWorkerLimit(2);
   const meshes: {
@@ -39,6 +43,18 @@ export function createExchangeScene(host: HTMLDivElement) {
   let groundVisible = true;
   const render = () => {
     if (!disposed) renderer.render(scene, camera);
+  };
+  // A render-on-demand canvas (redrawing only in response to a select() or
+  // a drag) turns out to go blank between those events in this embed —
+  // the on-demand model that TownhouseViewer/LollaViewer both use is fine
+  // for a canvas the browser keeps actively compositing, but this one loads
+  // and frames itself before ever entering the viewport, and nothing then
+  // forces a second paint until the visitor interacts. renderer.setAnimationLoop
+  // (rather than a bare requestAnimationFrame loop) is three.js's own
+  // continuous-rendering driver — it keeps the canvas continuously fresh
+  // the same way any live three.js viewer would.
+  const renderLoop = () => {
+    renderer.setAnimationLoop(disposed ? null : render);
   };
   const resize = () => {
     const { width, height } = host.getBoundingClientRect();
@@ -63,7 +79,7 @@ export function createExchangeScene(host: HTMLDivElement) {
   function select(view: ExchangeView, immediate = false) {
     current = view;
     cancelAnimationFrame(frame);
-    const isolated = view !== "overall" && view !== "section";
+    const isolated = view !== "overall";
     const box = boxes[isolated ? view : "overall"];
     if (!box || box.isEmpty()) return;
     const offset = isolated ? new THREE.Vector3(10, 0, 0) : new THREE.Vector3();
@@ -71,15 +87,13 @@ export function createExchangeScene(host: HTMLDivElement) {
     const size = box.getSize(new THREE.Vector3());
     const nextSpan = Math.max(size.x, size.y, size.z) * (isolated ? 0.68 : 0.62);
     const direction =
-      view === "section"
-        ? new THREE.Vector3(1, 0, 0)
-        : view === "nibi"
-          ? new THREE.Vector3(1, 0.65, 0.45)
-          : view === "wavescape"
-            ? new THREE.Vector3(1, 0.3, 0.35)
-            : view === "steam"
-              ? new THREE.Vector3(1, 0.2, 0.55)
-              : new THREE.Vector3(1, 0.45, 0.65);
+      view === "nibi"
+        ? new THREE.Vector3(1, 0.65, 0.45)
+        : view === "wavescape"
+          ? new THREE.Vector3(1, 0.3, 0.35)
+          : view === "steam"
+            ? new THREE.Vector3(1, 0.2, 0.55)
+            : new THREE.Vector3(1, 0.45, 0.65);
     const nextCamera = target.clone().add(direction.normalize().multiplyScalar(85));
     const startCam = camera.position.clone(),
       startTarget = orbit.target.clone(),
@@ -124,6 +138,11 @@ export function createExchangeScene(host: HTMLDivElement) {
     };
     tick();
   }
+  function zoomBy(factor: number) {
+    camera.zoom = THREE.MathUtils.clamp(camera.zoom * factor, orbit.minZoom, orbit.maxZoom);
+    camera.updateProjectionMatrix();
+    render();
+  }
   return {
     async load() {
       const gltf = await new GLTFLoader().setDRACOLoader(decoder).loadAsync("/models/exchange.glb");
@@ -144,17 +163,38 @@ export function createExchangeScene(host: HTMLDivElement) {
         const shell = mesh.userData.shell;
         const existing = mesh.userData.visual_role === "existing";
         const seating = mesh.userData.visual_role === "seating";
-        const color = existing
-          ? "#e4e8f0"
-          : seating
-            ? "#f1f4fc"
-            : zone === "ground"
-              ? "#7788aa"
-              : "#84a8ed";
+        // The Rhino source_layer name is the only place the water-form
+        // geometry (waterfalls, ripple channels) is independently tagged in
+        // the export, so the bioluminescent accent is keyed off it directly
+        // rather than off zone/visual_role, which don't distinguish it.
+        const sourceLayer = String(mesh.userData.source_layer || "");
+        const isWaterPathway = /wiggle|waterfall|biochannel/i.test(sourceLayer);
+        // Pale white-to-mint linework throughout, with a cyan/green
+        // bioluminescent accent reserved for the water pathways — no blue
+        // wash anywhere in the palette.
+        const color = isWaterPathway
+          ? "#4dffb8"
+          : existing
+            ? "#f2f7f4"
+            : seating
+              ? "#ffffff"
+              : zone === "ground"
+                ? "#4c5f57"
+                : "#dff5ec";
         for (const mat of Array.isArray(mesh.material) ? mesh.material : [mesh.material])
           mat.dispose();
-        const opacity = zone === "ground" ? 0.018 : shell ? 0.1 : seating ? 0.32 : 0.24;
-        const edgeOpacity = zone === "ground" ? 0.12 : existing ? 0.32 : shell ? 0.42 : 0.72;
+        const opacity = zone === "ground" ? 0.014 : isWaterPathway ? 0.2 : shell ? 0.08 : seating ? 0.3 : 0.18;
+        // Exterior silhouettes (the shell) read stronger; fine interior lines
+        // stay restrained; the water pathways glow brightest of all.
+        const edgeOpacity = isWaterPathway
+          ? 0.95
+          : zone === "ground"
+            ? 0.1
+            : existing
+              ? 0.4
+              : shell
+                ? 0.78
+                : 0.5;
         mesh.material = new THREE.MeshBasicMaterial({
           color,
           transparent: true,
@@ -180,13 +220,15 @@ export function createExchangeScene(host: HTMLDivElement) {
         const edge = new THREE.LineSegments(
           new THREE.EdgesGeometry(mesh.geometry, 35),
           new THREE.LineBasicMaterial({
-            color: existing
-              ? "#edf0f7"
-              : seating
-                ? "#ffffff"
-                : zone === "ground"
-                  ? "#7788aa"
-                  : color,
+            color: isWaterPathway
+              ? "#8fffce"
+              : existing
+                ? "#f5faf8"
+                : seating
+                  ? "#ffffff"
+                  : zone === "ground"
+                    ? "#4c5f57"
+                    : color,
             transparent: true,
             opacity: edgeOpacity,
             depthWrite: false,
@@ -199,7 +241,14 @@ export function createExchangeScene(host: HTMLDivElement) {
         if (["nibi", "wavescape", "steam"].includes(zone)) boxes.overall.union(box);
         meshes.push({ mesh, base: mesh.position.clone(), zone, opacity, edgeOpacity, edge });
       }
+      // Auto-loading (no click gate) means this can resolve before the host
+      // element's own layout has settled, so the very first frame — drawn
+      // off whatever size getBoundingClientRect() reports at that instant —
+      // can land on a stale zero/partial size and paint nothing. A couple of
+      // rAFs guarantees layout has actually committed before the first
+      // camera framing is computed.
       select("overall", true);
+      renderLoop();
     },
     select,
     ground(show: boolean) {
@@ -209,12 +258,23 @@ export function createExchangeScene(host: HTMLDivElement) {
       });
       render();
     },
+    zoomIn() {
+      zoomBy(1.35);
+    },
+    zoomOut() {
+      zoomBy(1 / 1.35);
+    },
+    resetView() {
+      camera.zoom = 1;
+      select(current, true);
+    },
     get current() {
       return current;
     },
     dispose() {
       disposed = true;
       cancelAnimationFrame(frame);
+      renderer.setAnimationLoop(null);
       ro.disconnect();
       orbit.dispose();
       decoder.dispose();

@@ -58,6 +58,9 @@ import fieldHouseDet from "@/assets/rg/p3_3.jpg.asset.json";
 import townHouse from "@/assets/rg/p3_4.jpg.asset.json";
 import townHouseDet from "@/assets/rg/p3_5.jpg.asset.json";
 import exchange from "@/assets/rg/exchange-render.jpg";
+import exchangeNibi from "@/assets/rg/exchange-nibi-render.png";
+import exchangeWavescape from "@/assets/rg/exchange-wavescape-render.png";
+import exchangeSteam from "@/assets/rg/exchange-steam-render.png";
 import staging from "@/assets/rg/p3_7.jpg.asset.json";
 import drafting from "@/assets/rg/p4_2.jpg.asset.json";
 import illustration from "@/assets/rg/p4_3.jpg.asset.json";
@@ -463,7 +466,7 @@ export const PROJECTS: Project[] = [
       { role: "Installation Design Team", name: "Keeran Cross, Chloe Erickson, Maggie Laakso, Elliot Reid" },
     ],
     description:
-      "An immersive, experiential design for Taubman College's annual Beaux-Arts Ball, reimagining the Renaissance as a timeless expression of creative transformation and continual innovation. Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative and marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials. A pop-up installation, playfully nodding to our event's shared name with TaB soda, became an engaging experiential marketing moment that built anticipation for the event.",
+      "Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials.",
     cover: tab,
     tags: ["Production/Scenic", "Experiential"],
     media: [
@@ -494,9 +497,15 @@ export const PROJECTS: Project[] = [
         type: "image",
         src: "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg",
         layout: "half",
+        caption: "Illustration Rendering",
       },
-      { type: "image", src: "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg", layout: "half" },
-      { type: "image", src: "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg" },
+      {
+        type: "image",
+        src: "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg",
+        layout: "half",
+        caption: "Isometric Diagram",
+      },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg", caption: "Section Drawing" },
       { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP1.jpg", layout: "half" },
       { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP2.jpg", layout: "half" },
     ],
@@ -535,14 +544,22 @@ export const PROJECTS: Project[] = [
     highlightPosition: "33% 50%",
     hub: "architecture",
     title: "The Exchange Facility",
-    subtitle: "A Speculative Future: World Building",
+    subtitle: "A Speculative Future: Reimagining the Post Office",
     mood: "aqua",
     weight: "left",
     description:
-      "Amid a climate crisis in 2114, the scarcity of clean water revives human reverence for its powers, facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
+      "As rapid technological advancement accelerates the exchange of information—transforming the core function of the post office—The Exchange Facility imagines how, in a future grappling with water scarcity, the pursuit of progress might ultimately restore connection with the natural world, reviving human reverence for water's powers and facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
     cover: exchange,
+    // media[0] (the old hero render) stays out of the gallery loop now that
+    // the live 3D model fills that slot — kept in the array (not deleted)
+    // since other code addresses media by fixed index. The three zone
+    // renderings that follow are the "static renderings" the model replaces
+    // up top; each gets its own caption lower on the page.
     media: [
-      { type: "image", src: exchange, caption: "River-status map, Algae Purification Station, section and interior vessels (RIBI Oasis, Wavescapes, Steam Sanctuary)" },
+      { type: "image", src: exchange, caption: "River-status map, Algae Purification Station, section and interior vessels (RIBI Oasis, Wavescapes, Steam Sanctuary)", hidden: true },
+      { type: "image", src: exchangeNibi, caption: "Nibi Oasis — Exchange of Vitality" },
+      { type: "image", src: exchangeWavescape, caption: "Wavescapes — Exchange of Rejuvenation" },
+      { type: "image", src: exchangeSteam, caption: "Steam Sanctuary — Exchange of Power" },
     ],
   },
   {
