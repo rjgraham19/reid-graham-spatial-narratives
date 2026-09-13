@@ -902,9 +902,9 @@ function ProjectPage() {
       )}
       {isExchange && <ExchangeViewer />}
       {isExchange && (
-        <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
+        <section className="px-6 md:px-12 lg:px-16 pt-3 pb-2 md:pb-4">
           <RevealBlock>
-            <p className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl">
+            <p className="mx-auto max-w-2xl text-center font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance">
               {
                 splitAt(
                   project.description,

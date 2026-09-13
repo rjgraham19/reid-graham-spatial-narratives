@@ -300,9 +300,24 @@
       "layoutShiftY": 206
     }
   },
+  "project.the-exchange-facility.media.media-mt3imc31-91zcc.caption": {
+    "base": {
+      "text": "Steam Sanctuary — Exchange of Power"
+    }
+  },
   "project.the-exchange-facility.media.media-mt3imlov-ot5ov": {
     "desktop": {
       "layoutShiftY": -208
+    }
+  },
+  "project.the-exchange-facility.media.media-mt3imlov-ot5ov.caption": {
+    "base": {
+      "text": "Wavescapes — Exchange of Rejuvenation"
+    }
+  },
+  "project.the-exchange-facility.media.media-mt3ils39-2501u.caption": {
+    "base": {
+      "text": "Nibi Oasis — Exchange of Vitality"
     }
   },
   "project.staging-aesthetics.media.0": {

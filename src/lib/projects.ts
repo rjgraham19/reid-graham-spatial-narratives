@@ -58,9 +58,6 @@ import fieldHouseDet from "@/assets/rg/p3_3.jpg.asset.json";
 import townHouse from "@/assets/rg/p3_4.jpg.asset.json";
 import townHouseDet from "@/assets/rg/p3_5.jpg.asset.json";
 import exchange from "@/assets/rg/exchange-render.jpg";
-import exchangeNibi from "@/assets/rg/exchange-nibi-render.png";
-import exchangeWavescape from "@/assets/rg/exchange-wavescape-render.png";
-import exchangeSteam from "@/assets/rg/exchange-steam-render.png";
 import staging from "@/assets/rg/p3_7.jpg.asset.json";
 import drafting from "@/assets/rg/p4_2.jpg.asset.json";
 import illustration from "@/assets/rg/p4_3.jpg.asset.json";
@@ -552,14 +549,13 @@ export const PROJECTS: Project[] = [
     cover: exchange,
     // media[0] (the old hero render) stays out of the gallery loop now that
     // the live 3D model fills that slot — kept in the array (not deleted)
-    // since other code addresses media by fixed index. The three zone
-    // renderings that follow are the "static renderings" the model replaces
-    // up top; each gets its own caption lower on the page.
+    // since other code addresses media by fixed index. The three static
+    // renderings themselves are already present as Design Mode-added media
+    // (see design-media-additions.json) in a clustered half-width layout;
+    // their captions are set via design-overrides.json rather than here, to
+    // avoid a second, duplicate copy of the same three images.
     media: [
       { type: "image", src: exchange, caption: "River-status map, Algae Purification Station, section and interior vessels (RIBI Oasis, Wavescapes, Steam Sanctuary)", hidden: true },
-      { type: "image", src: exchangeNibi, caption: "Nibi Oasis — Exchange of Vitality" },
-      { type: "image", src: exchangeWavescape, caption: "Wavescapes — Exchange of Rejuvenation" },
-      { type: "image", src: exchangeSteam, caption: "Steam Sanctuary — Exchange of Power" },
     ],
   },
   {
