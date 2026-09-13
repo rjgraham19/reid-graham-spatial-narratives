@@ -88,37 +88,6 @@ export function ExchangeViewer() {
 
   return (
     <section className="pt-4 pb-10" aria-label="Explore the Exchange Facility">
-      <div
-        className="flex flex-wrap gap-2 mb-4 px-6 md:px-12 lg:px-16"
-        role="group"
-        aria-label="Facility view"
-      >
-        {ZONES.map((z) => (
-          <button
-            key={z.id}
-            type="button"
-            aria-pressed={view === z.id}
-            onClick={() => selectZone(z.id)}
-            className={`rounded-md border px-4 py-2.5 text-left text-sm transition-colors ${
-              view === z.id
-                ? "bg-[#84a8ed] text-black border-[#84a8ed]"
-                : "border-white/20 hover:bg-white/10"
-            }`}
-          >
-            {z.overline && (
-              <span
-                className={`block text-[9px] tracking-[0.2em] uppercase ${
-                  view === z.id ? "text-black/60" : "text-foreground/45"
-                }`}
-              >
-                {z.overline}
-              </span>
-            )}
-            {z.label}
-          </button>
-        ))}
-      </div>
-
       {/* Full-bleed and tall — this is the page's real header image, not a
           boxed-in embed, so it needs to fill the viewport the moment the
           page opens rather than sit behind a rounded frame with page
@@ -129,6 +98,42 @@ export function ExchangeViewer() {
         style={{ height: "clamp(480px, 85vh, 950px)" }}
       >
         <div ref={host} className="absolute inset-0" data-lenis-prevent />
+
+        {/* The zone nav sits inside the model's own empty headroom rather
+            than as a separate row above it — folding it in moves the model
+            itself up and closes what would otherwise be dead space at the
+            top of the viewport. */}
+        <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black via-black/60 to-transparent px-6 pb-10 pt-6 md:px-12 lg:px-16">
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white/60">
+            Explore in 3D
+          </p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Facility view">
+            {ZONES.map((z) => (
+              <button
+                key={z.id}
+                type="button"
+                aria-pressed={view === z.id}
+                onClick={() => selectZone(z.id)}
+                className={`rounded-md border px-4 py-2.5 text-left text-sm transition-colors ${
+                  view === z.id
+                    ? "bg-[#84a8ed] text-black border-[#84a8ed]"
+                    : "border-white/20 bg-black/30 hover:bg-white/10"
+                }`}
+              >
+                {z.overline && (
+                  <span
+                    className={`block text-[9px] tracking-[0.2em] uppercase ${
+                      view === z.id ? "text-black/60" : "text-foreground/45"
+                    }`}
+                  >
+                    {z.overline}
+                  </span>
+                )}
+                {z.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {!ready && (
           <p

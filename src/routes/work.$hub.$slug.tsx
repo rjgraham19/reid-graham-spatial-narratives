@@ -885,7 +885,7 @@ function ProjectPage() {
           Skipped in the generic description+credits band further down so
           it doesn't repeat. */}
       {isExchange && (
-        <section className="px-6 md:px-12 lg:px-16 pb-2">
+        <section className="px-6 md:px-12 lg:px-16 pb-2 -mt-4 md:-mt-6">
           <RevealBlock>
             <p
               data-design-id={designId.projectDescription(project.slug)}
