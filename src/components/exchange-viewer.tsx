@@ -47,7 +47,6 @@ export function ExchangeViewer() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
   const [view, setView] = useState<ExchangeView>("overall");
-  const [siteContext, setSiteContext] = useState(true);
 
   useEffect(() => {
     if (!stage.current || !host.current) return;
@@ -88,13 +87,9 @@ export function ExchangeViewer() {
   const zoneText = ZONES.find((z) => z.id === view);
 
   return (
-    <section className="px-6 md:px-12 lg:px-16 py-10" aria-label="Explore the Exchange Facility">
-      <p className="text-xs tracking-[.2em] uppercase text-foreground/50 mb-5 font-display">
-        Three Zones / One Water Journey
-      </p>
-
+    <section className="pt-4 pb-10" aria-label="Explore the Exchange Facility">
       <div
-        className="flex flex-wrap gap-2 mb-5"
+        className="flex flex-wrap gap-2 mb-4 px-6 md:px-12 lg:px-16"
         role="group"
         aria-label="Facility view"
       >
@@ -106,7 +101,7 @@ export function ExchangeViewer() {
             onClick={() => selectZone(z.id)}
             className={`rounded-md border px-4 py-2.5 text-left text-sm transition-colors ${
               view === z.id
-                ? "bg-[#dff5ec] text-black border-[#dff5ec]"
+                ? "bg-[#84a8ed] text-black border-[#84a8ed]"
                 : "border-white/20 hover:bg-white/10"
             }`}
           >
@@ -124,10 +119,14 @@ export function ExchangeViewer() {
         ))}
       </div>
 
+      {/* Full-bleed and tall — this is the page's real header image, not a
+          boxed-in embed, so it needs to fill the viewport the moment the
+          page opens rather than sit behind a rounded frame with page
+          gutters on either side. */}
       <div
         ref={stage}
-        className="relative overflow-hidden rounded-md bg-black"
-        style={{ height: "clamp(420px, 72svh, 850px)" }}
+        className="relative w-full overflow-hidden bg-black"
+        style={{ height: "clamp(480px, 85vh, 950px)" }}
       >
         <div ref={host} className="absolute inset-0" data-lenis-prevent />
 
@@ -141,13 +140,13 @@ export function ExchangeViewer() {
         )}
 
         {/* Zone copy, inside the viewport so it never gets skipped past on a
-            scroll — set on the left, since the scene shifts the selected
-            zone's geometry to the right to make room for it. Below md there
-            isn't space to overlay text on such a short canvas, so it moves
-            to a plain block under the model instead (still inside this same
-            component, per spec). */}
+            scroll — set on the right, since the scene shifts the selected
+            zone's geometry there to make room for it. Only overlaid from lg:
+            below that the canvas is too short/narrow for text to sit over it
+            without covering the model, so it drops to a plain block under
+            the canvas instead (still inside this same component). */}
         {ready && zoneText?.text && (
-          <div className="hidden md:block absolute left-6 top-1/2 max-w-xs -translate-y-1/2 rounded-md bg-black/50 p-4 backdrop-blur-sm">
+          <div className="hidden lg:block absolute right-6 top-1/2 max-w-xs -translate-y-1/2 rounded-md bg-black/50 p-4 backdrop-blur-sm">
             <h3 className="font-display text-xl mb-1">{zoneText.label}</h3>
             <p className="text-xs uppercase tracking-[0.15em] text-white/50 mb-2">
               {zoneText.subtitle}
@@ -200,30 +199,16 @@ export function ExchangeViewer() {
         )}
       </div>
 
-      {/* Mobile copy of the same zone text, below the canvas but still
-          inside this component. */}
+      {/* Zone copy for anything below lg, below the canvas but still inside
+          this component. */}
       {ready && zoneText?.text && (
-        <div className="md:hidden mt-4">
+        <div className="lg:hidden mt-4 px-6 md:px-12 lg:px-16">
           <h3 className="font-display text-xl mb-1">{zoneText.label}</h3>
           <p className="text-xs uppercase tracking-[0.15em] text-foreground/50 mb-2">
             {zoneText.subtitle}
           </p>
           <p className="text-sm leading-relaxed text-foreground/70">{zoneText.text}</p>
         </div>
-      )}
-
-      {ready && (
-        <label className="flex gap-2 items-center text-xs uppercase tracking-[0.15em] text-foreground/60 mt-5">
-          <input
-            type="checkbox"
-            checked={siteContext}
-            onChange={(e) => {
-              setSiteContext(e.target.checked);
-              controls.current?.ground(e.target.checked);
-            }}
-          />
-          Site Context
-        </label>
       )}
     </section>
   );

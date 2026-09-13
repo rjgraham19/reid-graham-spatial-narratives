@@ -59,6 +59,18 @@ function italicizePhrase(text: string, phrase: string) {
   );
 }
 
+// Exchange Facility: the description reads as two paragraphs but only one
+// of them belongs up top — the second sits below the model, directly
+// before the static renderings, so it doesn't pile onto the page's opening
+// before the model has a chance to show. Splitting on the sentence that
+// starts the second half rather than duplicating both halves as separate
+// strings keeps `project.description` the single source of truth.
+function splitAt(text: string, marker: string): [string, string] {
+  const i = text.indexOf(marker);
+  if (i === -1) return [text, ""];
+  return [text.slice(0, i).trim(), text.slice(i).trim()];
+}
+
 /**
  * Show the caption under an enlarged image in the lightbox.
  *
@@ -571,7 +583,7 @@ function ProjectPage() {
 
               Lollapalooza has no runway: the scrolling photo band sits between
               the title and the hero, so there's nothing to pin the title over. */}
-          <div className={isLollapalooza ? "hidden" : "h-0 lg:h-[300px]"} />
+          <div className={isLollapalooza || isExchange ? "hidden" : "h-0 lg:h-[300px]"} />
         </div>
 
         {/* Lollapalooza — the gallery-* event photos as an endless, clickable
@@ -865,24 +877,44 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Exchange Facility — the description sits directly under the hero
-          title, above the live model (which renders immediately below in
-          its own section, ExchangeViewer). Skipped in the generic
-          description+credits band further down so it doesn't repeat. */}
+      {/* Exchange Facility — only the first half of the description sits
+          under the title; the model (full-bleed, directly below) is meant
+          to be visible right away rather than sitting under a tall block of
+          text. The second half moves below the model, just before the
+          static renderings — see the block right before the media gallery.
+          Skipped in the generic description+credits band further down so
+          it doesn't repeat. */}
       {isExchange && (
-        <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
+        <section className="px-6 md:px-12 lg:px-16 pb-2">
           <RevealBlock>
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-4xl"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
             >
-              {project.description}
+              {splitAt(
+                project.description,
+                "The Exchange facility enables the systemic circulation",
+              )[0]}
             </p>
           </RevealBlock>
         </section>
       )}
       {isExchange && <ExchangeViewer />}
+      {isExchange && (
+        <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
+          <RevealBlock>
+            <p className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl">
+              {
+                splitAt(
+                  project.description,
+                  "The Exchange facility enables the systemic circulation",
+                )[1]
+              }
+            </p>
+          </RevealBlock>
+        </section>
+      )}
 
       {/* TaB: Renaissance — the PINK FOUNTAIN technical drawing, directly under
           the transition animation where the page turns white.

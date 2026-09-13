@@ -40,7 +40,6 @@ export function createExchangeScene(host: HTMLDivElement) {
     frame = 0,
     span = 25,
     current: ExchangeView = "overall";
-  let groundVisible = true;
   const render = () => {
     if (!disposed) renderer.render(scene, camera);
   };
@@ -129,7 +128,7 @@ export function createExchangeScene(host: HTMLDivElement) {
           selected ? item.edgeOpacity : 0.035,
           e,
         );
-        item.mesh.visible = item.zone !== "ground" || groundVisible;
+        item.mesh.visible = true;
       });
       orbit.update();
       resize();
@@ -163,38 +162,17 @@ export function createExchangeScene(host: HTMLDivElement) {
         const shell = mesh.userData.shell;
         const existing = mesh.userData.visual_role === "existing";
         const seating = mesh.userData.visual_role === "seating";
-        // The Rhino source_layer name is the only place the water-form
-        // geometry (waterfalls, ripple channels) is independently tagged in
-        // the export, so the bioluminescent accent is keyed off it directly
-        // rather than off zone/visual_role, which don't distinguish it.
-        const sourceLayer = String(mesh.userData.source_layer || "");
-        const isWaterPathway = /wiggle|waterfall|biochannel/i.test(sourceLayer);
-        // Pale white-to-mint linework throughout, with a cyan/green
-        // bioluminescent accent reserved for the water pathways — no blue
-        // wash anywhere in the palette.
-        const color = isWaterPathway
-          ? "#4dffb8"
-          : existing
-            ? "#f2f7f4"
-            : seating
-              ? "#ffffff"
-              : zone === "ground"
-                ? "#4c5f57"
-                : "#dff5ec";
+        const color = existing
+          ? "#e4e8f0"
+          : seating
+            ? "#f1f4fc"
+            : zone === "ground"
+              ? "#7788aa"
+              : "#84a8ed";
         for (const mat of Array.isArray(mesh.material) ? mesh.material : [mesh.material])
           mat.dispose();
-        const opacity = zone === "ground" ? 0.014 : isWaterPathway ? 0.2 : shell ? 0.08 : seating ? 0.3 : 0.18;
-        // Exterior silhouettes (the shell) read stronger; fine interior lines
-        // stay restrained; the water pathways glow brightest of all.
-        const edgeOpacity = isWaterPathway
-          ? 0.95
-          : zone === "ground"
-            ? 0.1
-            : existing
-              ? 0.4
-              : shell
-                ? 0.78
-                : 0.5;
+        const opacity = zone === "ground" ? 0.018 : shell ? 0.1 : seating ? 0.32 : 0.24;
+        const edgeOpacity = zone === "ground" ? 0.12 : existing ? 0.32 : shell ? 0.42 : 0.72;
         mesh.material = new THREE.MeshBasicMaterial({
           color,
           transparent: true,
@@ -220,15 +198,13 @@ export function createExchangeScene(host: HTMLDivElement) {
         const edge = new THREE.LineSegments(
           new THREE.EdgesGeometry(mesh.geometry, 35),
           new THREE.LineBasicMaterial({
-            color: isWaterPathway
-              ? "#8fffce"
-              : existing
-                ? "#f5faf8"
-                : seating
-                  ? "#ffffff"
-                  : zone === "ground"
-                    ? "#4c5f57"
-                    : color,
+            color: existing
+              ? "#edf0f7"
+              : seating
+                ? "#ffffff"
+                : zone === "ground"
+                  ? "#7788aa"
+                  : color,
             transparent: true,
             opacity: edgeOpacity,
             depthWrite: false,
@@ -252,13 +228,6 @@ export function createExchangeScene(host: HTMLDivElement) {
       renderLoop();
     },
     select,
-    ground(show: boolean) {
-      groundVisible = show;
-      meshes.forEach((i) => {
-        if (i.zone === "ground") i.mesh.visible = show;
-      });
-      render();
-    },
     zoomIn() {
       zoomBy(1.35);
     },
