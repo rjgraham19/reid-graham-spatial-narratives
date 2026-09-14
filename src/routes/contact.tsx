@@ -1,7 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { SiteNav } from "@/components/site-nav";
-import { SiteFooter } from "@/components/site-footer";
 import { ResumeSection } from "@/components/resume-viewer";
 import designOverrides from "@/lib/design-overrides.json";
 import { mergeOverridesFiles, resolveText, resolveHidden, designModeStyleTag } from "@/lib/apply-overrides";
@@ -35,22 +33,6 @@ function Contact() {
   const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const responsiveCss = designModeStyleTag(overridesFile);
-  // mailto: hands off to whatever mail app the visitor's OS/browser has
-  // registered as the default — correct, standard behavior, but on a
-  // machine with nothing registered for it, clicking does nothing visible
-  // at all. This is the fallback for that: a plain copy so the address is
-  // always reachable one way or another.
-  const [copied, setCopied] = useState(false);
-  const copyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(EMAIL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard API unavailable (very old browser, or blocked) — the
-      // mailto link right beside this is still there as the primary path.
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -96,13 +78,6 @@ function Contact() {
               reidjgraham@<wbr />
               gmail.com
             </a>
-            <button
-              type="button"
-              onClick={copyEmail}
-              className="text-xs uppercase tracking-[0.2em] text-foreground/40 hover:text-foreground/80 transition-colors"
-            >
-              {copied ? "Copied" : "Copy"}
-            </button>
           </div>
         </div>
 
@@ -115,46 +90,42 @@ function Contact() {
             <ResumeSection />
           </div>
 
-          <div className="md:col-span-7 animate-swoop-in">
-            {/* Photo and text as one deliberate pairing, not a thumbnail
-                beside a label — the heading itself ("About Me :)") is what
-                used to be the small eyebrow above it, so that label is gone
-                rather than repeating the same words twice. Swap the file at
-                public/reid-graham-portrait.jpg to replace the photo. */}
+          <div className="md:col-span-7 animate-pop-in">
+            {/* The heading sits directly above the photo — both in the left
+                half of this pairing — with the description running the full
+                height of the right half beside them, rather than heading and
+                description stacked together next to the photo. Swap the file
+                at public/reid-graham-portrait.jpg to replace the photo. */}
             <div className="grid grid-cols-1 sm:grid-cols-[0.85fr_1.15fr] gap-8">
-              <img
-                src="/reid-graham-portrait.jpg"
-                alt="Reid Graham"
-                className="w-full aspect-[3/4] rounded-md object-cover object-top bg-secondary"
-              />
               <div>
                 <h2
                   data-design-id={designId.connect("about-heading")}
                   data-design-kind="heading"
-                  className="font-display font-black uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-6xl"
+                  className="font-display font-black uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-6xl mb-6"
                 >
                   {overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)"}
                 </h2>
-                <p
-                  data-design-id={designId.connect("about-description")}
-                  data-design-kind="text"
-                  className="mt-6 font-display font-light text-lg md:text-2xl leading-snug text-foreground/85 text-balance"
-                >
-                  {resolveText(
-                    overridesFile,
-                    designId.connect("about-description"),
-                    "I'm Reid Graham, a designer based in New York City. I studied architecture at the University of Michigan, with a minor in scenic design. My foundation in theater, combined with my architectural background, fuels my desire to merge these disciplines and elevate the possibilities for immersive storytelling through the built environment.",
-                  )}
-                </p>
+                <img
+                  src="/reid-graham-portrait.jpg"
+                  alt="Reid Graham"
+                  className="w-full aspect-[3/4] rounded-md object-cover object-top bg-secondary"
+                />
               </div>
+              <p
+                data-design-id={designId.connect("about-description")}
+                data-design-kind="text"
+                className="font-display font-light text-lg md:text-2xl leading-snug text-foreground/85 text-balance"
+              >
+                {resolveText(
+                  overridesFile,
+                  designId.connect("about-description"),
+                  "I'm Reid Graham, a designer based in New York City. I studied architecture at the University of Michigan, with a minor in scenic design. My foundation in theater, combined with my architectural background, fuels my desire to merge these disciplines and elevate the possibilities for immersive storytelling through the built environment.",
+                )}
+              </p>
             </div>
           </div>
         </div>
       </main>
-
-      <div data-design-protected="Protected navigation">
-        <SiteFooter />
-      </div>
     </div>
   );
 }

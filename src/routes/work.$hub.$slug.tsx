@@ -710,7 +710,17 @@ function ProjectPage() {
               location line on the left, and the images self-end, docked to
               the hero's foot the way they always were — moving the
               paragraph up didn't drag the images up with it. */}
-          <RevealBlock className="px-6 md:px-0 md:col-start-2 md:row-start-1 md:self-start">
+          {/* Plain CSS reveal instead of RevealBlock: at some in-between
+              viewport widths this element's pushed-down position (see its
+              offsetY override) sits right at RevealBlock's -80px
+              intersection-margin boundary, so its whileInView animation can
+              start, get interrupted by a layout shift, and freeze mid-fade
+              (a real ~40% opacity, permanently, until something else
+              triggers a re-check) — it only ever showed up at widths where
+              the element happened to land safely away from that boundary.
+              animate-reveal plays unconditionally on mount, with no
+              intersection observer to race. */}
+          <div className="relative z-10 animate-reveal px-6 md:px-0 md:col-start-2 md:row-start-1 md:self-start">
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
@@ -718,7 +728,7 @@ function ProjectPage() {
             >
               {project.description}
             </p>
-          </RevealBlock>
+          </div>
 
           <div className="px-6 md:px-0 pt-8 md:pt-0 space-y-4 md:space-y-6 md:col-start-2 md:row-start-1 md:self-end">
             {[1, 2].map((idx) => (
@@ -822,13 +832,19 @@ function ProjectPage() {
                 </RevealBlock>
               )}
               <RevealBlock delay={0.1}>
-                <p
+                <div
                   data-design-id={designId.projectDescription(project.slug)}
                   data-design-kind="text"
-                  className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance"
+                  className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance space-y-3"
                 >
-                  {italicizePhrase(project.description, "The Garden of Earthly Delights")}
-                </p>
+                  <p>{splitAt(project.description, "Inspired by")[0]}</p>
+                  <p>
+                    {italicizePhrase(
+                      splitAt(project.description, "Inspired by")[1],
+                      "The Garden of Earthly Delights",
+                    )}
+                  </p>
+                </div>
               </RevealBlock>
             </div>
           </div>

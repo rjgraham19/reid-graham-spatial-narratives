@@ -71,7 +71,7 @@ class PdfErrorBoundary extends Component<{ fallback: ReactNode; children: ReactN
 function ComingSoonCard() {
   return (
     <div
-      className="block w-full max-w-xl aspect-[8.5/11] bg-white text-black rounded-md shadow-2xl overflow-hidden animate-swoop-in p-8 md:p-10 flex flex-col"
+      className="block w-full max-w-xl aspect-[8.5/11] bg-white text-black rounded-md shadow-2xl overflow-hidden animate-pop-in p-8 md:p-10 flex flex-col"
       aria-label="Resume coming soon"
     >
       <p className="font-display font-black uppercase tracking-tight text-2xl md:text-3xl">Reid Graham</p>
@@ -162,7 +162,7 @@ export function ResumeSection() {
           ref={cardRef}
           type="button"
           onClick={() => setZoom(true)}
-          className="group relative block w-full max-w-xl aspect-[8.5/11] bg-white text-black rounded-md shadow-2xl overflow-hidden animate-swoop-in text-left transition-transform duration-300 hover:scale-[1.015] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+          className="group relative block w-full max-w-xl aspect-[8.5/11] bg-white text-black rounded-md shadow-2xl overflow-hidden animate-pop-in text-left transition-transform duration-300 hover:scale-[1.015] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
           aria-label="Enlarge resume"
         >
           <div ref={thumbRef} className="absolute inset-0">

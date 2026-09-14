@@ -463,7 +463,7 @@ export const PROJECTS: Project[] = [
       { role: "Installation Design Team", name: "Keeran Cross, Chloe Erickson, Maggie Laakso, Elliot Reid" },
     ],
     description:
-      "Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials.",
+      "An immersive, experiential design for Taubman College's annual Beaux-Arts Ball, reimagining the Renaissance as a timeless expression of creative transformation and continual innovation. Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials.",
     cover: tab,
     tags: ["Production/Scenic", "Experiential"],
     media: [

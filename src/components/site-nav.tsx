@@ -153,7 +153,7 @@ export function SiteNav({
               onMouseMove={trackSheen}
               className={glassButton({ quiet: true, sheen: true })}
             >
-              CONNECT
+              LET'S CONNECT!
             </Link>
           </li>
         </ul>
