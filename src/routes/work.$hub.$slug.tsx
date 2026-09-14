@@ -900,20 +900,19 @@ function ProjectPage() {
           </RevealBlock>
         </section>
       )}
-      {isExchange && <ExchangeViewer />}
+      {/* The closing half of the description now lives inside the model
+          itself (the "Entire Facility" view's own bottom-left overlay)
+          rather than a separate section here — removing that section
+          brings the static renderings up sooner. */}
       {isExchange && (
-        <section className="px-6 md:px-12 lg:px-16 pt-3 pb-2 md:pb-4">
-          <RevealBlock>
-            <p className="mx-auto max-w-2xl text-center font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance">
-              {
-                splitAt(
-                  project.description,
-                  "The Exchange facility enables the systemic circulation",
-                )[1]
-              }
-            </p>
-          </RevealBlock>
-        </section>
+        <ExchangeViewer
+          description={
+            splitAt(
+              project.description,
+              "The Exchange facility enables the systemic circulation",
+            )[1]
+          }
+        />
       )}
 
       {/* TaB: Renaissance — the PINK FOUNTAIN technical drawing, directly under
@@ -1498,7 +1497,7 @@ function ProjectPage() {
                     src={m.src}
                     alt={m.decorative ? "" : (m.alt ?? m.caption ?? project.title)}
                     loading="lazy"
-                    className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                    className="block w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
                 );
               return (

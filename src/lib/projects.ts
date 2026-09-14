@@ -540,6 +540,7 @@ export const PROJECTS: Project[] = [
     highlight: hlExchange,
     highlightPosition: "33% 50%",
     hub: "architecture",
+    tags: ["Architecture", "Experiential"],
     title: "The Exchange Facility",
     subtitle: "A Speculative Future: Reimagining the Post Office",
     mood: "aqua",

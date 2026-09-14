@@ -38,7 +38,7 @@ const ZONES: {
  *  ever drags the camera; scroll-wheel zoom is switched off in the scene
  *  itself so an ordinary scroll never gets caught by the model and always
  *  keeps moving the page. */
-export function ExchangeViewer() {
+export function ExchangeViewer({ description }: { description: string }) {
   const stage = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
   const controls = useRef<Awaited<
@@ -160,6 +160,17 @@ export function ExchangeViewer() {
           </div>
         )}
 
+        {/* The project description, folded into the "Entire Facility" view
+            itself rather than living in its own section below — bottom-left
+            so it never fights the zone nav's scrim at the top. */}
+        {ready && view === "overall" && (
+          <div className="hidden lg:block absolute left-6 bottom-6 max-w-sm rounded-md bg-black/50 p-4 backdrop-blur-sm">
+            <p className="font-display font-light text-base leading-snug tracking-tight text-white/90">
+              {description}
+            </p>
+          </div>
+        )}
+
         {/* Floating zoom / reset puck — small, translucent, recedes until
             hovered so it never competes with the model itself. */}
         {ready && (
@@ -213,6 +224,13 @@ export function ExchangeViewer() {
             {zoneText.subtitle}
           </p>
           <p className="text-sm leading-relaxed text-foreground/70">{zoneText.text}</p>
+        </div>
+      )}
+      {ready && view === "overall" && (
+        <div className="lg:hidden mt-4 px-6 md:px-12 lg:px-16">
+          <p className="font-display font-light text-base leading-snug tracking-tight text-foreground/80">
+            {description}
+          </p>
         </div>
       )}
     </section>
