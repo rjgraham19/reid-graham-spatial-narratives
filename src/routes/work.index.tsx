@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect } from "react";
 import { SiteNav } from "@/components/site-nav";
-import { SiteFooter } from "@/components/site-footer";
 import { ProjectTile } from "@/components/project-tile";
 import { ProjectPanel } from "@/components/project-panel";
 import { useCanShowPanel } from "@/hooks/use-media-query";
@@ -134,7 +133,7 @@ function ProjectsPage() {
         </h1>
 
         <div className="flex flex-wrap gap-2 md:gap-3 mb-10 md:mb-14">
-          <FilterPill to={{}} active={!tag} label="All" />
+          <FilterPill to={{}} active={!tag} label="All Projects" />
           {PROJECT_TAGS.map((t) => (
             <FilterPill
               key={t}
@@ -185,7 +184,6 @@ function ProjectsPage() {
         />
       )}
 
-      <SiteFooter />
     </div>
   );
 }

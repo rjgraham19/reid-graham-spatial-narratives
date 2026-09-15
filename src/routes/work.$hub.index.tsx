@@ -1,6 +1,5 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
-import { SiteFooter } from "@/components/site-footer";
 import { ProjectTile } from "@/components/project-tile";
 import { HUBS, projectsByHub, type Hub, type Project } from "@/lib/projects";
 
@@ -89,7 +88,6 @@ function HubPage() {
         </Link>
       </section>
 
-      <SiteFooter />
     </div>
   );
 }

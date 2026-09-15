@@ -1,7 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
-import { SiteFooter } from "@/components/site-footer";
 import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { BackChevron, CloseMark, glassButton, trackSheen } from "@/components/glass-button";
@@ -1780,14 +1779,6 @@ function ProjectPage() {
           </h3>
         </Link>
       </section>
-      )}
-
-      {/* Footer likewise — the wordmark, the statement line and the contact
-          details belong to the site, and the site is the page behind. */}
-      {!panel && (
-        <div data-design-protected="Protected navigation">
-          <SiteFooter />
-        </div>
       )}
 
       </div>{/* end light-zone */}

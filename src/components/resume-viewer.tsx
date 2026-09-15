@@ -190,7 +190,7 @@ export function ResumeSection() {
 
       {zoom && hasResume && (
         <div
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-2xl"
+          className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-2xl"
           role="dialog"
           aria-modal="true"
           aria-label="Resume"

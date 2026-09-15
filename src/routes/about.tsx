@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
-import { SiteFooter } from "@/components/site-footer";
 import portraitImg from "@/assets/portrait.jpg";
 
 export const Route = createFileRoute("/about")({
@@ -188,7 +187,6 @@ function About() {
         </Link>
       </section>
 
-      <SiteFooter />
     </div>
   );
 }

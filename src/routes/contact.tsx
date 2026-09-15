@@ -114,12 +114,12 @@ function Contact() {
               <p
                 data-design-id={designId.connect("about-description")}
                 data-design-kind="text"
-                className="font-display font-light text-lg md:text-2xl leading-snug text-foreground/85 text-balance"
+                className="font-display font-light text-lg md:text-2xl leading-snug text-foreground/85 text-balance whitespace-pre-line"
               >
                 {resolveText(
                   overridesFile,
                   designId.connect("about-description"),
-                  "I'm Reid Graham, a designer based in New York City. I studied architecture at the University of Michigan, with a minor in scenic design. My foundation in theater, combined with my architectural background, fuels my desire to merge these disciplines and elevate the possibilities for immersive storytelling through the built environment.",
+                  "I'm Reid Graham, a designer based in New York City with a background in Architecture and Scenic Design.\n\nMy work merges these disciplines to create immersive storytelling through the built environment.",
                 )}
               </p>
             </div>

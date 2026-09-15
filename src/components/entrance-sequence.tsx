@@ -204,7 +204,7 @@ export function EntranceSequence() {
             <span className="glass-button glass-button--quiet">Projects</span>
           </li>
           <li>
-            <span className="glass-button glass-button--quiet">Connect</span>
+            <span className="glass-button glass-button--quiet">LET'S CONNECT!</span>
           </li>
         </ul>
       </div>
