@@ -18,10 +18,13 @@ import { PROJECTS, HERO_URL } from "@/lib/projects";
  * Plays on every full load of "/" — opening the URL fresh, a refresh, or
  * re-typing the address all replay it. A module-level flag stops it from
  * replaying on client-side navigation back to the homepage within the same
- * page load (e.g. clicking the wordmark from another route). Renders nothing
- * on the server / first hydration frame, so there is no hydration mismatch.
- * Honours prefers-reduced-motion (short, static path); the cursor-follow
- * spawns are desktop-only, the auto trail runs everywhere.
+ * page load (e.g. clicking the wordmark from another route). Renders the
+ * black takeover from the very first frame — server-rendered and matched on
+ * the client's first hydration pass — rather than deciding in a post-mount
+ * effect, which used to let the real homepage flash on screen for a frame
+ * before the takeover slammed on over it. Honours prefers-reduced-motion
+ * (short, static path); the cursor-follow spawns are desktop-only, the auto
+ * trail runs everywhere.
  */
 
 const WORDMARK = "REID GRAHAM DESIGN";
@@ -37,7 +40,32 @@ const REEL: string[] = PROJECTS.filter((p) => p.tags && p.tags.length > 0)
   .slice(0, 10);
 
 export function EntranceSequence() {
-  const [active, setActive] = useState(false);
+  // Lazy initializer, not a post-mount effect: this runs during the render
+  // itself, on both the server and the client's first (hydrating) render —
+  // so the black takeover is part of the very first HTML the browser paints,
+  // instead of appearing a tick after the real homepage was already visible
+  // underneath it. That gap used to be the "millisecond glitch" right before
+  // the image trail starts: SSR sent the real page, the browser painted it,
+  // and only then did a mount effect flip the overlay on over top of it.
+  //
+  // SSR always represents a fresh document load (a same-session SPA nav
+  // back to "/" never re-invokes SSR, that path stays client-side), so the
+  // server branch always returns true — unconditionally, without touching
+  // `playedThisPageLoad` at all. That statelessness matters: if it read or
+  // wrote that module-level flag here, a server process that reuses its
+  // module cache across requests would have the SECOND visitor's homepage
+  // load see "already played" from the FIRST visitor's request, silently
+  // killing the animation for everyone after the first. The flag stays
+  // exactly what it always was — a client-only, per-browser-session guard —
+  // and the client branch below reproduces the server's `true` on its own
+  // first hydration pass (a genuinely fresh module load gets a fresh
+  // `false`), so the two agree and nothing mismatches.
+  const [active, setActive] = useState(() => {
+    if (typeof window === "undefined") return true;
+    if (playedThisPageLoad) return false;
+    playedThisPageLoad = true;
+    return true;
+  });
   const [leaving, setLeaving] = useState(false);
   const [phase, setPhase] = useState<"centre" | "docked">("centre");
   const [payphone, setPayphone] = useState(false);
@@ -48,15 +76,6 @@ export function EntranceSequence() {
   // Gate on spawning trail images. Flipped off the instant the wordmark
   // starts docking, so nothing new can land over the incoming payphone.
   const spawnable = useRef(true);
-
-  // Client-only decision: SSR renders nothing; an SPA nav back to "/" within
-  // the same page load renders nothing; a fresh document load plays it.
-  useEffect(() => {
-    if (!playedThisPageLoad) {
-      playedThisPageLoad = true;
-      setActive(true);
-    }
-  }, []);
 
   const spawn = useCallback((clientX: number, clientY: number, rot: number) => {
     if (!spawnable.current) return;
