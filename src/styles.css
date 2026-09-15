@@ -918,7 +918,13 @@
   transition: opacity 0.28s var(--ease-cinematic);
 }
 .glass-button--sheen:hover::after,
-.glass-button--sheen:focus-visible::after {
+.glass-button--sheen:focus-visible::after,
+/* The current-page pill on tablet only ever showed this gradient because
+   touch keeps :hover "stuck" on whatever was last tapped — the same link
+   that navigated here. Desktop never taps, so it never got the same tell.
+   Tying it to `.is-active` directly makes it a real, deliberate indicator
+   at every breakpoint instead of a touch-input accident. */
+.glass-button--sheen.is-active::after {
   opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {

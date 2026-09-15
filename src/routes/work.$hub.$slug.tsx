@@ -718,7 +718,19 @@ function ProjectPage() {
               triggers a re-check) — it only ever showed up at widths where
               the element happened to land safely away from that boundary.
               animate-reveal plays unconditionally on mount, with no
-              intersection observer to race. */}
+              intersection observer to race.
+
+              Paragraph and images used to be two independent grid items
+              sharing this cell — text self-start, images self-end, docked to
+              the hero's foot — so they'd hold that composition regardless of
+              how long the paragraph ran. A long description grew down far
+              enough to collide with the bottom-pinned images, since the two
+              were never actually stacked, just pinned to opposite ends of
+              the same box. They're one flowing block now: images always sit
+              a fixed gap below wherever the text ends, so they can't overlap
+              it no matter the description length or the hero image's own
+              proportions — at the cost of the images no longer tracking the
+              hero's bottom edge on a short description. */}
           <div className="relative z-10 animate-reveal px-6 md:px-0 md:col-start-2 md:row-start-1 md:self-start">
             <p
               data-design-id={designId.projectDescription(project.slug)}
@@ -727,26 +739,26 @@ function ProjectPage() {
             >
               {project.description}
             </p>
-          </div>
 
-          <div className="px-6 md:px-0 pt-8 md:pt-0 space-y-4 md:space-y-6 md:col-start-2 md:row-start-1 md:self-end">
-            {[1, 2].map((idx) => (
-              <figure key={idx} className="group">
-                <button
-                  type="button"
-                  onClick={() => setLightbox(idx)}
-                  className="block w-full overflow-hidden rounded-md bg-secondary"
-                  aria-label={project.media[idx].caption ?? `View ${idx}`}
-                >
-                  <img
-                    src={project.media[idx].src}
-                    alt={project.media[idx].caption ?? project.title}
-                    loading="lazy"
-                    className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                  />
-                </button>
-              </figure>
-            ))}
+            <div className="pt-8 space-y-4 md:space-y-6">
+              {[1, 2].map((idx) => (
+                <figure key={idx} className="group">
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(idx)}
+                    className="block w-full overflow-hidden rounded-md bg-secondary"
+                    aria-label={project.media[idx].caption ?? `View ${idx}`}
+                  >
+                    <img
+                      src={project.media[idx].src}
+                      alt={project.media[idx].caption ?? project.title}
+                      loading="lazy"
+                      className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                    />
+                  </button>
+                </figure>
+              ))}
+            </div>
           </div>
 
           {project.credits && project.credits.length > 0 && (
@@ -1174,7 +1186,7 @@ function ProjectPage() {
                 className="w-full rounded-md bg-black"
               />
               {project.video.caption && (
-                <p className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide">
+                <p className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed">
                   {project.video.caption}
                 </p>
               )}
@@ -1457,7 +1469,7 @@ function ProjectPage() {
                         <figcaption
                           data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
                           data-design-kind="text"
-                          className="mt-2 text-xs text-foreground/60 tracking-wide leading-relaxed text-right"
+                          className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed text-right"
                         >
                           {project.media[idx].caption}
                         </figcaption>
@@ -1544,12 +1556,12 @@ function ProjectPage() {
                   )}
                   {m.caption && (
                     <figcaption
-                      className={`mt-3 text-xs md:text-sm text-foreground/60 tracking-wide ${
+                      className={`mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed ${
                         // Field House and Exchange match the plain, un-numbered,
                         // right-aligned caption style established on Townhouse —
                         // the numbered "01 — " prefix is this generic gallery's
                         // own default, not something every project should carry.
-                        isFieldHouse || isExchange ? "text-right leading-relaxed" : ""
+                        isFieldHouse || isExchange ? "text-right" : ""
                       }`}
                     >
                       {!m.addedByDesignMode && !isFieldHouse && !isExchange && `${String(i + 1).padStart(2, "0")} — `}

@@ -546,7 +546,7 @@ export const PROJECTS: Project[] = [
     mood: "aqua",
     weight: "left",
     description:
-      "As rapid technological advancement accelerates the exchange of information—transforming the core function of the post office—The Exchange Facility imagines how, in a future grappling with water scarcity, the pursuit of progress might ultimately restore connection with the natural world, reviving human reverence for water's powers and facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
+      "As rapid technological advancement accelerates the exchange of information—transforming the core function of the post office—The Exchange Facility imagines how, in a future grappling with water scarcity, the pursuit of progress might ultimately revive human reverence for water's powers and facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
     cover: exchange,
     // media[0] (the old hero render) stays out of the gallery loop now that
     // the live 3D model fills that slot — kept in the array (not deleted)

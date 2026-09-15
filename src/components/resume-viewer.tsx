@@ -114,7 +114,25 @@ function OpenNewTabLink({ href, className }: { href: string; className: string }
   );
 }
 
-export function ResumeSection() {
+/** The download/open links, split out from {@link ResumeSection} so the
+ *  Contact page can place the résumé card and its actions in separate grid
+ *  cells (card bottom-aligned with the portrait photo; actions in their own
+ *  row below). Reads the static résumé metadata directly rather than the
+ *  card's own state — fine since the only thing that updates it is Design
+ *  Mode's uploader, which the public Contact page never renders. */
+export function ResumeActions({ className }: { className?: string }) {
+  const meta = resumeMetaJson as ResumeMeta;
+  if (meta.updatedAt == null) return null;
+  const url = resumeUrl(meta);
+  return (
+    <div className={`flex flex-wrap gap-3${className ? ` ${className}` : ""}`}>
+      <DownloadLink href={url} className={glassButton({ touch: true })} onClick={trackResumeDownload} />
+      <OpenNewTabLink href={url} className={glassButton({ quiet: true, touch: true })} />
+    </div>
+  );
+}
+
+export function ResumeSection({ hideActions = false }: { hideActions?: boolean } = {}) {
   const [meta, setMeta] = useState<ResumeMeta>(resumeMetaJson as ResumeMeta);
   const [zoom, setZoom] = useState(false);
   const [, setNumPages] = useState<number | null>(null);
@@ -175,7 +193,7 @@ export function ResumeSection() {
         </button>
       )}
 
-      {hasResume && (
+      {hasResume && !hideActions && (
         <div className="mt-4 flex flex-wrap gap-3">
           <DownloadLink href={url} className={glassButton({ touch: true })} onClick={trackResumeDownload} />
           <OpenNewTabLink href={url} className={glassButton({ quiet: true, touch: true })} />
