@@ -286,8 +286,7 @@
   "project.reshuffling-the-deck.description": {
     "desktop": {
       "align": "left",
-      "fontSize": 18,
-      "offsetY": 430
+      "fontSize": 18
     }
   },
   "project.townhouse.media.1": {
@@ -367,14 +366,6 @@
     "desktop": {
       "layoutShiftY": 181,
       "maxWidth": 819
-    }
-  },
-  "project.tab-renaissance.media.0": {
-    "base": {
-      "hidden": true
-    },
-    "desktop": {
-      "layoutShiftY": -449
     }
   },
   "project.townhouse.description": {

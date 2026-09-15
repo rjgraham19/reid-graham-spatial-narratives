@@ -1,4 +1,5 @@
 import { Component, Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { glassButton, CloseMark, trackSheen } from "@/components/glass-button";
 import resumeMetaJson from "@/lib/resume-meta.json";
 
@@ -206,68 +207,85 @@ export function ResumeSection({ hideActions = false }: { hideActions?: boolean }
         </Suspense>
       )}
 
-      {zoom && hasResume && (
-        <div
-          className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-2xl"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Resume"
-          onClick={close}
-        >
-          {/* Fixed to the viewport, not the scrolling content, so it stays
-              reachable no matter how far down a long resume is scrolled. */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              close();
-            }}
-            onMouseMove={trackSheen}
-            className={glassButton({
-              touch: true,
-              sheen: true,
-              className: "fixed top-4 right-4 md:top-6 md:right-6 z-[110]",
-            })}
-            aria-label="Close resume"
+      {zoom &&
+        hasResume &&
+        // Portaled straight to <body>, not just given a high z-index — a
+        // fixed-position element's z-index only ever wins against elements
+        // *outside* whatever stacking context contains it. The Contact page
+        // wraps this component in an `animate-pop-in` entrance, and *any*
+        // element with a transform-based animation establishes its own
+        // stacking context for good — even once the animation has finished
+        // and settled on `scale(1)`, which counts as "not none." That
+        // trapped this modal's z-120 below the site nav's z-110 the moment
+        // an ancestor picked up that animation, with no amount of raising
+        // this element's own z-index able to escape it. A portal sidesteps
+        // the problem entirely: it's no longer a descendant of anything on
+        // the page, so no ancestor's stacking context can ever reach it
+        // again, regardless of what animation classes land on the page
+        // around it in the future.
+        createPortal(
+          <div
+            className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Resume"
+            onClick={close}
           >
-            <CloseMark />
-          </button>
+            {/* Fixed to the viewport, not the scrolling content, so it stays
+                reachable no matter how far down a long resume is scrolled. */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                close();
+              }}
+              onMouseMove={trackSheen}
+              className={glassButton({
+                touch: true,
+                sheen: true,
+                className: "fixed top-4 right-4 md:top-6 md:right-6 z-[110]",
+              })}
+              aria-label="Close resume"
+            >
+              <CloseMark />
+            </button>
 
-          <div className="h-full overflow-y-auto overscroll-contain px-6 md:px-16 py-20 flex flex-col items-center">
-            <div ref={docRef} className="w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-              {previewFailed ? (
-                <div className="bg-white rounded-md shadow-2xl p-10 text-center text-black/70">
-                  Preview unavailable — use Download below.
-                </div>
-              ) : (
-                <PdfErrorBoundary
-                  fallback={
-                    <div className="bg-white rounded-md shadow-2xl p-10 text-center text-black/70">
-                      Preview unavailable — use Download below.
-                    </div>
-                  }
-                >
-                  <Suspense fallback={<div className="w-full aspect-[8.5/11] bg-white/90 rounded-sm animate-pulse" />}>
-                    {docWidth > 0 && (
-                      <ResumeDocumentPages
-                        file={url}
-                        width={docWidth}
-                        onNumPages={setNumPages}
-                        onError={() => setPreviewFailed(true)}
-                      />
-                    )}
-                  </Suspense>
-                </PdfErrorBoundary>
-              )}
-            </div>
+            <div className="h-full overflow-y-auto overscroll-contain px-6 md:px-16 py-20 flex flex-col items-center">
+              <div ref={docRef} className="w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+                {previewFailed ? (
+                  <div className="bg-white rounded-md shadow-2xl p-10 text-center text-black/70">
+                    Preview unavailable — use Download below.
+                  </div>
+                ) : (
+                  <PdfErrorBoundary
+                    fallback={
+                      <div className="bg-white rounded-md shadow-2xl p-10 text-center text-black/70">
+                        Preview unavailable — use Download below.
+                      </div>
+                    }
+                  >
+                    <Suspense fallback={<div className="w-full aspect-[8.5/11] bg-white/90 rounded-sm animate-pulse" />}>
+                      {docWidth > 0 && (
+                        <ResumeDocumentPages
+                          file={url}
+                          width={docWidth}
+                          onNumPages={setNumPages}
+                          onError={() => setPreviewFailed(true)}
+                        />
+                      )}
+                    </Suspense>
+                  </PdfErrorBoundary>
+                )}
+              </div>
 
-            <div className="mt-8 shrink-0 flex flex-wrap justify-center gap-3" onClick={(e) => e.stopPropagation()}>
-              <DownloadLink href={url} className={glassButton({ touch: true })} onClick={trackResumeDownload} />
-              <OpenNewTabLink href={url} className={glassButton({ quiet: true, touch: true })} />
+              <div className="mt-8 shrink-0 flex flex-wrap justify-center gap-3" onClick={(e) => e.stopPropagation()}>
+                <DownloadLink href={url} className={glassButton({ touch: true })} onClick={trackResumeDownload} />
+                <OpenNewTabLink href={url} className={glassButton({ quiet: true, touch: true })} />
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

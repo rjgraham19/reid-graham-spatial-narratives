@@ -627,7 +627,7 @@ function ProjectPage() {
                    Lollapalooza pulls nothing back: its runway is gone and the
                    photo band sits above, so the hero just flows under it. */
                 isTab
-                ? "relative mt-0 lg:-mt-[540px]"
+                ? "relative mt-0 lg:-mt-[449px]"
                 : isLollapalooza
                   ? "relative mt-0"
                   : "relative mt-0 lg:-mt-[300px]"
@@ -703,12 +703,6 @@ function ProjectPage() {
           explicit, so the two are free to differ. */}
       {isReshuffling && (
         <>
-          {/* Paragraph and images are two independent grid items sharing
-              col-2/row-1 (not one stacked block) so each can carry its own
-              align-self: the paragraph self-start, level with the title/
-              location line on the left, and the images self-end, docked to
-              the hero's foot the way they always were — moving the
-              paragraph up didn't drag the images up with it. */}
           {/* Plain CSS reveal instead of RevealBlock: at some in-between
               viewport widths this element's pushed-down position (see its
               offsetY override) sits right at RevealBlock's -80px
@@ -722,16 +716,15 @@ function ProjectPage() {
 
               Paragraph and images used to be two independent grid items
               sharing this cell — text self-start, images self-end, docked to
-              the hero's foot — so they'd hold that composition regardless of
-              how long the paragraph ran. A long description grew down far
-              enough to collide with the bottom-pinned images, since the two
-              were never actually stacked, just pinned to opposite ends of
-              the same box. They're one flowing block now: images always sit
-              a fixed gap below wherever the text ends, so they can't overlap
-              it no matter the description length or the hero image's own
-              proportions — at the cost of the images no longer tracking the
-              hero's bottom edge on a short description. */}
-          <div className="relative z-10 animate-reveal px-6 md:px-0 md:col-start-2 md:row-start-1 md:self-start">
+              the hero's foot — so a long description grew down far enough to
+              collide with the bottom-pinned images, since the two were never
+              actually stacked, just pinned to opposite ends of the same box.
+              They're one flowing block now (text always directly above the
+              images, so they can never overlap it), and the whole block
+              carries self-end so its last element — the second image —
+              still lands level with the hero's foot, the way the two were
+              always meant to read as a pair. */}
+          <div className="relative z-10 animate-reveal px-6 md:px-0 md:col-start-2 md:row-start-1 md:self-end">
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
