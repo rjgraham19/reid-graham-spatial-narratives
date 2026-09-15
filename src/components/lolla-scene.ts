@@ -65,6 +65,17 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
   orbit.maxZoom = 3;
   orbit.maxPolarAngle = Math.PI * 0.49;
   orbit.listenToKeyEvents(renderer.domElement);
+  // Three.js sets touch-action:none on the canvas the moment OrbitControls
+  // connects, so it can capture a one-finger drag as orbit — that also blocks
+  // the browser's native touch-scroll over the whole element. On a phone,
+  // disabling one-finger rotate and handing touch-action back to the browser
+  // lets an ordinary swipe scroll the page instead of getting stuck orbiting
+  // the model; two-finger drag still dollies/pans. See exchange-scene.ts for
+  // the same fix and the fuller explanation.
+  if (window.matchMedia("(pointer: coarse)").matches) {
+    orbit.touches.ONE = null;
+    renderer.domElement.style.touchAction = "pan-y";
+  }
   // Held off until reveal() hands control over — before that the roof is
   // still sitting at its bind pose, unrevealed, and there's nothing to gain
   // from letting a stray drag or wheel nudge the camera this early.

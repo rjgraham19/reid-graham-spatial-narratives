@@ -378,13 +378,6 @@
     }
   },
   "project.townhouse.media.0": {
-    "desktop": {
-      "widthPct": 66,
-      "offsetX": 2,
-      "layoutShiftY": 150,
-      "offsetY": -10,
-      "align": "right"
-    },
     "mobile": {
       "layoutShiftY": -10
     }

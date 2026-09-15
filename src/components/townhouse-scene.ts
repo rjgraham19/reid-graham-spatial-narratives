@@ -32,6 +32,17 @@ export function createTownhouseScene(host: HTMLDivElement): TownhouseControls {
   const orbit = new OrbitControls(camera, renderer.domElement);
   orbit.enableDamping = false;orbit.maxPolarAngle = Math.PI*.49;orbit.minZoom=.45;orbit.maxZoom=5;
   orbit.listenToKeyEvents(renderer.domElement);
+  // Three.js sets touch-action:none on the canvas the moment OrbitControls
+  // connects, so it can capture a one-finger drag as orbit — that also blocks
+  // the browser's native touch-scroll over the whole element. On a phone,
+  // disabling one-finger rotate and handing touch-action back to the browser
+  // lets an ordinary swipe scroll the page instead of getting stuck orbiting
+  // the model; two-finger drag still dollies/pans. See exchange-scene.ts for
+  // the same fix and the fuller explanation.
+  if (window.matchMedia('(pointer: coarse)').matches) {
+    orbit.touches.ONE = null;
+    renderer.domElement.style.touchAction = 'pan-y';
+  }
   let model: THREE.Group | undefined; let disposed=false; let span=18; let aspect=1; const homeTarget=new THREE.Vector3();
   const render = () => {if (!disposed) renderer.render(scene,camera);};
   orbit.addEventListener('change',render);

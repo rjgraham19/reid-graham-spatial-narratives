@@ -1416,7 +1416,7 @@ function ProjectPage() {
           // both columns starting on the same line.
           <div className="grid grid-cols-1 md:grid-cols-[19fr_10fr] gap-6 md:gap-10 md:items-start">
             {!project.media[0]?.hidden && (
-              <figure className="group overflow-hidden rounded-md">
+              <figure className="group overflow-hidden rounded-md lg:mt-[150px]">
                 <button
                   type="button"
                   onClick={() => setLightbox(0)}
@@ -1429,7 +1429,17 @@ function ProjectPage() {
                     src={project.media[0].src}
                     alt={project.media[0].caption ?? project.title}
                     loading="lazy"
-                    className="w-full h-auto group-hover:scale-[1.03] transition-transform duration-700 ease-cinematic"
+                    /* Real desktop only (lg+): the axon runs narrower than its
+                       column and nudged slightly, a composition tuned at wide
+                       viewports. A Design Mode edit used to apply this from
+                       768px up — the same threshold tablet shares with real
+                       desktop — so the tablet-width column (much narrower
+                       than what this was tuned against) got the same 150px
+                       drop and 66% shrink and the axon read as missing,
+                       stranded well below the renders beside it. lg-gating it
+                       here, the way the TaB hero's stray offset was fixed,
+                       keeps tablet at its natural full-width/no-shift layout. */
+                    className="w-full h-auto lg:w-[66%] lg:translate-x-[2px] lg:-translate-y-[10px] group-hover:scale-[1.03] transition-transform duration-700 ease-cinematic"
                   />
                 </button>
               </figure>

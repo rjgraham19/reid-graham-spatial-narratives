@@ -24,6 +24,21 @@ export function createExchangeScene(host: HTMLDivElement) {
   // enableZoom off, OrbitControls' wheel handler returns before calling
   // preventDefault, so the wheel event passes straight through to the page.
   orbit.enableZoom = false;
+  // Touch needs the equivalent treatment for the equivalent reason. Three.js
+  // sets touch-action:none on the canvas the moment OrbitControls connects
+  // (so it can capture a one-finger drag as orbit), which blocks the
+  // browser's native touch-scroll over the whole element regardless of what
+  // touches.ONE is mapped to. On a phone this canvas runs nearly full-screen
+  // (see the `85vh` stage height), so that made a one-finger swipe anywhere
+  // over the model orbit the camera instead of scrolling the page — with no
+  // way to keep scrolling without lifting off and retrying outside its
+  // bounds. Disabling one-finger rotate and handing touch-action back to the
+  // browser makes an ordinary swipe scroll the page again, like it does
+  // everywhere else on the site; two-finger drag still dollies/pans.
+  if (window.matchMedia("(pointer: coarse)").matches) {
+    orbit.touches.ONE = null;
+    renderer.domElement.style.touchAction = "pan-y";
+  }
   const decoder = new DRACOLoader().setDecoderPath("/draco/");
   decoder.setWorkerLimit(2);
   const meshes: {

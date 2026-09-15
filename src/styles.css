@@ -1194,6 +1194,14 @@
    jumping when the takeover lifts. Rises in a fraction after .rg-entr-nav /
    .rg-entr-payphone. */
 .rg-entr-disciplines {
+  /* Below md the payphone photo goes full-bleed (see .rg-entr-payphone's own
+     max-width:767px rule) rather than sitting confined to the right half —
+     so this row, docked under the wordmark in the photo's left/lower reach,
+     faded in as barely-legible text smeared across a busy image instead of
+     resting on the clear black ground it gets from md up. The real page's
+     own discipline nav underneath it is what a visitor actually lands on,
+     so the phone gets no stand-in here at all rather than a glitchy one. */
+  display: none;
   position: absolute;
   top: 100%;
   left: 0;
@@ -1202,7 +1210,6 @@
   /* Reset the wordmark's display type — the glass buttons style their own. */
   line-height: normal;
   letter-spacing: normal;
-  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
@@ -1220,6 +1227,7 @@
   /* Match the real page: one equal-width row spanning "GRAHAM", 2.25rem
      (mt-9) below the lockup. */
   .rg-entr-disciplines {
+    display: flex;
     flex-direction: row;
     margin-top: 2.25rem;
   }

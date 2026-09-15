@@ -76,6 +76,14 @@ function Home() {
               wordmark so it doesn't push the lockup off-centre — that shift
               is what made the entrance hand-off visibly jump. */}
           <div className="relative w-fit">
+            {/* The nav lives inside the id'd div (not a sibling of it) so a
+                Design Mode position nudge on the wordmark — an `offsetY`
+                transform, which moves what it's applied to without touching
+                anyone else's layout — carries the discipline row along with
+                it. It used to be a sibling: a -159px mobile nudge left the
+                nav exactly 159px behind, opening a dead gap between the
+                wordmark and the buttons under it that isn't there on the
+                settled page at any other breakpoint. */}
             <div data-design-id={brandingId} data-design-kind="heading">
               <h1
                 className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
@@ -85,32 +93,32 @@ function Home() {
                 <span className="block">Graham</span>
                 <span className="block font-thin text-foreground/85">Design</span>
               </h1>
-            </div>
 
-            {/* Discipline shortcuts, spanning the width of "Graham" as one
-                row of equal buttons. The entrance sequence renders a matching
-                stand-in set (see .rg-entr-disciplines) that rises in with the
-                top nav, then cross-fades onto these. */}
-            <nav
-              aria-label="Project disciplines"
-              className="mt-7 flex w-full flex-col gap-2 md:absolute md:left-0 md:top-full md:mt-9 md:flex-row"
-            >
-              {PROJECT_TAGS.map((t) => (
-                <Link
-                  key={t}
-                  to="/work"
-                  search={{ tag: t }}
-                  onMouseMove={trackSheen}
-                  className={glassButton({
-                    quiet: true,
-                    sheen: true,
-                    className: "md:grow md:basis-0 md:min-w-max",
-                  })}
-                >
-                  {t.replace("/", " / ")}
-                </Link>
-              ))}
-            </nav>
+              {/* Discipline shortcuts, spanning the width of "Graham" as one
+                  row of equal buttons. The entrance sequence renders a matching
+                  stand-in set (see .rg-entr-disciplines) that rises in with the
+                  top nav, then cross-fades onto these. */}
+              <nav
+                aria-label="Project disciplines"
+                className="mt-7 flex w-full flex-col gap-2 md:absolute md:left-0 md:top-full md:mt-9 md:flex-row"
+              >
+                {PROJECT_TAGS.map((t) => (
+                  <Link
+                    key={t}
+                    to="/work"
+                    search={{ tag: t }}
+                    onMouseMove={trackSheen}
+                    className={glassButton({
+                      quiet: true,
+                      sheen: true,
+                      className: "md:grow md:basis-0 md:min-w-max",
+                    })}
+                  >
+                    {t.replace("/", " / ")}
+                  </Link>
+                ))}
+              </nav>
+            </div>
           </div>
         </div>
 
