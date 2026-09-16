@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
-import { useScrollScrubVideo } from "@/hooks/use-scroll-scrub-video";
+import { RecordPlayerViewer } from "@/components/record-player-viewer";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { BackChevron, CloseMark, glassButton, trackSheen } from "@/components/glass-button";
 import { LightboxVideo } from "@/components/lightbox-video";
@@ -293,15 +293,14 @@ function ProjectPage() {
     : [];
 
   const recordScrubWrapperRef = useRef<HTMLDivElement>(null);
-  const recordScrubVideoRef = useRef<HTMLVideoElement>(null);
   // The blurb pinned beside the record player fades in a beat after the
   // scrub starts, then holds. Opacity is written straight to the node from
   // the scroll-progress callback so the page doesn't re-render every frame.
   const recordCaptionRef = useRef<HTMLParagraphElement>(null);
-  useScrollScrubVideo(recordScrubWrapperRef, recordScrubVideoRef, (p: number) => {
+  const updateRecordCaption = (p: number) => {
     const el = recordCaptionRef.current;
     if (el) el.style.opacity = String(Math.min(1, Math.max(0, (p - 0.04) / 0.12)));
-  });
+  };
 
   // The fixed nav's own translucent/blurred backdrop sits at the very top of
   // the viewport throughout the 400vh record-scrub, over ~66px the circular
@@ -971,29 +970,15 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Lollapalooza — record-player scroll-scrub video, full-bleed background
+      {/* Lollapalooza — record-player scroll-controlled 3D, full-bleed background
           with the project blurb pinned in the black space beside it (desktop). */}
       {isLollapalooza && (
-        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] lolla-bg">
+        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] lolla-bg" data-record-player-section>
           {/* svh, not vh: on a phone the sticky frame must fit the space that's
               actually visible with the address bar showing, or its bottom is cut
               off. vh measures the tall viewport the bar is hidden in. */}
           <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
-            {/* Desktop: scaled up and pushed left of centre so the record
-                player clears the right of the frame for the blurb — and, being
-                scaled past 100%, the video still covers the whole viewport, so
-                no page colour ever shows at its edge (its rendered near-black
-                doesn't paint quite the same as a CSS value). Untouched on
-                phones, where there's no room to spare. translateX must come
-                first so the scale still covers the right edge. */}
-            <video
-              ref={recordScrubVideoRef}
-              src="/lollapalooza-recordplayer.mp4"
-              muted
-              playsInline
-              preload="auto"
-              className="absolute inset-0 h-full w-full object-cover md:[transform:translateX(-10%)_scale(1.3)]"
-            />
+            <RecordPlayerViewer wrapperRef={recordScrubWrapperRef} onProgress={updateRecordCaption} />
             {/* Desktop only: the blurb, pinned mid-height in the black space to
                 the right of the record player. It's inside the sticky frame, so
                 it holds its spot for the whole scrub; opacity is driven by
@@ -1004,7 +989,7 @@ function ProjectPage() {
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
               style={{ opacity: 0 }}
-              className="hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
+              className="record-player-caption hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
             >
               {project.description}
             </p>
