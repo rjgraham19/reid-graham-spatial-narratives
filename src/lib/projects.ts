@@ -481,7 +481,6 @@ export const PROJECTS: Project[] = [
   {
     slug: "rags-to-riches",
     accentColor: "#5baaff",
-    heroTitleAbove: true,
     hub: "production-scenic",
     title: "Rags to Riches",
     subtitle: "Country Music Festival, Nashville, TN",

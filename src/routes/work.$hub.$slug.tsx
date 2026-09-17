@@ -587,7 +587,15 @@ function ProjectPage() {
 
               Lollapalooza has no runway: the scrolling photo band sits between
               the title and the hero, so there's nothing to pin the title over. */}
-          <div className={isLollapalooza || isExchange ? "hidden" : "h-0 lg:h-[300px]"} />
+          <div
+            className={
+              isLollapalooza || isExchange
+                ? "hidden"
+                : isRagsToRiches
+                  ? "h-0 lg:h-[150px]"
+                  : "h-0 lg:h-[300px]"
+            }
+          />
         </div>
 
         {/* Lollapalooza — the gallery-* event photos as an endless, clickable
@@ -1051,7 +1059,7 @@ function ProjectPage() {
               <p
                 data-design-id={designId.projectDescription(project.slug)}
                 data-design-kind="text"
-                className="font-display font-light text-xl md:text-2xl leading-snug tracking-tight text-balance"
+                className="font-display font-light text-2xl md:text-3xl leading-snug tracking-tight text-balance"
               >
                 {project.description}
               </p>
@@ -1084,7 +1092,7 @@ function ProjectPage() {
       {isRagsToRiches && (
         <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
           <RevealBlock>
-            <p className="font-display font-light text-xl md:text-2xl leading-snug tracking-tight text-balance text-center max-w-2xl mx-auto">
+            <p className="font-display font-light text-2xl md:text-3xl leading-snug tracking-tight text-balance text-center">
               At the "Rags to Riches" country carnival, every game revolves
               around luck and money. The main attraction: a blinged-out,
               Zoltar-inspired "Cash Cow" dispenses your financial fortunes.
