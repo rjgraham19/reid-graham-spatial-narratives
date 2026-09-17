@@ -25,6 +25,10 @@ import tab from "@/assets/rg/tab-full.jpg";
 // them side by side reconstructs the original at a single consistent scale.
 import tabDrawingLeft from "@/assets/rg/tab-drawing-left.jpg";
 import tabDrawingRight from "@/assets/rg/tab-drawing-right.jpg";
+import ragsRichesFull from "@/assets/rg/rags-riches-full.jpg";
+import ragsRichesZoltar from "@/assets/rg/rags-riches-zoltar.jpg";
+import ragsRichesCountryClose from "@/assets/rg/rags-riches-country-close.jpg";
+import ragsRichesCountryFull from "@/assets/rg/rags-riches-country-full.jpg";
 import lollaClubMagenta from "@/assets/rg/lollapalooza-clubmagenta.jpg";
 import lollaGalleryDj from "@/assets/rg/lollapalooza-gallery-dj-booth.jpg";
 import lollaGalleryLoungePath from "@/assets/rg/lollapalooza-gallery-lounge-path.jpg";
@@ -471,6 +475,29 @@ export const PROJECTS: Project[] = [
       { type: "video", src: "/tab-closeup-animation.mp4" },
       { type: "image", src: tabDrawingLeft, caption: "PINK FOUNTAIN — components and modular seating types" },
       { type: "image", src: tabDrawingRight, caption: "PINK FOUNTAIN — exploded assembly and installation plan" },
+    ],
+  },
+  {
+    slug: "rags-to-riches",
+    accentColor: "#5baaff",
+    heroTitleAbove: true,
+    hub: "production-scenic",
+    title: "Rags to Riches",
+    subtitle: "Country Music Festival, Nashville, TN",
+    tags: ["Experiential"],
+    highlight: ragsRichesCountryClose,
+    description:
+      "A winning concept in a competitive bid for client business, this activation integrates a personal banking app into Nashville's music festival scene. A country music photo op — complete with an Opry-style ribbon microphone — nods to the city's honky-tonk culture.",
+    cover: ragsRichesCountryFull,
+    media: [
+      { type: "image", src: ragsRichesCountryFull, caption: "Rags to Riches — country carnival activation" },
+      {
+        type: "image",
+        src: ragsRichesCountryClose,
+        caption: "Honky-tonk photo op with Opry-style ribbon microphone",
+      },
+      { type: "image", src: ragsRichesZoltar, caption: "Cash Cow — Zoltar-inspired fortune booth" },
+      { type: "image", src: ragsRichesFull, caption: "Rags to Riches — closing view" },
     ],
   },
 

@@ -234,6 +234,7 @@ function ProjectPage() {
   const isReshuffling = project.slug === "reshuffling-the-deck";
   const isLollapalooza = project.slug === "lollapalooza";
   const isExchange = project.slug === "the-exchange-facility";
+  const isRagsToRiches = project.slug === "rags-to-riches";
   const isPortraitHero = project.heroPortrait === true;
   const isTitleAbove = project.heroTitleAbove === true;
 
@@ -268,6 +269,7 @@ function ProjectPage() {
       .filter(
         ({ item, index }: { item: MediaItem; index: number }) =>
           !(isTab && index !== 0) &&
+          !isRagsToRiches &&
           !(isLollapalooza && (item.id?.startsWith("gallery-") || item.id?.startsWith("drafting-"))) &&
           !item.hidden,
       ),
@@ -480,7 +482,9 @@ function ProjectPage() {
               isTitleAbove
                 ? "pb-8 md:pb-10"
                 : "pb-8 sm:pb-10 lg:pb-24 lg:pointer-events-none"
-            } ${isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"}`}
+            } ${
+              isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"
+            }`}
           >
             {project.tags && project.tags.length > 0 && (
               /* Lollapalooza desktop: the tag sits ~40% closer to the title,
@@ -627,9 +631,11 @@ function ProjectPage() {
                    photo band sits above, so the hero just flows under it. */
                 isTab
                 ? "relative mt-0 lg:-mt-[449px]"
-                : isLollapalooza
-                  ? "relative mt-0"
-                  : "relative mt-0 lg:-mt-[300px]"
+                : isRagsToRiches
+                  ? "relative mt-0 lg:-mt-[380px]"
+                  : isLollapalooza
+                    ? "relative mt-0"
+                    : "relative mt-0 lg:-mt-[300px]"
               : "lg:col-start-1 lg:row-start-1"
           } ${
             /* Full bleed in the panel. The standard 64px gutter left the hero
@@ -1004,7 +1010,7 @@ function ProjectPage() {
           whole band is skipped for it rather than sitting empty. Lollapalooza
           likewise: its blurb is pinned on the record-player animation and its
           credits sit up by the hero, so nothing is left for this band. */}
-      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && (
+      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && !isRagsToRiches && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
           {/* Skipped on True West, where the two lines of the description now
@@ -1034,6 +1040,112 @@ function ProjectPage() {
           </RevealBlock>
         )}
       </section>
+      )}
+
+      {/* Rags to Riches — first blurb beside the honky-tonk photo op,
+          directly under the hero. */}
+      {isRagsToRiches && (
+        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-start">
+            <RevealBlock>
+              <p
+                data-design-id={designId.projectDescription(project.slug)}
+                data-design-kind="text"
+                className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
+              >
+                {project.description}
+              </p>
+            </RevealBlock>
+            <RevealBlock delay={0.1}>
+              <figure className="group">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(1)}
+                  className="block w-full overflow-hidden rounded-md bg-secondary"
+                  aria-label={project.media[1].caption ?? project.title}
+                >
+                  <img
+                    data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
+                    data-design-kind="image"
+                    src={project.media[1].src}
+                    alt={project.media[1].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+            </RevealBlock>
+          </div>
+        </section>
+      )}
+
+      {/* Rags to Riches — full-width image, above the second blurb. */}
+      {isRagsToRiches && (
+        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
+          <RevealBlock>
+            <figure className="group">
+              <button
+                type="button"
+                onClick={() => setLightbox(3)}
+                className="block w-full overflow-hidden rounded-md bg-secondary"
+                aria-label={project.media[3].caption ?? project.title}
+              >
+                <img
+                  data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
+                  data-design-kind="image"
+                  src={project.media[3].src}
+                  alt={project.media[3].caption ?? project.title}
+                  loading="lazy"
+                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                />
+              </button>
+            </figure>
+          </RevealBlock>
+        </section>
+      )}
+
+      {/* Rags to Riches — second blurb, continuing the story. */}
+      {isRagsToRiches && (
+        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
+          <RevealBlock>
+            <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+              At the "Rags to Riches" country carnival, every game revolves
+              around luck and money. The main attraction: a blinged-out,
+              Zoltar-inspired "Cash Cow" dispenses your financial fortunes.
+            </p>
+          </RevealBlock>
+        </section>
+      )}
+
+      {/* Rags to Riches — Cash Cow, left half of a two-photo row, now the
+          closing section. The right half is reserved for a second image Reid
+          plans to drop in later. */}
+      {isRagsToRiches && (
+        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16">
+            <RevealBlock>
+              <figure className="group">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(2)}
+                  className="block w-full overflow-hidden rounded-md bg-secondary"
+                  aria-label={project.media[2].caption ?? project.title}
+                >
+                  <img
+                    data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
+                    data-design-kind="image"
+                    src={project.media[2].src}
+                    alt={project.media[2].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+            </RevealBlock>
+            {/* Reserved for the second image — currently empty. */}
+            <div />
+          </div>
+        </section>
       )}
 
       {/* Pull quote */}
