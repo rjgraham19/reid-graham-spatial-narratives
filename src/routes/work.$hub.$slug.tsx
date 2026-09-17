@@ -257,8 +257,10 @@ function ProjectPage() {
 
   /* What the standard gallery should list. TaB gives its closeup video and
      both halves of the PINK FOUNTAIN drawing their own sections higher up the
-     page, so only the opening contact sheet is left to show here. The original
-     index travels with each item, since that's what the lightbox counts by. */
+     page — the opening contact sheet is the same image as the hero, so it's
+     excluded here too rather than repeating the hero at the foot of the page.
+     The original index travels with each item, since that's what the
+     lightbox counts by. */
   // The generic two-column gallery grid's own display order can additionally
   // be overridden by a Design Mode Reorder drag (`applyMediaOrder`) — the
   // several bespoke per-project layouts below address `project.media` by
@@ -268,7 +270,7 @@ function ProjectPage() {
       .map((item: MediaItem, index: number) => ({ item, index }))
       .filter(
         ({ item, index }: { item: MediaItem; index: number }) =>
-          !(isTab && index !== 0) &&
+          !isTab &&
           !isRagsToRiches &&
           !(isLollapalooza && (item.id?.startsWith("gallery-") || item.id?.startsWith("drafting-"))) &&
           !item.hidden,
