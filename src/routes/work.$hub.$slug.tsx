@@ -1051,7 +1051,7 @@ function ProjectPage() {
               <p
                 data-design-id={designId.projectDescription(project.slug)}
                 data-design-kind="text"
-                className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance"
+                className="font-display font-light text-xl md:text-2xl leading-snug tracking-tight text-balance"
               >
                 {project.description}
               </p>
@@ -1079,11 +1079,12 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Rags to Riches — second blurb, continuing the story. */}
+      {/* Rags to Riches — second blurb, continuing the story, centered in
+          the gap between the honky-tonk photo and the closing image. */}
       {isRagsToRiches && (
         <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
           <RevealBlock>
-            <p className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance">
+            <p className="font-display font-light text-xl md:text-2xl leading-snug tracking-tight text-balance text-center max-w-2xl mx-auto">
               At the "Rags to Riches" country carnival, every game revolves
               around luck and money. The main attraction: a blinged-out,
               Zoltar-inspired "Cash Cow" dispenses your financial fortunes.
@@ -1093,10 +1094,10 @@ function ProjectPage() {
       )}
 
       {/* Rags to Riches — full-width closing-transition image, below the
-          second blurb. Extra margin keeps it noticeably smaller than a true
-          full-bleed image. */}
+          second blurb. Same margins as the sections above/below it so its
+          edges line up with the Country Close and Cash Cow images. */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-28 lg:px-36 py-6 md:py-8">
+        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
           <RevealBlock>
             <figure className="group">
               <button
