@@ -419,18 +419,17 @@ function ProjectPage() {
             className={`bg-gradient-to-b from-black via-black/70 to-transparent ${
               panel ? "pt-9 md:pt-10" : "pt-10 md:pt-14"
             } ${
-              /* Lollapalooza title lockup, desktop only. Tighter top and
-                 bottom padding, pulling the black title area in by about 17%
-                 without touching the title's own scale. Paired with the
-                 tightened gaps below.
+              /* Lollapalooza title lockup, desktop only. Tighter top
+                 padding, pulling the black title area in by about 17%
+                 without touching the title's own scale.
 
                  Still scoped to this one project rather than promoted to all
                  of them: it's an approved composition for Lollapalooza, and
                  applying it site-wide would restyle every other project's
                  title block, which is its own decision. lg-gated, so phone
                  and tablet are untouched either way. */
-              isLollapalooza ? "lg:pt-8 lg:pb-6" : ""
-            } pb-8 md:pb-10 px-6 md:px-12 lg:px-16`}
+              isLollapalooza ? "lg:pt-8" : ""
+            } pb-2 px-6 md:px-12 lg:px-16`}
           >
             {project.tags && project.tags.length > 0 && (
               /* Lollapalooza desktop: the tag sits ~40% closer to the title,
@@ -498,7 +497,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectSubtitle(project.slug)}
               data-design-kind="text"
-              className={`mt-4 font-display font-extralight uppercase tracking-[0.15em] text-sm md:text-base ${
+              className={`mt-4 font-display font-light uppercase tracking-[0.15em] text-sm md:text-base ${
                 isLollapalooza
                   ? "text-foreground/50 lg:mt-2 lg:text-foreground/70"
                   : "text-foreground/50"
