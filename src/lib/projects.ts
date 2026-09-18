@@ -46,7 +46,9 @@ import lollaDraftingSofaGroundplan from "@/assets/rg/lollapalooza-drafting-sofa-
 import hlTrueWest from "@/assets/rg/highlight-true-west.jpg";
 import hlFieldHouse from "@/assets/rg/highlight-field-house.jpg";
 import hlTownhouse from "@/assets/rg/highlight-townhouse.jpg";
-import hlExchange from "@/assets/rg/highlight-exchange.jpg";
+// Was highlight-exchange.jpg — swapped for the Wavescapes vessel interior
+// render, which is the current, accurate image for this project's tile.
+import hlExchange from "@/assets/rg/exchange-wavescape-render.png";
 import hlStaging from "@/assets/rg/highlight-staging.jpg";
 import hlRenderings from "@/assets/rg/highlight-renderings.jpg";
 import hlDrafting from "@/assets/rg/highlight-drafting.jpg";
@@ -372,25 +374,29 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    slug: "rags-to-riches",
-    accentColor: "#5baaff",
-    hub: "production-scenic",
-    title: "Rags to Riches",
-    subtitle: "Country Music Festival, Nashville, TN",
-    tags: ["Experiential"],
-    highlight: ragsRichesCountryClose,
+    slug: "the-exchange-facility",
+    accentColor: "#b89bec",
+    heroTitleAbove: true,
+    highlight: hlExchange,
+    highlightPosition: "55% 60%",
+    hub: "architecture",
+    tags: ["Architecture", "Experiential"],
+    title: "The Exchange Facility",
+    subtitle: "A Speculative Future: Reimagining the Post Office",
+    mood: "aqua",
+    weight: "left",
     description:
-      "A winning concept in a competitive bid for client business, this activation integrates a personal banking app into Nashville's music festival scene. A country music photo op — complete with an Opry-style ribbon microphone — nods to the city's honky-tonk culture.",
-    cover: ragsRichesCountryFull,
+      "As rapid technological advancement accelerates the exchange of information—transforming the core function of the post office—The Exchange Facility imagines how, in a future grappling with water scarcity, the pursuit of progress might ultimately revive human reverence for water's powers and facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
+    cover: exchange,
+    // media[0] (the old hero render) stays out of the gallery loop now that
+    // the live 3D model fills that slot — kept in the array (not deleted)
+    // since other code addresses media by fixed index. The three static
+    // renderings themselves are already present as Design Mode-added media
+    // (see design-media-additions.json) in a clustered half-width layout;
+    // their captions are set via design-overrides.json rather than here, to
+    // avoid a second, duplicate copy of the same three images.
     media: [
-      { type: "image", src: ragsRichesCountryFull, caption: "Rags to Riches — country carnival activation" },
-      {
-        type: "image",
-        src: ragsRichesCountryClose,
-        caption: "Honky-tonk photo op with Opry-style ribbon microphone",
-      },
-      { type: "image", src: ragsRichesZoltar, caption: "Cash Cow — Zoltar-inspired fortune booth" },
-      { type: "image", src: ragsRichesFull, caption: "Rags to Riches — closing view" },
+      { type: "image", src: exchange, caption: "River-status map, Algae Purification Station, section and interior vessels (RIBI Oasis, Wavescapes, Steam Sanctuary)", hidden: true },
     ],
   },
   {
@@ -477,35 +483,25 @@ export const PROJECTS: Project[] = [
 
   // ─── Architecture (Anne Frank, Production/Scenic, is slotted in here) ────
   {
-    slug: "field-house",
-    accentColor: "#98A633",
-    highlight: hlFieldHouse,
-    highlightPosition: "70% 50%",
-    hub: "architecture",
-    title: "Field House",
-    subtitle: "Community Tennis & Recreational Building",
-    mood: "concrete",
-    weight: "left",
+    slug: "rags-to-riches",
+    accentColor: "#5baaff",
+    hub: "production-scenic",
+    title: "Rags to Riches",
+    subtitle: "Country Music Festival, Nashville, TN",
+    tags: ["Experiential"],
+    highlight: ragsRichesCountryClose,
     description:
-      "Guided by accessibility and inclusive play for individuals of all ages and physical abilities, the Community Tennis and Recreational Building incorporates ramps to facilitate activity and motion around the courts — watching the game becomes as dynamic as playing it.",
-    cover: fieldHouseFull,
-    collage: [fieldHouseDet.url],
+      "A winning concept in a competitive bid for client business, this activation integrates a personal banking app into Nashville's music festival scene. A country music photo op — complete with an Opry-style ribbon microphone — nods to the city's honky-tonk culture.",
+    cover: ragsRichesCountryFull,
     media: [
+      { type: "image", src: ragsRichesCountryFull, caption: "Rags to Riches — country carnival activation" },
       {
         type: "image",
-        src: "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg",
-        layout: "half",
-        caption: "Illustration Rendering",
+        src: ragsRichesCountryClose,
+        caption: "Honky-tonk photo op with Opry-style ribbon microphone",
       },
-      {
-        type: "image",
-        src: "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg",
-        layout: "half",
-        caption: "Isometric Diagram",
-      },
-      { type: "image", src: "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg", caption: "Section Drawing" },
-      { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP1.jpg", layout: "half" },
-      { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP2.jpg", layout: "half" },
+      { type: "image", src: ragsRichesZoltar, caption: "Cash Cow — Zoltar-inspired fortune booth" },
+      { type: "image", src: ragsRichesFull, caption: "Rags to Riches — closing view" },
     ],
   },
   {
@@ -535,29 +531,35 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    slug: "the-exchange-facility",
-    accentColor: "#b89bec",
-    heroTitleAbove: true,
-    highlight: hlExchange,
-    highlightPosition: "33% 50%",
+    slug: "field-house",
+    accentColor: "#98A633",
+    highlight: hlFieldHouse,
+    highlightPosition: "70% 50%",
     hub: "architecture",
-    tags: ["Architecture", "Experiential"],
-    title: "The Exchange Facility",
-    subtitle: "A Speculative Future: Reimagining the Post Office",
-    mood: "aqua",
+    title: "Field House",
+    subtitle: "Community Tennis & Recreational Building",
+    mood: "concrete",
     weight: "left",
     description:
-      "As rapid technological advancement accelerates the exchange of information—transforming the core function of the post office—The Exchange Facility imagines how, in a future grappling with water scarcity, the pursuit of progress might ultimately revive human reverence for water's powers and facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
-    cover: exchange,
-    // media[0] (the old hero render) stays out of the gallery loop now that
-    // the live 3D model fills that slot — kept in the array (not deleted)
-    // since other code addresses media by fixed index. The three static
-    // renderings themselves are already present as Design Mode-added media
-    // (see design-media-additions.json) in a clustered half-width layout;
-    // their captions are set via design-overrides.json rather than here, to
-    // avoid a second, duplicate copy of the same three images.
+      "Guided by accessibility and inclusive play for individuals of all ages and physical abilities, the Community Tennis and Recreational Building incorporates ramps to facilitate activity and motion around the courts — watching the game becomes as dynamic as playing it.",
+    cover: fieldHouseFull,
+    collage: [fieldHouseDet.url],
     media: [
-      { type: "image", src: exchange, caption: "River-status map, Algae Purification Station, section and interior vessels (RIBI Oasis, Wavescapes, Steam Sanctuary)", hidden: true },
+      {
+        type: "image",
+        src: "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg",
+        layout: "half",
+        caption: "Illustration Rendering",
+      },
+      {
+        type: "image",
+        src: "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg",
+        layout: "half",
+        caption: "Isometric Diagram",
+      },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg", caption: "Section Drawing" },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP1.jpg", layout: "half" },
+      { type: "image", src: "/design-media/field-house/FIELDHOUSE_RESIZED_GP2.jpg", layout: "half" },
     ],
   },
   {
