@@ -237,6 +237,29 @@ function ProjectPage() {
   const isRagsToRiches = project.slug === "rags-to-riches";
   const isPortraitHero = project.heroPortrait === true;
 
+  /* Shared between the two placements below — same link, same label, just
+     rendered in two different spots depending on viewport. */
+  const backLink =
+    project.tags && project.tags.length > 0 ? (
+      <Link
+        to="/work"
+        search={{ tag: project.tags[0] }}
+        className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
+      >
+        {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
+        Back to Projects
+      </Link>
+    ) : (
+      <Link
+        to="/work/$hub"
+        params={{ hub: hub.slug }}
+        className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
+      >
+        {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
+        Back to {hub.title}
+      </Link>
+    );
+
   // Lollapalooza's record animation renders on a near-black (~#0a0908), not
   // pure #000, so against a #000 page the scrub video reads as a separate
   // panel. Take the html/body (behind any overscroll, and the panel it can
@@ -355,35 +378,29 @@ function ProjectPage() {
         </div>
       )}
 
-      {/* Back — to /work for tagged projects, to hub for visualizations */}
-      {/* Back link, and the tall top padding that clears the fixed site nav.
-          Both are dropped in the panel: the panel puts its own back control in
+      {/* Back — to /work for tagged projects, to hub for visualizations.
+          Dropped entirely in the panel: the panel puts its own back control in
           the chrome above the frame, where it stays put instead of scrolling
-          away with the page, and without the nav this padding was just dead
-          black along the top edge. Outside the panel — every phone and tablet
-          visit — this is the only back control, so it stays. */}
+          away with the page. Outside the panel — every phone and tablet
+          visit — this is the only back control, so it stays, but in two
+          different spots depending on viewport:
+
+          - Phone: fixed in the same top row as the MENU button (matching its
+            own py-4), left-aligned where that row is otherwise empty (MENU
+            sits right, justify-end). It used to sit below the nav in normal
+            flow with a big top padding (pt-28) just to clear the fixed bar —
+            that reserved a chunk of a short phone screen's height before any
+            real content (the tags/title/hero) even started. Fixed instead of
+            in-flow, it takes up none of that vertical space.
+          - Tablet/desktop: unchanged, in normal flow below the nav — there's
+            room to spare there and this keeps the wider layout as it was. */}
       {!panel && (
-      <div className="px-6 md:px-12 lg:px-16 pt-28 md:pt-32">
-        {project.tags && project.tags.length > 0 ? (
-          <Link
-            to="/work"
-            search={{ tag: project.tags[0] }}
-            className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
-          >
-            {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
-            Back to Projects
-          </Link>
-        ) : (
-          <Link
-            to="/work/$hub"
-            params={{ hub: hub.slug }}
-            className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
-          >
-            {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
-            Back to {hub.title}
-          </Link>
-        )}
-      </div>
+        <>
+          <div className="md:hidden fixed top-0 left-0 z-[110] px-6 py-4 flex items-center">
+            {backLink}
+          </div>
+          <div className="hidden md:block px-12 lg:px-16 pt-32">{backLink}</div>
+        </>
       )}
 
       {/* Header + hero.
@@ -417,7 +434,14 @@ function ProjectPage() {
       <div className="relative z-10">
           <div
             className={`bg-gradient-to-b from-black via-black/70 to-transparent ${
-              panel ? "pt-9 md:pt-10" : "pt-10 md:pt-14"
+              panel
+                ? "pt-9 md:pt-10"
+                : /* Phone: the back link is now fixed in the nav row rather
+                     than in normal flow (see above), so this is the only
+                     thing clearing the fixed bar — needs real height, not
+                     just a small gap. Tablet/desktop unchanged: the back
+                     link still sits in flow above this with its own pt-32. */
+                  "pt-24 md:pt-14"
             } ${
               /* Lollapalooza title lockup, desktop only. Tighter top
                  padding, pulling the black title area in by about 17%
