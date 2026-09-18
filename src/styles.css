@@ -770,6 +770,17 @@
      whole declaration otherwise, blur included. */
   -webkit-backdrop-filter: blur(8px) saturate(115%);
   backdrop-filter: blur(8px) saturate(115%);
+  /* iOS Safari's known backdrop-filter bug: on first paint it sometimes
+     skips the blur entirely and only starts applying it after the next
+     repaint (a scroll, an animation frame, anything that forces the layer
+     to recomposite) — which on a static page reads as the glass "glitching"
+     on a beat after load rather than being there from the first frame.
+     Promoting the button to its own compositing layer up front is the
+     standard fix: it forces the filter to render immediately instead of
+     waiting for an incidental repaint to trigger it. */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: backdrop-filter;
 
   /* A hairline along the bottom edge and a shallow contact shadow. No inner
      glow, no bevel. */
@@ -787,7 +798,7 @@
 /* Hover lifts the pane very slightly off the glass. The label never changes
    colour, so it stays neutral over any surround. */
 .glass-button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-1px) translateZ(0);
   background-color: rgba(18, 13, 22, 0.38);
   border-color: rgba(255, 255, 255, 0.13);
   box-shadow:
@@ -799,7 +810,7 @@
    a pane pushed into its housing stops catching anything along its top edge.
    Shallow, so it reads as the glass seating rather than as a button depressing. */
 .glass-button:active {
-  transform: translateY(1px);
+  transform: translateY(1px) translateZ(0);
   background-color: rgba(4, 3, 6, 0.46);
   background-image: linear-gradient(
     to bottom,
