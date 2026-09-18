@@ -1930,7 +1930,7 @@ function ProjectPage() {
           iframe so it navigates the real window instead of nesting a page
           inside the panel already open one level up. */}
       <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-t border-border">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-3 font-display font-thin uppercase tracking-tight text-xl md:text-3xl leading-tight">
+          <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-3 font-display font-thin uppercase tracking-tight text-xl md:text-3xl leading-tight text-center">
             {[
               { slug: "__home", title: "All Projects", to: "/" as const },
               ...PROJECTS.filter((p) => p.tags && p.tags.length > 0),
