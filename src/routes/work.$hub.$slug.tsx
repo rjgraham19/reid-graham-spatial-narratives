@@ -1920,11 +1920,16 @@ function ProjectPage() {
           leads the list — no separate discipline-filter pills here, just
           the names, in the same wording as the "← All Projects" link above.
           Kept outside the light-zone div above so it always reads on the
-          dark theme, and suppressed in the panel for the same reason the
-          Back/Next section above it is — the feed is already the page
-          sitting behind the panel. */}
-      {!panel && (
-        <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-t border-border">
+          dark theme.
+
+          Unlike the Back/Next section above, this one is NOT suppressed in
+          the panel — the panel is desktop-only, so this is the one place
+          most visitors actually reach the end of a project, and hiding it
+          there meant almost nobody ever saw it. `target="_top"` (same escape
+          hatch the hub-tag pill above uses) breaks each link out of the
+          iframe so it navigates the real window instead of nesting a page
+          inside the panel already open one level up. */}
+      <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-t border-border">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-3 font-display font-thin uppercase tracking-tight text-xl md:text-3xl leading-tight">
             {[
               { slug: "__home", title: "All Projects", to: "/" as const },
@@ -1933,13 +1938,18 @@ function ProjectPage() {
               <span key={p.slug} className="flex items-baseline gap-x-3">
                 {i > 0 && <span className="text-foreground/25" aria-hidden>|</span>}
                 {"to" in p ? (
-                  <Link to={p.to} className="text-foreground/40 hover:text-foreground transition-colors">
+                  <Link
+                    to={p.to}
+                    target={panel ? "_top" : undefined}
+                    className="text-foreground/40 hover:text-foreground transition-colors"
+                  >
                     {p.title}
                   </Link>
                 ) : (
                   <Link
                     to="/work/$hub/$slug"
                     params={{ hub: p.hub, slug: p.slug }}
+                    target={panel ? "_top" : undefined}
                     className="text-foreground/40 hover:text-foreground transition-colors"
                   >
                     {p.title}
@@ -1948,8 +1958,7 @@ function ProjectPage() {
               </span>
             ))}
           </div>
-        </section>
-      )}
+      </section>
 
       {/* Lightbox — deliberately outside the light region so it stays dark.
           `--accent-color` drives the Prev/Next arrows' hover tint (see
