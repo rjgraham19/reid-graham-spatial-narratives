@@ -1906,6 +1906,51 @@ function ProjectPage() {
 
       </div>{/* end light-zone */}
 
+      {/* Every other project, as a flowing block of titles — the pattern on
+          brycrasch.com/jack at the foot of each project page. The point is
+          exactly what Reid asked for: someone who scrolls to the end of one
+          project lands on more ways to keep browsing instead of a dead stop,
+          so they keep moving through the site rather than leaving it. Gray
+          by default, full white on hover (this site's --foreground, not
+          Bry's own styling — only the behavior is borrowed), thin weight to
+          match the "| creative designer" tagline rather than the bold
+          headings elsewhere on the page. A "|" between each title (same
+          mark as the tagline's) rather than a bare gap, so two adjacent
+          titles don't visually run together into one phrase. "All Projects"
+          leads the list — no separate discipline-filter pills here, just
+          the names, in the same wording as the "← All Projects" link above.
+          Kept outside the light-zone div above so it always reads on the
+          dark theme, and suppressed in the panel for the same reason the
+          Back/Next section above it is — the feed is already the page
+          sitting behind the panel. */}
+      {!panel && (
+        <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-t border-border">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-3 font-display font-thin uppercase tracking-tight text-xl md:text-3xl leading-tight">
+            {[
+              { slug: "__home", title: "All Projects", to: "/" as const },
+              ...PROJECTS.filter((p) => p.tags && p.tags.length > 0),
+            ].map((p, i) => (
+              <span key={p.slug} className="flex items-baseline gap-x-3">
+                {i > 0 && <span className="text-foreground/25" aria-hidden>|</span>}
+                {"to" in p ? (
+                  <Link to={p.to} className="text-foreground/40 hover:text-foreground transition-colors">
+                    {p.title}
+                  </Link>
+                ) : (
+                  <Link
+                    to="/work/$hub/$slug"
+                    params={{ hub: p.hub, slug: p.slug }}
+                    className="text-foreground/40 hover:text-foreground transition-colors"
+                  >
+                    {p.title}
+                  </Link>
+                )}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Lightbox — deliberately outside the light region so it stays dark.
           `--accent-color` drives the Prev/Next arrows' hover tint (see
           `.nav-arrow`) — this project's own accent, same as the panel view's

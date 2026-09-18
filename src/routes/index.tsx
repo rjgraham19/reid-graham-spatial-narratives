@@ -5,7 +5,7 @@ import { SiteNav } from "@/components/site-nav";
 import { ProjectTile } from "@/components/project-tile";
 import { ProjectPanel } from "@/components/project-panel";
 import { useCanShowPanel } from "@/hooks/use-media-query";
-import { glassButton } from "@/components/glass-button";
+import { DisciplineFilterPills } from "@/components/discipline-filter-pills";
 import designOverrides from "@/lib/design-overrides.json";
 import { mergeOverridesFiles, designModeStyleTag } from "@/lib/apply-overrides";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
@@ -218,11 +218,7 @@ function Home() {
             (see its inline style) specifically so that's a rare fallback,
             not the normal case. */}
         <div className="relative z-10 px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-10 md:pb-8 md:w-[55%] lg:w-[52%] animate-reveal-delay">
-          <div className="flex flex-col md:flex-row md:flex-wrap gap-2 md:gap-3">
-            {PROJECT_TAGS.map((t) => (
-              <FilterPill key={t} to={{ tag: t }} active={tag === t} label={formatTag(t)} />
-            ))}
-          </div>
+          <DisciplineFilterPills activeTag={tag} />
         </div>
       </div>
 
@@ -269,53 +265,3 @@ function Home() {
   );
 }
 
-function formatTag(t: ProjectTag) {
-  return t.replace("/", " / ");
-}
-
-function FilterPill({
-  to,
-  active,
-  label,
-}: {
-  to: HomeSearch;
-  active: boolean;
-  label: string;
-}) {
-  return (
-    <Link
-      to="/"
-      search={to}
-      className={glassButton({
-        quiet: true,
-        touch: true,
-        sheen: true,
-        className: active ? "is-active" : "",
-      })}
-      /* .glass-button's own font-size/padding/tracking (sized for a compact
-         nav pill) win over Tailwind utilities here since both are plain
-         rules of equal specificity — inline styles are the one thing
-         guaranteed to beat them. All three shrink together with the
-         viewport: three pills, "Production / Scenic" included, have to fit
-         in a column that's only ~52-55% of the screen (the rest is the
-         image), so besides a smaller font than the grid tiles get, the
-         padding and letter-spacing are tightened too — otherwise the label
-         text has nowhere to go but past the edge of that column, where the
-         wrapper's overflow-hidden was slicing it off rather than shrinking
-         it. */
-      style={{
-        fontSize: "clamp(0.7rem, 0.9vw + 0.3rem, 1.05rem)",
-        padding: "clamp(0.3rem, 0.4vw + 0.2rem, 0.5rem) clamp(0.5rem, 0.8vw + 0.3rem, 0.9rem)",
-        letterSpacing: "0.06em",
-      }}
-      onMouseMove={(e) => {
-        const el = e.currentTarget;
-        const r = el.getBoundingClientRect();
-        el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
-        el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
-      }}
-    >
-      {label}
-    </Link>
-  );
-}
