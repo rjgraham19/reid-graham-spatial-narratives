@@ -88,11 +88,6 @@
       "layoutShiftY": 150
     }
   },
-  "project.you-cant-take-it-with-you.media.full": {
-    "desktop": {
-      "layoutShiftY": 128
-    }
-  },
   "project.you-cant-take-it-with-you.credit.director": {
     "desktop": {
       "offsetX": 7,
@@ -258,11 +253,6 @@
       "fontSize": 20,
       "align": "left",
       "offsetY": 265
-    }
-  },
-  "project.reshuffling-the-deck.media.0": {
-    "desktop": {
-      "layoutShiftY": 272
     }
   },
   "project.reshuffling-the-deck.credit.thesis-director": {
@@ -452,11 +442,6 @@
   "project.true-west.media.2": {
     "desktop": {
       "layoutShiftY": -83
-    }
-  },
-  "project.the-diary-of-anne-frank.media.0": {
-    "desktop": {
-      "layoutShiftY": 66
     }
   }
 }

@@ -563,7 +563,7 @@ function ProjectPage() {
             shows moving. */}
         {!isExchange && (
         <figure
-          className={`z-0 relative mt-0 ${
+          className={`z-0 relative ${
             /* Same margins as every other image/text block on the page, in
                the panel or out of it — the hero used to go edge-to-edge
                specifically inside the panel (to avoid a double-border look
@@ -572,9 +572,26 @@ function ProjectPage() {
                how you got to the project. Consistent now. */
             isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"
           } ${
-            /* nudged down so the title clears more of the composition and the
-               stacked views alongside sit within the page rather than above it */
-            isReshuffling ? "mt-10 md:mt-24" : ""
+            /* Several of these header photos have their own dead space baked
+               into the top of the file itself — stage rigging/headroom above
+               the set, or a dark gallery backdrop around a model — which,
+               now that the gap below the subtitle is tight, was pushing the
+               actual photo content too far down the page. Pulling the image
+               up by a share of its own rendered width (not a fixed px value,
+               so it scales with viewport) tucks that dead space in behind
+               the title/subtitle instead. figure is z-0 and the title block
+               above it is z-10, so the overlap reads as the image sitting
+               behind the text, not on top of it. Magnitudes are graduated by
+               how much of each photo is genuinely empty at the top. */
+            isYctiwy
+              ? "-mt-[18%]"
+              : isReshuffling
+                ? "-mt-[14%]"
+                : isStaging
+                  ? "-mt-[8%]"
+                  : isAnneFrank
+                    ? "-mt-[5%]"
+                    : "mt-0"
           }`}
         >
           <button
