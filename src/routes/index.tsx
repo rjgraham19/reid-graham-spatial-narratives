@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { HERO_URL, PROJECT_TAGS } from "@/lib/projects";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect } from "react";
+import { HERO_URL, PROJECT_TAGS, taggedProjects, type Project, type ProjectTag } from "@/lib/projects";
 import { SiteNav } from "@/components/site-nav";
-import { glassButton, trackSheen } from "@/components/glass-button";
-import { EntranceSequence } from "@/components/entrance-sequence";
+import { ProjectTile } from "@/components/project-tile";
+import { ProjectPanel } from "@/components/project-panel";
+import { useCanShowPanel } from "@/hooks/use-media-query";
+import { glassButton } from "@/components/glass-button";
 import designOverrides from "@/lib/design-overrides.json";
 import { mergeOverridesFiles, designModeStyleTag } from "@/lib/apply-overrides";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
@@ -10,7 +13,16 @@ import { designId } from "@/lib/design-ids";
 import { useLiveOverrides } from "@/lib/use-live-overrides";
 import { DesignFrameBridge } from "@/design-mode/frame-bridge";
 
+/** `project` is the slug of the one shown in the panel over the feed. */
+type HomeSearch = { tag?: ProjectTag; project?: string };
+
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): HomeSearch => {
+    const raw = typeof search.tag === "string" ? search.tag : undefined;
+    const tag = PROJECT_TAGS.find((t) => t === raw);
+    const project = typeof search.project === "string" ? search.project : undefined;
+    return { ...(tag ? { tag } : {}), ...(project ? { project } : {}) };
+  },
   head: () => ({
     meta: [
       { title: "Reid Graham Design — Production/Scenic, Architecture, Visualizations" },
@@ -38,10 +50,62 @@ function Home() {
   const responsiveCss = designModeStyleTag(overridesFile);
   const brandingId = designId.home("branding");
 
+  const { tag, project } = Route.useSearch();
+  const all = taggedProjects();
+  const projects = tag ? all.filter((p) => p.tags?.includes(tag)) : all;
+
+  /* Which project is panelled lives in the URL as ?project=<slug>, so Back
+     closes it and the link is shareable — same pattern the standalone /work
+     feed used before it moved here. */
+  const navigate = Route.useNavigate();
+  const open = project ? all.find((p) => p.slug === project) ?? null : null;
+
+  const canPanel = useCanShowPanel();
+
+  const openProject = useCallback(
+    (p: Project) => {
+      void navigate({
+        search: (prev) => ({ ...prev, project: p.slug }),
+        resetScroll: false,
+      });
+    },
+    [navigate],
+  );
+
+  const closeProject = useCallback(() => {
+    void navigate({
+      search: (prev) => ({ ...prev, project: undefined }),
+      resetScroll: false,
+    });
+  }, [navigate]);
+
+  const openIndex = open ? projects.findIndex((p) => p.slug === open.slug) : -1;
+  const showPanelNav = open != null && openIndex !== -1 && projects.length > 1;
+  const openPrev = useCallback(() => {
+    if (openIndex === -1) return;
+    openProject(projects[(openIndex - 1 + projects.length) % projects.length]);
+  }, [openIndex, openProject, projects]);
+  const openNext = useCallback(() => {
+    if (openIndex === -1) return;
+    openProject(projects[(openIndex + 1) % projects.length]);
+  }, [openIndex, openProject, projects]);
+
+  /* A ?project= link opened on a phone takes over as its own full page, the
+     same fallback the old /work feed used. */
+  const toProject = useNavigate();
+  useEffect(() => {
+    if (canPanel === false && open) {
+      void toProject({
+        to: "/work/$hub/$slug",
+        params: { hub: open.hub, slug: open.slug },
+        replace: true,
+      });
+    }
+  }, [canPanel, open, toProject]);
+
   return (
-    <div className="relative min-h-[100svh] bg-background text-foreground">
+    <div className="relative bg-black min-h-screen text-foreground">
       {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
-      <EntranceSequence />
       <DesignFrameBridge
         liveOverrides={live}
         liveMedia={liveMedia}
@@ -51,99 +115,207 @@ function Home() {
         onSyncAll={onSyncAll}
       />
 
+      {/* Always transparent here: PROJECTS / LET'S CONNECT are glass pills
+          with their own surface, legible over the hero image on their own —
+          an opaque bar behind them as well just drew a second, redundant
+          black band across the top of the photo. */}
       <div data-design-protected="Protected navigation">
         <SiteNav variant="top-transparent" />
       </div>
-      {/* Split screen: text left, phone-booth image right (right = clickable → /contact).
-          Heights are in svh so the whole split fits the space a phone actually
-          shows with its address bar up — in vh the wordmark is pushed below the
-          fold and the entrance reads as a page you have to scroll to see. */}
-      <div className="grid grid-cols-1 md:grid-cols-2 min-h-[100svh]">
-        {/* LEFT — text. Bottom-anchored on a phone (the svh reasoning above);
-            vertically centred from md up, so on a monitor the wordmark sits
-            mid-height rather than down in the corner. */}
-        <div className="relative z-10 flex flex-col justify-end md:justify-center px-6 md:px-12 lg:px-16 py-10 md:py-14 pt-28 md:pt-14">
-          {/* The wrapper (not the h1) carries the design ID: typography
-              overrides need to reach the h1's own classes (see
-              apply-overrides.ts), but *positioning* — what this element is
-              actually for — applies to this wrapper so dragging moves the
-              whole three-line lockup as one block via a transform, leaving
-              its reserved layout space untouched rather than switching the
-              header to absolute positioning. */}
-          {/* w-fit shrink-wraps this block to the wordmark's widest line
-              ("Graham"), so the discipline row below can be exactly that
-              wide. From md the row is positioned absolutely under the
-              wordmark so it doesn't push the lockup off-centre — that shift
-              is what made the entrance hand-off visibly jump. */}
-          <div className="relative w-fit">
-            {/* The nav lives inside the id'd div (not a sibling of it) so a
-                Design Mode position nudge on the wordmark — an `offsetY`
-                transform, which moves what it's applied to without touching
-                anyone else's layout — carries the discipline row along with
-                it. It used to be a sibling: a -159px mobile nudge left the
-                nav exactly 159px behind, opening a dead gap between the
-                wordmark and the buttons under it that isn't there on the
-                settled page at any other breakpoint. */}
-            <div data-design-id={brandingId} data-design-kind="heading">
-              <h1
-                className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(3rem,9vw,8rem)] animate-title-lr"
-                aria-label="Reid Graham Design"
-              >
-                <span className="block">Reid</span>
-                <span className="block">Graham</span>
-                <span className="block font-thin text-foreground/85">Design</span>
-              </h1>
 
-              {/* Discipline shortcuts, spanning the width of "Graham" as one
-                  row of equal buttons. The entrance sequence renders a matching
-                  stand-in set (see .rg-entr-disciplines) that rises in with the
-                  top nav, then cross-fades onto these. */}
-              <nav
-                aria-label="Project disciplines"
-                className="mt-7 flex w-full flex-col gap-2 md:absolute md:left-0 md:top-full md:mt-9 md:flex-row"
-              >
-                {PROJECT_TAGS.map((t) => (
-                  <Link
-                    key={t}
-                    to="/work"
-                    search={{ tag: t }}
-                    onMouseMove={trackSheen}
-                    className={glassButton({
-                      quiet: true,
-                      sheen: true,
-                      className: "md:grow md:basis-0 md:min-w-max",
-                    })}
-                  >
-                    {t.replace("/", " / ")}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT — phone booth, clickable easter-egg → /contact */}
-        <div className="relative order-first md:order-last min-h-[56svh] md:min-h-[100svh] overflow-hidden">
+      {/* Header + filters share one wrapper now: the payphone image is a
+          single absolutely-positioned panel spanning this whole block's
+          height, from the very top down to just above the grid — not tied
+          to the (much shorter) height of the text column beside it. Before,
+          the image lived inside the same flex row as the text and could
+          only ever be as tall as that row, which meant it stopped and
+          "scrunched up" long before the grid actually started, leaving a
+          band of plain black on the right that had no reason to be there.
+          The wordmark and the filters both stay confined to the left column
+          width though — the image is background for the "Reid Graham"
+          description, not something the filter buttons sit on top of. */}
+      <div className="relative overflow-hidden min-h-[46svh] md:min-h-[44svh]">
+        {/* Mobile/narrow: full-bleed background behind the text, scrimmed for
+            legibility — the image reads as atmosphere, not a clickable tile.
+            Hidden from md up, where it moves into its own right-hand panel
+            instead (see below). */}
+        <div className="absolute inset-0 md:hidden">
           <img
             src={HERO_URL}
-            alt="Payphone booth in an overgrown, neon-lit environment — pick up to reach Reid"
+            alt=""
+            aria-hidden
             className="absolute inset-0 w-full h-full object-cover"
           />
-          {/* Ambient darken toward the split line */}
-          <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-background via-background/40 to-transparent hidden md:block" />
-          <div className="absolute inset-0 md:hidden bg-background/50" />
-          {/* Hit target scoped to the payphone itself. The image is a wide crop
-              whose left half is the lit portal and jungle — a full-bleed link
-              there meant every tap on that empty scenery navigated to /contact.
-              These insets track the phone unit and its post across both the
-              mobile (more horizontal crop) and desktop columns. */}
-          <Link
-            to="/contact"
-            aria-label="Contact — pick up the phone"
-            className="absolute left-[56%] right-[6%] top-[28%] bottom-[8%] block"
+          {/* Darkest at the TOP, where the wordmark now sits (it moved up
+              to sit flush with the viewport edge) — the old bottom-heavy
+              fade left exactly that area the most transparent, which is
+              what was making the text hard to read against the photo. */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/45 to-background/25" />
+        </div>
+
+        {/* md and up: the payphone as a real right-hand panel, flush with the
+            top and right edges of the viewport, and tall enough to run down
+            behind the filter row below the wordmark — not just behind the
+            wordmark itself. object-contain rather than cover: the source
+            photo (2547×1799) is wider than this panel is tall, and cover was
+            cropping its sides away to fill the box exactly. Contain's
+            default centering left a gap on whichever side didn't happen to
+            touch — object-right pins that gap to the left (where the scrim
+            already masks it) instead of the right, so the image itself
+            reads as flush against the actual edge of the screen. */}
+        <div className="hidden md:block absolute inset-y-0 right-0 md:w-[45%] lg:w-[48%] bg-black">
+          <img
+            src={HERO_URL}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-contain object-right"
           />
+          <div className="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background to-transparent" />
+        </div>
+
+        {/* Wordmark + tagline. The wordmark gets the nav's own top padding
+            (py-4 md:py-6) so its top edge lines up with PROJECTS/LET'S
+            CONNECT — matching the actual nav content's position rather than
+            the viewport edge. Confined to the left column so it never sits
+            over the image panel. */}
+        <div className="relative z-10 px-6 md:px-12 lg:px-16 pt-4 md:pt-6 md:w-[55%] lg:w-[52%]">
+          <Link
+            to="/"
+            className="animate-title-lr block w-fit transition-colors duration-200 hover:text-accent"
+            aria-label="Reid Graham — home"
+            data-design-id={brandingId}
+            data-design-kind="heading"
+          >
+            <h1 className="font-display font-black uppercase leading-[0.85] tracking-[-0.04em] text-[clamp(2.5rem,min(8vw,13svh),7.5rem)]">
+              <span className="block">Reid</span>
+              <span className="block">Graham</span>
+            </h1>
+          </Link>
+          {/* Same thin/uppercase treatment "Design" gets next to the bold
+              wordmark in the nav bar — no italics, no serif, just a lighter
+              weight of the same display face. */}
+          <p className="mt-2 md:mt-3 font-display font-thin uppercase tracking-[0.04em] text-foreground/80 text-[clamp(1.1rem,3vw,2rem)]">
+            | creative designer
+          </p>
+        </div>
+
+        {/* Filters — sits under the tagline with real breathing room (not
+            crowding it), in the same left column as the wordmark so it never
+            spills onto the image on the right. Confined to md:w-[55%]/lg:w-
+            [52%] below md the same as the text column above it; on mobile,
+            where the image is a full-bleed background rather than a side
+            panel, there's no column to overlap so it's free to run full
+            width there.
+
+            No label above it anymore — the three buttons are self-evident
+            as filters. Stacked below md (a narrow column has no room for all
+            three side by side); from md up they go to a row, but keep
+            flex-wrap as a fallback rather than forcing nowrap — the column
+            here is genuinely narrow (it's giving room to the image beside
+            it), and a pill that doesn't fit needs to drop to a second line,
+            not get sliced off by the wrapper's overflow-hidden. FilterPill's
+            own font-size/padding/tracking already shrink with the viewport
+            (see its inline style) specifically so that's a rare fallback,
+            not the normal case. */}
+        <div className="relative z-10 px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-10 md:pb-8 md:w-[55%] lg:w-[52%] animate-reveal-delay">
+          <div className="flex flex-col md:flex-row md:flex-wrap gap-2 md:gap-3">
+            {PROJECT_TAGS.map((t) => (
+              <FilterPill key={t} to={{ tag: t }} active={tag === t} label={formatTag(t)} />
+            ))}
+          </div>
         </div>
       </div>
+
+      {/* The feed itself — same grid, same panel-overlay behaviour the
+          standalone /work page used. Full width (no max-width cap): on a
+          wide monitor the four columns should fill the screen edge to edge,
+          the way a curated four-up row reads on a real portfolio homepage,
+          not shrink to leave black margins on either side. No side gutter
+          below sm either, for the same reason — on a phone that margin was
+          only making the project images (the whole point of this page)
+          smaller than they needed to be; the gap between tiles is enough
+          separation on its own. */}
+      <section className="px-0 sm:px-6 md:px-12 lg:px-16 pb-16 md:pb-24">
+        {projects.length === 0 ? (
+          <p className="text-foreground/60">No projects match this filter yet.</p>
+        ) : (
+          <ul
+            key={tag ?? "all"}
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+          >
+            {projects.map((p, i) => (
+              <ProjectTile
+                key={p.slug}
+                project={p}
+                appearIndex={i}
+                onOpen={canPanel ? openProject : undefined}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {canPanel && open && (
+        <ProjectPanel
+          url={`/work/${open.hub}/${open.slug}`}
+          title={open.title}
+          onClose={closeProject}
+          accentColor={open.accentColor}
+          onPrev={showPanelNav ? openPrev : undefined}
+          onNext={showPanelNav ? openNext : undefined}
+        />
+      )}
     </div>
+  );
+}
+
+function formatTag(t: ProjectTag) {
+  return t.replace("/", " / ");
+}
+
+function FilterPill({
+  to,
+  active,
+  label,
+}: {
+  to: HomeSearch;
+  active: boolean;
+  label: string;
+}) {
+  return (
+    <Link
+      to="/"
+      search={to}
+      className={glassButton({
+        quiet: true,
+        touch: true,
+        sheen: true,
+        className: active ? "is-active" : "",
+      })}
+      /* .glass-button's own font-size/padding/tracking (sized for a compact
+         nav pill) win over Tailwind utilities here since both are plain
+         rules of equal specificity — inline styles are the one thing
+         guaranteed to beat them. All three shrink together with the
+         viewport: three pills, "Production / Scenic" included, have to fit
+         in a column that's only ~52-55% of the screen (the rest is the
+         image), so besides a smaller font than the grid tiles get, the
+         padding and letter-spacing are tightened too — otherwise the label
+         text has nowhere to go but past the edge of that column, where the
+         wrapper's overflow-hidden was slicing it off rather than shrinking
+         it. */
+      style={{
+        fontSize: "clamp(0.7rem, 0.9vw + 0.3rem, 1.05rem)",
+        padding: "clamp(0.3rem, 0.4vw + 0.2rem, 0.5rem) clamp(0.5rem, 0.8vw + 0.3rem, 0.9rem)",
+        letterSpacing: "0.06em",
+      }}
+      onMouseMove={(e) => {
+        const el = e.currentTarget;
+        const r = el.getBoundingClientRect();
+        el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+        el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+      }}
+    >
+      {label}
+    </Link>
   );
 }

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/work/$hub/")({
     if (!HUB_SLUGS.has(params.hub as Hub)) throw notFound();
     const tag = HUB_TAG_REDIRECT[params.hub as Hub];
     if (tag) {
-      throw redirect({ to: "/work", search: { tag } });
+      throw redirect({ to: "/", search: { tag } });
     }
     const hub = HUBS.find((h) => h.slug === params.hub)!;
     return { hub, projects: projectsByHub(hub.slug) };
@@ -63,7 +63,7 @@ function HubPage() {
           {hub.description}
         </p>
 
-        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {projects.map((p: Project, i: number) => (
             <ProjectTile key={p.slug} project={p} appearIndex={i} />
           ))}
@@ -73,7 +73,7 @@ function HubPage() {
       {/* Back to unified projects feed */}
       <section className="border-t border-border">
         <Link
-          to="/work"
+          to="/"
           className="group block px-6 md:px-12 py-12 md:py-16 hover:bg-secondary/40 transition-colors"
         >
           <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-3">

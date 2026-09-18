@@ -67,7 +67,10 @@ export function ProjectTile({
         className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md"
         aria-label={`Open ${project.title}`}
       >
-        <div className="relative aspect-square overflow-hidden rounded-md bg-black">
+        {/* Same faint hairline the glass-button pills use (border-white/7) —
+            without it a dark image blends straight into the black page and
+            loses its own shape at the edges. */}
+        <div className="relative aspect-square overflow-hidden rounded-md bg-black border border-white/[0.07]">
           <img
             src={project.highlight ?? project.cover}
             alt={project.title}
@@ -91,15 +94,16 @@ export function ProjectTile({
             {/* No transition-colors here — the scale and the colour share one
                 transition in .project-title so they can't drift apart.
 
-                One flat size from the sm breakpoint up (was a ramp to
-                text-3xl): the grid narrows the tile as it adds columns, so a
-                size that looked right at three columns overflowed a ~185px
-                title box at four and five, and line-clamp's overflow:hidden
-                clipped the longest single words — "Lollapalooza",
-                "Reshuffling" — rather than wrapping. 1.35rem clears every
-                column count with room to spare; overflow-wrap:anywhere is the
-                last-ditch floor so nothing is ever cut, only wrapped. */}
-            <h2 className="project-title font-display font-black uppercase tracking-tight text-base sm:text-[1.4rem] leading-[0.95] text-balance text-foreground line-clamp-3 [overflow-wrap:anywhere]">
+                Ramps with the breakpoints (was pinned flat at 1.4rem): the
+                homepage grid no longer caps its width, so a wide monitor's
+                tiles are genuinely large now and a fixed size looked tiny
+                against them. overflow-wrap:anywhere is what actually keeps a
+                long single word ("Lollapalooza", "Reshuffling") from
+                overflowing at any of these sizes — line-clamp-3 alone would
+                clip a word that's still too wide for its line rather than
+                wrap it, which is the failure mode a flat size used to dodge
+                by staying small everywhere. */}
+            <h2 className="project-title font-display font-black uppercase tracking-tight text-base sm:text-xl md:text-2xl lg:text-[1.75rem] leading-[0.95] text-balance text-foreground line-clamp-3 [overflow-wrap:anywhere]">
               {project.title}
             </h2>
           </div>
