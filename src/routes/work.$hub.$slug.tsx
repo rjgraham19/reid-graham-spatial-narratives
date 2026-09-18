@@ -236,7 +236,6 @@ function ProjectPage() {
   const isExchange = project.slug === "the-exchange-facility";
   const isRagsToRiches = project.slug === "rags-to-riches";
   const isPortraitHero = project.heroPortrait === true;
-  const isTitleAbove = project.heroTitleAbove === true;
 
   // Lollapalooza's record animation renders on a near-black (~#0a0908), not
   // pure #000, so against a #000 page the scrub video reads as a separate
@@ -389,34 +388,24 @@ function ProjectPage() {
 
       {/* Header + hero.
 
-          From lg up, two arrangements, both keeping the same sticky behaviour:
+          Used to be two lg+ arrangements built on a sticky-pinned title: the
+          title would pin over the photo for a fixed 300px "runway" while it
+          scrolled underneath, then release. That scroll-linked pin-and-
+          release was the actual problem — it read as glitchy rather than
+          intentional, and it added a whole extra mechanism (the runway
+          spacer, a negative margin pulling the image back up to cancel it,
+          per-project tuning of both) just to get a title-then-image layout
+          that stacking already gives you for free.
 
-          • Overlay (default) — title and image sit in one single-cell grid so
-            they occupy the same space and the text reads over the photo. The
-            title layer uses self-start so it spans only its own content plus
-            the runway rather than the image's full height, which keeps the
-            sticky release governed purely by the 300px runway. It's
-            pointer-events-none so the transparent runway doesn't swallow
-            clicks meant for the image; its links re-enable them.
-
-          • Title-above (heroTitleAbove) — for compositions whose top carries
-            subject matter that shouldn't be covered. The title stacks above
-            and the image is pulled up by exactly the runway height so it
-            begins right where the title ends, with no gap and no overlap.
-
-          Below lg, neither. Both arrangements are built on the image and the
-          title sharing space, which works when the image is wide enough to
-          have room to spare. On a phone it doesn't: a hero rendering about
-          200px tall sat under a title block of 220–290px, so the text and its
-          scrim covered the photograph completely — measured at 100% on every
-          overlay project, whatever the length of the name.
-
-          So below lg the two simply stack, in ordinary flow. That is the whole
-          mechanism: with no runway to reserve height and no negative margin to
-          pull the image back over it, the hero begins exactly where the title
-          block ends, and a title that runs to three lines pushes the image
-          down by three lines rather than eating three lines of it. Nothing
-          here is a fixed offset that a longer name could overrun. */}
+          So now every project just stacks, at every width: title in normal
+          flow, image immediately after. The title's own entrance animation
+          (the same left-to-right wipe/reveal already used for every heading
+          on the site) is what carries the "arrival," the way it already did
+          on the title-above projects (Staging Aesthetics, the Garden of
+          Earthly Delights) — those never used the sticky mechanism, and are
+          the model this generalizes to everyone. A title that runs to three
+          lines simply pushes the image down by three lines; nothing here is
+          a fixed offset a longer name could overrun. */}
       <div
         className={
           isPortraitHero
@@ -425,46 +414,12 @@ function ProjectPage() {
         }
       >
       <div
-        className={`${
-          /* The single-cell grid — the thing that makes title and image share
-             space — only exists from lg. Below it this is a plain block and
-             the two children stack. */
-          isTitleAbove ? "relative" : "relative lg:grid lg:grid-cols-1 lg:grid-rows-1"
-        } ${isReshuffling ? "md:col-start-1 md:row-start-1" : ""}`}
+        className={`relative ${isReshuffling ? "md:col-start-1 md:row-start-1" : ""}`}
       >
-        <div
-          className={
-            isTitleAbove
-              ? "relative z-10"
-              : "z-10 lg:col-start-1 lg:row-start-1 lg:self-start lg:pointer-events-none"
-          }
-        >
+        <div className="relative z-10">
           <div
-            className={`${
-              /* Overlay heroes pin the title over the photo for the length of
-                 the runway, then let it fade off — that's the whole overlay
-                 effect. Title-above heroes are the opposite case by
-                 definition: the title sits above its own image precisely so
-                 it never covers it, so pinning it (with its black scrim)
-                 back down over the hero as you scroll is the one thing it
-                 must not do. Static there instead — it scrolls away with the
-                 page. The runway below still reserves its height and the
-                 figure's negative margin still cancels it, so the layout is
-                 unchanged; only the pin is gone. */
-              isTitleAbove ? "" : "sticky"
-            } bg-gradient-to-b from-black via-black/70 to-transparent ${
-              /* Two cases, and they want opposite things.
-
-                 In the panel there is no site nav, so the offset and padding
-                 that exist to clear it left about 115px of black above the
-                 title — the last of the dead space at the top of the panel.
-                 It pins to the panel's own top instead, with just enough
-                 padding to breathe.
-
-                 On the page, the offsets match the height of the fixed bar the
-                 title pins under — 76px on phones, 82px from md — so the title
-                 comes to rest against the bar rather than sliding behind it. */
-              panel ? "top-0 pt-9 md:pt-10" : "top-[76px] md:top-20 pt-10 md:pt-14"
+            className={`bg-gradient-to-b from-black via-black/70 to-transparent ${
+              panel ? "pt-9 md:pt-10" : "pt-10 md:pt-14"
             } ${
               /* Lollapalooza title lockup, desktop only. Tighter top and
                  bottom padding, pulling the black title area in by about 17%
@@ -477,14 +432,7 @@ function ProjectPage() {
                  title block, which is its own decision. lg-gated, so phone
                  and tablet are untouched either way. */
               isLollapalooza ? "lg:pt-8 lg:pb-6" : ""
-            } ${
-              /* Below lg this is the gap between the title and the hero under
-                 it, so it wants to be a breath — not the deep run-out the
-                 overlay needs to fade its scrim off the photograph. */
-              isTitleAbove
-                ? "pb-8 md:pb-10"
-                : "pb-8 sm:pb-10 lg:pb-24 lg:pointer-events-none"
-            } ${
+            } pb-8 md:pb-10 ${
               isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"
             }`}
           >
@@ -578,24 +526,6 @@ function ProjectPage() {
               </ul>
             )}
           </div>
-
-          {/* Runway — controls exactly how long the title stays pinned while
-              the image scrolls under it. It only has a job in the overlaid
-              arrangement, so below lg it collapses: with no reserved height
-              there is nothing for the hero to be pulled back across, and the
-              title block's own height becomes the spacing.
-
-              Lollapalooza has no runway: the scrolling photo band sits between
-              the title and the hero, so there's nothing to pin the title over. */}
-          <div
-            className={
-              isLollapalooza || isExchange
-                ? "hidden"
-                : isRagsToRiches
-                  ? "h-0 lg:h-[150px]"
-                  : "h-0 lg:h-[300px]"
-            }
-          />
         </div>
 
         {/* Lollapalooza — the gallery-* event photos as an endless, clickable
@@ -623,38 +553,14 @@ function ProjectPage() {
             shows moving. */}
         {!isExchange && (
         <figure
-          className={`z-0 ${
-            isTitleAbove
-              ? /* -300px cancels the runway exactly, so the image begins where
-                   the title ends. TaB goes further and tucks the image up
-                   behind the whole title block, which lifts everything below
-                   it by the same amount — the point being that the closeup
-                   animation starts near enough to the fold to signal there's
-                   more page. Readable because of the blue scrim above.
-
-                   Both are lg-only. Below it the runway is collapsed, so there
-                   is nothing to cancel — and TaB's deeper tuck would be pulling
-                   the image up over the title rather than behind a scrim that
-                   has room to fade.
-
-                   Lollapalooza pulls nothing back: its runway is gone and the
-                   photo band sits above, so the hero just flows under it. */
-                isTab
-                ? "relative mt-0 lg:-mt-[449px]"
-                : isLollapalooza
-                  ? "relative mt-0"
-                  : "relative mt-0 lg:-mt-[300px]"
-              : "lg:col-start-1 lg:row-start-1"
-          } ${
-            /* Full bleed in the panel. The standard 64px gutter left the hero
-               sitting inside a black border, which is the effect Reid was
-               seeing at the sides; letting the image meet the panel edge reads
-               as intentional framing instead. */
-            panel
-              ? "px-0"
-              : isPortraitHero
-                ? "px-6 md:px-0"
-                : "px-6 md:px-12 lg:px-16"
+          className={`z-0 relative mt-0 ${
+            /* Same margins as every other image/text block on the page, in
+               the panel or out of it — the hero used to go edge-to-edge
+               specifically inside the panel (to avoid a double-border look
+               against that frame), but that just made it read as a
+               different, cropped-in version of the same photo depending on
+               how you got to the project. Consistent now. */
+            isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"
           } ${
             /* nudged down so the title clears more of the composition and the
                stacked views alongside sit within the page rather than above it */
@@ -675,8 +581,18 @@ function ProjectPage() {
               src={project.cover}
               alt={project.title}
               className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
-                isYctiwy ? "animate-image-drift-up" : mood.enter
-              }`}
+                /* Full-width heroes render at whatever height their natural
+                   aspect ratio produces at the page's content width — fine
+                   at ordinary desktop widths, but on a very wide monitor
+                   that width alone can push the image past 900-1000px tall,
+                   reading as oversized rather than "prominent." Capped to a
+                   share of the viewport's own height so it scales down on
+                   short viewports too, instead of just wide ones. Portrait
+                   heroes are deliberately tall-and-narrow already (that's
+                   the point of that layout) so this is scoped to everyone
+                   else. */
+                isPortraitHero ? "" : "max-h-[75svh] md:max-h-[70svh]"
+              } ${isYctiwy ? "animate-image-drift-up" : mood.enter}`}
             />
           </button>
         </figure>
