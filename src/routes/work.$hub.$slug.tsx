@@ -498,7 +498,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectSubtitle(project.slug)}
               data-design-kind="text"
-              className={`mt-4 font-display font-thin uppercase tracking-[0.15em] text-xs md:text-sm ${
+              className={`mt-4 font-display font-extralight uppercase tracking-[0.15em] text-sm md:text-base ${
                 isLollapalooza
                   ? "text-foreground/50 lg:mt-2 lg:text-foreground/70"
                   : "text-foreground/50"
