@@ -405,18 +405,16 @@ function ProjectPage() {
           Earthly Delights) — those never used the sticky mechanism, and are
           the model this generalizes to everyone. A title that runs to three
           lines simply pushes the image down by three lines; nothing here is
-          a fixed offset a longer name could overrun. */}
-      <div
-        className={
-          isPortraitHero
-            ? "relative md:grid md:grid-cols-[8fr_5fr] md:gap-8 lg:gap-12 md:px-12 lg:px-16"
-            : "relative"
-        }
-      >
-      <div
-        className={`relative ${isReshuffling ? "md:col-start-1 md:row-start-1" : ""}`}
-      >
-        <div className="relative z-10">
+          a fixed offset a longer name could overrun.
+
+          The title block itself now always renders full-width, above the
+          portrait-hero grid rather than sharing its 8fr column — confined to
+          ~60% of the page, a longer name ("The Exchange Facility",
+          "Reshuffling the Deck") wrapped to two lines even with all the
+          screen width a wide monitor has to spare. Full width, it has room
+          to actually use that space and stay on one line, and the hero
+          image + description grid below is unaffected either way. */}
+      <div className="relative z-10">
           <div
             className={`bg-gradient-to-b from-black via-black/70 to-transparent ${
               panel ? "pt-9 md:pt-10" : "pt-10 md:pt-14"
@@ -432,9 +430,7 @@ function ProjectPage() {
                  title block, which is its own decision. lg-gated, so phone
                  and tablet are untouched either way. */
               isLollapalooza ? "lg:pt-8 lg:pb-6" : ""
-            } pb-8 md:pb-10 ${
-              isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"
-            }`}
+            } pb-8 md:pb-10 px-6 md:px-12 lg:px-16`}
           >
             {project.tags && project.tags.length > 0 && (
               /* Lollapalooza desktop: the tag sits ~40% closer to the title,
@@ -491,7 +487,7 @@ function ProjectPage() {
               <AnimatedHeading
                 text={project.title}
                 fit
-                className="project-hero-title font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-balance max-w-5xl"
+                className="project-hero-title font-display font-black uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-balance"
               />
             </div>
 
@@ -502,7 +498,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectSubtitle(project.slug)}
               data-design-kind="text"
-              className={`mt-4 text-[10px] tracking-[0.3em] uppercase ${
+              className={`mt-4 font-display font-thin uppercase tracking-[0.15em] text-xs md:text-sm ${
                 isLollapalooza
                   ? "text-foreground/50 lg:mt-2 lg:text-foreground/70"
                   : "text-foreground/50"
@@ -526,8 +522,23 @@ function ProjectPage() {
               </ul>
             )}
           </div>
-        </div>
+      </div>
 
+      {/* Hero image (+ description, for portrait heroes) — the grid this
+          used to share with the title. Now it only holds the image itself
+          (and, for the portrait layout, the description beside it), so its
+          8fr/5fr split no longer constrains how wide the title above it can
+          run. */}
+      <div
+        className={
+          isPortraitHero
+            ? "relative md:grid md:grid-cols-[8fr_5fr] md:gap-8 lg:gap-12 md:px-12 lg:px-16"
+            : "relative"
+        }
+      >
+      <div
+        className={`relative ${isReshuffling ? "md:col-start-1 md:row-start-1" : ""}`}
+      >
         {/* Lollapalooza — the gallery-* event photos as an endless, clickable
             band between the title and the hero. The same photos still sit in
             the carousel at the foot of the page (kept for now); this is the
