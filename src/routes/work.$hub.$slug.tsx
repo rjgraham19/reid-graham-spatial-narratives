@@ -1928,7 +1928,16 @@ function ProjectPage() {
           there meant almost nobody ever saw it. `target="_top"` (same escape
           hatch the hub-tag pill above uses) breaks each link out of the
           iframe so it navigates the real window instead of nesting a page
-          inside the panel already open one level up. */}
+          inside the panel already open one level up.
+
+          From inside the panel, a project link goes to `/?project=<slug>` —
+          the same search param the homepage grid uses to open the panel —
+          rather than straight to `/work/$hub/$slug`. Landing on the bare
+          full page there was the actual bug reported: it swapped the
+          tinted, panel-framed view for a plain page with no accent gradient
+          around it, so clicking a title through this list looked like a
+          different, broken version of the project instead of the same
+          panel simply switching which project it's showing. */}
       <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-t border-border">
           <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-3 font-display font-thin uppercase tracking-tight text-xl md:text-3xl leading-tight text-center">
             {[
@@ -1945,11 +1954,19 @@ function ProjectPage() {
                   >
                     {p.title}
                   </Link>
+                ) : panel ? (
+                  <Link
+                    to="/"
+                    search={{ project: p.slug }}
+                    target="_top"
+                    className="text-foreground/40 hover:text-foreground transition-colors"
+                  >
+                    {p.title}
+                  </Link>
                 ) : (
                   <Link
                     to="/work/$hub/$slug"
                     params={{ hub: p.hub, slug: p.slug }}
-                    target={panel ? "_top" : undefined}
                     className="text-foreground/40 hover:text-foreground transition-colors"
                   >
                     {p.title}
