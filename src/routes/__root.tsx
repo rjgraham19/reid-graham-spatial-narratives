@@ -94,22 +94,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        // display=optional (not the default "swap"): if the custom font
-        // isn't ready almost immediately, the page keeps the fallback font
-        // for that visit rather than swapping it in a beat later. Buttons
-        // and headings are sized to fit their own text, so a font that
-        // arrives late and changes the glyph widths was visibly reflowing
-        // things a moment after first paint — most noticeable on mobile,
-        // and worse under Safari's cross-site tracking protection, which
-        // can throttle the fonts.googleapis.com/fonts.gstatic.com requests
-        // this depends on. "optional" trades "always eventually gets the
-        // exact typeface" for "never visibly changes after load."
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter+Tight:wght@400;600;700;800&family=Poppins:wght@100;200;300;500;700;900&family=JetBrains+Mono:wght@400;500&display=optional",
-      },
+      // Fonts are self-hosted (see the @font-face rules in styles.css) rather
+      // than loaded from Google Fonts, so there's no external font request
+      // to throttle or delay — no preconnect/stylesheet links needed here.
     ],
   }),
   shellComponent: RootShell,

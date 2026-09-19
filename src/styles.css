@@ -10,6 +10,90 @@
  * (echoing the payphone-in-overgrowth hero rendering).
  */
 
+/*
+ * Self-hosted fonts (moved off Google's CDN into /public/fonts). DM Sans,
+ * Inter Tight, EB Garamond, and JetBrains Mono are variable fonts — one
+ * file covers their whole weight range, so a single @font-face per
+ * style/family is enough. Poppins ships as static per-weight files.
+ */
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: optional;
+  src: url("/fonts/dm-sans-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: optional;
+  src: url("/fonts/inter-tight-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: optional;
+  src: url("/fonts/eb-garamond-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: italic;
+  font-weight: 400 500;
+  font-display: optional;
+  src: url("/fonts/eb-garamond-variable-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: optional;
+  src: url("/fonts/jetbrains-mono-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 100;
+  font-display: optional;
+  src: url("/fonts/poppins-100.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 200;
+  font-display: optional;
+  src: url("/fonts/poppins-200.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 300;
+  font-display: optional;
+  src: url("/fonts/poppins-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: optional;
+  src: url("/fonts/poppins-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: optional;
+  src: url("/fonts/poppins-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 900;
+  font-display: optional;
+  src: url("/fonts/poppins-900.woff2") format("woff2");
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
