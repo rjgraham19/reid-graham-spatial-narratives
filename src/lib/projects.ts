@@ -451,6 +451,7 @@ export const PROJECTS: Project[] = [
   {
     slug: "reshuffling-the-deck",
     accentColor: "#A79E95",
+    heroPortrait: true,
     hub: "production-scenic",
     title: "Reshuffling the Deck",
     subtitle: "Duderstadt Video Studio @ the University of Michigan",
@@ -465,7 +466,9 @@ export const PROJECTS: Project[] = [
     cover: reshuf,
     tags: ["Production/Scenic", "Experiential"],
     media: [
-      { type: "image", src: reshuf, caption: "On-set: virtual production stage with painted flats and camera rig" },
+      // Same photo as `cover` — hidden so the generic gallery grid below
+      // doesn't repeat the hero image a second time.
+      { type: "image", src: reshuf, caption: "On-set: virtual production stage with painted flats and camera rig", hidden: true },
       { type: "image", src: reshufView1, caption: "Painted backdrop — colonnade receding to a vanishing point" },
       { type: "image", src: reshufView2, caption: "Painted backdrop — river landscape" },
     ],

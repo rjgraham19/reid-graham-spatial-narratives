@@ -616,7 +616,7 @@ function ProjectPage() {
         }`}
       >
       <div
-        className={`relative ${isReshuffling ? "md:col-start-1 md:row-start-1" : ""}`}
+        className="relative"
       >
         {/* Lollapalooza — the gallery-* event photos as an endless, clickable
             band between the title and the hero. The same photos still sit in
@@ -687,21 +687,21 @@ function ProjectPage() {
                behind the text, not on top of it. Magnitudes are graduated by
                how much of each photo is genuinely empty at the top.
 
-               YCTIWY, Anne Frank, Reshuffling and True West are non-portrait
-               heroes, so their height is capped (max-h-[70svh]/[75svh],
-               below) on a wide-but-short screen — width keeps growing there
-               while rendered height stays flat, so a plain width-based
-               percentage overshoots once that cap is active and starts
-               eating into real photo content, not just the dead space
-               above it. min() caps the pull at a share of the viewport's
-               height too, so it backs off to whichever is smaller once the
-               image stops growing with the viewport width. Staging is still
-               a portrait hero (no height cap at any width), so a plain
-               width percentage is safe for it. */
+               YCTIWY, Anne Frank and True West are non-portrait heroes, so
+               their height is capped (max-h-[70svh]/[75svh], below) on a
+               wide-but-short screen — width keeps growing there while
+               rendered height stays flat, so a plain width-based percentage
+               overshoots once that cap is active and starts eating into
+               real photo content, not just the dead space above it. min()
+               caps the pull at a share of the viewport's height too, so it
+               backs off to whichever is smaller once the image stops
+               growing with the viewport width. Reshuffling and Staging are
+               portrait heroes (no height cap at any width), so a plain
+               width percentage is safe for them. */
             isYctiwy
               ? "mt-[calc(-1*min(18%,10svh))]"
               : isReshuffling
-                ? "mt-[calc(-1*min(14%,9svh))]"
+                ? "-mt-[14%]"
                 : isStaging
                   ? "-mt-[8%]"
                   : isAnneFrank
@@ -800,48 +800,6 @@ function ProjectPage() {
             </p>
             <RoleAndCollaborators project={project} />
           </RevealBlock>
-        </section>
-      )}
-
-      {/* Reshuffling the Deck — description + MY ROLE / COLLABORATORS below
-          the hero at every viewport size (it used to sit beside the hero in
-          a narrow portrait column; the hero is a normal full-width, height-
-          capped image now, see isPortraitHero above). The two painted-
-          backdrop stills that used to sit inside that same column are kept,
-          just as their own row below the info block instead of stacked
-          inside it — preserved, not removed, per the redesign scope. */}
-      {isReshuffling && (
-        <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
-          <RevealBlock className="text-center">
-            <p
-              data-design-id={designId.projectDescription(project.slug)}
-              data-design-kind="text"
-              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
-            >
-              {project.description}
-            </p>
-            <RoleAndCollaborators project={project} />
-          </RevealBlock>
-
-          <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            {[1, 2].map((idx) => (
-              <figure key={idx} className="group">
-                <button
-                  type="button"
-                  onClick={() => setLightbox(idx)}
-                  className="block w-full overflow-hidden rounded-md bg-secondary"
-                  aria-label={project.media[idx].caption ?? `View ${idx}`}
-                >
-                  <img
-                    src={project.media[idx].src}
-                    alt={project.media[idx].caption ?? project.title}
-                    loading="lazy"
-                    className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                  />
-                </button>
-              </figure>
-            ))}
-          </div>
         </section>
       )}
 
@@ -1411,8 +1369,11 @@ function ProjectPage() {
           above, which would otherwise repeat the whole set — and, for the
           default (non-bespoke) branch, where there's simply nothing left in
           `galleryMedia` to show, so the section doesn't sit there as an
-          empty band of padding. */}
-      {!isTrueWest && !isReshuffling && (isAnneFrank || isYctiwy || isTownhouse || galleryMedia.length > 0) && (
+          empty band of padding. Reshuffling's two painted-backdrop stills
+          flow through this default branch now that it's a portrait hero
+          again (media[0], the same photo as the hero, is hidden so it
+          doesn't repeat). */}
+      {!isTrueWest && (isAnneFrank || isYctiwy || isTownhouse || galleryMedia.length > 0) && (
       <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
         {isAnneFrank ? (
           /* Anne Frank layout, per the supplied reference:
