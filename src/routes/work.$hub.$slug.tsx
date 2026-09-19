@@ -184,10 +184,14 @@ function RoleAndCollaborators({ project }: { project: Project }) {
         <p className="text-base">
           <span className="text-foreground/50">COLLABORATORS: </span>
           {collaborators.map((c, i) => (
-            <span key={c.role} data-design-id={designId.projectCredit(project.slug, c.role)} data-design-kind="text">
+            <span
+              key={c.role}
+              data-design-id={designId.projectCredit(project.slug, c.role)}
+              data-design-kind="text"
+              className="text-foreground/50"
+            >
               {i > 0 && " "}
-              <span className="text-foreground/50">{c.role}: </span>
-              <span className="text-foreground">{c.name}</span>
+              {c.role}: {c.name}
             </span>
           ))}
         </p>
