@@ -397,6 +397,10 @@ export const PROJECTS: Project[] = [
     subtitle: "A Speculative Future: Reimagining the Post Office",
     mood: "aqua",
     weight: "left",
+    credits: [
+      { role: "Designer", name: "Reid Graham" },
+      { role: "Professor Advisor", name: "Dawn Gilpin" },
+    ],
     description:
       "As rapid technological advancement accelerates the exchange of information—transforming the core function of the post office—The Exchange Facility imagines how, in a future grappling with water scarcity, the pursuit of progress might ultimately revive human reverence for water's powers and facilitating interconnection between living bodies: that of the human and that of the water. The Exchange facility enables the systemic circulation of bodies through a network of infrastructural vessels. Facilitating the flow of water and staging its communicative and transformational properties, these vessels shape space for the exchange of vitality, rejuvenation and power.",
     cover: exchange,

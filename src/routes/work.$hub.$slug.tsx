@@ -945,7 +945,7 @@ function ProjectPage() {
           Skipped in the generic description+credits band further down so
           it doesn't repeat. */}
       {isExchange && (
-        <section className="px-6 md:px-12 lg:px-16 pb-2 -mt-4 md:-mt-6">
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4">
           <RevealBlock>
             <p
               data-design-id={designId.projectDescription(project.slug)}
@@ -957,6 +957,7 @@ function ProjectPage() {
                 "The Exchange facility enables the systemic circulation",
               )[0]}
             </p>
+            <RoleAndCollaborators project={project} />
           </RevealBlock>
         </section>
       )}
