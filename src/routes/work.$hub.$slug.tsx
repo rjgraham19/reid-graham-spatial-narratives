@@ -216,12 +216,6 @@ function ProjectPage() {
   const hub = HUBS.find((h) => h.slug === project.hub)!;
   const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mood];
 
-  const idxInHub = PROJECTS.filter((p) => p.hub === project.hub).findIndex(
-    (p) => p.slug === project.slug,
-  );
-  const hubProjects = PROJECTS.filter((p) => p.hub === project.hub);
-  const next = hubProjects[(idxInHub + 1) % hubProjects.length];
-
   const [lightbox, setLightbox] = useState<number | null>(null);
   const close = useCallback(() => setLightbox(null), []);
   const step = useCallback(
@@ -1892,55 +1886,17 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Back to feed + next. Suppressed in the panel: the feed is already
-          sitting right behind it, so onward navigation belongs to that page,
-          not to a window floating over it. In the panel the project simply
-          ends with its last section. */}
-      {!panel && (
-      <section className="px-6 md:px-12 lg:px-16 py-12 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {project.tags && project.tags.length > 0 ? (
-          <Link
-            to="/work"
-            search={{ tag: project.tags[0] }}
-            className="group block"
-          >
-            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-              Return to
-            </p>
-            <h3 className="font-display font-black uppercase tracking-tight text-2xl md:text-4xl group-hover:text-accent transition-colors">
-              ← All Projects
-            </h3>
-          </Link>
-        ) : (
-          <Link
-            to="/work/$hub"
-            params={{ hub: hub.slug }}
-            className="group block"
-          >
-            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-              Return to
-            </p>
-            <h3 className="font-display font-black uppercase tracking-tight text-2xl md:text-4xl group-hover:text-accent transition-colors">
-              ← {hub.title}
-            </h3>
-          </Link>
-        )}
-        <Link
-          to="/work/$hub/$slug"
-          params={{ hub: next.hub, slug: next.slug }}
-          className="group block md:text-right"
-        >
-          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
-            Next
-          </p>
-          <h3 className="font-display font-black uppercase tracking-tight text-2xl md:text-4xl group-hover:text-accent transition-colors">
-            {next.title} →
-          </h3>
-        </Link>
-      </section>
-      )}
-
       </div>{/* end light-zone */}
+
+      {/* The old "Return to All Projects" / "Next [project]" block used to
+          sit right here, directly above the flowing all-projects list
+          below — two different "browse everything else" navigations
+          stacked back to back, which read as a mistake rather than two
+          intentional features (worse on mobile, where they're close enough
+          together to look like a duplicated section). The flowing list
+          already opens with "All Projects" and includes every other
+          project by name, so it alone covers what the removed block did;
+          removed rather than kept as a redundant duplicate. */}
 
       {/* Every other project, as a flowing block of titles — the pattern on
           brycrasch.com/jack at the foot of each project page. The point is
