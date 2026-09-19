@@ -647,7 +647,7 @@ function ProjectPage() {
               <p
                 data-design-id={designId.projectDescription(project.slug)}
                 data-design-kind="text"
-                className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
+                className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance"
               >
                 {project.description}
               </p>
@@ -774,7 +774,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
@@ -812,7 +812,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
@@ -1058,7 +1058,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
