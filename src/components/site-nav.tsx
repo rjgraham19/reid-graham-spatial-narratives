@@ -70,14 +70,20 @@ export function SiteNav({
              drops away so the project's ombré shows through it — and swapping
              that instantly was what made a persistent header read as a
              replaced one. Nothing else about the bar animates. */
-          "fixed top-0 left-0 w-full z-[110] px-6 md:px-10 py-4 md:py-6 flex items-center justify-end gap-4 md:gap-6 transition-[background-color,backdrop-filter] duration-300 ease-cinematic " +
+          "fixed top-0 left-0 w-full z-[110] px-6 md:px-10 py-4 md:py-6 flex items-center justify-end gap-4 md:gap-6 pointer-events-none transition-[background-color,backdrop-filter] duration-300 ease-cinematic " +
           (isTransparent ? "" : "bg-background/80 backdrop-blur-md")
         }
       >
         {/* No wordmark here anymore — the homepage's own "Reid Graham" hero
             heading is the logo/home link now (it links to "/" itself), and
             PROJECTS below already goes home too, so a second "Reid Graham
-            Design" in this bar was just the same destination said twice. */}
+            Design" in this bar was just the same destination said twice.
+            The bar itself is pointer-events-none and its two children below
+            opt back into pointer-events-auto — otherwise this row's empty
+            left-hand space (justify-end pushes the real controls right)
+            sits on top of "Reid" in the hero heading underneath and
+            swallows hover/clicks before they reach it, while "Graham" on
+            the line below is clear of the bar and works fine. */}
 
         {/* Phone — one control, opening the full-screen menu below. */}
         <GlassButton
@@ -85,13 +91,13 @@ export function SiteNav({
           onClick={() => setMenuOpen(true)}
           aria-expanded={menuOpen}
           aria-label="Open menu"
-          className="glass-button--touch md:hidden"
+          className="glass-button--touch md:hidden pointer-events-auto"
         >
           MENU
         </GlassButton>
 
         {/* Tablet and up — the full bar. */}
-        <ul className="hidden md:flex items-center justify-end gap-2 md:gap-3">
+        <ul className="hidden md:flex items-center justify-end gap-2 md:gap-3 pointer-events-auto">
           {/* PROJECTS — primary, with hover dropdown of disciplines */}
           <li className="relative group">
             <Link

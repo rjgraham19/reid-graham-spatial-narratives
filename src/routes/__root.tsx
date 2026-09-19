@@ -94,6 +94,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon-256.png", type: "image/png", sizes: "256x256" },
+      { rel: "apple-touch-icon", href: "/favicon-256.png" },
       // Fonts are self-hosted (see the @font-face rules in styles.css) rather
       // than loaded from Google Fonts, so there's no external font request
       // to throttle or delay — no preconnect/stylesheet links needed here.
