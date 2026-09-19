@@ -168,6 +168,10 @@ function RoleAndCollaborators({ project }: { project: Project }) {
   const myRole = credits.find((c) => c.name === "Reid Graham");
   const collaborators = credits.filter((c) => c.name !== "Reid Graham");
   if (!myRole && collaborators.length === 0) return null;
+  // "Collaborator" doesn't fit an academic advisor — on pages where every
+  // remaining credit is some flavor of advisor, drop the label and just
+  // list the role(s) plainly instead.
+  const allAdvisors = collaborators.length > 0 && collaborators.every((c) => /advisor/i.test(c.role));
   return (
     <div className="mt-8 md:mt-10 space-y-1 uppercase tracking-[0.15em] text-left">
       {myRole && (
@@ -182,7 +186,7 @@ function RoleAndCollaborators({ project }: { project: Project }) {
       )}
       {collaborators.length > 0 && (
         <p className="text-[0.6rem] md:text-base max-w-2xl">
-          <span className="text-foreground/50">COLLABORATORS: </span>
+          {!allAdvisors && <span className="text-foreground/50">COLLABORATORS: </span>}
           {collaborators.map((c, i) => (
             <span
               key={c.role}
