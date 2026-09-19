@@ -23,6 +23,7 @@ import {
   type Credit,
   type Mood,
   type PhilosophyCard,
+  type Project,
   type ProjectTag,
 } from "@/lib/projects";
 import {
@@ -151,6 +152,47 @@ function CreditRow({ slug, credit }: { slug: string; credit: Credit }) {
       <br />
       <span className="text-foreground">{credit.name}</span>
     </li>
+  );
+}
+
+/**
+ * Inline "MY ROLE: ..." / "COLLABORATORS: role: name" pair — a compact
+ * alternative to CreditRow's stacked label/name block, used on the three
+ * pages (Reshuffling, Townhouse, Staging Aesthetics) whose credits sit in a
+ * single info block with the description rather than a bulleted list beside
+ * the hero. Label and value stay on one line with natural wrapping — no
+ * dividers between multiple collaborators, just a plain space.
+ */
+function RoleAndCollaborators({ project }: { project: Project }) {
+  const credits = (project.credits ?? []).filter((c) => !c.hidden);
+  const myRole = credits.find((c) => c.name === "Reid Graham");
+  const collaborators = credits.filter((c) => c.name !== "Reid Graham");
+  if (!myRole && collaborators.length === 0) return null;
+  return (
+    <div className="mt-4 md:mt-6 space-y-1 text-sm md:text-base">
+      {myRole && (
+        <p data-design-id={designId.projectCredit(project.slug, myRole.role)} data-design-kind="text">
+          <span className="text-foreground/50">MY ROLE: </span>
+          <span className="text-foreground">{myRole.role}</span>
+        </p>
+      )}
+      {collaborators.length > 0 && (
+        <p>
+          <span className="text-foreground/50">COLLABORATORS: </span>
+          {collaborators.map((c, i) => (
+            <span
+              key={c.role}
+              data-design-id={designId.projectCredit(project.slug, c.role)}
+              data-design-kind="text"
+              className="text-foreground"
+            >
+              {i > 0 && ", "}
+              {c.role}: {c.name}
+            </span>
+          ))}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -614,20 +656,21 @@ function ProjectPage() {
                behind the text, not on top of it. Magnitudes are graduated by
                how much of each photo is genuinely empty at the top.
 
-               YCTIWY and Anne Frank are non-portrait heroes, so their height
-               is capped (max-h-[70svh]/[75svh], below) on a wide-but-short
-               screen — width keeps growing there while rendered height stays
-               flat, so a plain width-based percentage overshoots once that
-               cap is active and starts eating into real photo content, not
-               just the dead space above it. min() caps the pull at a share
-               of the viewport's height too, so it backs off to whichever is
-               smaller once the image stops growing with the viewport width.
-               Reshuffling and Staging are portrait heroes (no height cap at
-               any width), so a plain width percentage is safe for them. */
+               YCTIWY, Anne Frank and Reshuffling are non-portrait heroes, so
+               their height is capped (max-h-[70svh]/[75svh], below) on a
+               wide-but-short screen — width keeps growing there while
+               rendered height stays flat, so a plain width-based percentage
+               overshoots once that cap is active and starts eating into real
+               photo content, not just the dead space above it. min() caps
+               the pull at a share of the viewport's height too, so it backs
+               off to whichever is smaller once the image stops growing with
+               the viewport width. Staging is still a portrait hero (no
+               height cap at any width), so a plain width percentage is safe
+               for it. */
             isYctiwy
               ? "mt-[calc(-1*min(18%,10svh))]"
               : isReshuffling
-                ? "-mt-[14%]"
+                ? "mt-[calc(-1*min(14%,9svh))]"
                 : isStaging
                   ? "-mt-[8%]"
                   : isAnneFrank
@@ -687,107 +730,70 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Portrait heroes only: description sits beside the image, filling the
-          space a tall hero leaves empty, rather than below it. Sticky so it
-          stays in view alongside the image as it scrolls. */}
-      {/* Reshuffling occupies all four cells of the two-column grid rather
-          than a hero-plus-aside pair: hero and stacked views share row 1,
-          credits and description share row 2. Putting both text blocks in
-          the same grid row is what keeps them starting on the same line —
-          they'd otherwise be sized by their own columns and drift apart.
-          The views are self-end so the pair finishes level with the hero.
-          DOM order is the mobile reading order; desktop placement is
-          explicit, so the two are free to differ. */}
-      {isReshuffling && (
-        <>
-          {/* Plain CSS reveal instead of RevealBlock: at some in-between
-              viewport widths this element's pushed-down position (see its
-              offsetY override) sits right at RevealBlock's -80px
-              intersection-margin boundary, so its whileInView animation can
-              start, get interrupted by a layout shift, and freeze mid-fade
-              (a real ~40% opacity, permanently, until something else
-              triggers a re-check) — it only ever showed up at widths where
-              the element happened to land safely away from that boundary.
-              animate-reveal plays unconditionally on mount, with no
-              intersection observer to race.
-
-              Paragraph and images used to be two independent grid items
-              sharing this cell — text self-start, images self-end, docked to
-              the hero's foot — so a long description grew down far enough to
-              collide with the bottom-pinned images, since the two were never
-              actually stacked, just pinned to opposite ends of the same box.
-              They're one flowing block now (text always directly above the
-              images, so they can never overlap it), and the whole block
-              carries self-end so its last element — the second image —
-              still lands level with the hero's foot, the way the two were
-              always meant to read as a pair. */}
-          <div className="relative z-10 animate-reveal px-6 md:px-0 md:col-start-2 md:row-start-1 md:self-end">
-            <p
-              data-design-id={designId.projectDescription(project.slug)}
-              data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance md:text-right"
-            >
-              {project.description}
-            </p>
-
-            <div className="pt-8 space-y-4 md:space-y-6">
-              {[1, 2].map((idx) => (
-                <figure key={idx} className="group">
-                  <button
-                    type="button"
-                    onClick={() => setLightbox(idx)}
-                    className="block w-full overflow-hidden rounded-md bg-secondary"
-                    aria-label={project.media[idx].caption ?? `View ${idx}`}
-                  >
-                    <img
-                      src={project.media[idx].src}
-                      alt={project.media[idx].caption ?? project.title}
-                      loading="lazy"
-                      className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                    />
-                  </button>
-                </figure>
-              ))}
-            </div>
-          </div>
-
-          {project.credits && project.credits.length > 0 && (
-            <ul className="px-6 md:px-0 mt-8 md:mt-0 space-y-3 md:col-start-1 md:row-start-2">
-              {project.credits.filter((c: Credit) => !c.hidden).map((c: Credit) => (
-                <CreditRow key={c.role} slug={project.slug} credit={c} />
-              ))}
-            </ul>
-          )}
-        </>
-      )}
-
-      {isPortraitHero && !isReshuffling && (
+      {/* Portrait heroes (Townhouse, Staging Aesthetics): description +
+          MY ROLE / COLLABORATORS sits beside the image on a wide viewport,
+          filling the space a tall hero leaves empty, and stacks below it on
+          narrower ones — the grid this sits in (md:grid-cols-[8fr_5fr],
+          above) collapses to a single column below md for free. Sized as a
+          normal paragraph rather than stretched to match the hero's
+          height — it reads as body copy, not a second headline. */}
+      {isPortraitHero && (
         <aside className="px-6 md:px-0 pt-8 md:pt-14 pb-4 md:pb-0">
-          {/* No sticky: the blurb scrolls away with the hero rather than
-              trailing the viewport down the page. Pinning it made it drift
-              over later sections (the model video) on the way out, and
-              nudged the whole column into looking unstable on scroll and
-              resize — a portrait hero already gives the text room to sit
-              beside without it. */}
           <div>
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
-            {project.credits && project.credits.length > 0 && (
-              <ul className="mt-8 space-y-3">
-                {project.credits.filter((c: Credit) => !c.hidden).map((c: Credit) => (
-                  <CreditRow key={c.role} slug={project.slug} credit={c} />
-                ))}
-              </ul>
-            )}
+            <RoleAndCollaborators project={project} />
           </div>
         </aside>
       )}
       </div>
+
+      {/* Reshuffling the Deck — description + MY ROLE / COLLABORATORS below
+          the hero at every viewport size (it used to sit beside the hero in
+          a narrow portrait column; the hero is a normal full-width, height-
+          capped image now, see isPortraitHero above). The two painted-
+          backdrop stills that used to sit inside that same column are kept,
+          just as their own row below the info block instead of stacked
+          inside it — preserved, not removed, per the redesign scope. */}
+      {isReshuffling && (
+        <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
+          <RevealBlock>
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+            >
+              {project.description}
+            </p>
+            <RoleAndCollaborators project={project} />
+          </RevealBlock>
+
+          <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {[1, 2].map((idx) => (
+              <figure key={idx} className="group">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(idx)}
+                  className="block w-full overflow-hidden rounded-md bg-secondary"
+                  aria-label={project.media[idx].caption ?? `View ${idx}`}
+                >
+                  <img
+                    src={project.media[idx].src}
+                    alt={project.media[idx].caption ?? project.title}
+                    loading="lazy"
+                    className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                  />
+                </button>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* TaB: Renaissance — closeup animation, directly under the hero.
           Presented as a moving image rather than an embedded video: no
@@ -1001,8 +1007,11 @@ function ProjectPage() {
           blurb directly under the hero (above) and has no credits, so the
           whole band is skipped for it rather than sitting empty. Lollapalooza
           likewise: its blurb is pinned on the record-player animation and its
-          credits sit up by the hero, so nothing is left for this band. */}
-      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && !isRagsToRiches && (
+          credits sit up by the hero, so nothing is left for this band.
+          Reshuffling has its own info block directly below the hero (above)
+          now that it's no longer a portrait hero — skipped here too, or it
+          would render twice. */}
+      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && !isRagsToRiches && !isReshuffling && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
           {/* Skipped on True West, where the two lines of the description now
@@ -1261,6 +1270,19 @@ function ProjectPage() {
       {/* Special: Staging Aesthetics — native video + philosophy cards + tilted layout */}
       {isStaging && (
         <>
+          {project.extendedDescription && (
+            <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10">
+              <RevealBlock>
+                <p
+                  data-design-kind="text"
+                  className="font-display font-light text-xl md:text-2xl leading-snug tracking-tight text-balance max-w-3xl"
+                >
+                  {project.extendedDescription}
+                </p>
+              </RevealBlock>
+            </section>
+          )}
+
           {project.video && (
             <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
               <video
@@ -1496,16 +1518,28 @@ function ProjectPage() {
             </div>
           </div>
         ) : isTownhouse ? (
-          // Custom Townhouse layout: the axonometric upright on the left,
-          // the three renders stacked as a column on the right — nothing
-          // else follows it. The axon is shown at its own natural
-          // proportions (w-full h-auto, no object-cover and no fixed
-          // aspect-ratio box), so it can never be cropped whatever the
-          // file's real dimensions. The 19/10 column split is tuned so the
-          // portrait axon renders about as tall as the three stacked
-          // squares beside it — it fills the row rather than ending short
-          // and leaving black beside the lower renders. items-start keeps
-          // both columns starting on the same line.
+          // Custom Townhouse layout: the longer passage (the top-of-page
+          // description stays short) sits directly above this imagery, then
+          // the axonometric upright on the left, the three renders stacked
+          // as a column on the right — nothing else follows it. The axon is
+          // shown at its own natural proportions (w-full h-auto, no
+          // object-cover and no fixed aspect-ratio box), so it can never be
+          // cropped whatever the file's real dimensions. The 19/10 column
+          // split is tuned so the portrait axon renders about as tall as the
+          // three stacked squares beside it — it fills the row rather than
+          // ending short and leaving black beside the lower renders.
+          // items-start keeps both columns starting on the same line.
+          <>
+          {project.extendedDescription && (
+            <RevealBlock>
+              <p
+                data-design-kind="text"
+                className="font-display font-light text-xl md:text-2xl leading-snug tracking-tight text-balance max-w-3xl mb-8 md:mb-10"
+              >
+                {project.extendedDescription}
+              </p>
+            </RevealBlock>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-[19fr_10fr] gap-6 md:gap-10 md:items-start">
             {!project.media[0]?.hidden && (
               <figure className="group overflow-hidden rounded-md lg:mt-[150px]">
@@ -1574,6 +1608,7 @@ function ProjectPage() {
               )}
             </div>
           </div>
+          </>
         ) : galleryMedia.length === 0 ? null : (
           // grid-cols-2 lets a "half" item's md:col-span-1 sit next to
           // another half item automatically (standard grid auto-flow) while

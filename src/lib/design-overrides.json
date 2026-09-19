@@ -255,34 +255,6 @@
       "offsetY": -16.00000762939453
     }
   },
-  "project.staging-aesthetics.description": {
-    "base": {
-      "text": "Projecting National Culture, The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. This interactive installation utilizes animation software, projection mapping technology, and spatialized audio design to explore various alternative facades for the building, immersing viewers in the political stakes of architectural aesthetics."
-    },
-    "desktop": {
-      "fontSize": 20,
-      "align": "left",
-      "offsetY": 265
-    }
-  },
-  "project.reshuffling-the-deck.credit.thesis-director": {
-    "desktop": {
-      "offsetX": -1,
-      "offsetY": 2
-    }
-  },
-  "project.reshuffling-the-deck.credit.production-designer-scenic-painter": {
-    "desktop": {
-      "offsetX": 0,
-      "offsetY": -91
-    }
-  },
-  "project.reshuffling-the-deck.description": {
-    "desktop": {
-      "align": "left",
-      "fontSize": 18
-    }
-  },
   "project.townhouse.media.1": {
     "desktop": {
       "layoutShiftY": 0
@@ -360,15 +332,6 @@
     "desktop": {
       "layoutShiftY": 181,
       "maxWidth": 819
-    }
-  },
-  "project.townhouse.description": {
-    "base": {
-      "text": "Inspired by W.G. Clark and Charles Menefee’s Croffead House, this residential design creates portals of varying material transparency—from solid concrete to translucent glass block to transparent glass—in an exploration of public versus private space within the domestic footprint."
-    },
-    "desktop": {
-      "offsetX": -11,
-      "offsetY": 179
     }
   },
   "project.townhouse.media.0": {

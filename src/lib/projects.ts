@@ -157,6 +157,12 @@ export type Project = {
   credits?: Credit[];
   description: string;
   pullQuote?: string;
+  /**
+   * A second, longer passage of description text placed farther down the
+   * page alongside later imagery — for projects whose top-of-page
+   * description is deliberately short (Townhouse, Staging Aesthetics).
+   */
+  extendedDescription?: string;
   notes?: string[];
   cover: string;
   media: MediaItem[];
@@ -413,7 +419,15 @@ export const PROJECTS: Project[] = [
     weight: "right",
     tags: ["Experiential", "Architecture"],
     description:
-      "Projecting National Culture, The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. This interactive installation utilizes animation software, projection mapping technology, and spatialized audio design to explore various alternative facades for the building, immersing viewers in the political stakes of architectural aesthetics.",
+      "An interactive installation recognized with an Honorable Mention in the Wallenberg Foundation Awards uses projection mapping, animated visuals, and spatialized audio to explore the politics of architectural aesthetics.",
+    credits: [
+      { role: "Designer", name: "Reid Graham" },
+      { role: "Faculty Advisor", name: "Peter Halquist" },
+    ],
+    // Longer passage, placed farther down alongside the physical-model video
+    // rather than up top — the top-of-page description stays short.
+    extendedDescription:
+      "The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. Alternative facades for the building immerse viewers in the political stakes of national cultural expression.",
     cover: stagingFull,
     media: [
       { type: "image", src: stagingFull, caption: "Physical model — day condition and night projection-mapped facade" },
@@ -427,7 +441,6 @@ export const PROJECTS: Project[] = [
   {
     slug: "reshuffling-the-deck",
     accentColor: "#A79E95",
-    heroPortrait: true,
     hub: "production-scenic",
     title: "Reshuffling the Deck",
     subtitle: "Duderstadt Video Studio @ the University of Michigan",
@@ -570,11 +583,19 @@ export const PROJECTS: Project[] = [
     highlightPosition: "50% 50%",
     hub: "architecture",
     title: "Townhouse",
-    subtitle: "Inspired by the Croffead House by W.G. Clark",
+    subtitle: "Taubman College of Architecture, Studio I",
     mood: "concrete",
     weight: "right",
     description:
-      "A narrow town house inspired by the Croffead House by W.G. Clark. A shifted floor plate divides interior life: a library at grade, a dining room that overhangs the street, and blue-cast interiors that echo the precedent while framing everyday domestic ritual.",
+      "A residential design inspired by W.G. Clark and Charles Menefee's Croffead House.",
+    credits: [
+      { role: "Designer", name: "Reid Graham" },
+      { role: "Academic Advisor", name: "Colin Garnett" },
+    ],
+    // Longer passage, placed farther down alongside the axon/renders rather
+    // than up top — the top-of-page description stays short.
+    extendedDescription:
+      "Portals of varying transparency—from solid concrete to translucent glass block to clear glass—explore the boundary between public and private space.",
     cover: townhouseFull,
     collage: [townHouseDet.url],
     media: [
