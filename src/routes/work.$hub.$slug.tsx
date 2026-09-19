@@ -647,7 +647,7 @@ function ProjectPage() {
               <p
                 data-design-id={designId.projectDescription(project.slug)}
                 data-design-kind="text"
-                className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance"
+                className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
               >
                 {project.description}
               </p>
@@ -751,7 +751,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance"
+              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
@@ -774,7 +774,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance"
+              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
@@ -812,7 +812,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance"
+              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
@@ -855,7 +855,7 @@ function ProjectPage() {
 
             <div className="mt-6 md:mt-0">
               <RevealBlock>
-                <p className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance">
+                <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
                   {italicizePhrase(project.extendedDescription ?? "", "The Garden of Earthly Delights")}
                 </p>
               </RevealBlock>
@@ -997,7 +997,7 @@ function ProjectPage() {
             <p
               ref={recordCaptionRef}
               style={{ opacity: 0 }}
-              className="record-player-caption hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
+              className="record-player-caption hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 font-display font-light text-xl lg:text-2xl leading-snug tracking-tight text-white"
             >
               {project.extendedDescription}
             </p>
@@ -1058,7 +1058,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance"
+              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
             >
               {project.description}
             </p>
@@ -1073,7 +1073,7 @@ function ProjectPage() {
         <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-start">
             <RevealBlock>
-              <p className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance">
+              <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
                 A country music photo op — complete with an Opry-style ribbon
                 microphone — nods to the city's honky-tonk culture.
               </p>
@@ -1106,7 +1106,7 @@ function ProjectPage() {
       {isRagsToRiches && (
         <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
           <RevealBlock>
-            <p className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance text-center">
+            <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center">
               At the "Rags to Riches" country carnival, every game revolves
               around luck and money. The main attraction: a blinged-out,
               Zoltar-inspired "Cash Cow" dispenses your financial fortunes.
@@ -1296,7 +1296,7 @@ function ProjectPage() {
               <RevealBlock>
                 <p
                   data-design-kind="text"
-                  className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance max-w-3xl"
+                  className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-3xl"
                 >
                   {project.extendedDescription}
                 </p>
@@ -1555,7 +1555,7 @@ function ProjectPage() {
             <RevealBlock>
               <p
                 data-design-kind="text"
-                className="font-display font-light text-lg md:text-xl leading-snug tracking-tight text-balance max-w-3xl mb-8 md:mb-10"
+                className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-3xl mb-8 md:mb-10"
               >
                 {project.extendedDescription}
               </p>
