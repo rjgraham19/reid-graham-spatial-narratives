@@ -1026,6 +1026,16 @@
     width: 92%;
     top: max(76px, env(safe-area-inset-top));
   }
+  /* The stage box is much taller/narrower than the poster's own aspect
+     ratio at this width (a nearly full-height column vs. the image's
+     830x960), so `contain` (the default, above) left large empty bands
+     above and below it — background showing through and reading as a
+     dead gap right after the hero. `cover` fills the column completely;
+     the loading-state poster is a placeholder anyway, so a modest edge
+     crop here is the right trade for not leaving that much blank space. */
+  .record-player-poster {
+    object-fit: cover;
+  }
 }
 @media (min-width: 768px) and (max-width: 1023px) {
   .record-player-caption { font-size: clamp(15px, 1.95vw, 18px); }

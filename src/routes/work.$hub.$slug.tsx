@@ -683,17 +683,17 @@ function ProjectPage() {
                behind the text, not on top of it. Magnitudes are graduated by
                how much of each photo is genuinely empty at the top.
 
-               YCTIWY, Anne Frank and Reshuffling are non-portrait heroes, so
-               their height is capped (max-h-[70svh]/[75svh], below) on a
-               wide-but-short screen — width keeps growing there while
-               rendered height stays flat, so a plain width-based percentage
-               overshoots once that cap is active and starts eating into real
-               photo content, not just the dead space above it. min() caps
-               the pull at a share of the viewport's height too, so it backs
-               off to whichever is smaller once the image stops growing with
-               the viewport width. Staging is still a portrait hero (no
-               height cap at any width), so a plain width percentage is safe
-               for it. */
+               YCTIWY, Anne Frank, Reshuffling and True West are non-portrait
+               heroes, so their height is capped (max-h-[70svh]/[75svh],
+               below) on a wide-but-short screen — width keeps growing there
+               while rendered height stays flat, so a plain width-based
+               percentage overshoots once that cap is active and starts
+               eating into real photo content, not just the dead space
+               above it. min() caps the pull at a share of the viewport's
+               height too, so it backs off to whichever is smaller once the
+               image stops growing with the viewport width. Staging is still
+               a portrait hero (no height cap at any width), so a plain
+               width percentage is safe for it. */
             isYctiwy
               ? "mt-[calc(-1*min(18%,10svh))]"
               : isReshuffling
@@ -702,7 +702,15 @@ function ProjectPage() {
                   ? "-mt-[8%]"
                   : isAnneFrank
                     ? "mt-[calc(-1*min(5%,3svh))]"
-                    : isFieldHouse
+                    : isTrueWest
+                      ? /* True West's photo has the same kind of stage-
+                           rigging headroom at the top of the frame as the
+                           other Deerfield/Newman/Duderstadt stage photos
+                           above — it just hadn't been given the same
+                           compensation, so the title-to-photo gap read as
+                           much bigger than every sibling page. */
+                        "mt-[calc(-1*min(7%,8svh))]"
+                      : isFieldHouse
                       ? /* Field House's background flips from black to white
                            right at this image (light-zone above) — the
                            universal tight subtitle-to-hero gap read as an
@@ -1096,9 +1104,12 @@ function ProjectPage() {
       )}
 
       {/* Rags to Riches — first blurb beside the honky-tonk photo op,
-          directly under the hero. */}
+          directly under the hero. Only top padding on this and the next two
+          sections — each pair used to carry both a bottom and a top padding,
+          which stacked additively into a much looser rhythm than the rest
+          of the page (48-64px at every boundary, three times in a row). */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
+        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-start">
             <RevealBlock>
               <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
@@ -1132,7 +1143,7 @@ function ProjectPage() {
       {/* Rags to Riches — second blurb, continuing the story, centered in
           the gap between the honky-tonk photo and the closing image. */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
+        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
           <RevealBlock>
             <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center">
               At the "Rags to Riches" country carnival, every game revolves
@@ -1147,7 +1158,7 @@ function ProjectPage() {
           second blurb. Same margins as the sections above/below it so its
           edges line up with the Country Close and Cash Cow images. */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
+        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
           <RevealBlock>
             <figure className="group">
               <button
@@ -1921,7 +1932,7 @@ function ProjectPage() {
           not to a window floating over it. In the panel the project simply
           ends with its last section. */}
       {!panel && (
-      <section className="px-6 md:px-12 lg:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="px-6 md:px-12 lg:px-16 py-12 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-8">
         {project.tags && project.tags.length > 0 ? (
           <Link
             to="/work"
