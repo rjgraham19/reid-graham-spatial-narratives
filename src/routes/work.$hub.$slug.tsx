@@ -184,17 +184,10 @@ function RoleAndCollaborators({ project }: { project: Project }) {
         <p className="text-base">
           <span className="text-foreground/50">COLLABORATORS: </span>
           {collaborators.map((c, i) => (
-            <span
-              key={c.role}
-              data-design-id={designId.projectCredit(project.slug, c.role)}
-              data-design-kind="text"
-              // Alternating gray/white (not a divider character) is what
-              // separates one collaborator from the next in this one
-              // continuous, naturally wrapping run of text.
-              className={i % 2 === 0 ? "text-foreground" : "text-foreground/70"}
-            >
+            <span key={c.role} data-design-id={designId.projectCredit(project.slug, c.role)} data-design-kind="text">
               {i > 0 && " "}
-              {c.role}: {c.name}
+              <span className="text-foreground/50">{c.role}: </span>
+              <span className="text-foreground">{c.name}</span>
             </span>
           ))}
         </p>
