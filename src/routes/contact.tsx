@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import type { CSSProperties } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { ResumeSection, ResumeActions } from "@/components/resume-viewer";
 import designOverrides from "@/lib/design-overrides.json";
@@ -7,6 +8,7 @@ import type { DesignOverridesFile } from "@/lib/design-overrides.types";
 import { designId } from "@/lib/design-ids";
 import { useLiveOverrides } from "@/lib/use-live-overrides";
 import { DesignFrameBridge } from "@/design-mode/frame-bridge";
+import { useFitText } from "@/hooks/use-fit-text";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -33,6 +35,11 @@ function Contact() {
   const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const responsiveCss = designModeStyleTag(overridesFile);
+  // On an iPad-width column the email wrapped mid-address instead of just
+  // shrinking to fit — the `<wbr/>` below only chose *where* it wrapped, it
+  // never stopped it happening. Reusing the same shrink-to-fit approach as
+  // the project titles keeps it on one line at every width instead.
+  const { ref: emailRef, scale: emailScale } = useFitText<HTMLAnchorElement>([]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -65,21 +72,18 @@ function Contact() {
             column split of the Resume/Photo/Bio row below so both rows read
             as one consistent grid down the page. */}
         <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
-          <div className="md:col-span-5">
+          <div className="md:col-span-5 min-w-0">
             <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
               Email
             </p>
-            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-              <a
-                href={`mailto:${EMAIL}`}
-                className="font-display font-medium text-3xl md:text-5xl tracking-tight underline underline-offset-8 decoration-foreground/25 hover:decoration-foreground transition-colors break-words"
-              >
-                {/* Wraps after the @ on a narrow phone instead of splitting
-                    mid-word ("gmail.c" / "om") the way break-all did. */}
-                reidjgraham@<wbr />
-                gmail.com
-              </a>
-            </div>
+            <a
+              ref={emailRef}
+              href={`mailto:${EMAIL}`}
+              style={{ "--fit-scale": emailScale } as CSSProperties}
+              className="email-fit block w-full font-display font-medium tracking-tight underline underline-offset-8 decoration-foreground/25 hover:decoration-foreground transition-colors whitespace-nowrap"
+            >
+              {EMAIL}
+            </a>
           </div>
           <div className="md:col-span-7">
             <h2

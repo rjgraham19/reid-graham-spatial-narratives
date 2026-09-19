@@ -788,6 +788,18 @@
   }
 }
 
+/* The Contact page email address. Same shrink-to-fit trick as the project
+   title above: the base sizes match the old fixed text-3xl/md:text-5xl, and
+   `--fit-scale` only pulls them down when the address would otherwise wrap
+   inside its column — an iPad-width viewport was the case that actually hit
+   this, where 5/12 of the page wasn't wide enough for the address at 3rem. */
+@utility email-fit {
+  font-size: calc(1.875rem * var(--fit-scale, 1));
+  @media (min-width: 768px) {
+    font-size: calc(3rem * var(--fit-scale, 1));
+  }
+}
+
 /* Glass button — a small tile for controls sitting on top of a page rather
    than in it. Used by the project panel's Back and Close; see the component
    in components/glass-button.tsx. Not part of the Lollapalooza experiment,

@@ -57,7 +57,7 @@ import hlPhysicalModels from "@/assets/rg/highlight-physical-models.jpg";
 
 // Full uncropped versions of the above, used as the wide hero on their project pages.
 import fieldHouseFull from "@/assets/rg/field-house-full.jpg";
-import townhouseFull from "@/assets/rg/townhouse-full.jpg";
+import townhouseFull from "@/assets/rg/townhouse-full.webp";
 import stagingFull from "@/assets/rg/staging-full.jpg";
 import fieldHouse from "@/assets/rg/p3_2.jpg.asset.json";
 import fieldHouseDet from "@/assets/rg/p3_3.jpg.asset.json";

@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -53,8 +53,21 @@ export function ImageAutoSlider({
   const loop = n > 0 ? [...images, ...images] : [];
   const clickable = typeof onImageClick === "function";
 
+  // The belt never stops moving on its own, so a click aimed at one tile can
+  // land on whatever slid into that spot by the time it registers — the
+  // photo that opens doesn't match the one the eye was on. Pausing on hover
+  // (not just CSS `:hover`, since the inline `animationPlayState` below would
+  // always win over a stylesheet rule) freezes the frame the moment the
+  // pointer arrives, so whatever's under the cursor when it's clicked is
+  // still what was there when the click was aimed.
+  const [hovering, setHovering] = useState(false);
+
   return (
-    <div className={cn("ias-root relative w-full overflow-hidden", className)}>
+    <div
+      className={cn("ias-root relative w-full overflow-hidden", className)}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
       <style>{IAS_CSS}</style>
       <div
         className="ias-track flex w-max gap-4 md:gap-6"
@@ -62,7 +75,7 @@ export function ImageAutoSlider({
           {
             animationDuration: `${speedSeconds}s`,
             animationDirection: reverse ? "reverse" : "normal",
-            animationPlayState: paused ? "paused" : "running",
+            animationPlayState: paused || hovering ? "paused" : "running",
           } as CSSProperties
         }
       >

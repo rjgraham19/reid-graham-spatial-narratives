@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { PROJECT_TAGS, type ProjectTag } from "@/lib/projects";
 import { glassButton } from "@/components/glass-button";
 
-function formatTag(t: ProjectTag) {
+export function formatTag(t: ProjectTag) {
   return t.replace("/", " / ");
 }
 

@@ -4,6 +4,7 @@ import { SiteNav } from "@/components/site-nav";
 import { RecordPlayerViewer } from "@/components/record-player-viewer";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
 import { BackChevron, CloseMark, glassButton, trackSheen } from "@/components/glass-button";
+import { formatTag } from "@/components/discipline-filter-pills";
 import { LightboxVideo } from "@/components/lightbox-video";
 import { SwipeGallery } from "@/components/swipe-gallery";
 import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
@@ -216,17 +217,33 @@ function ProjectPage() {
   const hub = HUBS.find((h) => h.slug === project.hub)!;
   const mood = MOOD_STYLES[(project.mood ?? "concrete") as Mood];
 
+  /* The hero photo (`project.cover`) is a separate field from `project.media`
+     — most projects never put it in the array at all, so it never showed up
+     in the lightbox's arrow navigation, and clicking the hero itself opened
+     whatever real `media[0]` happened to be instead of the hero. Appending
+     it here (once, only if it isn't already `media[0]` the way tab-renaissance
+     deliberately does it) gives it a real slot in the count and the arrows
+     without duplicating it in the on-page gallery grid — that grid already
+     skips anything `hidden`. Every other hardcoded `media[N]` reference on
+     this page is untouched: appending at the end never shifts an existing
+     index. */
+  const lightboxMedia =
+    project.media.some((m) => m.src === project.cover)
+      ? project.media
+      : [...project.media, { type: "image" as const, src: project.cover, caption: project.title, hidden: true }];
+  const heroLightboxIndex = lightboxMedia.findIndex((m) => m.src === project.cover);
+
   const [lightbox, setLightbox] = useState<number | null>(null);
   const close = useCallback(() => setLightbox(null), []);
   const step = useCallback(
     (delta: number) => {
       setLightbox((cur) => {
         if (cur == null) return cur;
-        const n = project.media.length;
+        const n = lightboxMedia.length;
         return (cur + delta + n) % n;
       });
     },
-    [project.media.length],
+    [lightboxMedia.length],
   );
 
   const [zoom, setZoom] = useState(1);
@@ -536,7 +553,7 @@ function ProjectPage() {
                       sheen: true,
                     })}`}
                   >
-                    {t.replace("/", " ")}
+                    {formatTag(t)}
                   </Link>
                 ))}
               </div>
@@ -722,8 +739,16 @@ function ProjectPage() {
         >
           <button
             type="button"
-            onClick={() => setLightbox(0)}
-            className="block w-full h-auto overflow-hidden rounded-md bg-secondary group"
+            onClick={() => setLightbox(heroLightboxIndex)}
+            className={`block w-full h-auto overflow-hidden rounded-md group ${
+              /* The current render is framed tighter around the house than
+                 the render it replaced (less sky above, less street below),
+                 so at the same width it reads as more zoomed in even though
+                 nothing is actually being cropped. Padding the image inside
+                 its own box, on the page's own background, gives it back
+                 that breathing room without touching the source file. */
+              isTownhouse ? "bg-background p-4 md:p-8" : "bg-secondary"
+            }`}
             aria-label={`Enlarge ${project.title}`}
           >
             <img
@@ -734,6 +759,17 @@ function ProjectPage() {
               src={project.cover}
               alt={project.title}
               className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
+                isTownhouse ? "rounded-md" : ""
+              } ${
+                /* Field House's render is mostly sky (the building sits in
+                   the bottom third of the frame) — center object-position,
+                   the default, cropped a window that landed entirely in the
+                   sky at the capped hero height below, so the building never
+                   showed at all. Anchoring the crop to the bottom keeps the
+                   building in frame first, cropping away from the sky
+                   instead of through the subject. */
+                isFieldHouse ? "object-bottom" : ""
+              } ${
                 /* Full-width heroes render at whatever height their natural
                    aspect ratio produces at the page's content width — fine
                    at ordinary desktop widths, but on a very wide monitor
@@ -1385,8 +1421,15 @@ function ProjectPage() {
                 fade in from opposite sides (RevealBlock's `from` prop) on
                 scroll into view; only the column proportions changed. */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-14 md:items-start">
-              {/* Left: sketch, then the pull-quote beneath it */}
-              <div className="md:pt-4">
+              {/* Left: sketch, then the pull-quote beneath it. Nudged down a
+                  bit more than the old md:pt-4 — the description + MY ROLE /
+                  COLLABORATORS block above it (in its own separate section)
+                  was landing close enough to the sketch's top edge that a
+                  two-line collaborators credit touched or overlapped the
+                  drawing. Scoped to this column only, so the kitchen photo
+                  and the technical drawings below keep their existing
+                  spacing exactly as it was. */}
+              <div className="pt-4 md:pt-14 lg:pt-16">
                 <RevealBlock from="left">
                   <figure className="group">
                     <button
@@ -2000,7 +2043,7 @@ function ProjectPage() {
         >
           <div className="flex items-center justify-between px-6 py-5">
             <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/70">
-              {String(lightbox + 1).padStart(2, "0")} / {String(project.media.length).padStart(2, "0")}
+              {String(lightbox + 1).padStart(2, "0")} / {String(lightboxMedia.length).padStart(2, "0")}
             </span>
             <button
               type="button"
@@ -2023,20 +2066,20 @@ function ProjectPage() {
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
-            {project.media[lightbox].type === "video" ? (
+            {lightboxMedia[lightbox].type === "video" ? (
               /* Enlarged video: gains a minimal, auto-hiding play/pause +
                  scrub bar here — the one place a project video is a player
                  rather than a moving image. Clicking it toggles play/pause,
                  so closing is via the ✕ or the dark margin. */
               <LightboxVideo
-                src={project.media[lightbox].src}
+                src={lightboxMedia[lightbox].src}
                 zoom={zoom}
                 animateZoom={!pinchStart.current}
               />
             ) : (
               <img
-                src={project.media[lightbox].src}
-                alt={project.media[lightbox].caption ?? project.title}
+                src={lightboxMedia[lightbox].src}
+                alt={lightboxMedia[lightbox].caption ?? project.title}
                 onClick={close}
                 style={{ transform: `scale(${zoom})`, transition: pinchStart.current ? "none" : "transform 120ms ease-out" }}
                 className="max-h-full max-w-full object-contain cursor-zoom-out select-none"
@@ -2069,17 +2112,17 @@ function ProjectPage() {
             </button>
           </div>
 
-          {SHOW_LIGHTBOX_CAPTIONS && project.media[lightbox].caption && (
+          {SHOW_LIGHTBOX_CAPTIONS && lightboxMedia[lightbox].caption && (
             <p
               className="text-xs md:text-sm text-foreground/80 text-center px-6 pb-6"
               onClick={(e) => e.stopPropagation()}
               data-design-id={designId.projectMediaCaption(
                 project.slug,
-                project.media[lightbox].id ?? String(lightbox),
+                lightboxMedia[lightbox].id ?? String(lightbox),
               )}
               data-design-kind="text"
             >
-              {project.media[lightbox].caption}
+              {lightboxMedia[lightbox].caption}
             </p>
           )}
         </div>
