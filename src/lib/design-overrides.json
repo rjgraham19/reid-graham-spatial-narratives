@@ -231,16 +231,5 @@
       "offsetX": 0,
       "offsetY": 13
     }
-  },
-  "project.true-west.media.1": {
-    "desktop": {
-      "layoutShiftY": -55,
-      "offsetY": 10
-    }
-  },
-  "project.true-west.media.2": {
-    "desktop": {
-      "layoutShiftY": -83
-    }
   }
 }

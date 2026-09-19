@@ -552,11 +552,12 @@ export const PROJECTS: Project[] = [
     ],
     description:
       "A set design grounded in the historical annex, a tribute to Anne and her diary's enduring legacy.",
-    // Preserved verbatim from the old description — now the page's large
-    // stylized tagline (via the shared pull-quote section) instead of the
-    // top-of-page intro, matching the treatment already used on YCTIWY.
+    // Trimmed to drop its second sentence, which now just repeats the
+    // top-of-page description above almost word for word. Rendered under
+    // the sketch in the bespoke gallery layout below (not the generic
+    // pull-quote section, so it doesn't also appear as a second tagline).
     pullQuote:
-      "The rawness of the space is conveyed through skeletal framing and deteriorating wood slatting. Reflecting historical reference to the original annex, the design pays tribute to Anne and her diary's enduring legacy.",
+      "The rawness of the space is conveyed through skeletal framing and deteriorating wood slatting.",
     cover: anne,
     collage: [anneDet],
     // Order matters: the custom layout on this page addresses these by index.

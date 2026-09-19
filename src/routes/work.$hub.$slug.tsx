@@ -1168,8 +1168,9 @@ function ProjectPage() {
         </section>
       )}
 
-      {/* Pull quote */}
-      {project.pullQuote && (
+      {/* Pull quote — skipped on Anne Frank, whose pullQuote instead sits
+          under the sketch in its own bespoke gallery layout below. */}
+      {project.pullQuote && !isAnneFrank && (
         <section
           className={`px-6 md:px-12 lg:px-16 ${
             /* True West runs this straight into the image trio below it, so
@@ -1384,7 +1385,7 @@ function ProjectPage() {
                 fade in from opposite sides (RevealBlock's `from` prop) on
                 scroll into view; only the column proportions changed. */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-14 md:items-start">
-              {/* Left: sketch, then the description beneath it */}
+              {/* Left: sketch, then the pull-quote beneath it */}
               <div className="md:pt-4">
                 <RevealBlock from="left">
                   <figure className="group">
@@ -1405,6 +1406,17 @@ function ProjectPage() {
                     </button>
                   </figure>
                 </RevealBlock>
+                {project.pullQuote && (
+                  <RevealBlock>
+                    <p
+                      data-design-id={designId.projectPullQuote(project.slug)}
+                      data-design-kind="text"
+                      className="mt-6 md:mt-8 font-display font-light text-sm md:text-base leading-relaxed text-balance text-foreground/85 text-center"
+                    >
+                      {project.pullQuote}
+                    </p>
+                  </RevealBlock>
+                )}
               </div>
 
               {/* Right: kitchen closeup, dropped lower than the sketch */}
