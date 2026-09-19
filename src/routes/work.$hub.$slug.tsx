@@ -169,7 +169,7 @@ function RoleAndCollaborators({ project }: { project: Project }) {
   const collaborators = credits.filter((c) => c.name !== "Reid Graham");
   if (!myRole && collaborators.length === 0) return null;
   return (
-    <div className="mt-4 md:mt-6 space-y-1 text-sm md:text-base">
+    <div className="mt-4 md:mt-6 space-y-1 text-sm md:text-base uppercase">
       {myRole && (
         <p data-design-id={designId.projectCredit(project.slug, myRole.role)} data-design-kind="text">
           <span className="text-foreground/50">MY ROLE: </span>
