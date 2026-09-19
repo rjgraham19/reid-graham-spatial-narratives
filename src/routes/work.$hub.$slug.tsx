@@ -206,6 +206,21 @@ function RoleAndCollaborators({ project }: { project: Project }) {
 }
 
 function ProjectPage() {
+  /* TanStack Router reuses this same component instance across a slug
+     change (Lollapalooza -> True West, say) rather than remounting it —
+     only props/loader data update. CSS entrances that only play "on mount"
+     (animate-slide-from-left/right, the True West dual-image grid) don't
+     replay, and for a page whose structure differs a lot from whatever was
+     open a moment ago, the previous page's DOM briefly sits there in the
+     new page's place before React finishes reconciling it — the "wrong
+     layout for an instant" flash. Keying on the slug forces a real
+     unmount/remount on every project change, so each page always starts
+     from a clean first paint. */
+  const { slug } = Route.useParams();
+  return <ProjectPageInner key={slug} />;
+}
+
+function ProjectPageInner() {
   const { project: rawProject } = Route.useLoaderData();
   const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
@@ -1323,6 +1338,35 @@ function ProjectPage() {
       {/* Special: Staging Aesthetics — native video + philosophy cards + tilted layout */}
       {isStaging && (
         <>
+          {/* The physical-model video, then the Kennedy Center passage right
+              after it — was rendering the other way around (`project.video`
+              here was always undefined, a leftover from before this video
+              lived in `project.media`; the real clip actually rendered much
+              further down, inside the generic gallery, well after this
+              description). Pulling the real video up into its own section
+              here, ahead of the description, puts them in the intended
+              order without duplicating the clip (it's `hidden` in
+              `project.media` now, so the generic gallery below skips it). */}
+          {(() => {
+            const video = project.media.find((m) => m.id === "staging-model-video");
+            return video ? (
+              <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
+                <video
+                  src={video.src}
+                  poster={video.poster}
+                  controls
+                  playsInline
+                  className="w-full rounded-md bg-black"
+                />
+                {video.caption && (
+                  <p className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed">
+                    {video.caption}
+                  </p>
+                )}
+              </section>
+            ) : null;
+          })()}
+
           {project.extendedDescription && (
             <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10">
               <RevealBlock>
@@ -1333,23 +1377,6 @@ function ProjectPage() {
                   {project.extendedDescription}
                 </p>
               </RevealBlock>
-            </section>
-          )}
-
-          {project.video && (
-            <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
-              <video
-                src={project.video.src}
-                poster={project.video.poster}
-                controls
-                playsInline
-                className="w-full rounded-md bg-black"
-              />
-              {project.video.caption && (
-                <p className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed">
-                  {project.video.caption}
-                </p>
-              )}
             </section>
           )}
 

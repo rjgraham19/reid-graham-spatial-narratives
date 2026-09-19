@@ -309,7 +309,7 @@ export const PROJECTS: Project[] = [
     weight: "right",
     tags: ["Experiential"],
     credits: [
-      { role: "Experiential Designer", name: "Reid Graham" },
+      { role: "Experiential Designer + 3D Renderer + Technical Designer / Fabrication Liaison", name: "Reid Graham" },
       { role: "Art Director", name: "Rachel Roth" },
       { role: "Creative Director", name: "Bry Crasch" },
       { role: "Brand Design Lead", name: "Matt Plaia" },
@@ -370,7 +370,7 @@ export const PROJECTS: Project[] = [
     weight: "right",
     credits: [
       { id: "director", role: "Director", name: "Helen Crowley" },
-      { id: "scenic-designer", role: "Scenic Designer", name: "Reid Graham" },
+      { id: "scenic-designer", role: "Scenic Designer + Scenic Painter", name: "Reid Graham" },
       { id: "technical-director", role: "Technical Director", name: "Michael Clack" },
     ],
     description: "A set design for Hart & Kaufman's Pulitzer Prize–winning comedy.",
@@ -398,7 +398,7 @@ export const PROJECTS: Project[] = [
     mood: "aqua",
     weight: "left",
     credits: [
-      { role: "Designer", name: "Reid Graham" },
+      { role: "3D Designer + Worldbuilder", name: "Reid Graham" },
       { role: "Professor Advisor", name: "Dawn Gilpin" },
     ],
     description:
@@ -431,7 +431,7 @@ export const PROJECTS: Project[] = [
     description:
       "An interactive installation recognized with an Honorable Mention in the Wallenberg Foundation Awards uses projection mapping, animated visuals, and spatialized audio to explore the politics of architectural aesthetics.",
     credits: [
-      { role: "Designer", name: "Reid Graham" },
+      { role: "Exhibition Designer + Model Maker + Projection Mapping Designer", name: "Reid Graham" },
       { role: "Faculty Advisor", name: "Peter Halquist" },
     ],
     // Longer passage, placed farther down alongside the physical-model video
@@ -445,7 +445,9 @@ export const PROJECTS: Project[] = [
       // the closing still. Served from public/ like the other project videos
       // (TaB, Lollapalooza); the gallery loop already renders `type: "video"`
       // as a muted, looping, autoplaying clip.
-      { id: "staging-model-video", type: "video", src: "/staging-model.mp4" },
+      // Hidden from the generic gallery grid — it gets its own bespoke
+      // section (with the extended description right after it) instead.
+      { id: "staging-model-video", type: "video", src: "/staging-model.mp4", hidden: true },
     ],
   },
   {
@@ -459,7 +461,7 @@ export const PROJECTS: Project[] = [
     weight: "left",
     credits: [
       { role: "Thesis Director", name: "Rose Albayat" },
-      { role: "Production Designer & Scenic Painter", name: "Reid Graham" },
+      { role: "Production Designer + Scenic Painter", name: "Reid Graham" },
     ],
     description:
       "A short film reimagining of Georges Méliès' The Living Playing Cards, brought to life through Virtual Production Technology.",
@@ -519,7 +521,7 @@ export const PROJECTS: Project[] = [
     tags: ["Experiential"],
     highlight: ragsRichesCountryClose,
     credits: [
-      { role: "Experiential Designer", name: "Reid Graham" },
+      { role: "Experiential Designer + 3D Renderer", name: "Reid Graham" },
       { role: "Art Director", name: "Juli Isman" },
       { role: "Creative Director", name: "Bry Crasch" },
     ],
@@ -547,7 +549,7 @@ export const PROJECTS: Project[] = [
     weight: "right",
     credits: [
       { role: "Director", name: "Helen Crowley" },
-      { role: "Scenic Designer", name: "Reid Graham" },
+      { role: "Scenic Designer + Scenic Painter", name: "Reid Graham" },
       { role: "Technical Director", name: "Michael Clack" },
     ],
     description:
@@ -645,7 +647,7 @@ export const PROJECTS: Project[] = [
     mood: "pop",
     weight: "right",
     credits: [
-      { role: "Creative Director + Illustrator", name: "Reid Graham" },
+      { role: "Creative Director + Illustrator + Creative Marketing Strategist", name: "Reid Graham" },
       { role: "Event Coordinator", name: "Irem Hatipoglu" },
       { role: "Technical Coordinator", name: "Erin Hobbs" },
       { role: "Installation Design Team", name: "Keeran Cross, Chloe Erickson, Maggie Laakso, Elliot Reid" },
