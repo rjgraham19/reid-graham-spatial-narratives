@@ -702,7 +702,16 @@ function ProjectPage() {
                   ? "-mt-[8%]"
                   : isAnneFrank
                     ? "mt-[calc(-1*min(5%,3svh))]"
-                    : "mt-0"
+                    : isFieldHouse
+                      ? /* Field House's background flips from black to white
+                           right at this image (light-zone above) — the
+                           universal tight subtitle-to-hero gap read as an
+                           abrupt cut straight from the black title text into
+                           the photo with no breathing room. A little extra
+                           top space here lets that transition read as
+                           deliberate. */
+                        "mt-8 md:mt-10"
+                      : "mt-0"
           }`}
         >
           <button
