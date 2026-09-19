@@ -553,11 +553,17 @@ function ProjectPage() {
           8fr/5fr split no longer constrains how wide the title above it can
           run. */}
       <div
-        className={
+        className={`${
           isPortraitHero
             ? "relative md:grid md:grid-cols-[8fr_5fr] md:gap-8 lg:gap-12 md:px-12 lg:px-16"
             : "relative"
-        }
+        }${
+          /* Field House: the light theme used for the rest of its body (see
+             the light-zone wrapper further down) starts here instead, right
+             at the hero, so the page's black only reads as a band behind the
+             nav/title and doesn't run down behind the photo too. */
+          isFieldHouse ? " light-zone" : ""
+        }`}
       >
       <div
         className={`relative ${isReshuffling ? "md:col-start-1 md:row-start-1" : ""}`}
@@ -606,15 +612,26 @@ function ProjectPage() {
                the title/subtitle instead. figure is z-0 and the title block
                above it is z-10, so the overlap reads as the image sitting
                behind the text, not on top of it. Magnitudes are graduated by
-               how much of each photo is genuinely empty at the top. */
+               how much of each photo is genuinely empty at the top.
+
+               YCTIWY and Anne Frank are non-portrait heroes, so their height
+               is capped (max-h-[70svh]/[75svh], below) on a wide-but-short
+               screen — width keeps growing there while rendered height stays
+               flat, so a plain width-based percentage overshoots once that
+               cap is active and starts eating into real photo content, not
+               just the dead space above it. min() caps the pull at a share
+               of the viewport's height too, so it backs off to whichever is
+               smaller once the image stops growing with the viewport width.
+               Reshuffling and Staging are portrait heroes (no height cap at
+               any width), so a plain width percentage is safe for them. */
             isYctiwy
-              ? "-mt-[18%]"
+              ? "mt-[calc(-1*min(18%,10svh))]"
               : isReshuffling
                 ? "-mt-[14%]"
                 : isStaging
                   ? "-mt-[8%]"
                   : isAnneFrank
-                    ? "-mt-[5%]"
+                    ? "mt-[calc(-1*min(5%,3svh))]"
                     : "mt-0"
           }`}
         >

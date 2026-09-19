@@ -215,6 +215,16 @@
       "offsetY": -16.000019073486328
     }
   },
+  "project.rags-to-riches.subtitle": {
+    "desktop": {
+      "offsetX": 0,
+      "offsetY": -16
+    },
+    "mobile": {
+      "offsetX": 0,
+      "offsetY": -16
+    }
+  },
   "project.townhouse.subtitle": {
     "desktop": {
       "offsetX": 0,
