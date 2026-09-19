@@ -642,12 +642,12 @@ function ProjectPage() {
             pinned beside the record-player scroll-scrub farther down
             instead of up here. */}
         {isLollapalooza && (
-          <section className="px-6 md:px-12 lg:px-16 pb-6 md:pb-8">
+          <section className="px-6 md:px-12 lg:px-16 pb-6 md:pb-8 text-center">
             <RevealBlock>
               <p
                 data-design-id={designId.projectDescription(project.slug)}
                 data-design-kind="text"
-                className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+                className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
               >
                 {project.description}
               </p>
@@ -770,11 +770,11 @@ function ProjectPage() {
           inside it — preserved, not removed, per the redesign scope. */}
       {isReshuffling && (
         <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
-          <RevealBlock>
+          <RevealBlock className="text-center">
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
             >
               {project.description}
             </p>
@@ -807,12 +807,12 @@ function ProjectPage() {
           MY ROLE / COLLABORATORS below the hero, same compact info block as
           the other redesigned pages. */}
       {isTab && (
-        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4">
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
           <RevealBlock>
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
             >
               {project.description}
             </p>
@@ -1053,12 +1053,12 @@ function ProjectPage() {
           description now moves to the blurb beside the honky-tonk photo
           directly below, where it's actually about the pictured image. */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8 pb-2 md:pb-4">
+        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
           <RevealBlock>
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-4xl mx-auto"
             >
               {project.description}
             </p>
