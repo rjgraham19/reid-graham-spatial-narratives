@@ -364,7 +364,7 @@ export const PROJECTS: Project[] = [
     slug: "you-cant-take-it-with-you",
     accentColor: "#68691c",
     hub: "production-scenic",
-    title: "You Can't Take It With You!",
+    title: "You Can't Take It With You",
     subtitle: "Deerfield Studio Theatre",
     mood: "warm",
     weight: "right",
@@ -373,8 +373,7 @@ export const PROJECTS: Project[] = [
       { id: "scenic-designer", role: "Scenic Designer", name: "Reid Graham" },
       { id: "technical-director", role: "Technical Director", name: "Michael Clack" },
     ],
-    description:
-      "A living-room set for the Sycamore household. Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character — mirroring the playful heart of the family who lives inside it.",
+    description: "A set design for Hart & Kaufman's Pulitzer Prize–winning comedy.",
     pullQuote:
       "Slanted walls, adorned with tortoise shells and quirky clocks, transform the space into its own character, mirroring the playful heart of the Sycamore family.",
     cover: yctFull,
@@ -482,8 +481,7 @@ export const PROJECTS: Project[] = [
       { role: "Scenic Designer", name: "Reid Graham" },
       { role: "Technical Director", name: "Elliot Reid" },
     ],
-    description:
-      "The Wild West is honest — untamed and uncivilized. Suburbia shelters us in its artificial lushness, built on astroturf and synthetic greenery. A suburban kitchen unravels as the wild west comes pouring in.",
+    description: "A set design for Sam Shepard's American classic.",
     pullQuote:
       "A 1980s suburban kitchen unravels as the wild west comes pouring in...",
     dualityLines: [
@@ -543,6 +541,11 @@ export const PROJECTS: Project[] = [
       { role: "Technical Director", name: "Michael Clack" },
     ],
     description:
+      "A set design grounded in the historical annex, a tribute to Anne and her diary's enduring legacy.",
+    // Preserved verbatim from the old description — now the page's large
+    // stylized tagline (via the shared pull-quote section) instead of the
+    // top-of-page intro, matching the treatment already used on YCTIWY.
+    pullQuote:
       "The rawness of the space is conveyed through skeletal framing and deteriorating wood slatting. Reflecting historical reference to the original annex, the design pays tribute to Anne and her diary's enduring legacy.",
     cover: anne,
     collage: [anneDet],

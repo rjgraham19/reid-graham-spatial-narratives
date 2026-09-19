@@ -761,6 +761,27 @@ function ProjectPage() {
       )}
       </div>
 
+      {/* YCTIWY, True West, Anne Frank — description + MY ROLE /
+          COLLABORATORS below the hero, same compact centered info block as
+          the other redesigned pages. Each project's existing atmospheric
+          line (pullQuote, plus True West's dualityLines) is untouched and
+          keeps rendering in its own existing spot farther down the page —
+          only the top-of-page description slot changes here. */}
+      {(isYctiwy || isTrueWest || isAnneFrank) && (
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
+          <RevealBlock>
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
+            >
+              {project.description}
+            </p>
+            <RoleAndCollaborators project={project} />
+          </RevealBlock>
+        </section>
+      )}
+
       {/* Reshuffling the Deck — description + MY ROLE / COLLABORATORS below
           the hero at every viewport size (it used to sit beside the hero in
           a narrow portrait column; the hero is a normal full-width, height-
@@ -898,7 +919,7 @@ function ProjectPage() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl"
+              className="font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl"
             >
               {project.description}
             </p>
@@ -1015,25 +1036,21 @@ function ProjectPage() {
           credits sit up by the hero, so nothing is left for this band.
           Reshuffling has its own info block directly below the hero (above)
           now that it's no longer a portrait hero — skipped here too, or it
-          would render twice. */}
-      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && !isRagsToRiches && !isReshuffling && (
+          would render twice. YCTIWY, True West and Anne Frank each have
+          their own info block below the hero too now — skipped here for
+          the same reason. */}
+      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && !isRagsToRiches && !isReshuffling && !isYctiwy && !isTrueWest && !isAnneFrank && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
-          {/* Skipped on True West, where the two lines of the description now
-              run as the pull quotes flanking the image trio below — printing
-              it here as well just repeats them. Credits keep their usual place
-              on the right either way. */}
-          {!isYctiwy && !isAnneFrank && !isTrueWest && (
-            <RevealBlock>
-              <p
-                data-design-id={designId.projectDescription(project.slug)}
-                data-design-kind="text"
-                className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
-              >
-                {project.description}
-              </p>
-            </RevealBlock>
-          )}
+          <RevealBlock>
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
+            >
+              {project.description}
+            </p>
+          </RevealBlock>
         </div>
         {/* Lollapalooza's credits render up beside the hero instead. */}
         {project.credits && project.credits.length > 0 && !isLollapalooza && (
@@ -1188,7 +1205,7 @@ function ProjectPage() {
             <blockquote
               data-design-id={designId.projectPullQuote(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-2xl md:text-4xl leading-snug text-balance max-w-4xl"
+              className="font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl"
             >
               {project.pullQuote}
             </blockquote>
@@ -1261,7 +1278,7 @@ function ProjectPage() {
               /* Second pull quote — same weight and size as the one above the
                  image trio, sitting just under it and before the final
                  diagram. */
-              <blockquote className="mt-10 md:mt-12 max-w-4xl space-y-2 font-display font-light text-2xl md:text-4xl leading-snug text-balance">
+              <blockquote className="mt-10 md:mt-12 max-w-4xl space-y-2 font-display font-light text-xl md:text-3xl leading-snug text-balance">
                 <span className="block">{project.dualityLines[0]}</span>
                 <span className="block">{project.dualityLines[1]}</span>
               </blockquote>
@@ -1375,10 +1392,12 @@ function ProjectPage() {
         {isAnneFrank ? (
           /* Anne Frank layout, per the supplied reference:
              upper band — conceptual sketch left (sitting higher), kitchen
-             closeup right (dropped lower), with the description tucked under
-             the sketch and to the left of the photo. Lower band — the two
-             technical drawings side by side, each independently clickable but
-             sharing a row so they read as a matched pair. */
+             closeup right (dropped lower). Lower band — the two technical
+             drawings side by side, each independently clickable but sharing
+             a row so they read as a matched pair. The caption that used to
+             sit under the sketch (the same text as the old description) now
+             lives in `pullQuote`, rendered once via the shared pull-quote
+             section instead of duplicated here. */
           <div className="space-y-10 md:space-y-16">
             {/* Back to an even split — the wider 5fr/9fr run made the photo
                 read too large against the sketch. Sketch and photo still
@@ -1405,16 +1424,6 @@ function ProjectPage() {
                       />
                     </button>
                   </figure>
-                </RevealBlock>
-
-                <RevealBlock>
-                  <p
-                    data-design-id={designId.projectDescription(project.slug)}
-                    data-design-kind="text"
-                    className="mt-6 md:mt-8 font-display font-light text-sm md:text-base leading-relaxed text-balance text-foreground/85 text-center"
-                  >
-                    {project.description}
-                  </p>
                 </RevealBlock>
               </div>
 

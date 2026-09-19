@@ -17,61 +17,6 @@
       "text": "Wall Elevations, Technical Drafting"
     }
   },
-  "project.you-cant-take-it-with-you.credit.scenic-designer": {
-    "base": {
-      "text": "Reid Graham"
-    },
-    "desktop": {
-      "offsetX": 7,
-      "offsetY": -81,
-      "align": "right"
-    },
-    "mobile": {
-      "align": "right",
-      "offsetX": 8.807054300170874,
-      "offsetY": -87
-    }
-  },
-  "project.you-cant-take-it-with-you.credit.technical-director": {
-    "desktop": {
-      "offsetX": 7,
-      "offsetY": -44,
-      "align": "right"
-    },
-    "mobile": {
-      "align": "right",
-      "offsetX": 8,
-      "offsetY": -55
-    }
-  },
-  "project.true-west.credit.scenic-designer": {
-    "desktop": {
-      "offsetX": -3,
-      "offsetY": -66,
-      "align": "right"
-    }
-  },
-  "project.true-west.credit.technical-director": {
-    "desktop": {
-      "offsetX": -4,
-      "offsetY": -32,
-      "align": "right"
-    }
-  },
-  "project.the-diary-of-anne-frank.credit.scenic-designer": {
-    "desktop": {
-      "offsetX": 0,
-      "offsetY": -74,
-      "align": "right"
-    }
-  },
-  "project.the-diary-of-anne-frank.credit.technical-director": {
-    "desktop": {
-      "offsetX": 0,
-      "offsetY": -37,
-      "align": "right"
-    }
-  },
   "project.reshuffling-the-deck.media.2.caption": {
     "base": {
       "text": "SCENE 1"
@@ -86,25 +31,6 @@
   "project.true-west.media.0": {
     "desktop": {
       "layoutShiftY": 150
-    }
-  },
-  "project.you-cant-take-it-with-you.credit.director": {
-    "desktop": {
-      "offsetX": 7,
-      "offsetY": 15,
-      "align": "right"
-    },
-    "mobile": {
-      "align": "right",
-      "offsetX": 7.66666,
-      "offsetY": 7
-    }
-  },
-  "project.true-west.credit.director": {
-    "desktop": {
-      "offsetX": -4,
-      "offsetY": 28,
-      "align": "right"
     }
   },
   "project.lollapalooza.subtitle": {
@@ -294,23 +220,9 @@
       "layoutShiftY": -22
     }
   },
-  "project.the-diary-of-anne-frank.credit.director": {
-    "desktop": {
-      "align": "right",
-      "offsetX": 0,
-      "offsetY": 21
-    }
-  },
   "project.the-diary-of-anne-frank.media.1": {
     "desktop": {
       "layoutShiftY": -207
-    }
-  },
-  "project.the-diary-of-anne-frank.description": {
-    "desktop": {
-      "offsetX": 0.0000152587890625,
-      "offsetY": -76,
-      "align": "right"
     }
   },
   "project.the-diary-of-anne-frank.media.2": {
