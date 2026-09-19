@@ -174,17 +174,14 @@ function RoleAndCollaborators({ project }: { project: Project }) {
         <p
           data-design-id={designId.projectCredit(project.slug, myRole.role)}
           data-design-kind="text"
-          className="text-sm"
+          className="text-base md:text-lg"
         >
           <span className="text-foreground/50">MY ROLE: </span>
           <span className="text-foreground">{myRole.role}</span>
         </p>
       )}
       {collaborators.length > 0 && (
-        // Same size as the hub tag pill above the title (.glass-button's
-        // own 0.7rem) — clearly a step down from MY ROLE without needing
-        // its own font-size scale.
-        <p className="text-[0.7rem]">
+        <p className="text-xs">
           <span className="text-foreground/50">COLLABORATORS: </span>
           {collaborators.map((c, i) => (
             <span
