@@ -169,15 +169,22 @@ function RoleAndCollaborators({ project }: { project: Project }) {
   const collaborators = credits.filter((c) => c.name !== "Reid Graham");
   if (!myRole && collaborators.length === 0) return null;
   return (
-    <div className="mt-4 md:mt-6 space-y-1 text-sm md:text-base uppercase">
+    <div className="mt-4 md:mt-6 space-y-1 uppercase">
       {myRole && (
-        <p data-design-id={designId.projectCredit(project.slug, myRole.role)} data-design-kind="text">
+        <p
+          data-design-id={designId.projectCredit(project.slug, myRole.role)}
+          data-design-kind="text"
+          className="text-sm"
+        >
           <span className="text-foreground/50">MY ROLE: </span>
           <span className="text-foreground">{myRole.role}</span>
         </p>
       )}
       {collaborators.length > 0 && (
-        <p>
+        // Same size as the hub tag pill above the title (.glass-button's
+        // own 0.7rem) — clearly a step down from MY ROLE without needing
+        // its own font-size scale.
+        <p className="text-[0.7rem]">
           <span className="text-foreground/50">COLLABORATORS: </span>
           {collaborators.map((c, i) => (
             <span
