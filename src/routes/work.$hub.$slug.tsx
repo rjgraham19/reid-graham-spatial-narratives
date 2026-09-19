@@ -902,6 +902,7 @@ function ProjectPage() {
             >
               {project.description}
             </p>
+            <RoleAndCollaborators project={project} />
           </RevealBlock>
         </section>
       )}

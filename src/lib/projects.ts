@@ -562,11 +562,15 @@ export const PROJECTS: Project[] = [
     highlightPosition: "70% 50%",
     hub: "architecture",
     title: "Field House",
-    subtitle: "Community Tennis & Recreational Building",
+    subtitle: "Taubman College of Architecture, Studio II",
     mood: "concrete",
     weight: "left",
+    credits: [
+      { role: "Designer", name: "Reid Graham" },
+      { role: "Academic Advisor", name: "Athar Mufreh" },
+    ],
     description:
-      "Guided by accessibility and inclusive play for individuals of all ages and physical abilities, the Community Tennis and Recreational Building incorporates ramps to facilitate activity and motion around the courts — watching the game becomes as dynamic as playing it.",
+      "A community tennis and recreational building designed for accessibility and inclusive play, with ramps that thread through the courts so watching the game feels as dynamic as playing it.",
     cover: fieldHouseFull,
     collage: [fieldHouseDet.url],
     media: [
