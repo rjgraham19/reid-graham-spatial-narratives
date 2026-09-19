@@ -108,9 +108,6 @@
     }
   },
   "project.lollapalooza.subtitle": {
-    "base": {
-      "text": "T-Mobile Club Magenta, Chicago, IL"
-    },
     "desktop": {
       "offsetX": 4,
       "offsetY": -4.9999847412109375
@@ -123,18 +120,6 @@
   "project.lollapalooza.media.0.caption": {
     "base": {
       "text": ""
-    }
-  },
-  "project.lollapalooza.description": {
-    "base": {
-      "text": "A giant CD player channels the early-2000s as an oversized photo backdrop for festivalgoers, with a spinning translucent magenta compact disc. At night, its chrome and brushed aluminum finishes pop against the glowing crescent moon inside the flip-open lid."
-    },
-    "mobile": {
-      "offsetX": 0,
-      "offsetY": -62
-    },
-    "desktop": {
-      "align": "left"
     }
   },
   "project.the-exchange-facility.media.0.caption": {
@@ -343,61 +328,6 @@
     "mobile": {
       "offsetX": 0,
       "offsetY": 13
-    }
-  },
-  "project.tab-renaissance.credit.event-coordinator": {
-    "mobile": {
-      "offsetX": 0,
-      "offsetY": -10
-    }
-  },
-  "project.tab-renaissance.credit.technical-coordinator": {
-    "mobile": {
-      "offsetX": 0,
-      "offsetY": -19
-    }
-  },
-  "project.tab-renaissance.credit.installation-design-team": {
-    "mobile": {
-      "offsetX": 0,
-      "offsetY": -28
-    }
-  },
-  "project.lollapalooza.credit.art-director": {
-    "base": {
-      "text": "\nRachel Roth"
-    },
-    "desktop": {
-      "align": "right",
-      "offsetX": 0,
-      "offsetY": -32
-    }
-  },
-  "project.lollapalooza.credit.creative-director": {
-    "base": {
-      "text": "\nBry Crasch"
-    },
-    "desktop": {
-      "align": "right",
-      "offsetX": 0,
-      "offsetY": -39
-    }
-  },
-  "project.lollapalooza.credit.graphic-designer": {
-    "base": {
-      "text": "Celine To"
-    },
-    "desktop": {
-      "align": "right",
-      "offsetX": 0,
-      "offsetY": -48
-    }
-  },
-  "project.lollapalooza.credit.experiential-designer": {
-    "desktop": {
-      "align": "right",
-      "offsetX": 0,
-      "offsetY": -22
     }
   },
   "project.true-west.pull-quote": {

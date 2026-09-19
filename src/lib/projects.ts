@@ -304,17 +304,24 @@ export const PROJECTS: Project[] = [
     accentColor: "#E20074",
     hub: "production-scenic",
     title: "Lollapalooza",
-    subtitle: "T-Mobile Club Magenta, Chicago, IL",
+    subtitle: "T-Mobile Club Magenta, Chicago, Illinois",
     mood: "pop",
     weight: "right",
     tags: ["Experiential"],
     credits: [
       { role: "Experiential Designer", name: "Reid Graham" },
       { role: "Art Director", name: "Rachel Roth" },
-      { role: "Creative Director", name: "Brie Crash" },
-      { role: "Graphic Designer", name: "Selene" },
+      { role: "Creative Director", name: "Bry Crasch" },
+      { role: "Brand Design Lead", name: "Matt Plaia" },
+      { role: "Graphic Designer", name: "Celine To" },
+      { role: "Fabrication", name: "Revel Decor" },
     ],
     description:
+      "A lounge inspired by Y2K space aesthetics, giving festivalgoers a place to gather and enjoy elevated views of the main stage.",
+    // Longer passage, kept exactly as it read before — now pinned beside
+    // the record-player scroll-scrub farther down instead of up top, so it
+    // sits with the CD-player imagery it actually describes.
+    extendedDescription:
       "A giant CD player channels the early-2000s as an oversized photo backdrop for festivalgoers, with a spinning translucent magenta compact disc. At night, its chrome and brushed aluminum finishes pop against the glowing crescent moon inside the flip-open lid.",
     cover: lollaClubMagenta,
     // The CGI render (formerly project.media[0]) that used to open the
@@ -503,8 +510,13 @@ export const PROJECTS: Project[] = [
     subtitle: "Country Music Festival, Nashville, TN",
     tags: ["Experiential"],
     highlight: ragsRichesCountryClose,
+    credits: [
+      { role: "Experiential Designer", name: "Reid Graham" },
+      { role: "Art Director", name: "Juli Isman" },
+      { role: "Creative Director", name: "Bry Crasch" },
+    ],
     description:
-      "A winning concept in a competitive bid for client business, this activation integrates a personal banking app into Nashville's music festival scene. A country music photo op — complete with an Opry-style ribbon microphone — nods to the city's honky-tonk culture.",
+      "A winning concept in a competitive bid for client business, this activation introduces a personal banking app to festivalgoers through a country-themed experience.",
     cover: ragsRichesCountryFull,
     media: [
       { type: "image", src: ragsRichesCountryFull, caption: "Rags to Riches — country carnival activation" },
@@ -615,13 +627,18 @@ export const PROJECTS: Project[] = [
     mood: "pop",
     weight: "right",
     credits: [
-      { role: "Creative Director", name: "Reid Graham" },
+      { role: "Creative Director + Illustrator", name: "Reid Graham" },
       { role: "Event Coordinator", name: "Irem Hatipoglu" },
       { role: "Technical Coordinator", name: "Erin Hobbs" },
       { role: "Installation Design Team", name: "Keeran Cross, Chloe Erickson, Maggie Laakso, Elliot Reid" },
     ],
     description:
-      "An immersive, experiential design for Taubman College's annual Beaux-Arts Ball, reimagining the Renaissance as a timeless expression of creative transformation and continual innovation. Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials.",
+      "An immersive, experiential design for Taubman College's annual Beaux-Arts Ball, reimagining the Renaissance as a timeless expression of creative transformation and continual innovation.",
+    // Longer passage, kept exactly as it read before — now sits beside the
+    // closeup animation farther down instead of up top, alongside the
+    // imagery it explains (the Bosch-inspired branding/graphics).
+    extendedDescription:
+      "Inspired by The Garden of Earthly Delights by Hieronymus Bosch, the creative marketing team drew upon the painting's color scheme and whimsicality for the event's branding, graphics, and promotional materials.",
     cover: tab,
     tags: ["Production/Scenic", "Experiential"],
     media: [

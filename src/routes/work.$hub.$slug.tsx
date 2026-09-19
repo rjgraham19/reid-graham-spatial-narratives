@@ -188,9 +188,12 @@ function RoleAndCollaborators({ project }: { project: Project }) {
               key={c.role}
               data-design-id={designId.projectCredit(project.slug, c.role)}
               data-design-kind="text"
-              className="text-foreground"
+              // Alternating gray/white (not a divider character) is what
+              // separates one collaborator from the next in this one
+              // continuous, naturally wrapping run of text.
+              className={i % 2 === 0 ? "text-foreground" : "text-foreground/70"}
             >
-              {i > 0 && ", "}
+              {i > 0 && " "}
               {c.role}: {c.name}
             </span>
           ))}
@@ -633,6 +636,29 @@ function ProjectPage() {
           </div>
         )}
 
+        {/* Lollapalooza — description + MY ROLE / COLLABORATORS between the
+            gallery carousel above and the hero photo below, rather than
+            below either. Kept out of the shared description+credits section
+            further down (see the `!isLollapalooza` guard there) so it
+            doesn't repeat. The CD-player paragraph that used to live in
+            this same description field now sits in `extendedDescription`,
+            pinned beside the record-player scroll-scrub farther down
+            instead of up here. */}
+        {isLollapalooza && (
+          <section className="px-6 md:px-12 lg:px-16 pb-6 md:pb-8">
+            <RevealBlock>
+              <p
+                data-design-id={designId.projectDescription(project.slug)}
+                data-design-kind="text"
+                className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+              >
+                {project.description}
+              </p>
+              <RoleAndCollaborators project={project} />
+            </RevealBlock>
+          </section>
+        )}
+
         {/* Exchange Facility — no static hero photo. The live 3D model fills
             this slot instead (rendered further down, directly under the
             description), so nothing repeats a rendering the model already
@@ -715,25 +741,6 @@ function ProjectPage() {
 
       </div>
 
-      {/* Lollapalooza — credits, on the right, directly under the hero. Kept
-          out of the shared description+credits section further down (see the
-          `!isLollapalooza` guard there) so they don't repeat. */}
-      {isLollapalooza && project.credits && project.credits.length > 0 && (
-        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <RevealBlock className="md:col-span-4 md:col-start-9">
-              <ul className="space-y-3">
-                {project.credits
-                  .filter((c: Credit) => !c.hidden)
-                  .map((c: Credit) => (
-                    <CreditRow key={c.role} slug={project.slug} credit={c} />
-                  ))}
-              </ul>
-            </RevealBlock>
-          </div>
-        </section>
-      )}
-
       {/* Portrait heroes (Townhouse, Staging Aesthetics): description +
           MY ROLE / COLLABORATORS sits beside the image on a wide viewport,
           filling the space a tall hero leaves empty, and stacks below it on
@@ -799,6 +806,24 @@ function ProjectPage() {
         </section>
       )}
 
+      {/* Garden of Earthly Delights (tab-renaissance) — description +
+          MY ROLE / COLLABORATORS below the hero, same compact info block as
+          the other redesigned pages. */}
+      {isTab && (
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4">
+          <RevealBlock>
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+            >
+              {project.description}
+            </p>
+            <RoleAndCollaborators project={project} />
+          </RevealBlock>
+        </section>
+      )}
+
       {/* TaB: Renaissance — closeup animation, directly under the hero.
           Presented as a moving image rather than an embedded video: no
           controls, no play badge, no poster affordance. It runs once when
@@ -808,9 +833,13 @@ function ProjectPage() {
       {isTab && (
         <section className="px-6 md:px-12 lg:px-16 pt-2 md:pt-4 pb-4 md:pb-6">
           {/* A straight half-and-half split: the closeup animation fills the
-              left half (just under half the page), credits + description hold
-              the right half on their own — the text column is a fixed half,
-              not sized off the video. */}
+              left half (just under half the page), the longer Bosch/
+              marketing passage holds the right half on its own — the text
+              column is a fixed half, not sized off the video. That passage
+              used to be the back half of the top-of-page description; it's
+              its own field now (extendedDescription) so it can sit here,
+              beside the imagery it actually explains, without also being
+              duplicated in the short intro above. */}
           <div className="md:grid md:grid-cols-2 md:gap-8 lg:gap-12 md:items-start">
             <figure className="group">
               <button
@@ -827,35 +856,11 @@ function ProjectPage() {
               </button>
             </figure>
 
-            {/* Right column: credits sit up here above the description.
-                space-y-2 to match the tighter credit spacing on True West /
-                Anne Frank / YCTIWU. */}
             <div className="mt-6 md:mt-0">
-              {project.credits && project.credits.length > 0 && (
-                <RevealBlock>
-                  <ul className="mb-5 space-y-2 md:mb-6">
-                    {project.credits
-                      .filter((c: Credit) => !c.hidden)
-                      .map((c: Credit) => (
-                        <CreditRow key={c.role} slug={project.slug} credit={c} />
-                      ))}
-                  </ul>
-                </RevealBlock>
-              )}
-              <RevealBlock delay={0.1}>
-                <div
-                  data-design-id={designId.projectDescription(project.slug)}
-                  data-design-kind="text"
-                  className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance space-y-3"
-                >
-                  <p>{splitAt(project.description, "Inspired by")[0]}</p>
-                  <p>
-                    {italicizePhrase(
-                      splitAt(project.description, "Inspired by")[1],
-                      "The Garden of Earthly Delights",
-                    )}
-                  </p>
-                </div>
+              <RevealBlock>
+                <p className="font-display font-light text-lg md:text-xl lg:text-2xl leading-snug tracking-tight text-balance">
+                  {italicizePhrase(project.extendedDescription ?? "", "The Garden of Earthly Delights")}
+                </p>
               </RevealBlock>
             </div>
           </div>
@@ -994,12 +999,10 @@ function ProjectPage() {
                 after the animation starts and then stays. */}
             <p
               ref={recordCaptionRef}
-              data-design-id={designId.projectDescription(project.slug)}
-              data-design-kind="text"
               style={{ opacity: 0 }}
               className="record-player-caption hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 font-display font-light text-lg lg:text-xl leading-snug tracking-tight text-white"
             >
-              {project.description}
+              {project.extendedDescription}
             </p>
           </div>
         </div>
@@ -1047,18 +1050,35 @@ function ProjectPage() {
       </section>
       )}
 
+      {/* Rags to Riches — description + MY ROLE / COLLABORATORS below the
+          hero, same compact info block as the other redesigned pages. The
+          photo-op sentence that used to be the back half of this same
+          description now moves to the blurb beside the honky-tonk photo
+          directly below, where it's actually about the pictured image. */}
+      {isRagsToRiches && (
+        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8 pb-2 md:pb-4">
+          <RevealBlock>
+            <p
+              data-design-id={designId.projectDescription(project.slug)}
+              data-design-kind="text"
+              className="font-display font-light text-base md:text-lg leading-snug tracking-tight text-balance max-w-2xl"
+            >
+              {project.description}
+            </p>
+            <RoleAndCollaborators project={project} />
+          </RevealBlock>
+        </section>
+      )}
+
       {/* Rags to Riches — first blurb beside the honky-tonk photo op,
           directly under the hero. */}
       {isRagsToRiches && (
         <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-start">
             <RevealBlock>
-              <p
-                data-design-id={designId.projectDescription(project.slug)}
-                data-design-kind="text"
-                className="font-display font-light text-2xl md:text-3xl leading-snug tracking-tight text-balance"
-              >
-                {project.description}
+              <p className="font-display font-light text-2xl md:text-3xl leading-snug tracking-tight text-balance">
+                A country music photo op — complete with an Opry-style ribbon
+                microphone — nods to the city's honky-tonk culture.
               </p>
             </RevealBlock>
             <RevealBlock delay={0.1}>
