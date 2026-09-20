@@ -946,7 +946,7 @@ function ProjectPageInner() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl mx-auto text-center"
+              className="font-display font-light text-xl md:text-3xl leading-snug text-balance text-center"
             >
               {project.description}
             </p>
