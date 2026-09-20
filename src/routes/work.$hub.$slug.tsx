@@ -637,8 +637,16 @@ function ProjectPageInner() {
           /* Field House: the light theme used for the rest of its body (see
              the light-zone wrapper further down) starts here instead, right
              at the hero, so the page's black only reads as a band behind the
-             nav/title and doesn't run down behind the photo too. */
-          isFieldHouse ? " light-zone" : ""
+             nav/title and doesn't run down behind the photo too.
+
+             bg-background + a real padding-top (not the figure's own margin
+             below) is what actually paints that transition white: a margin
+             on the figure collapses through this wrapper since nothing else
+             separates them, so the gap it made was rendering as the page's
+             plain black, not the light zone's white — which is why the hero
+             read as pressed straight against the black title block instead
+             of eased into it. */
+          isFieldHouse ? " light-zone bg-background pt-6 md:pt-8" : ""
         }`}
       >
       <div
@@ -740,16 +748,11 @@ function ProjectPageInner() {
                            compensation, so the title-to-photo gap read as
                            much bigger than every sibling page. */
                         "mt-[calc(-1*min(7%,8svh))]"
-                      : isFieldHouse
-                      ? /* Field House's background flips from black to white
-                           right at this image (light-zone above) — the
-                           universal tight subtitle-to-hero gap read as an
-                           abrupt cut straight from the black title text into
-                           the photo with no breathing room. A little extra
-                           top space here lets that transition read as
-                           deliberate. */
-                        "mt-8 md:mt-10"
-                      : "mt-0"
+                      : /* Field House's black-to-white transition breathing
+                           room now lives as real padding on the light-zone
+                           wrapper above (so it actually paints white) —
+                           nothing extra needed here. */
+                        "mt-0"
           }`}
         >
           <button
@@ -943,7 +946,7 @@ function ProjectPageInner() {
             <p
               data-design-id={designId.projectDescription(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl"
+              className="font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl mx-auto text-center"
             >
               {project.description}
             </p>
