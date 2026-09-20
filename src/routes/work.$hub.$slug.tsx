@@ -1350,35 +1350,41 @@ function ProjectPageInner() {
           {(() => {
             const video = project.media.find((m) => m.id === "staging-model-video");
             return video ? (
-              <section className="px-6 md:px-12 lg:px-16 py-16 md:py-24">
-                <video
-                  src={video.src}
-                  poster={video.poster}
-                  controls
-                  playsInline
-                  className="w-full rounded-md bg-black"
-                />
-                {video.caption && (
-                  <p className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed">
-                    {video.caption}
-                  </p>
-                )}
+              /* Smaller and centered, on purpose — at full width this read
+                 as the biggest thing on the page; narrowing it and letting
+                 the black page show on both sides puts it more in scale
+                 with everything around it. Cut pt-16/24 down to pt-4/6: that
+                 was on top of the description-block above already ending in
+                 its own padding, which is what stacked into an oversized
+                 gap between the hero copy and the video ever showing up. */
+              <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-16 md:pb-24">
+                <div className="max-w-xl mx-auto">
+                  <video
+                    src={video.src}
+                    poster={video.poster}
+                    controls
+                    playsInline
+                    className="w-full rounded-md bg-black"
+                  />
+                  {video.caption && (
+                    <p className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed text-center">
+                      {video.caption}
+                    </p>
+                  )}
+                  {project.extendedDescription && (
+                    <RevealBlock>
+                      <p
+                        data-design-kind="text"
+                        className="mt-6 md:mt-8 font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center"
+                      >
+                        {project.extendedDescription}
+                      </p>
+                    </RevealBlock>
+                  )}
+                </div>
               </section>
             ) : null;
           })()}
-
-          {project.extendedDescription && (
-            <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10">
-              <RevealBlock>
-                <p
-                  data-design-kind="text"
-                  className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-3xl"
-                >
-                  {project.extendedDescription}
-                </p>
-              </RevealBlock>
-            </section>
-          )}
 
           {project.philosophyCards && (
             <section className="px-6 md:px-12 lg:px-16 py-20 md:py-28">

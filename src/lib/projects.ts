@@ -490,7 +490,7 @@ export const PROJECTS: Project[] = [
     weight: "left",
     credits: [
       { role: "Director", name: "Nick Alexander" },
-      { role: "Scenic Designer", name: "Reid Graham" },
+      { role: "Scenic Designer + Scenic Painter", name: "Reid Graham" },
       { role: "Technical Director", name: "Elliot Reid" },
     ],
     description: "A set design for Sam Shepard's American classic.",
@@ -582,7 +582,7 @@ export const PROJECTS: Project[] = [
     mood: "concrete",
     weight: "left",
     credits: [
-      { role: "Designer", name: "Reid Graham" },
+      { role: "Architectural Designer", name: "Reid Graham" },
       { role: "Academic Advisor", name: "Athar Mufreh" },
     ],
     description:
@@ -621,7 +621,7 @@ export const PROJECTS: Project[] = [
     description:
       "A residential design inspired by W.G. Clark and Charles Menefee's Croffead House.",
     credits: [
-      { role: "Designer", name: "Reid Graham" },
+      { role: "Architectural Designer", name: "Reid Graham" },
       { role: "Academic Advisor", name: "Colin Garnett" },
     ],
     // Longer passage, placed farther down alongside the axon/renders rather
