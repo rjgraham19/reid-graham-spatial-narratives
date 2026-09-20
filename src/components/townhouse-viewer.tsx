@@ -86,7 +86,7 @@ export function TownhouseViewer() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-md bg-white px-6 py-3 text-sm font-medium text-black shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-md bg-white px-6 py-3 font-display font-extralight uppercase tracking-[0.08em] text-sm text-black shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4"
         >
           Explore in 3D
         </button>

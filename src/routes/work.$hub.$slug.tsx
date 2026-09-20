@@ -1370,7 +1370,7 @@ function ProjectPageInner() {
                     className="w-full rounded-md bg-black"
                   />
                   {video.caption && (
-                    <p className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed text-center">
+                    <p className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed text-center">
                       {video.caption}
                     </p>
                   )}
@@ -1570,7 +1570,7 @@ function ProjectPageInner() {
               <figcaption
                 data-design-id={designId.projectMediaCaption(project.slug, project.media[1].id ?? "1")}
                 data-design-kind="text"
-                className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed"
+                className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed"
               >
                 {project.media[1].caption}
               </figcaption>
@@ -1700,7 +1700,7 @@ function ProjectPageInner() {
                         <figcaption
                           data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
                           data-design-kind="text"
-                          className="mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed text-right"
+                          className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed text-right"
                         >
                           {project.media[idx].caption}
                         </figcaption>
@@ -1788,7 +1788,7 @@ function ProjectPageInner() {
                   )}
                   {m.caption && (
                     <figcaption
-                      className={`mt-3 text-xs md:text-sm text-foreground/60 tracking-wide leading-relaxed ${
+                      className={`mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed ${
                         // Field House and Exchange match the plain, un-numbered,
                         // right-aligned caption style established on Townhouse —
                         // the numbered "01 — " prefix is this generic gallery's
