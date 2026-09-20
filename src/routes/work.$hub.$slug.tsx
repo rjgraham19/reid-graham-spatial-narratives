@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { SiteNav } from "@/components/site-nav";
 import { RecordPlayerViewer } from "@/components/record-player-viewer";
 import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
@@ -260,6 +261,22 @@ function ProjectPageInner() {
     },
     [lightboxMedia.length],
   );
+
+  /* Which way the cross-fade slides — derived from whichever index the
+     lightbox last held, not just from the arrows. A straight thumbnail
+     click to a different photo while one is already open slides the same
+     sensible direction (toward wherever that photo sits in the sequence)
+     without every one of the many setLightbox(N) call sites needing to
+     know or report a direction themselves. */
+  const prevLightboxRef = useRef<number | null>(null);
+  const [lightboxDirection, setLightboxDirection] = useState(1);
+  useEffect(() => {
+    const prev = prevLightboxRef.current;
+    if (lightbox != null && prev != null && prev !== lightbox) {
+      setLightboxDirection(lightbox > prev ? 1 : -1);
+    }
+    prevLightboxRef.current = lightbox;
+  }, [lightbox]);
 
   const [zoom, setZoom] = useState(1);
   useEffect(() => setZoom(1), [lightbox]);
@@ -1117,14 +1134,17 @@ function ProjectPageInner() {
           directly under the hero. Only top padding on this and the next two
           sections — each pair used to carry both a bottom and a top padding,
           which stacked additively into a much looser rhythm than the rest
-          of the page (48-64px at every boundary, three times in a row). */}
+          of the page (48-64px at every boundary, three times in a row).
+          md:items-center (not the default md:items-start) so the caption
+          sits centered against the photo's height rather than pinned to
+          its top edge. */}
       {isRagsToRiches && (
         <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center">
             <RevealBlock>
               <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
-                A country music photo op — complete with an Opry-style ribbon
-                microphone — nods to the city's honky-tonk culture.
+                A photo op that nods to Nashville's honky-tonk culture,
+                complete with an Opry-style ribbon microphone.
               </p>
             </RevealBlock>
             <RevealBlock delay={0.1}>
@@ -1150,53 +1170,13 @@ function ProjectPageInner() {
         </section>
       )}
 
-      {/* Rags to Riches — second blurb, continuing the story, centered in
-          the gap between the honky-tonk photo and the closing image. */}
+      {/* Rags to Riches — Cash Cow (the smaller image) paired with the
+          "luck and money" blurb beside it, ahead of the wide carnival photo
+          now closing the page — Cash Cow used to sit after that closing
+          image with this blurb stranded on its own between them. */}
       {isRagsToRiches && (
         <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
-          <RevealBlock>
-            <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center">
-              At the "Rags to Riches" country carnival, every game revolves
-              around luck and money. The main attraction: a blinged-out,
-              Zoltar-inspired "Cash Cow" dispenses your financial fortunes.
-            </p>
-          </RevealBlock>
-        </section>
-      )}
-
-      {/* Rags to Riches — full-width closing-transition image, below the
-          second blurb. Same margins as the sections above/below it so its
-          edges line up with the Country Close and Cash Cow images. */}
-      {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
-          <RevealBlock>
-            <figure className="group">
-              <button
-                type="button"
-                onClick={() => setLightbox(3)}
-                className="block w-full overflow-hidden rounded-md bg-secondary"
-                aria-label={project.media[3].caption ?? project.title}
-              >
-                <img
-                  data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
-                  data-design-kind="image"
-                  src={project.media[3].src}
-                  alt={project.media[3].caption ?? project.title}
-                  loading="lazy"
-                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                />
-              </button>
-            </figure>
-          </RevealBlock>
-        </section>
-      )}
-
-      {/* Rags to Riches — Cash Cow, left half of a two-photo row, now the
-          closing section. The right half is reserved for a second image Reid
-          plans to drop in later. */}
-      {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 py-6 md:py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center">
             <RevealBlock>
               <figure className="group">
                 <button
@@ -1216,9 +1196,39 @@ function ProjectPageInner() {
                 </button>
               </figure>
             </RevealBlock>
-            {/* Reserved for the second image — currently empty. */}
-            <div />
+            <RevealBlock delay={0.1}>
+              <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+                At the "Rags to Riches" country carnival, every game revolves
+                around luck and money. The main attraction: a blinged-out,
+                Zoltar-inspired "Cash Cow" dispenses your financial fortunes.
+              </p>
+            </RevealBlock>
           </div>
+        </section>
+      )}
+
+      {/* Rags to Riches — full-width closing image, now last on the page. */}
+      {isRagsToRiches && (
+        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8 pb-6 md:pb-8">
+          <RevealBlock>
+            <figure className="group">
+              <button
+                type="button"
+                onClick={() => setLightbox(3)}
+                className="block w-full overflow-hidden rounded-md bg-secondary"
+                aria-label={project.media[3].caption ?? project.title}
+              >
+                <img
+                  data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
+                  data-design-kind="image"
+                  src={project.media[3].src}
+                  alt={project.media[3].caption ?? project.title}
+                  loading="lazy"
+                  className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                />
+              </button>
+            </figure>
+          </RevealBlock>
         </section>
       )}
 
@@ -2102,26 +2112,51 @@ function ProjectPageInner() {
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
-            {lightboxMedia[lightbox].type === "video" ? (
-              /* Enlarged video: gains a minimal, auto-hiding play/pause +
-                 scrub bar here — the one place a project video is a player
-                 rather than a moving image. Clicking it toggles play/pause,
-                 so closing is via the ✕ or the dark margin. */
-              <LightboxVideo
-                src={lightboxMedia[lightbox].src}
-                zoom={zoom}
-                animateZoom={!pinchStart.current}
-              />
-            ) : (
-              <img
-                src={lightboxMedia[lightbox].src}
-                alt={lightboxMedia[lightbox].caption ?? project.title}
-                onClick={close}
-                style={{ transform: `scale(${zoom})`, transition: pinchStart.current ? "none" : "transform 120ms ease-out" }}
-                className="max-h-full max-w-full object-contain cursor-zoom-out select-none"
-                draggable={false}
-              />
-            )}
+            {/* Cross-fade + slide between photos on arrow/thumbnail
+                navigation, instead of the old hard cut straight from one
+                image to the next. mode="wait" lets the outgoing image
+                finish its exit before the incoming one starts, so they
+                never double up mid-transition; the direction (which side
+                each slides from/to) comes from lightboxDirection above. */}
+            <AnimatePresence mode="wait">
+              {lightboxMedia[lightbox].type === "video" ? (
+                /* Enlarged video: gains a minimal, auto-hiding play/pause +
+                   scrub bar here — the one place a project video is a player
+                   rather than a moving image. Clicking it toggles play/pause,
+                   so closing is via the ✕ or the dark margin. */
+                <motion.div
+                  key={lightbox}
+                  initial={{ opacity: 0, x: lightboxDirection * 32 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -lightboxDirection * 32 }}
+                  transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+                  className="contents"
+                >
+                  <LightboxVideo
+                    src={lightboxMedia[lightbox].src}
+                    zoom={zoom}
+                    animateZoom={!pinchStart.current}
+                  />
+                </motion.div>
+              ) : (
+                <motion.img
+                  key={lightbox}
+                  src={lightboxMedia[lightbox].src}
+                  alt={lightboxMedia[lightbox].caption ?? project.title}
+                  onClick={close}
+                  initial={{ opacity: 0, x: lightboxDirection * 32 }}
+                  animate={{ opacity: 1, x: 0, scale: zoom }}
+                  exit={{ opacity: 0, x: -lightboxDirection * 32 }}
+                  transition={{
+                    opacity: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+                    x: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+                    scale: { duration: pinchStart.current ? 0 : 0.12, ease: "easeOut" },
+                  }}
+                  className="max-h-full max-w-full object-contain cursor-zoom-out select-none"
+                  draggable={false}
+                />
+              )}
+            </AnimatePresence>
 
             {/* Chevron arrows over image */}
             <button
