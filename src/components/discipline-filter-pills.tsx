@@ -16,16 +16,26 @@ export function formatTag(t: ProjectTag) {
 export function DisciplineFilterPills({ activeTag }: { activeTag?: ProjectTag }) {
   return (
     <div className="flex flex-col items-start md:flex-row md:flex-wrap gap-2 md:gap-3">
-      {PROJECT_TAGS.map((t) => (
+      {PROJECT_TAGS.map((t) => {
+        const isActive = activeTag === t;
+        return (
         <Link
           key={t}
           to="/"
-          search={{ tag: t }}
+          /* Clicking the already-active pill used to just re-navigate to
+             the same ?tag=, which does nothing — there was no way to get
+             back to "All Projects" except knowing to click the wordmark.
+             Clearing the search here on a second click turns each pill
+             into a real toggle: click to filter, click again to clear it.
+             Only meaningful where `activeTag` is passed in (the homepage);
+             on a project page's footer pills, isActive is always false, so
+             this keeps behaving exactly as a plain filter link there. */
+          search={isActive ? {} : { tag: t }}
           className={glassButton({
             quiet: true,
             touch: true,
             sheen: true,
-            className: activeTag === t ? "is-active" : "",
+            className: isActive ? "is-active" : "",
           })}
           /* .glass-button's own font-size/padding/tracking (sized for a
              compact nav pill) win over Tailwind utilities here since both
@@ -52,7 +62,8 @@ export function DisciplineFilterPills({ activeTag }: { activeTag?: ProjectTag })
         >
           {formatTag(t)}
         </Link>
-      ))}
+        );
+      })}
     </div>
   );
 }

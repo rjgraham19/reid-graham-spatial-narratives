@@ -923,6 +923,30 @@
   outline-offset: 2px;
 }
 
+/* Selected/locked state — a full, flat fill across the whole pane rather
+   than the hover sheen's small glow that follows the cursor. Before this,
+   `.is-active` just left that same localized radial glow permanently on
+   (see `.glass-button--sheen.is-active::after` below), which is exactly
+   what hovering any other pill also looks like — there was no way to tell
+   "this one is selected" from "my cursor happens to be over this one right
+   now." This is deliberately a different kind of effect (flat, edge to
+   edge) so the two stay visually distinct even though the sheen glow can
+   still layer on top of it on hover. The fill alone already carries the
+   "selected" read; a brighter border on top of that started to look like a
+   second, separate button treatment rather than a state of the same one,
+   so the border stays whatever it already was at rest/hover. Written after
+   :hover so it wins the cascade there without needing extra specificity. */
+.glass-button.is-active {
+  background-color: rgba(255, 255, 255, 0.065);
+  box-shadow:
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.28);
+}
+.glass-button.is-active:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Quiet — for nav, where a row of labels at full strength competes with the
    page. The glass is unchanged; only the label recedes, and it comes back on
    hover and when the link is the current page. This replaces `nav-fade`,
