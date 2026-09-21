@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * The video as it appears *enlarged* in the project lightbox — the one place
- * a project video gets real transport controls. Inline in the gallery it
- * stays a silent, looping, controlless moving image (see the gallery loop in
- * work.$hub.$slug.tsx); those affordances only make sense once the clip is
- * blown up and the viewer has clearly chosen to look at it.
+ * a project video gets real transport controls and sound. Inline on the
+ * page it stays a silent, looping, controlless moving image that starts
+ * itself on scroll (InViewVideo); those affordances, sound included, only
+ * make sense once the clip is blown up and the viewer has clearly chosen to
+ * look at it.
  *
  * The bar is deliberately minimal: a play/pause toggle and a draggable
  * progress rail, nothing else. It auto-hides a couple of seconds after the
@@ -35,9 +36,43 @@ export function LightboxVideo({
   const hideTimer = useRef<number | null>(null);
   const scrubbing = useRef(false);
 
-  const [playing, setPlaying] = useState(true);
+  /* Starts paused, not "playing" — unlike the old muted autoplay, sound
+     needs an actual play() call to confirm the browser allowed it (see the
+     mount effect below) rather than assuming the `autoPlay` attribute
+     worked. Wrong here means an incorrect pause icon over audio that never
+     actually started, not audio playing silently. */
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0); // 0..1
   const [controlsShown, setControlsShown] = useState(true);
+
+  /* Opening the lightbox is itself the user gesture that permits unmuted
+     autoplay — most browsers grant it here since this mounts synchronously
+     inside that same click. A browser that still refuses an unmuted
+     autoplay typically only rejects it *with sound*; retrying muted is what
+     actually gets the clip moving instead of leaving it frozen on its first
+     frame. The `volumechange` listener below is what then corrects the
+     mute button to match — this effect only ever attempts the state, it
+     never assumes it stuck. */
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {
+      v.muted = true;
+      void v.play().catch(() => {});
+    });
+  }, [src]);
+
+  // Mirrors the element's real muted/volume state — covers the muted-retry
+  // above, a browser forcing mute on its own, and the toggle button itself.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    setMuted(v.muted);
+    const onVolumeChange = () => setMuted(v.muted);
+    v.addEventListener("volumechange", onVolumeChange);
+    return () => v.removeEventListener("volumechange", onVolumeChange);
+  }, [src]);
 
   const clearHideTimer = useCallback(() => {
     if (hideTimer.current != null) window.clearTimeout(hideTimer.current);
@@ -98,6 +133,13 @@ export function LightboxVideo({
     revealControls();
   }, [revealControls]);
 
+  const toggleMute = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    revealControls();
+  }, [revealControls]);
+
   const seekToClientX = useCallback((clientX: number) => {
     const v = videoRef.current;
     const track = trackRef.current;
@@ -149,9 +191,7 @@ export function LightboxVideo({
         ref={videoRef}
         key={src}
         src={src}
-        autoPlay
         loop
-        muted
         playsInline
         onClick={togglePlay}
         style={{
@@ -203,6 +243,18 @@ export function LightboxVideo({
             style={{ ...accentFill, left: `${progress * 100}%` }}
           />
         </div>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMute();
+          }}
+          aria-label={muted ? "Unmute" : "Mute"}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition-colors hover:bg-white/20"
+        >
+          {muted ? <MutedIcon /> : <VolumeIcon />}
+        </button>
       </div>
     </div>
   );
@@ -224,6 +276,25 @@ function PauseIcon() {
     <svg aria-hidden viewBox="0 0 12 12" width="12" height="12" fill="currentColor">
       <rect x="2.5" y="1.5" width="2.5" height="9" rx="0.4" />
       <rect x="7" y="1.5" width="2.5" height="9" rx="0.4" />
+    </svg>
+  );
+}
+
+function VolumeIcon() {
+  return (
+    <svg aria-hidden viewBox="0 0 14 12" width="14" height="12" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 4.5h2.2L6.5 2v8L3.2 7.5H1z" fill="currentColor" stroke="none" />
+      <path d="M9 4c.9.7 1.4 1.7 1.4 3S9.9 9.3 9 10" />
+      <path d="M10.8 2.3c1.5 1.1 2.4 2.8 2.4 4.7s-.9 3.6-2.4 4.7" />
+    </svg>
+  );
+}
+
+function MutedIcon() {
+  return (
+    <svg aria-hidden viewBox="0 0 14 12" width="14" height="12" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 4.5h2.2L6.5 2v8L3.2 7.5H1z" fill="currentColor" stroke="none" />
+      <path d="M9.5 4.5l3.5 3M13 4.5l-3.5 3" />
     </svg>
   );
 }

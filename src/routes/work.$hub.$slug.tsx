@@ -206,6 +206,17 @@ function RoleAndCollaborators({ project }: { project: Project }) {
   );
 }
 
+/** The hover cue on a silent inline video — tells a visitor this is where
+ *  to click for the real, full-sound experience in the lightbox. Drawn
+ *  rather than a glyph, to match BackChevron / CloseMark. */
+function ExpandIcon() {
+  return (
+    <svg aria-hidden viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2H2v4M10 2h4v4M6 14H2v-4M10 14h4v-4" />
+    </svg>
+  );
+}
+
 function ProjectPage() {
   /* TanStack Router reuses this same component instance across a slug
      change (Lollapalooza -> True West, say) rather than remounting it —
@@ -1371,40 +1382,66 @@ function ProjectPageInner() {
               order without duplicating the clip (it's `hidden` in
               `project.media` now, so the generic gallery below skips it). */}
           {(() => {
-            const video = project.media.find((m) => m.id === "staging-model-video");
+            const videoIndex = project.media.findIndex((m) => m.id === "staging-model-video");
+            const video = videoIndex === -1 ? null : project.media[videoIndex];
             return video ? (
-              /* Smaller and centered, on purpose — at full width this read
-                 as the biggest thing on the page; narrowing it and letting
-                 the black page show on both sides puts it more in scale
-                 with everything around it. Cut pt-16/24 down to pt-4/6: that
-                 was on top of the description-block above already ending in
-                 its own padding, which is what stacked into an oversized
-                 gap between the hero copy and the video ever showing up. */
+              /* Centered, and a bit bigger than the first pass at this —
+                 that landed too small on a wide monitor. Still capped
+                 rather than full-bleed (the hero photo above already reads
+                 as too large edge-to-edge with a lot of negative space —
+                 separate issue, image's own problem to fix later). The
+                 description below is deliberately its own, wider max-width
+                 rather than matching the video's: at the video's narrower
+                 width the Kennedy Center passage was wrapping into a tall,
+                 cramped column instead of reading as a normal paragraph.
+                 Cut pt-16/24 down to pt-4/6: that was on top of the
+                 description-block above already ending in its own padding,
+                 which is what stacked into an oversized gap before the
+                 video ever showed up. */
               <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-16 md:pb-24">
-                <div className="max-w-xl mx-auto">
-                  <video
-                    src={video.src}
-                    poster={video.poster}
-                    controls
-                    playsInline
-                    className="w-full rounded-md bg-black"
-                  />
+                <div className="max-w-3xl mx-auto">
+                  {/* Same treatment as any other clickable media on the
+                      page: a silent, looping, autoplaying-on-scroll moving
+                      image with no visible controls. Sound and the scrub
+                      bar only exist in the lightbox this opens — the
+                      "expand" cue on hover is what tells a visitor that's
+                      where to get them, rather than the clip trying to be
+                      a full player in both places at once. */}
+                  <figure className="group relative">
+                    <button
+                      type="button"
+                      onClick={() => setLightbox(videoIndex)}
+                      /* The border itself is the hover cue now — brightening
+                         it reads as "this whole pane is about to open"
+                         rather than a floating control sitting on top of
+                         the footage. The expand mark stays tucked in the
+                         corner, small and quiet, just confirming what a
+                         click here does rather than demanding attention. */
+                      className="block w-full overflow-hidden rounded-md border border-white/[0.07] bg-black transition-colors duration-200 hover:border-white/30"
+                      aria-label={`Enlarge ${project.title} video`}
+                    >
+                      <InViewVideo src={video.src} className="w-full h-auto" />
+                      <span className="absolute bottom-2.5 right-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white/60 opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
+                        <ExpandIcon />
+                      </span>
+                    </button>
+                  </figure>
                   {video.caption && (
                     <p className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed text-center">
                       {video.caption}
                     </p>
                   )}
-                  {project.extendedDescription && (
-                    <RevealBlock>
-                      <p
-                        data-design-kind="text"
-                        className="mt-6 md:mt-8 font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center"
-                      >
-                        {project.extendedDescription}
-                      </p>
-                    </RevealBlock>
-                  )}
                 </div>
+                {project.extendedDescription && (
+                  <RevealBlock>
+                    <p
+                      data-design-kind="text"
+                      className="mt-6 md:mt-8 max-w-4xl mx-auto font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center"
+                    >
+                      {project.extendedDescription}
+                    </p>
+                  </RevealBlock>
+                )}
               </section>
             ) : null;
           })()}
