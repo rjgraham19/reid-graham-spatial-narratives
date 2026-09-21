@@ -12,6 +12,7 @@ import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
 import { ExchangeViewer } from "@/components/exchange-viewer";
 import { LollaViewer } from "@/components/lolla-viewer";
+import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 
 import tabAnimation from "@/assets/rg/tab-animation.svg";
@@ -783,7 +784,7 @@ function ProjectPageInner() {
                         "mt-0"
           }`}
         >
-          <button
+          {isLollapalooza ? <LollaRenderCarousel /> : <button
             type="button"
             onClick={() => setLightbox(heroLightboxIndex)}
             className={`block w-full h-auto overflow-hidden rounded-md group ${
@@ -839,7 +840,7 @@ function ProjectPageInner() {
                 isPortraitHero ? "" : "max-h-[75svh] md:max-h-[70svh]"
               } ${isYctiwy ? "animate-image-drift-up" : mood.enter}`}
             />
-          </button>
+          </button>}
         </figure>
         )}
 
