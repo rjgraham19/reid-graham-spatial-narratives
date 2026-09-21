@@ -49,7 +49,20 @@ export function RecordPlayerViewer({ wrapperRef, onProgress }: {
         if (!cancelled && !media.matches && !control.current && !failed) void start();
       }
     };
-    const observer = new IntersectionObserver(([entry]) => { near = entry.isIntersecting; void start(); }, { rootMargin: "600px 0px" });
+    /* 600px of lead time wasn't reliably enough: the model itself is small,
+       but it drags in a whole loading chain behind it — a JS chunk, the
+       Draco decoder and its wasm, two textures, then the glb — and on a
+       real connection that chain can still be running by the time the
+       scrub section actually reaches the viewport, leaving the static
+       poster (which used to be an actual video here) visible for a beat
+       once scrolling starts. This section is guaranteed to be part of the
+       current page — unlike genuinely below-the-fold content on a page a
+       visitor might never scroll to, there's no bandwidth saved by staying
+       lazy here — so the margin is wide enough that the observer fires
+       essentially on mount instead of waiting for the visitor to scroll
+       within reach of it. prefers-reduced-motion (below) still skips
+       loading it at all for anyone who has that set. */
+    const observer = new IntersectionObserver(([entry]) => { near = entry.isIntersecting; void start(); }, { rootMargin: "4000px 0px" });
     observer.observe(el);
     const visibleObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;

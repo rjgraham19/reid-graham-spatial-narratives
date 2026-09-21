@@ -783,6 +783,16 @@ function ProjectPageInner() {
                  its own box, on the page's own background, gives it back
                  that breathing room without touching the source file. */
               isTownhouse ? "bg-background p-4 md:p-8" : "bg-secondary"
+            } ${
+              /* On a wide screen the 8fr grid column stretches this well
+                 past 900px, reading as oversized against the rest of the
+                 page — the title above it, at its own capped size, only
+                 ever runs to about 620px. 720px keeps the hero a bit larger
+                 than that (its own presence, not identical to the title)
+                 without ballooning further just because a wide monitor has
+                 the room. Only kicks in at lg — narrower than that the
+                 column is already this size or smaller on its own. */
+              isTownhouse ? "lg:max-w-[720px]" : ""
             }`}
             aria-label={`Enlarge ${project.title}`}
           >
