@@ -6,7 +6,7 @@ import night from "@/assets/rg/lollapalooza-render-night.jpg";
 import full from "@/assets/rg/lollapalooza-render-full.jpg";
 import oasis from "@/assets/rg/lollapalooza-render-oasis.jpg";
 
-const labels = ["Day and night", "Full view", "Oasis"];
+const labels = ["Day and night", "Interior view", "Oasis lounge space"];
 
 /* Starts just left of the lamppost so the T-Mobile Club Magenta roof
    logo lands fully on the night side and never gets sliced by the
@@ -81,7 +81,12 @@ export function LollaRenderCarousel() {
                   {index === 0 ? (
                     <DayNightComparison position={comparisonPosition} />
                   ) : (
-                    <img src={index === 1 ? full : oasis} alt={`Club Magenta — ${label.toLowerCase()} rendering`} loading="lazy" draggable={false} className="aspect-video w-full object-contain" />
+                    /* These two renders aren't shot at 16:9 like the day/night
+                       pair, so `object-contain` in this aspect-video frame
+                       was letterboxing them with empty bars. `object-cover`
+                       fills the frame instead, at the cost of a slight crop
+                       top/bottom. */
+                    <img src={index === 1 ? full : oasis} alt={`Club Magenta — ${label.toLowerCase()} rendering`} loading="lazy" draggable={false} className="aspect-video w-full object-cover" />
                   )}
                 </div>
               ))}
