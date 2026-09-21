@@ -1510,7 +1510,7 @@ function ProjectPageInner() {
                     <p
                       data-design-id={designId.projectPullQuote(project.slug)}
                       data-design-kind="text"
-                      className="mt-6 md:mt-8 font-display font-light text-sm md:text-base leading-relaxed text-balance text-foreground/85 text-center"
+                      className="mt-6 md:mt-8 font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-foreground/85 text-center"
                     >
                       {project.pullQuote}
                     </p>
