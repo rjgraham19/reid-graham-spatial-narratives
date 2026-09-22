@@ -99,8 +99,17 @@ export function createRecordPlayerScene(host: HTMLDivElement, onFailure: () => v
     }
     if (!referenceFraming && boundsPoints.length && width && height) {
       // A constant reference stage preserves the original shrink and camera
-      // pacing. Safety fitting only engages on narrow or short viewports.
-      const referenceScale = Math.min(width / 660, height / 720);
+      // pacing. `Math.max`, not `Math.min` — the stage column's aspect ratio
+      // varies a lot more than the reference box's does (a thin phone
+      // viewport is much taller/narrower than 660x720), and `min` always
+      // locked the scale to whichever dimension was more constrained. On a
+      // narrow column that's the width, so the model shrank to fit it and
+      // left the rest of the (much taller) column empty above and below.
+      // `max` lets the model grow to fill the more generous dimension
+      // instead; `fitScale` below — a real safety check against the
+      // model's actual projected silhouette, not a fixed reference box —
+      // still catches it before it overflows the column's edges.
+      const referenceScale = Math.max(width / 660, height / 720);
       const fitScale = Math.min(width * 0.92 / ((maxX-minX)*640), height * 0.94 / ((maxY-minY)*360));
       const scale = Math.min(referenceScale, fitScale);
       camera.aspect = width / height;
