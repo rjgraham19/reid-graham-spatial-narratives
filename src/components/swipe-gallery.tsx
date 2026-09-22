@@ -16,6 +16,10 @@ import type { MediaItem } from "@/lib/projects";
  * on the page. A horizontal drag scrolls instead of tapping — the browser
  * distinguishes the two.
  *
+ * `onOpen` is optional — leave it out for a set (like the drafting sheets)
+ * that has no isolated view worth opening, and slides render as plain divs
+ * instead of buttons, so nothing here is clickable.
+ *
  * Desktop keeps its existing layout; this is rendered only inside a
  * `md:hidden` wrapper by the caller.
  */
@@ -27,7 +31,7 @@ export function SwipeGallery({
 }: {
   slug: string;
   items: { item: MediaItem; index: number }[];
-  onOpen: (index: number) => void;
+  onOpen?: (index: number) => void;
   /** Extra classes on each slide button — e.g. a white card for line drawings. */
   slideClassName?: string;
 }) {
@@ -48,14 +52,8 @@ export function SwipeGallery({
         onScroll={onScroll}
         className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {items.map(({ item: m, index: i }) => (
-          <button
-            key={m.id}
-            type="button"
-            onClick={() => onOpen(i)}
-            aria-label={m.caption ?? "Open image"}
-            className={`w-full shrink-0 snap-start ${slideClassName}`}
-          >
+        {items.map(({ item: m, index: i }) => {
+          const img = (
             <img
               data-design-id={designId.projectMedia(slug, m.id!)}
               data-design-kind="image"
@@ -64,8 +62,23 @@ export function SwipeGallery({
               loading="lazy"
               className="h-auto w-full object-contain"
             />
-          </button>
-        ))}
+          );
+          return onOpen ? (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => onOpen(i)}
+              aria-label={m.caption ?? "Open image"}
+              className={`w-full shrink-0 snap-start ${slideClassName}`}
+            >
+              {img}
+            </button>
+          ) : (
+            <div key={m.id} className={`w-full shrink-0 snap-start ${slideClassName}`}>
+              {img}
+            </div>
+          );
+        })}
       </div>
 
       {items.length > 1 && (

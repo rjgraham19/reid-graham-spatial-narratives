@@ -20,13 +20,30 @@ const INITIAL_SLIDER_POSITION = 28;
    right next to it at the frame edge. */
 const DOCK_THRESHOLD = 2;
 
-/* Just the two images and the "Day" / "Night" corner labels — the drag
-   handle itself lives one level up, outside the embla viewport's
-   `overflow-hidden`, so the handle's circle never gets clipped as it
-   nears either edge. */
-function DayNightComparison({ position }: { position: number }) {
+/* The whole image is the drag surface, not just the thin handle — on
+   touch, a swipe that starts a few pixels off the handle used to fall
+   through to embla and flip the carousel instead of moving the
+   comparison. `data-comparison-frame` tells embla's `watchDrag` to leave
+   any touch starting here alone; the handle (rendered one level up, so
+   its circle isn't clipped by the viewport's `overflow-hidden`) stays on
+   top for the fine, click-to-jump interaction and the docked next arrow. */
+function DayNightComparison({ position, onScrub }: { position: number; onScrub: (clientX: number) => void }) {
   return (
-    <div className="relative aspect-video select-none">
+    <div
+      data-comparison-frame
+      className="relative aspect-video touch-pan-y select-none cursor-ew-resize"
+      onPointerDown={(event) => {
+        if (!event.isPrimary || event.button !== 0) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        onScrub(event.clientX);
+      }}
+      onPointerMove={(event) => {
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) onScrub(event.clientX);
+      }}
+      onPointerUp={(event) => {
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+      }}
+    >
       <img src={night} alt="Club Magenta exterior at night" draggable={false} className="absolute inset-0 h-full w-full object-contain" />
       <img src={day} alt="Club Magenta exterior by day" draggable={false} className="absolute inset-0 h-full w-full object-contain" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }} />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-3 flex justify-between px-4 font-display font-extralight text-[10px] uppercase tracking-[0.2em] text-white sm:top-5 sm:px-6">
@@ -41,7 +58,7 @@ export function LollaRenderCarousel() {
   const reducedMotion = useReducedMotion();
   const [viewport, api] = useEmblaCarousel({
     loop: false,
-    watchDrag: (_api, event) => !(event.target instanceof Element && event.target.closest("[data-comparison-handle]")),
+    watchDrag: (_api, event) => !(event.target instanceof Element && event.target.closest("[data-comparison-handle], [data-comparison-frame]")),
   });
   const [active, setActive] = useState(0);
   const [comparisonPosition, setComparisonPosition] = useState(INITIAL_SLIDER_POSITION);
@@ -56,10 +73,11 @@ export function LollaRenderCarousel() {
   }, [api]);
 
   const go = (index: number) => api?.scrollTo(index, !!reducedMotion);
-  const update = (event: PointerEvent<HTMLDivElement>) => {
+  const updateFromClientX = (clientX: number) => {
     const rect = frame.current?.getBoundingClientRect();
-    if (rect) setComparisonPosition(Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)));
+    if (rect) setComparisonPosition(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
   };
+  const update = (event: PointerEvent<HTMLDivElement>) => updateFromClientX(event.clientX);
   const dockedLeft = comparisonPosition <= DOCK_THRESHOLD;
   const dockedRight = comparisonPosition >= 100 - DOCK_THRESHOLD;
 
@@ -70,7 +88,7 @@ export function LollaRenderCarousel() {
             reads as this asset's label rather than a stray line of page
             copy — and clearly larger than the "drag to explore" caption
             below the image, which is the supporting hint, not the title. */}
-        <p className="mb-2 text-left font-display font-extralight uppercase text-sm md:text-base tracking-[0.1em] text-foreground/50">
+        <p className="mb-3 text-left font-display font-light uppercase text-xl md:text-3xl tracking-wide text-foreground">
           Renderings
         </p>
         <div ref={frame} className="relative">
@@ -79,7 +97,7 @@ export function LollaRenderCarousel() {
               {labels.map((label, index) => (
                 <div key={label} role="group" aria-roledescription="slide" aria-label={`${index + 1} of 3: ${label}`} aria-hidden={index !== active} className="min-w-0 flex-[0_0_100%]">
                   {index === 0 ? (
-                    <DayNightComparison position={comparisonPosition} />
+                    <DayNightComparison position={comparisonPosition} onScrub={updateFromClientX} />
                   ) : (
                     /* These two renders aren't shot at 16:9 like the day/night
                        pair, so `object-contain` in this aspect-video frame
@@ -107,10 +125,11 @@ export function LollaRenderCarousel() {
               aria-orientation="horizontal"
               tabIndex={0}
               data-comparison-handle
-              className="group absolute inset-y-0 z-30 w-11 -translate-x-1/2 cursor-ew-resize touch-pan-y focus-visible:outline-none"
-              style={{ left: `${comparisonPosition}%` }}
+              className="group absolute inset-y-0 z-30 w-11 -translate-x-1/2 cursor-ew-resize touch-pan-y select-none focus-visible:outline-none"
+              style={{ left: `${comparisonPosition}%`, WebkitUserSelect: "none" }}
               onPointerDown={(event) => {
                 if (!event.isPrimary || event.button !== 0) return;
+                event.preventDefault();
                 event.currentTarget.setPointerCapture(event.pointerId);
                 event.currentTarget.focus({ preventScroll: true });
                 update(event);
@@ -157,7 +176,7 @@ export function LollaRenderCarousel() {
             </button>
           ))}
         </div>
-        <p aria-live="polite" className="text-center font-display font-extralight uppercase text-[10px] tracking-[0.2em] text-foreground/50">
+        <p aria-live="polite" className="text-center font-display font-extralight uppercase text-sm md:text-base tracking-[0.1em] text-foreground/50">
           {active === 0 ? "Slide to explore day & night" : labels[active]}
         </p>
       </div>

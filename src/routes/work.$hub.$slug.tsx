@@ -1884,11 +1884,17 @@ function ProjectPageInner() {
           lightbox. */}
       {isLollapalooza && lollapaloozaDraftingMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pt-10">
+          {/* Same label treatment as the render carousel's "Renderings"
+              header above — a real section title, not a caption. */}
+          <div className="mx-auto max-w-[1200px]">
+            <p className="mb-3 text-left font-display font-light uppercase text-xl md:text-3xl tracking-wide text-foreground">
+              Technical drawings + design intent decks
+            </p>
+          </div>
           <div className="md:hidden">
             <SwipeGallery
               slug={project.slug}
               items={lollapaloozaDraftingMedia}
-              onOpen={setLightbox}
               slideClassName="rounded-xl bg-white p-2"
             />
           </div>
