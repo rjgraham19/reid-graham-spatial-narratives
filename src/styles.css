@@ -1137,14 +1137,26 @@
   height: 100%;
   object-fit: contain;
 }
-.record-player-caption {
-  right: clamp(24px, 4vw, 64px);
+/* This side-blurb offset only makes sense at the desktop layout (see
+   `.record-player-caption`'s own lg: classes in the JSX) — below that
+   the caption moves to a bottom band instead, so it's scoped here to
+   match rather than fighting that layout at every other width. */
+@media (min-width: 1024px) {
+  .record-player-caption {
+    right: clamp(24px, 4vw, 64px);
+  }
 }
 @media (max-width: 767px) {
   .record-player-stage {
     left: 4%;
     width: 92%;
     top: max(76px, env(safe-area-inset-top));
+    /* Leaves a band at the bottom of the sticky frame for the caption
+       (see the JSX) instead of the model claiming the full height —
+       widening the column to fix the letterboxing black-space problem
+       otherwise left no room for the blurb to sit beside the model like
+       it does on desktop, so it moves below instead. */
+    bottom: 32%;
   }
   /* The stage box is much taller/narrower than the poster's own aspect
      ratio at this width (a nearly full-height column vs. the image's
@@ -1172,6 +1184,9 @@
   .record-player-stage {
     left: 4%;
     width: 92%;
+    /* Same trade as the phone rule above — a shorter model column,
+       traded for a legible caption band instead of an overlap. */
+    bottom: 26%;
   }
   .record-player-poster {
     object-fit: cover;

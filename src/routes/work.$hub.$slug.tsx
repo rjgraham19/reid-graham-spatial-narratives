@@ -1078,15 +1078,24 @@ function ProjectPageInner() {
               off. vh measures the tall viewport the bar is hidden in. */}
           <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
             <RecordPlayerViewer wrapperRef={recordScrubWrapperRef} onProgress={updateRecordCaption} />
-            {/* Desktop only: the blurb, pinned mid-height in the black space to
-                the right of the record player. It's inside the sticky frame, so
-                it holds its spot for the whole scrub; opacity is driven by
-                scroll progress (see recordCaptionRef above) so it fades in just
-                after the animation starts and then stays. */}
+            {/* The blurb, pinned inside the sticky frame so it holds its spot
+                for the whole scrub; opacity is driven by scroll progress (see
+                recordCaptionRef above) so it fades in just after the
+                animation starts and then stays.
+
+                Desktop (lg+) keeps the original side placement, in the black
+                space beside the model's narrow column. Below that the model
+                widens to fill the frame (see `.record-player-stage`'s mobile/
+                tablet-portrait rules) to avoid leaving empty bands above and
+                below it, which no longer leaves room beside it for text — so
+                there the model's column is shortened instead to leave a
+                dedicated band at the bottom of the frame, and the caption
+                moves there with a scrim behind it for legibility over the
+                model. */}
             <p
               ref={recordCaptionRef}
               style={{ opacity: 0 }}
-              className="record-player-caption hidden md:block absolute left-[60%] top-[46%] max-w-[30rem] -translate-y-1/2 font-display font-light text-xl lg:text-2xl leading-snug tracking-tight text-white"
+              className="record-player-caption absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-6 pb-8 pt-16 font-display font-light text-sm leading-snug tracking-tight text-white lg:inset-x-auto lg:left-[60%] lg:top-[46%] lg:bottom-auto lg:max-w-[30rem] lg:-translate-y-1/2 lg:bg-none lg:px-0 lg:pb-0 lg:pt-0 lg:text-xl xl:text-2xl"
             >
               {project.extendedDescription}
             </p>
