@@ -86,15 +86,7 @@ export function LollaViewer() {
 
   return (
     <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10" aria-label="Lolla pavilion model">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">3D Experience</p>
-          <h2 className="text-2xl font-medium">Step Inside the Lounge</h2>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Press play, move through the space, and experience the festival from every angle.
-        </p>
-      </div>
+      <h2 className="mb-4 font-display font-light uppercase text-xl md:text-3xl tracking-wide text-foreground">Explore in 3D</h2>
 
       <div
         ref={stage}

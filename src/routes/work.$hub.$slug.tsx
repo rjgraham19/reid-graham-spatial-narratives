@@ -1888,7 +1888,7 @@ function ProjectPageInner() {
               header above — a real section title, not a caption. */}
           <div className="mx-auto max-w-[1200px]">
             <p className="mb-3 text-left font-display font-light uppercase text-xl md:text-3xl tracking-wide text-foreground">
-              Technical drawings + design intent decks
+              Technical drawings
             </p>
           </div>
           <div className="md:hidden">
