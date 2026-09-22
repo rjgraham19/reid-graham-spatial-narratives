@@ -787,7 +787,7 @@ function ProjectPageInner() {
           {isLollapalooza ? <LollaRenderCarousel /> : <button
             type="button"
             onClick={() => setLightbox(heroLightboxIndex)}
-            className={`block w-full h-auto overflow-hidden rounded-md group ${
+            className={`block w-full h-auto overflow-hidden group ${
               /* The current render is framed tighter around the house than
                  the render it replaced (less sky above, less street below),
                  so at the same width it reads as more zoomed in even though
@@ -816,8 +816,6 @@ function ProjectPageInner() {
               src={project.cover}
               alt={project.title}
               className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
-                isTownhouse ? "rounded-md" : ""
-              } ${
                 /* Field House's render is mostly sky (the building sits in
                    the bottom third of the frame) — center object-position,
                    the default, cropped a window that landed entirely in the
@@ -929,7 +927,7 @@ function ProjectPageInner() {
               <button
                 type="button"
                 onClick={() => setLightbox(1)}
-                className="block w-full overflow-hidden rounded-md bg-secondary md:max-w-[95%]"
+                className="block w-full overflow-hidden bg-secondary md:max-w-[95%]"
                 aria-label="Enlarge TaB closeup animation"
               >
                 <InViewVideo
@@ -1183,7 +1181,7 @@ function ProjectPageInner() {
                 <button
                   type="button"
                   onClick={() => setLightbox(1)}
-                  className="block w-full overflow-hidden rounded-md bg-secondary"
+                  className="block w-full overflow-hidden bg-secondary"
                   aria-label={project.media[1].caption ?? project.title}
                 >
                   <img
@@ -1213,7 +1211,7 @@ function ProjectPageInner() {
                 <button
                   type="button"
                   onClick={() => setLightbox(2)}
-                  className="block w-full overflow-hidden rounded-md bg-secondary"
+                  className="block w-full overflow-hidden bg-secondary"
                   aria-label={project.media[2].caption ?? project.title}
                 >
                   <img
@@ -1246,7 +1244,7 @@ function ProjectPageInner() {
               <button
                 type="button"
                 onClick={() => setLightbox(3)}
-                className="block w-full overflow-hidden rounded-md bg-secondary"
+                className="block w-full overflow-hidden bg-secondary"
                 aria-label={project.media[3].caption ?? project.title}
               >
                 <img
@@ -1295,7 +1293,7 @@ function ProjectPageInner() {
                 <button
                   type="button"
                   onClick={() => setLightbox(1)}
-                  className="block h-full w-full overflow-hidden rounded-md bg-secondary"
+                  className="block h-full w-full overflow-hidden bg-secondary"
                   aria-label={project.media[1].caption ?? "True West — second act"}
                 >
                   <img
@@ -1363,7 +1361,7 @@ function ProjectPageInner() {
               <button
                 type="button"
                 onClick={() => setLightbox(4)}
-                className="block w-full overflow-hidden rounded-md bg-secondary"
+                className="block w-full overflow-hidden bg-secondary"
                 aria-label={project.media[4].caption ?? "Plan comparison diagram"}
               >
                 <img
@@ -1427,7 +1425,7 @@ function ProjectPageInner() {
                          the footage. The expand mark stays tucked in the
                          corner, small and quiet, just confirming what a
                          click here does rather than demanding attention. */
-                      className="block w-full overflow-hidden rounded-md border border-white/[0.07] bg-black transition-colors duration-200 hover:border-white/30"
+                      className="block w-full overflow-hidden border border-white/[0.07] bg-black transition-colors duration-200 hover:border-white/30"
                       aria-label={`Enlarge ${project.title} video`}
                     >
                       <InViewVideo src={video.src} className="w-full h-auto" />
@@ -1538,7 +1536,7 @@ function ProjectPageInner() {
                     <button
                       type="button"
                       onClick={() => setLightbox(1)}
-                      className="block w-full overflow-hidden rounded-md"
+                      className="block w-full overflow-hidden"
                       aria-label={project.media[1].caption ?? "Conceptual sketch"}
                     >
                       <img
@@ -1571,7 +1569,7 @@ function ProjectPageInner() {
                   <button
                     type="button"
                     onClick={() => setLightbox(2)}
-                    className="block w-full overflow-hidden rounded-md bg-secondary"
+                    className="block w-full overflow-hidden bg-secondary"
                     aria-label={project.media[2].caption ?? "Set closeup"}
                   >
                     <img
@@ -1597,7 +1595,7 @@ function ProjectPageInner() {
                   <button
                     type="button"
                     onClick={() => setLightbox(idx)}
-                    className="block w-full overflow-hidden rounded-md"
+                    className="block w-full overflow-hidden"
                     aria-label={project.media[idx].caption ?? `Technical drawing ${idx - 2}`}
                   >
                     <img
@@ -1622,7 +1620,7 @@ function ProjectPageInner() {
               <button
                 type="button"
                 onClick={() => setLightbox(1)}
-                className="block w-full overflow-hidden rounded-md bg-secondary"
+                className="block w-full overflow-hidden bg-secondary"
                 aria-label={project.media[1].caption ?? "Closeup"}
               >
                 <img
@@ -1651,7 +1649,7 @@ function ProjectPageInner() {
                 <button
                   type="button"
                   onClick={() => setLightbox(2)}
-                  className="block w-full overflow-hidden rounded-md bg-black p-6 md:p-8"
+                  className="block w-full overflow-hidden bg-black p-6 md:p-8"
                   aria-label={project.media[2].caption ?? "Sketch"}
                 >
                   <img
@@ -1670,7 +1668,7 @@ function ProjectPageInner() {
                 <button
                   type="button"
                   onClick={() => setLightbox(3)}
-                  className="block w-full overflow-hidden rounded-md bg-black p-6 md:p-8"
+                  className="block w-full overflow-hidden bg-black p-6 md:p-8"
                   aria-label={project.media[3].caption ?? "Drawing"}
                 >
                   <img
@@ -1711,7 +1709,7 @@ function ProjectPageInner() {
           )}
           <div className="grid grid-cols-1 md:grid-cols-[19fr_10fr] gap-6 md:gap-10 md:items-start">
             {!project.media[0]?.hidden && (
-              <figure className="group overflow-hidden rounded-md lg:mt-[150px]">
+              <figure className="group overflow-hidden lg:mt-[150px]">
                 <button
                   type="button"
                   onClick={() => setLightbox(0)}
@@ -1751,7 +1749,7 @@ function ProjectPageInner() {
                       <button
                         type="button"
                         onClick={() => setLightbox(idx)}
-                        className="block w-full aspect-square overflow-hidden rounded-md bg-secondary"
+                        className="block w-full aspect-square overflow-hidden bg-secondary"
                         aria-label={project.media[idx].caption ?? `Render ${idx}`}
                       >
                         <img
@@ -1840,14 +1838,14 @@ function ProjectPageInner() {
                       Content/Arrange, so a link never fights selection while
                       editing. */}
                   {m.link ? (
-                    <a href={m.link} className="block w-full overflow-hidden rounded-md bg-secondary">
+                    <a href={m.link} className="block w-full overflow-hidden bg-secondary">
                       {mediaEl}
                     </a>
                   ) : (
                     <button
                       type="button"
                       onClick={() => setLightbox(i)}
-                      className="block w-full overflow-hidden rounded-md bg-secondary"
+                      className="block w-full overflow-hidden bg-secondary"
                       aria-label={m.caption ?? `Media ${i + 1}`}
                     >
                       {mediaEl}
@@ -1904,7 +1902,7 @@ function ProjectPageInner() {
             <SwipeGallery
               slug={project.slug}
               items={lollapaloozaDraftingMedia}
-              slideClassName="rounded-xl bg-white p-2"
+              slideClassName="bg-white p-2"
             />
           </div>
 
@@ -1933,7 +1931,7 @@ function ProjectPageInner() {
                      card. */
                   <div className="flex w-full justify-center pt-4 pb-2">
                     <div className="relative">
-                      <div className="flex items-center justify-center rounded-xl bg-white p-3 shadow-lg">
+                      <div className="flex items-center justify-center bg-white p-3 shadow-lg">
                         <img
                           data-design-id={designId.projectMedia(project.slug, m.id!)}
                           data-design-kind="image"
@@ -1990,7 +1988,7 @@ function ProjectPageInner() {
               slug={project.slug}
               items={lollapaloozaGalleryMedia}
               onOpen={setLightbox}
-              slideClassName="rounded-lg overflow-hidden bg-secondary"
+              slideClassName="overflow-hidden bg-secondary"
             />
           </div>
 
@@ -2008,7 +2006,7 @@ function ProjectPageInner() {
                         type="button"
                         onClick={() => setLightbox(index)}
                         aria-label={m.caption ?? "Open photo"}
-                        className="block overflow-hidden rounded-lg bg-secondary shadow-lg transition-transform duration-300 hover:scale-[1.01]"
+                        className="block overflow-hidden bg-secondary shadow-lg transition-transform duration-300 hover:scale-[1.01]"
                       >
                         <img
                           data-design-id={designId.projectMedia(project.slug, m.id!)}

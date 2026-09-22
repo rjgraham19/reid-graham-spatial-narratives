@@ -66,7 +66,7 @@ export function FramerCarousel({
   return (
     <div className={className}>
       <style>{FC_CSS}</style>
-      <div ref={frameRef} className="relative overflow-hidden rounded-2xl">
+      <div ref={frameRef} className="relative overflow-hidden">
         <motion.div className="flex" style={{ x }}>
           {Array.from({ length: count }, (_, i) => (
             <div key={i} className="w-full shrink-0">
@@ -94,7 +94,7 @@ export function FramerCarousel({
                 aria-current={i === index}
                 style={{ ["--fc-accent" as string]: accentColor }}
                 className={cn(
-                  "fc-thumb h-16 w-24 shrink-0 overflow-hidden rounded-md bg-secondary transition-all duration-300 ease-out sm:h-20 sm:w-32",
+                  "fc-thumb h-16 w-24 shrink-0 overflow-hidden bg-secondary transition-all duration-300 ease-out sm:h-20 sm:w-32",
                   i === index
                     ? "fc-thumb--active scale-[1.06] opacity-100"
                     : "opacity-40 grayscale hover:opacity-80 hover:grayscale-0",

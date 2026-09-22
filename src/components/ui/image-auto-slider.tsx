@@ -84,7 +84,7 @@ export function ImageAutoSlider({
           const isDupe = i >= n;
           const alt = imageAlts?.[idx] ?? "";
           const tileClass = cn(
-            "ias-item h-48 w-48 shrink-0 overflow-hidden rounded-xl shadow-2xl sm:h-60 sm:w-60 md:h-80 md:w-80 lg:h-[22rem] lg:w-[22rem]",
+            "ias-item h-48 w-48 shrink-0 overflow-hidden shadow-2xl sm:h-60 sm:w-60 md:h-80 md:w-80 lg:h-[22rem] lg:w-[22rem]",
             imageClassName,
           );
           const img = (

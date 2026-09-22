@@ -92,7 +92,7 @@ export function LollaRenderCarousel() {
           Renderings
         </p>
         <div ref={frame} className="relative">
-          <div ref={viewport} className="overflow-hidden rounded-lg">
+          <div ref={viewport} className="overflow-hidden">
             <div className="flex touch-pan-y">
               {labels.map((label, index) => (
                 <div key={label} role="group" aria-roledescription="slide" aria-label={`${index + 1} of 3: ${label}`} aria-hidden={index !== active} className="min-w-0 flex-[0_0_100%]">
