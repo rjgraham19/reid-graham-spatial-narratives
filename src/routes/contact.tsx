@@ -42,7 +42,16 @@ function Contact() {
   const { ref: emailRef, scale: emailScale } = useFitText<HTMLAnchorElement>([]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    /* `intro-font`: General Sans, with the same weights as the project pages
+       (see styles.css). */
+    <div className="intro-font min-h-screen flex flex-col">
+      <link
+        rel="preload"
+        href="/fonts/general-sans-variable.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
       {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
       <DesignFrameBridge
         liveOverrides={live}
@@ -62,7 +71,7 @@ function Contact() {
           <h1
             data-design-id={designId.connect("heading")}
             data-design-kind="heading"
-            className="font-display font-black uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-8xl"
+            className="font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-8xl"
           >
             {resolveText(overridesFile, designId.connect("heading"), "Get in touch!")}
           </h1>
@@ -73,7 +82,7 @@ function Contact() {
             as one consistent grid down the page. */}
         <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
           <div className="md:col-span-5 min-w-0">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 mb-4">
+            <p className="text-[10px] lg:text-[13px] tracking-[0.14em] uppercase text-foreground/50 mb-4">
               Email
             </p>
             <a
@@ -89,7 +98,7 @@ function Contact() {
             <h2
               data-design-id={designId.connect("about-heading")}
               data-design-kind="heading"
-              className="font-display font-black uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-6xl"
+              className="font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-6xl"
             >
               {overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)"}
             </h2>
@@ -108,7 +117,7 @@ function Contact() {
             and the download/open links get their own row 3 under the card
             alone rather than adding to the height the portrait matches. */}
         <div className="mt-16 grid grid-cols-1 md:[grid-template-columns:5fr_3fr_4fr] gap-x-8 lg:gap-x-12 gap-y-6 animate-pop-in">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-foreground/50 md:[grid-column:1] md:[grid-row:1]">
+          <p className="text-[10px] lg:text-[13px] tracking-[0.14em] uppercase text-foreground/50 md:[grid-column:1] md:[grid-row:1]">
             Resume
           </p>
           <div className="md:[grid-column:1] md:[grid-row:2]">
@@ -129,7 +138,7 @@ function Contact() {
           <p
             data-design-id={designId.connect("about-description")}
             data-design-kind="text"
-            className="font-display font-light text-lg md:text-2xl leading-snug text-foreground/85 text-balance whitespace-pre-line md:[grid-column:3] md:[grid-row:2]"
+            className="font-display [font-weight:var(--intro-description-w)] text-lg md:text-2xl leading-[1.45] text-foreground text-balance whitespace-pre-line md:[grid-column:3] md:[grid-row:2]"
           >
             {resolveText(
               overridesFile,
