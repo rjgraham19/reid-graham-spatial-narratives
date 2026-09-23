@@ -162,6 +162,11 @@
   --font-serif: "General Sans", ui-sans-serif, system-ui, sans-serif;
   --font-body: "General Sans", ui-sans-serif, system-ui, sans-serif;
   --font-weight-black: 600;
+
+  /* `mon:` — monitor layouts, half-width windows included (900px+), sitting
+     between md (768) and lg (1024). A named breakpoint rather than an
+     arbitrary min-[900px] so it sorts in size order with the others. */
+  --breakpoint-mon: 56.25rem;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --ease-cinematic: cubic-bezier(0.32, 0.72, 0, 1);

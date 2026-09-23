@@ -124,11 +124,15 @@ function OpenNewTabLink({ href, className, label = "Open in new tab" }: { href: 
 export function ResumeActions({
   className,
   viewFirst = false,
+  downloadOnly = false,
 }: {
   className?: string;
   /** Phone version, where there's no preview card: lead with "View Resume"
    *  (the PDF in a new tab, i.e. the phone's own PDF viewer), then Download. */
   viewFirst?: boolean;
+  /** Just the Download button — the Contact page's monitor layout pairs it
+   *  with its own View Resume pull-down toggle. */
+  downloadOnly?: boolean;
 }) {
   const meta = resumeMetaJson as ResumeMeta;
   if (meta.updatedAt == null) return null;
@@ -136,6 +140,7 @@ export function ResumeActions({
   const btn = glassButton({ sheen: true, className: "text-button text-button--sized" });
   const download = <DownloadLink href={url} className={btn} onClick={trackResumeDownload} />;
   const open = <OpenNewTabLink href={url} className={btn} label={viewFirst ? "View Resume" : undefined} />;
+  if (downloadOnly) return download;
   return (
     <div className={`flex flex-wrap gap-3${className ? ` ${className}` : ""}`}>
       {viewFirst ? (
