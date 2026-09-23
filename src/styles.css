@@ -868,10 +868,16 @@
    `--fit-scale` only pulls them down when the address would otherwise wrap
    inside its column — an iPad-width viewport was the case that actually hit
    this, where 5/12 of the page wasn't wide enough for the address at 3rem. */
+/* The Contact page email address: its usual size, capped so the whole
+   address fits its column on one line. 100cqi is the column's width (the
+   wrapping <section> is a size container); 11.1 is "reidjgraham@gmail.com"
+   set in General Sans Medium at -0.025em tracking, measured at 10.83em, with
+   a little headroom. Pure CSS, so it's right from the first frame — the old
+   post-load shrink bottomed out and still spilled on an iPad-width column. */
 @utility email-fit {
-  font-size: calc(1.875rem * var(--fit-scale, 1));
+  font-size: min(1.875rem, calc(100cqi / 11.1));
   @media (min-width: 768px) {
-    font-size: calc(3rem * var(--fit-scale, 1));
+    font-size: min(3rem, calc(100cqi / 11.1));
   }
 }
 

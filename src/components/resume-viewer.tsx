@@ -127,8 +127,8 @@ export function ResumeActions({ className }: { className?: string }) {
   const url = resumeUrl(meta);
   return (
     <div className={`flex flex-wrap gap-3${className ? ` ${className}` : ""}`}>
-      <DownloadLink href={url} className={glassButton({ touch: true })} onClick={trackResumeDownload} />
-      <OpenNewTabLink href={url} className={glassButton({ quiet: true, touch: true })} />
+      <DownloadLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} onClick={trackResumeDownload} />
+      <OpenNewTabLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} />
     </div>
   );
 }
@@ -196,8 +196,8 @@ export function ResumeSection({ hideActions = false }: { hideActions?: boolean }
 
       {hasResume && !hideActions && (
         <div className="mt-4 flex flex-wrap gap-3">
-          <DownloadLink href={url} className={glassButton({ touch: true })} onClick={trackResumeDownload} />
-          <OpenNewTabLink href={url} className={glassButton({ quiet: true, touch: true })} />
+          <DownloadLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} onClick={trackResumeDownload} />
+          <OpenNewTabLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} />
         </div>
       )}
 
@@ -279,8 +279,8 @@ export function ResumeSection({ hideActions = false }: { hideActions?: boolean }
               </div>
 
               <div className="mt-8 shrink-0 flex flex-wrap justify-center gap-3" onClick={(e) => e.stopPropagation()}>
-                <DownloadLink href={url} className={glassButton({ touch: true })} onClick={trackResumeDownload} />
-                <OpenNewTabLink href={url} className={glassButton({ quiet: true, touch: true })} />
+                <DownloadLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} onClick={trackResumeDownload} />
+                <OpenNewTabLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} />
               </div>
             </div>
           </div>,
