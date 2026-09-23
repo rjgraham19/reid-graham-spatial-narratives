@@ -868,6 +868,25 @@
    `--fit-scale` only pulls them down when the address would otherwise wrap
    inside its column — an iPad-width viewport was the case that actually hit
    this, where 5/12 of the page wasn't wide enough for the address at 3rem. */
+/* Contact page heading ("Let's get in touch!"). Phones: 3rem, wrapping.
+   Tablet up: one line, as large as fits — 100cqi (its wrapper's width) over
+   the heading's width in ems (`--title-ems`), capped at 4.5rem / 6rem. */
+.contact-title {
+  font-size: 3rem;
+  text-wrap: balance;
+}
+@media (min-width: 768px) {
+  .contact-title {
+    font-size: min(4.5rem, calc(100cqi / var(--title-ems, 12)));
+    white-space: nowrap;
+  }
+}
+@media (min-width: 1024px) {
+  .contact-title {
+    font-size: min(6rem, calc(100cqi / var(--title-ems, 12)));
+  }
+}
+
 /* The Contact page email address: its usual size, capped so the whole
    address fits its column on one line. 100cqi is the column's width (the
    wrapping <section> is a size container); 11.1 is "reidjgraham@gmail.com"

@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import type { CSSProperties } from "react";
+import { textEms } from "@/lib/title-metrics";
 import { SiteNav } from "@/components/site-nav";
 import { ResumeSection, ResumeActions } from "@/components/resume-viewer";
 import designOverrides from "@/lib/design-overrides.json";
@@ -38,6 +40,7 @@ function Contact() {
   const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const responsiveCss = designModeStyleTag(overridesFile);
+  const heading = resolveText(overridesFile, designId.connect("heading"), "Let's get in touch!");
 
   return (
     /* `intro-font`: General Sans, with the same weights as the project pages
@@ -66,13 +69,21 @@ function Contact() {
 
       <main className="flex-1 pt-24 md:pt-28 lg:pt-32 pb-16 px-6 md:px-12 lg:px-16">
         {!resolveHidden(overridesFile, designId.connect("heading")) && (
-          <h1
-            data-design-id={designId.connect("heading")}
-            data-design-kind="heading"
-            className="font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em] text-5xl md:text-7xl lg:text-8xl"
+          /* One line from tablet up, sized in CSS to fit the page width (see
+             .contact-title) — the wrapper is the size container and carries
+             the heading's width in ems. Phones wrap it. */
+          <div
+            className="[container-type:inline-size]"
+            style={{ "--title-ems": textEms(heading).toFixed(3) } as CSSProperties}
           >
-            {resolveText(overridesFile, designId.connect("heading"), "Get in touch!")}
-          </h1>
+            <h1
+              data-design-id={designId.connect("heading")}
+              data-design-kind="heading"
+              className="contact-title font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
+            >
+              {heading}
+            </h1>
+          </div>
         )}
 
         {/* Two self-contained groups, each label sitting directly on what it
