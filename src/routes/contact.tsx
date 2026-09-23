@@ -42,6 +42,9 @@ function Contact() {
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
   const responsiveCss = designModeStyleTag(overridesFile);
   const heading = resolveText(overridesFile, designId.connect("heading"), "Let's get in touch!");
+  const aboutHeading = overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)";
+  // Both headings are fitted using the longer one's width, so they match.
+  const headingEms = Math.max(textEms(heading), textEms(aboutHeading)).toFixed(3);
 
   // Monitors only: the résumé pull-down. Mounted on first open (so the PDF
   // preview isn't rendered until asked for) and kept mounted after, so it
@@ -91,18 +94,32 @@ function Contact() {
           Phones and tablets (under 900px): stacked top to bottom, split by
           a faint rule; EMAIL and RESUME sit side by side from tablet up.
           Monitors (900px+, half-width windows included): the two clusters
-          frame the screen on a diagonal — About top-left, Let's get in
-          touch lower and to the right — and the résumé preview isn't shown
-          by default: "View Resume" pulls it down, centered below both. */}
+          side by side, top-aligned, split by a faint upright rule — and the
+          résumé preview isn't shown by default: "View Resume" pulls it
+          down, centered below both. */}
       <main className="flex-1 pt-24 md:pt-28 lg:pt-32 pb-16 px-6 md:px-12 lg:px-16">
-        <section id="about" className="scroll-mt-24 mon:w-[58%]">
-          <h2
-            data-design-id={designId.connect("about-heading")}
-            data-design-kind="heading"
-            className="animate-heading-pop motion-reduce:animate-none origin-center md:origin-left text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-5xl lg:text-6xl"
-          >
-            {overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)"}
-          </h2>
+        {/* Monitors: the two clusters side by side, top-aligned, split by a
+            faint upright rule. Below 900px they stack, split by the same
+            rule running across. */}
+        <div className="mon:grid mon:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] mon:gap-10 lg:gap-14">
+        {/* Each cluster sits centered in its half, capped in width, so on a
+            wide screen they split the difference between the page edge and
+            the center rule instead of hugging the outside edges. Both halves
+            share the same cap so the two headings (sized from their box, see
+            below) come out the same size. */}
+        <section id="about" className="scroll-mt-24 mon:w-full mon:max-w-[38rem] mon:justify-self-center">
+          {/* Same size as "Let's get in touch!" at every width: both headings
+              are fitted to their (equal-width) boxes using the longer of the
+              two, so they scale down together as the window narrows. */}
+          <div className="[container-type:inline-size]" style={{ "--title-ems": headingEms } as CSSProperties}>
+            <h2
+              data-design-id={designId.connect("about-heading")}
+              data-design-kind="heading"
+              className="contact-title animate-heading-pop motion-reduce:animate-none origin-center md:origin-left text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
+            >
+              {aboutHeading}
+            </h2>
+          </div>
 
           <div className="mt-5 md:mt-6 grid grid-cols-[2fr_3fr] md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] mon:grid-cols-[2fr_3fr] gap-5 md:gap-8 items-start md:max-w-4xl">
             {/* Swap the file at public/reid-graham-portrait.jpg to replace
@@ -127,16 +144,16 @@ function Contact() {
           </div>
         </section>
 
-        <div aria-hidden className="my-10 md:my-14 h-px bg-foreground/15 mon:hidden" />
+        <div aria-hidden className="my-10 md:my-14 h-px bg-foreground/15 mon:my-0 mon:h-auto mon:w-px mon:shrink-0" />
 
-        <section className="mon:ml-auto mon:w-[44%] mon:mt-16 lg:mt-20">
+        <section className="mon:w-full mon:max-w-[38rem] mon:justify-self-center">
           {!resolveHidden(overridesFile, designId.connect("heading")) && (
             /* One line at every width, sized in CSS to fit its column (see
                .contact-title) — the wrapper is the size container and carries
                the heading's width in ems. Centered on phones. */
             <div
               className="[container-type:inline-size]"
-              style={{ "--title-ems": textEms(heading).toFixed(3) } as CSSProperties}
+              style={{ "--title-ems": headingEms } as CSSProperties}
             >
               <h1
                 data-design-id={designId.connect("heading")}
@@ -202,6 +219,7 @@ function Contact() {
             </section>
           </div>
         </section>
+        </div>
 
         {/* Monitors: the résumé pull-down. Collapsed to zero height until
             View Resume opens it, then it slides open, centered below both
