@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useFitText } from "@/hooks/use-fit-text";
+import { textEms, longestWordEms } from "@/lib/title-metrics";
 import { AnimatePresence, motion } from "motion/react";
 import { SiteNav } from "@/components/site-nav";
 import { RecordPlayerViewer } from "@/components/record-player-viewer";
@@ -268,28 +269,9 @@ const introDescriptionGap = "mt-12 md:mt-16 lg:mt-24";
 const introColumn = (align: IntroAlign) =>
   align === "center" ? "mx-auto max-w-6xl text-center" : "text-center md:text-left";
 
-/* General Sans Semibold advance widths (em, uppercase + digits + common
-   punctuation), measured from the self-hosted font. Lets the server work out
-   how wide a title will set, so a one-line title can be sized in CSS before
-   anything loads. */
-const GENERAL_SANS_600_ADVANCE: Record<string, number> = {
-  A: 0.73, B: 0.647, C: 0.786, D: 0.727, E: 0.601, F: 0.568, G: 0.796, H: 0.763, I: 0.299,
-  J: 0.624, K: 0.68, L: 0.568, M: 0.928, N: 0.765, O: 0.799, P: 0.652, Q: 0.799, R: 0.685,
-  S: 0.663, T: 0.639, U: 0.734, V: 0.7, W: 0.97, X: 0.716, Y: 0.674, Z: 0.644,
-  "0": 0.614, "1": 0.359, "2": 0.558, "3": 0.577, "4": 0.595, "5": 0.571, "6": 0.577,
-  "7": 0.514, "8": 0.592, "9": 0.577,
-  " ": 0.209, "!": 0.287, "?": 0.518, "&": 0.693, "'": 0.256, "’": 0.27, ".": 0.263,
-  ",": 0.263, ":": 0.263, ";": 0.263, "-": 0.36, "–": 0.5, "—": 0.75, "/": 0.505,
-  "+": 0.66, "@": 0.975, "(": 0.318, ")": 0.318,
-};
-
-/** Width of an all-caps title in General Sans Semibold at the title's
- *  -0.03em tracking, in ems — with 2% headroom for kerning and rounding. */
-function titleEms(text: string) {
-  let ems = 0;
-  for (const ch of text.toUpperCase()) ems += (GENERAL_SANS_600_ADVANCE[ch] ?? 0.7) - 0.03;
-  return ems * 1.02;
-}
+/* Width of an all-caps title in General Sans Semibold at the title's -0.03em
+   tracking, in ems (see src/lib/title-metrics.ts). */
+const titleEms = (text: string) => textEms(text);
 
 function IntroHeader({ project, panel, align }: { project: Project; panel: boolean; align: IntroAlign }) {
   return (
@@ -331,7 +313,7 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
         style={
           {
             "--title-ems": titleEms(project.title).toFixed(3),
-            "--word-ems": Math.max(...project.title.split(" ").map(titleEms)).toFixed(3),
+            "--word-ems": longestWordEms(project.title).toFixed(3),
           } as CSSProperties
         }
       >
@@ -613,23 +595,35 @@ function ProjectPageInner() {
 
   /* Shared between the two placements below — same link, same label, just
      rendered in two different spots depending on viewport. */
+  /* On standard-intro pages the back button is a text button, identical to
+     Projects / Let's Connect beside it (Lollapalooza included — its old retro
+     arrow button is retired there). The Visualizations hub keeps the old
+     style. */
+  const backClass = INTRO_TRIAL_SLUGS.has(project.slug)
+    ? glassButton({ sheen: true, className: "text-button text-button--sized gap-2.5" })
+    : isLollapalooza
+      ? "retro-btn"
+      : glassButton({ touch: true, className: "gap-3" });
+  const retroBack = isLollapalooza && !INTRO_TRIAL_SLUGS.has(project.slug);
   const backLink =
     project.tags && project.tags.length > 0 ? (
       <Link
         to="/work"
         search={{ tag: project.tags[0] }}
-        className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
+        onMouseMove={trackSheen}
+        className={backClass}
       >
-        {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
+        {retroBack ? <span aria-hidden>←</span> : <BackChevron />}
         Back to Projects
       </Link>
     ) : (
       <Link
         to="/work/$hub"
         params={{ hub: hub.slug }}
-        className={isLollapalooza ? "retro-btn" : glassButton({ touch: true, className: "gap-3" })}
+        onMouseMove={trackSheen}
+        className={backClass}
       >
-        {isLollapalooza ? <span aria-hidden>←</span> : <BackChevron />}
+        {retroBack ? <span aria-hidden>←</span> : <BackChevron />}
         Back to {hub.title}
       </Link>
     );
@@ -781,24 +775,21 @@ function ProjectPageInner() {
             that reserved a chunk of a short phone screen's height before any
             real content (the tags/title/hero) even started. Fixed instead of
             in-flow, it takes up none of that vertical space.
-          - Tablet/desktop: unchanged, in normal flow below the nav — there's
-            room to spare there and this keeps the wider layout as it was. */}
+          - Tablet/desktop, pages with the standard intro: also fixed in the
+            nav row (same padding as the bar, so it lines up with Projects /
+            Let's Connect) and stays put while the page scrolls, like them.
+          - Tablet/desktop, everything else (the Visualizations hub): in
+            normal flow below the nav, as before — those layouts rely on it. */}
       {!panel && (
         <>
-          <div className="md:hidden fixed top-0 left-0 z-[110] px-6 py-4 flex items-center">
-            {backLink}
-          </div>
           <div
-            className={
-              /* Image-first trial: floats over the full-bleed hero instead
-                 of pushing it down. */
-              introTrial
-                ? "hidden md:block absolute left-0 top-0 z-20 px-12 lg:px-16 pt-24"
-                : "hidden md:block px-12 lg:px-16 pt-32"
-            }
+            className={`fixed top-0 left-0 z-[110] px-6 py-4 flex items-center ${
+              introTrial ? "md:px-10 md:py-6" : "md:hidden"
+            }`}
           >
             {backLink}
           </div>
+          {!introTrial && <div className="hidden md:block px-12 lg:px-16 pt-32">{backLink}</div>}
         </>
       )}
 

@@ -87,11 +87,10 @@ export function SiteNav({
 
         {/* Phone — one control, opening the full-screen menu below. */}
         <GlassButton
-          quiet
           onClick={() => setMenuOpen(true)}
           aria-expanded={menuOpen}
           aria-label="Open menu"
-          className="glass-button--touch md:hidden pointer-events-auto"
+          className="text-button text-button--sized md:hidden pointer-events-auto"
         >
           MENU
         </GlassButton>

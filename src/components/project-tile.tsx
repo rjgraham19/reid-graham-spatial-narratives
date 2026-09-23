@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { accentTitleColor, type Project } from "@/lib/projects";
+import { longestWordEms } from "@/lib/title-metrics";
 
 /**
  * Square grid thumbnail, shared by the unified /work feed and the
@@ -99,20 +100,21 @@ export function ProjectTile({
               but under 10px from the bottom, sitting high and right in the
               corner. The bottom inset is the larger number so the two optical
               gaps come out level. */}
-          <div className="absolute bottom-2.5 left-1.5 right-3 md:bottom-3 md:left-1.5 md:right-4">
+          {/* Size container for the title (see .project-title): `--word-ems`
+              is the title's longest word in ems, at the tile's -0.025em
+              tracking, with 6% headroom for kerning and the hover scale-up. */}
+          <div
+            className="absolute bottom-2.5 left-1.5 right-3 md:bottom-3 md:left-1.5 md:right-4 [container-type:inline-size]"
+            style={{ "--word-ems": longestWordEms(project.title, -0.025, 1.06).toFixed(3) } as React.CSSProperties}
+          >
             {/* No transition-colors here — the scale and the colour share one
                 transition in .project-title so they can't drift apart.
 
-                Ramps with the breakpoints (was pinned flat at 1.4rem): the
-                homepage grid no longer caps its width, so a wide monitor's
-                tiles are genuinely large now and a fixed size looked tiny
-                against them. overflow-wrap:anywhere is what actually keeps a
-                long single word ("Lollapalooza", "Reshuffling") from
-                overflowing at any of these sizes — line-clamp-3 alone would
-                clip a word that's still too wide for its line rather than
-                wrap it, which is the failure mode a flat size used to dodge
-                by staying small everywhere. */}
-            <h2 className="project-title font-display font-black uppercase tracking-tight text-base sm:text-xl md:text-2xl lg:text-[1.75rem] leading-[0.95] text-balance text-foreground line-clamp-3 [overflow-wrap:anywhere]">
+                Size ramps with the breakpoints but is capped so the longest
+                word always fits the tile (see .project-title in styles.css):
+                a long word ("Lollapalooza", "Reshuffling") shrinks the name
+                rather than breaking mid-word or clipping. */}
+            <h2 className="project-title uppercase tracking-tight leading-[0.95] text-balance text-foreground line-clamp-3">
               {project.title}
             </h2>
           </div>

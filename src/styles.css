@@ -154,9 +154,14 @@
   --color-ring: var(--ring);
   --color-ash: var(--ash);
 
-  --font-display: "Poppins", "Inter Tight", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "EB Garamond", ui-serif, Georgia, serif;
-  --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  /* One typeface site-wide: General Sans (self-hosted, see @font-face above).
+     Display, body and the old serif accents all use it now. General Sans
+     tops out at Bold, so `font-black` (the old Poppins Black headings) maps
+     to Semibold — the same weight as the project titles. */
+  --font-display: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-weight-black: 600;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --ease-cinematic: cubic-bezier(0.32, 0.72, 0, 1);
@@ -803,10 +808,24 @@
      utilities. */
   font-family: "General Sans", ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
+  /* The usual ramp (1 / 1.25 / 1.5 / 1.75rem), capped so the name's longest
+     word always fits its tile: 100cqi is the title box's width (a size
+     container) and --word-ems that word's width in ems. A long word makes
+     the whole name smaller instead of breaking mid-word. */
+  font-size: min(1rem, calc(100cqi / var(--word-ems, 7)));
   transform-origin: bottom left;
   transition:
     transform 900ms var(--ease-cinematic),
     color 900ms var(--ease-cinematic);
+}
+@media (min-width: 640px) {
+  .project-title { font-size: min(1.25rem, calc(100cqi / var(--word-ems, 7))); }
+}
+@media (min-width: 768px) {
+  .project-title { font-size: min(1.5rem, calc(100cqi / var(--word-ems, 7))); }
+}
+@media (min-width: 1024px) {
+  .project-title { font-size: min(1.75rem, calc(100cqi / var(--word-ems, 7))); }
 }
 .group:hover .project-title {
   /* 1.035, down from 1.06: on the tightest grid (five columns, a ~186px title

@@ -100,68 +100,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // than loaded from Google Fonts, so there's no external font request
       // to throttle or delay — no preconnect/stylesheet links needed here.
       //
-      // They're still `font-display: optional`, which only gives the browser
-      // a ~100ms window to fetch a font before permanently committing to the
-      // fallback for that page view (no swapping in later, which is what
-      // keeps a long-word title from reflowing once the real font lands).
-      // Normally that fetch doesn't even start until the browser has
-      // downloaded and parsed styles.css and matched an element to the
-      // @font-face rule — on a cold cache that's often already past the
-      // 100ms mark, which is why a first visit can land on the fallback and
-      // a refresh (font now cached) does not. Preloading starts the fetch
-      // immediately, in parallel with the stylesheet itself, so the font is
-      // far more likely to make the window on the very first load. Limited
-      // to DM Sans (body copy) and Poppins (every heading/label) — the two
-      // families on screen the instant any page paints; EB Garamond and
-      // JetBrains Mono show up further down the page, where there's no
-      // first-paint deadline to beat.
+      // The whole site is set in General Sans (one variable file covering
+      // every weight). Its @font-face uses `font-display: block`, so text
+      // waits for the real face rather than flashing a stand-in; preloading
+      // starts that fetch immediately, in parallel with the stylesheet, so
+      // the wait is as short as possible on a first visit.
       {
         rel: "preload",
         as: "font",
         type: "font/woff2",
-        href: "/fonts/dm-sans-variable.woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/poppins-900.woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/poppins-700.woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/poppins-500.woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/poppins-300.woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/poppins-200.woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "/fonts/poppins-100.woff2",
+        href: "/fonts/general-sans-variable.woff2",
         crossOrigin: "anonymous",
       },
     ],
