@@ -67,13 +67,13 @@ function Contact() {
         <SiteNav />
       </div>
 
-      <main className="flex-1 pt-24 md:pt-28 lg:pt-32 pb-16 px-6 md:px-12 lg:px-16">
+      <main className="flex-1 flex flex-col md:block pt-24 md:pt-28 lg:pt-32 pb-16 px-6 md:px-12 lg:px-16">
         {!resolveHidden(overridesFile, designId.connect("heading")) && (
           /* One line from tablet up, sized in CSS to fit the page width (see
              .contact-title) — the wrapper is the size container and carries
              the heading's width in ems. Phones wrap it. */
           <div
-            className="[container-type:inline-size]"
+            className="order-3 md:order-none [container-type:inline-size]"
             style={{ "--title-ems": textEms(heading).toFixed(3) } as CSSProperties}
           >
             <h1
@@ -101,8 +101,8 @@ function Contact() {
             it introduces — and hung the résumé buttons below the bio's
             height rather than the card's. Stacks (contact, then about) on a
             phone. */}
-        <div className="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-12 gap-y-14 md:gap-x-10 lg:gap-x-16 animate-pop-in">
-          <div className="md:col-span-5 min-w-0 flex flex-col gap-12">
+        <div className="contents md:grid mt-10 md:mt-12 md:grid-cols-12 md:gap-x-10 lg:gap-x-16 animate-pop-in">
+          <div className="order-4 md:order-none mt-6 md:mt-0 md:col-span-5 min-w-0 flex flex-col gap-8 md:gap-12">
             {/* Size container for the email (see `email-fit` in styles.css). */}
             <section className="[container-type:inline-size]">
               <p className={contactLabel}>Email</p>
@@ -121,7 +121,11 @@ function Contact() {
             </section>
           </div>
 
-          <section className="md:col-span-7 min-w-0">
+          {/* Phone only: a faint rule between the two halves — About first,
+              then Let's get in touch. */}
+          <div aria-hidden className="order-2 md:hidden my-10 h-px bg-foreground/15" />
+
+          <section id="about" className="order-1 md:order-none md:col-span-7 min-w-0 scroll-mt-24">
             <h2
               data-design-id={designId.connect("about-heading")}
               data-design-kind="heading"
@@ -142,12 +146,12 @@ function Contact() {
               <p
                 data-design-id={designId.connect("about-description")}
                 data-design-kind="text"
-                className="font-display [font-weight:var(--intro-description-w)] text-base md:text-lg lg:text-xl xl:text-2xl leading-[1.45] text-foreground text-balance whitespace-pre-line"
+                className="font-display [font-weight:var(--intro-description-w)] text-sm md:text-lg lg:text-xl xl:text-2xl leading-[1.45] text-foreground text-balance whitespace-pre-line"
               >
                 {resolveText(
                   overridesFile,
                   designId.connect("about-description"),
-                  "I'm Reid Graham, a designer based in New York City with a background in Architecture and Scenic Design.\n\nMy work merges these disciplines to create immersive storytelling through the built environment.",
+                  "I'm Reid Graham, a designer based in New York City with a background in Architecture and Scenic Design (yes I'm a theatre kid).\n\nMy work merges these disciplines to create immersive storytelling through the built environment.",
                 )}
               </p>
             </div>

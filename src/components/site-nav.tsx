@@ -204,9 +204,8 @@ export function SiteNav({
                         search={{ tag: p.tag }}
                         onMouseMove={trackSheen}
                         className={glassButton({
-                          touch: true,
                           sheen: true,
-                          className: "animate-title-lr",
+                          className: "text-button text-button--sized animate-title-lr",
                         })}
                         style={{ animationDelay: `${0.08 + i * 0.06}s` }}
                       >
@@ -224,15 +223,35 @@ export function SiteNav({
                 >
                   Connect
                 </Link>
+                {/* Same pattern as Projects: a pill under the heading, then
+                    the email as a plain tappable mailto link (upright, in the
+                    site face — it used to sit far below in the old serif
+                    italic). */}
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  <li>
+                    <Link
+                      to="/contact"
+                      hash="about"
+                      onMouseMove={trackSheen}
+                      className={glassButton({
+                        sheen: true,
+                        className: "text-button text-button--sized animate-title-lr",
+                      })}
+                      style={{ animationDelay: "0.32s" }}
+                    >
+                      About Me
+                    </Link>
+                  </li>
+                </ul>
+                <a
+                  href="mailto:reidjgraham@gmail.com"
+                  className="mt-4 block text-lg text-foreground/70 underline underline-offset-4 decoration-foreground/25 hover:text-accent transition-colors animate-title-lr"
+                  style={{ animationDelay: "0.38s" }}
+                >
+                  reidjgraham@gmail.com
+                </a>
               </li>
             </ul>
-
-            <a
-              href="mailto:reidjgraham@gmail.com"
-              className="mt-14 block font-serif italic text-lg text-foreground/60 hover:text-accent transition-colors"
-            >
-              reidjgraham@gmail.com
-            </a>
           </div>
         </div>
       )}
