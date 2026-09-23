@@ -250,6 +250,27 @@ const INTRO_TRIAL_SLUGS = new Set(INTRO_PROJECTS.map(([, slug]) => slug));
    gallery image, see design-media-additions.json). */
 const EXCHANGE_HERO_SRC = "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE_EDITEDRENDER.png";
 
+/* Each top image's width ÷ height, measured from the files. The hero is
+   the first thing on the page, so until its file arrives the browser would
+   otherwise give it no height — everything below drew up near the top and
+   then jumped down once the photo landed (most visible when stepping
+   between projects in the panel, where each one loads fresh). Setting the
+   aspect ratio up front reserves the right space from the first frame.
+   If a hero image is ever swapped, update its ratio here (a stale value
+   only changes the crop slightly; a missing one falls back to 3:2). */
+const HERO_ASPECT: Record<string, number> = {
+  "you-cant-take-it-with-you": 5109 / 3309,
+  "the-exchange-facility": 1332 / 1101,
+  "staging-aesthetics": 2000 / 2310,
+  "reshuffling-the-deck": 1989 / 2219,
+  "true-west": 5632 / 3168,
+  "rags-to-riches": 2000 / 1340,
+  "the-diary-of-anne-frank": 1612 / 1080,
+  "field-house": 2400 / 1552,
+  townhouse: 736 / 931,
+  "tab-renaissance": 1929 / 1329,
+};
+
 type IntroAlign = "center" | "split";
 
 /* Subtitle and description share a size and weight (16/20/24px, Regular).
@@ -1168,6 +1189,7 @@ function ProjectPageInner() {
               data-design-project={project.slug}
               src={heroSrc}
               alt={project.title}
+              style={introTrial ? { aspectRatio: String(HERO_ASPECT[project.slug] ?? 1.5) } : undefined}
               className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
                 /* Field House's render is mostly sky (the building sits in
                    the bottom third of the frame) — center object-position,
