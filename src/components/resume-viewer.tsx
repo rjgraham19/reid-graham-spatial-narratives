@@ -225,7 +225,7 @@ export function ResumeSection({ hideActions = false }: { hideActions?: boolean }
         // around it in the future.
         createPortal(
           <div
-            className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-2xl"
+            className="intro-font fixed inset-0 z-[120] bg-black/60 backdrop-blur-2xl"
             role="dialog"
             aria-modal="true"
             aria-label="Resume"

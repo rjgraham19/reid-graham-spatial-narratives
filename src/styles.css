@@ -798,6 +798,11 @@
 
    Unlayered, so it outranks the Tailwind utilities that used to do this. */
 .project-title {
+  /* Homepage / hub tile names: General Sans Semibold, matching the project
+     page titles. Unlayered, so it beats the tile's font-display/font-black
+     utilities. */
+  font-family: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
   transform-origin: bottom left;
   transition:
     transform 900ms var(--ease-cinematic),

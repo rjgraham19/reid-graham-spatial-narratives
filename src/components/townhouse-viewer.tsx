@@ -99,7 +99,7 @@ export function TownhouseViewer() {
                unobstructed, unlike the image lightbox which sits under it.
                The perimeter carries a soft vignette so the dark margin
                reads as a frame around the model, and clicking it closes. */
-            className="fixed inset-0 z-[130] flex flex-col animate-fade-in-fast"
+            className="intro-font fixed inset-0 z-[130] flex flex-col animate-fade-in-fast"
             style={{ background: 'radial-gradient(ellipse at center, #0c0c0f 0%, #000 78%)' }}
             role="dialog"
             aria-modal="true"

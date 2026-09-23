@@ -54,6 +54,15 @@ export function ProjectTile({
       className={appearIndex != null ? "relative animate-tile-in" : "relative"}
       style={Object.keys(style).length ? style : undefined}
     >
+      {/* The tile name is set in General Sans (.project-title). React hoists
+          this into <head> and de-duplicates it across tiles. */}
+      <link
+        rel="preload"
+        href="/fonts/general-sans-variable.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
       <Link
         to="/work/$hub/$slug"
         params={{ hub: project.hub, slug: project.slug }}
