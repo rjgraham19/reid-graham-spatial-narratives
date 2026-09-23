@@ -258,7 +258,6 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
               target={panel ? "_top" : undefined}
               onMouseMove={trackSheen}
               className={`pointer-events-auto hub-tag-pill text-[10px] lg:text-[13px] leading-none py-[0.7em] pl-[1.15em] pr-[1.01em] border-white/25 hover:border-white/40 ${glassButton({
-                touch: true,
                 sheen: true,
               })}`}
               style={{ fontWeight: "var(--intro-tags-w, 200)", borderWidth: "1px" }}
@@ -293,9 +292,9 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
    read as peers and the block stays short; stacked (tight gap) on narrow
    screens and in the narrow "split" column. MY ROLE leads (first, white, a
    touch heavier); collaborators sit at nearly the same size, just softer. */
-const creditLabel = "text-[0.65rem] md:text-xs tracking-[0.18em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
-const creditRole = "text-xs md:text-[0.95rem] tracking-[0.12em] text-foreground font-medium";
-const creditCollab = "text-[0.7rem] md:text-sm leading-relaxed tracking-[0.12em] text-foreground/70";
+const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.18em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
+const creditRole = "text-[10px] lg:text-[13px] tracking-[0.12em] text-foreground font-medium";
+const creditCollab = "text-[10px] lg:text-[13px] leading-relaxed tracking-[0.12em] text-foreground/70";
 
 function IntroCredits({ project, align }: { project: Project; align: IntroAlign }) {
   const credits = (project.credits ?? []).filter((c) => !c.hidden);
@@ -353,7 +352,7 @@ function IntroBody({ project, align }: { project: Project; align: IntroAlign }) 
           {project.description}
         </p>
       </div>
-      <div className="mt-[25px]">
+      <div className="mt-10 md:mt-12 lg:mt-16">
         <IntroCredits project={project} align={align} />
       </div>
     </RevealBlock>
@@ -773,7 +772,7 @@ function ProjectPageInner() {
           <div className="relative z-10 order-2 px-6 md:px-12 lg:px-16 pt-4 lg:pt-5">
             <IntroHeader project={project} panel={!!panel} align="center" />
           </div>
-          <div className="order-3 px-6 md:px-12 lg:px-16 pt-[25px] pb-14 md:pb-20">
+          <div className="order-3 px-6 md:px-12 lg:px-16 pt-10 md:pt-12 lg:pt-16 pb-14 md:pb-20">
             <IntroBody project={project} align="center" />
           </div>
         </>
@@ -1113,7 +1112,7 @@ function ProjectPageInner() {
            Stacks below it (centered) under md, like the "center" layout. */
         <aside className="px-6 md:px-0 pt-4 lg:pt-5 md:py-16 pb-14 md:self-center">
           <IntroHeader project={project} panel={!!panel} align="split" />
-          <div className="mt-[25px]">
+          <div className="mt-10 md:mt-12 lg:mt-16">
             <IntroBody project={project} align="split" />
           </div>
         </aside>
