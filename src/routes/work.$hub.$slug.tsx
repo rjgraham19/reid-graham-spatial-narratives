@@ -243,8 +243,8 @@ const introSubtitleType = `${introStatementBase} uppercase leading-[1.3] trackin
 const introDescriptionType = `${introStatementBase} leading-[1.45]`;
 
 /* The breathing room above and below the description (subtitle →
-   description, description → credits): 48 / 64 / 128px. */
-const introDescriptionGap = "mt-12 md:mt-16 lg:mt-32";
+   description, description → credits): 48 / 64 / 96px. */
+const introDescriptionGap = "mt-12 md:mt-16 lg:mt-24";
 
 const introColumn = (align: IntroAlign) =>
   align === "center" ? "mx-auto max-w-6xl text-center" : "text-center md:text-left";
@@ -807,7 +807,7 @@ function ProjectPageInner() {
           <div className="relative z-10 order-2 px-6 md:px-12 lg:px-16 pt-4 lg:pt-5">
             <IntroHeader project={project} panel={!!panel} align="center" />
           </div>
-          <div className="order-3 px-6 md:px-12 lg:px-16 pt-12 md:pt-16 lg:pt-32 pb-14 md:pb-20">
+          <div className="order-3 px-6 md:px-12 lg:px-16 pt-12 md:pt-16 lg:pt-24 pb-14 md:pb-20">
             <IntroBody project={project} align="center" />
           </div>
         </>
