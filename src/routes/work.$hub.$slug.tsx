@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useFitText } from "@/hooks/use-fit-text";
 import { AnimatePresence, motion } from "motion/react";
 import { SiteNav } from "@/components/site-nav";
 import { RecordPlayerViewer } from "@/components/record-player-viewer";
@@ -207,6 +208,217 @@ function RoleAndCollaborators({ project }: { project: Project }) {
   );
 }
 
+/* ── Standard project intro (trial, localhost mockups only) ──
+   One fixed order for every project's opening info:
+   tags → title → subtitle → description → my role → collaborators.
+
+   Two arrangements of the same content:
+   - "center": the hero photo runs full-bleed across the top and the
+     intro sits below it in one centered column (Garden of Earthly
+     Delights, You Can't Take It With You).
+   - "split": for tall portrait heroes (Reshuffling the Deck; later
+     Townhouse / Staging Aesthetics). The photo holds the left of the
+     screen, bleeding off the left and top edges, and the intro sits
+     beside it, left-aligned and vertically centered. Below `md` it
+     collapses to the same stacked, centered layout as "center".
+
+   Keeps the site's type rules: all-caps title, caps subtitle and credits,
+   the standard glass tag pills. Typeface is General Sans (self-hosted, see
+   styles.css); per-element weights come from the CSS variables set in
+   `useGeneralSans`. The `.intro-trial` wrapper cancels any old visual-editor
+   nudges on these elements (see styles.css) — they were tuned for the
+   previous layout. */
+const INTRO_TRIAL_SLUGS = new Set(["tab-renaissance", "you-cant-take-it-with-you", "reshuffling-the-deck"]);
+
+type IntroAlign = "center" | "split";
+
+/* Description and subtitle share one type treatment (16/20/24px, all caps,
+   Regular) — the subtitle is the same, just grey. Trimmed to cap height and
+   baseline so the margins between blocks are the visible gaps. */
+const introStatement =
+  "uppercase text-base md:text-xl lg:text-2xl leading-[1.3] tracking-[0.02em] text-balance [text-box:trim-both_cap_alphabetic]";
+
+const introColumn = (align: IntroAlign) =>
+  align === "center" ? "mx-auto max-w-6xl text-center" : "text-center md:text-left";
+
+function IntroHeader({ project, panel, align }: { project: Project; panel: boolean; align: IntroAlign }) {
+  return (
+    <div className={`intro-trial ${introColumn(align)}`}>
+      {project.tags && project.tags.length > 0 && (
+        /* The site's standard glass pills, minus the `quiet` dimming so the
+           label sits at full white. */
+        <div
+          className={`mb-4 lg:mb-5 flex flex-wrap gap-2 justify-center ${align === "split" ? "md:justify-start" : ""}`}
+        >
+          {project.tags.map((t: ProjectTag) => (
+            <Link
+              key={t}
+              to="/work"
+              search={{ tag: t }}
+              target={panel ? "_top" : undefined}
+              onMouseMove={trackSheen}
+              className={`pointer-events-auto hub-tag-pill text-[10px] lg:text-[13px] leading-none py-[0.7em] pl-[1.15em] pr-[1.01em] border-white/25 hover:border-white/40 ${glassButton({
+                touch: true,
+                sheen: true,
+              })}`}
+              style={{ fontWeight: "var(--intro-tags-w, 200)", borderWidth: "1px" }}
+            >
+              {formatTag(t)}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div data-design-id={designId.projectTitle(project.slug)} data-design-kind="heading">
+        <AnimatedHeading
+          text={project.title}
+          fit
+          className="intro-title project-hero-title [font-weight:var(--intro-title-w,700)] [text-box:trim-both_cap_alphabetic] uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-balance"
+        />
+      </div>
+      <p
+        data-design-id={designId.projectSubtitle(project.slug)}
+        data-design-kind="text"
+        className={`mt-[14px] ${introStatement} text-foreground/55`}
+        style={{ fontWeight: "var(--intro-description-w, 400)" }}
+      >
+        {project.subtitle}
+      </p>
+    </div>
+  );
+}
+
+/* Credits: MY ROLE and COLLABORATORS, each a small grey label over its
+   credit, left-aligned. Side by side on a wide "center" layout so the two
+   read as peers and the block stays short; stacked (tight gap) on narrow
+   screens and in the narrow "split" column. MY ROLE leads (first, white, a
+   touch heavier); collaborators sit at nearly the same size, just softer. */
+const creditLabel = "text-[0.65rem] md:text-xs tracking-[0.18em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
+const creditRole = "text-xs md:text-[0.95rem] tracking-[0.12em] text-foreground font-medium";
+const creditCollab = "text-[0.7rem] md:text-sm leading-relaxed tracking-[0.12em] text-foreground/70";
+
+function IntroCredits({ project, align }: { project: Project; align: IntroAlign }) {
+  const credits = (project.credits ?? []).filter((c) => !c.hidden);
+  const myRole = credits.find((c) => c.name === "Reid Graham");
+  const collaborators = credits.filter((c) => c.name !== "Reid Graham");
+  if (!myRole && collaborators.length === 0) return null;
+  // A lone advisor/director reads better as their own label than under
+  // "COLLABORATORS" — same rule the old credits block used for advisors.
+  const collabLabel = collaborators.length === 1 ? collaborators[0].role : "Collaborators";
+
+  return (
+    <div
+      className={`text-left uppercase grid gap-y-3 ${
+        align === "center" ? "mx-auto max-w-6xl md:grid-cols-[auto_1fr] md:gap-x-14" : ""
+      }`}
+    >
+      {myRole && (
+        <div>
+          <p className={creditLabel}>My role</p>
+          <p className={`mt-1 ${creditRole}`}>{myRole.role}</p>
+        </div>
+      )}
+      {collaborators.length > 0 && (
+        <div>
+          <p className={creditLabel}>{collabLabel}</p>
+          <p className={`mt-1 ${creditCollab}`}>
+            {collaborators.length === 1 ? (
+              <span className="text-foreground/90">{collaborators[0].name}</span>
+            ) : (
+              collaborators.map((c, i) => (
+                <span key={c.role}>
+                  {i > 0 && <span className="mx-2 text-foreground/30">·</span>}
+                  <span className="text-foreground/90">{c.name}</span>, {c.role}
+                </span>
+              ))
+            )}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Everything after the header: the description, then the credits. */
+function IntroBody({ project, align }: { project: Project; align: IntroAlign }) {
+  return (
+    <RevealBlock className="intro-trial">
+      <div className={introColumn(align)}>
+        <p
+          data-design-id={designId.projectDescription(project.slug)}
+          data-design-kind="text"
+          className={introStatement}
+          style={{ fontWeight: "var(--intro-description-w, 400)" }}
+        >
+          {project.description}
+        </p>
+      </div>
+      <div className="mt-[25px]">
+        <IntroCredits project={project} align={align} />
+      </div>
+    </RevealBlock>
+  );
+}
+
+/* Localhost-only tab strip for flipping between the intro mockups. Plain
+   links (not router Links) so each page loads fresh; keeps `?panel=1` when
+   browsing inside the project panel's frame. */
+const INTRO_MOCKUPS: [string, string][] = [
+  ["tab-renaissance", "Garden of Earthly Delights"],
+  ["you-cant-take-it-with-you", "You Can't Take It With You"],
+  ["reshuffling-the-deck", "Reshuffling the Deck"],
+];
+
+function IntroMockupTabs({ current, hub, panel }: { current: string; hub: string; panel: boolean }) {
+  if (!import.meta.env.DEV) return null;
+  return (
+    <div className="fixed bottom-4 left-4 z-[200] flex flex-wrap items-center gap-1 rounded-full border border-white/20 bg-black/85 p-1 text-[11px] text-white backdrop-blur">
+      <span className="px-2 uppercase tracking-[0.15em] text-white/50">Mockup</span>
+      {INTRO_MOCKUPS.map(([slug, label]) => (
+        <a
+          key={slug}
+          href={`/work/${hub}/${slug}${panel ? "?panel=1" : ""}`}
+          className={`rounded-full px-3 py-1 ${current === slug ? "bg-white text-black" : "hover:bg-white/15"}`}
+        >
+          {label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+/* General Sans on this page (the trial's chosen font). Swaps in only once
+   the self-hosted files are loaded so a stand-in font never shows. */
+function useGeneralSans(enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+    const style = document.createElement("style");
+    style.id = "font-trial-style";
+    style.textContent = `
+      body, body *:not(code):not(pre) { font-family: "General Sans", ui-sans-serif, system-ui, sans-serif !important; }
+      :root {
+        --intro-title-w: 600;
+        --intro-tags-w: 300;
+        --intro-subtitle-w: 500;
+        --intro-description-w: 400;
+      }
+    `;
+    const ready = document.fonts
+      ? Promise.all([300, 400, 500, 600].map((w) => document.fonts.load(`${w} 1em "General Sans"`))).catch(() => {})
+      : Promise.resolve();
+    void ready.then(() => {
+      if (cancelled) return;
+      document.getElementById("font-trial-style")?.remove();
+      document.head.appendChild(style);
+    });
+    return () => {
+      cancelled = true;
+      style.remove();
+    };
+  }, [enabled]);
+}
+
 /** The hover cue on a silent inline video — tells a visitor this is where
  *  to click for the real, full-sound experience in the lightbox. Drawn
  *  rather than a glyph, to match BackChevron / CloseMark. */
@@ -331,6 +543,10 @@ function ProjectPageInner() {
 
   const isStaging = project.slug === "staging-aesthetics";
   const isTab = project.slug === "tab-renaissance";
+  // Intro trial (localhost mockups): hero first, standard intro, General Sans.
+  const introTrial = INTRO_TRIAL_SLUGS.has(project.slug);
+  const introSplit = introTrial && project.heroPortrait === true;
+  useGeneralSans(introTrial);
   const isFieldHouse = project.slug === "field-house";
   const isTownhouse = project.slug === "townhouse";
   const isYctiwy = project.slug === "you-cant-take-it-with-you";
@@ -479,7 +695,7 @@ function ProjectPageInner() {
 
       {!panel && (
         <div data-design-protected="Protected navigation">
-          <SiteNav variant={isLollapalooza && scrubInView ? "top-transparent" : "top"} />
+          <SiteNav variant={(isLollapalooza && scrubInView) || introTrial ? "top-transparent" : "top"} />
         </div>
       )}
 
@@ -504,7 +720,17 @@ function ProjectPageInner() {
           <div className="md:hidden fixed top-0 left-0 z-[110] px-6 py-4 flex items-center">
             {backLink}
           </div>
-          <div className="hidden md:block px-12 lg:px-16 pt-32">{backLink}</div>
+          <div
+            className={
+              /* Image-first trial: floats over the full-bleed hero instead
+                 of pushing it down. */
+              introTrial
+                ? "hidden md:block absolute left-0 top-0 z-20 px-12 lg:px-16 pt-24"
+                : "hidden md:block px-12 lg:px-16 pt-32"
+            }
+          >
+            {backLink}
+          </div>
         </>
       )}
 
@@ -535,7 +761,27 @@ function ProjectPageInner() {
           "Reshuffling the Deck") wrapped to two lines even with all the
           screen width a wide monitor has to spare. Full width, it has room
           to actually use that space and stay on one line, and the hero
-          image + description grid below is unaffected either way. */}
+          image + description grid below is unaffected either way.
+
+          Garden of Earthly Delights is trialling an image-first template:
+          hero on top, then title/subtitle, then the description block. A
+          flex column with order-first on the hero grid swaps the two without
+          duplicating either block. */}
+      <div className={introTrial ? "flex flex-col" : undefined}>
+      {introTrial && !introSplit && (
+        <>
+          <div className="relative z-10 order-2 px-6 md:px-12 lg:px-16 pt-4 lg:pt-5">
+            <IntroHeader project={project} panel={!!panel} align="center" />
+          </div>
+          <div className="order-3 px-6 md:px-12 lg:px-16 pt-[25px] pb-14 md:pb-20">
+            <IntroBody project={project} align="center" />
+          </div>
+        </>
+      )}
+      {introTrial && (
+        <IntroMockupTabs current={project.slug} hub={project.hub} panel={!!panel} />
+      )}
+      {!introTrial && (
       <div className="relative z-10">
           <div
             className={`bg-gradient-to-b from-black via-black/70 to-transparent ${
@@ -651,6 +897,7 @@ function ProjectPageInner() {
             )}
           </div>
       </div>
+      )}
 
       {/* Hero image (+ description, for portrait heroes) — the grid this
           used to share with the title. Now it only holds the image itself
@@ -659,7 +906,9 @@ function ProjectPageInner() {
           run. */}
       <div
         className={`${
-          isPortraitHero
+          introSplit
+            ? "relative md:grid md:grid-cols-[7fr_5fr] md:items-start md:gap-10 lg:gap-16 md:pr-12 lg:pr-16"
+            : isPortraitHero
             ? "relative md:grid md:grid-cols-[8fr_5fr] md:gap-8 lg:gap-12 md:px-12 lg:px-16"
             : "relative"
         }${
@@ -676,6 +925,10 @@ function ProjectPageInner() {
              read as pressed straight against the black title block instead
              of eased into it. */
           isFieldHouse ? " light-zone bg-background pt-6 md:pt-8" : ""
+        }${
+          /* Image-first trial (Garden of Earthly Delights): move the hero
+             above the title, flush to the top edge of the window/panel. */
+          introTrial ? " order-1" : ""
         }`}
       >
       <div
@@ -736,7 +989,9 @@ function ProjectPageInner() {
                against that frame), but that just made it read as a
                different, cropped-in version of the same photo depending on
                how you got to the project. Consistent now. */
-            isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"
+            introTrial
+              ? "px-0" /* intro trial: edge to edge (split: bleeds off the left) */
+              : isPortraitHero ? "px-6 md:px-0" : "px-6 md:px-12 lg:px-16"
           } ${
             /* Several of these header photos have their own dead space baked
                into the top of the file itself — stage rigging/headroom above
@@ -761,7 +1016,9 @@ function ProjectPageInner() {
                growing with the viewport width. Reshuffling and Staging are
                portrait heroes (no height cap at any width), so a plain
                width percentage is safe for them. */
-            isYctiwy
+            introTrial
+              ? "mt-0" /* intro trial: the hero starts flush at the top */
+              : isYctiwy
               ? "mt-[calc(-1*min(18%,10svh))]"
               : isReshuffling
                 ? "-mt-[14%]"
@@ -851,7 +1108,17 @@ function ProjectPageInner() {
           above) collapses to a single column below md for free. Sized as a
           normal paragraph rather than stretched to match the hero's
           height — it reads as body copy, not a second headline. */}
-      {isPortraitHero && (
+      {introSplit && (
+        /* Intro trial, split: the standard intro beside the portrait hero.
+           Stacks below it (centered) under md, like the "center" layout. */
+        <aside className="px-6 md:px-0 pt-4 lg:pt-5 md:py-16 pb-14 md:self-center">
+          <IntroHeader project={project} panel={!!panel} align="split" />
+          <div className="mt-[25px]">
+            <IntroBody project={project} align="split" />
+          </div>
+        </aside>
+      )}
+      {isPortraitHero && !introSplit && (
         <aside className="px-6 md:px-0 pt-8 md:pt-14 pb-4 md:pb-0">
           <div>
             <p
@@ -866,6 +1133,7 @@ function ProjectPageInner() {
         </aside>
       )}
       </div>
+      </div>
 
       {/* YCTIWY, True West, Anne Frank — description + MY ROLE /
           COLLABORATORS below the hero, same compact centered info block as
@@ -873,25 +1141,7 @@ function ProjectPageInner() {
           line (pullQuote, plus True West's dualityLines) is untouched and
           keeps rendering in its own existing spot farther down the page —
           only the top-of-page description slot changes here. */}
-      {(isYctiwy || isTrueWest || isAnneFrank) && (
-        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
-          <RevealBlock>
-            <p
-              data-design-id={designId.projectDescription(project.slug)}
-              data-design-kind="text"
-              className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance"
-            >
-              {project.description}
-            </p>
-            <RoleAndCollaborators project={project} />
-          </RevealBlock>
-        </section>
-      )}
-
-      {/* Garden of Earthly Delights (tab-renaissance) — description +
-          MY ROLE / COLLABORATORS below the hero, same compact info block as
-          the other redesigned pages. */}
-      {isTab && (
+      {(isYctiwy || isTrueWest || isAnneFrank) && !introTrial && (
         <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
           <RevealBlock>
             <p
