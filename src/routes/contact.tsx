@@ -67,44 +67,72 @@ function Contact() {
         <SiteNav />
       </div>
 
-      <main className="flex-1 flex flex-col md:block pt-24 md:pt-28 lg:pt-32 pb-16 px-6 md:px-12 lg:px-16">
-        {!resolveHidden(overridesFile, designId.connect("heading")) && (
-          /* One line at every width, sized in CSS to fit the page width (see
-             .contact-title) — the wrapper is the size container and carries
-             the heading's width in ems. Centered on phones. */
-          <div
-            className="order-3 md:order-none [container-type:inline-size]"
-            style={{ "--title-ems": textEms(heading).toFixed(3) } as CSSProperties}
+      {/* Two sections, top to bottom at every width, split by a faint rule:
+          1. About — "About Me :)" with the portrait and bio side by side
+             directly beneath it.
+          2. Let's get in touch — the heading, then EMAIL and RESUME (side by
+             side from tablet up; stacked on phones), each label sitting
+             directly on what it names.
+          This replaced a two-column grid that put "About Me" beside the
+          email and hung things off each other's heights; one clear order
+          reads the same on a phone, an iPad and a desktop. */}
+      <main className="flex-1 pt-24 md:pt-28 lg:pt-32 pb-16 px-6 md:px-12 lg:px-16">
+        <section id="about" className="scroll-mt-24">
+          <h2
+            data-design-id={designId.connect("about-heading")}
+            data-design-kind="heading"
+            className="animate-heading-pop motion-reduce:animate-none origin-center md:origin-left text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-5xl lg:text-6xl"
           >
-            <h1
-              data-design-id={designId.connect("heading")}
-              data-design-kind="heading"
-              className="contact-title text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
-            >
-              {heading}
-            </h1>
-          </div>
-        )}
+            {overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)"}
+          </h2>
 
-        {/* Two self-contained groups, each label sitting directly on what it
-            names, so nothing reads as belonging to its neighbour at any
-            width:
-            - Contact (left): EMAIL + address, then RESUME + the résumé card
-              with its Download / Open buttons side by side right under it.
-            - About (right): ABOUT ME :) with the portrait and bio directly
-              beneath it, side by side.
-            On an iPad-width column the portrait stacks above the bio (side by
-            side there left both too cramped); phone and desktop keep them
-            side by side.
-            They used to share one row-by-row grid, which put "About Me"
-            beside the email — a row above, and a column off, from the photo
-            it introduces — and hung the résumé buttons below the bio's
-            height rather than the card's. Stacks (contact, then about) on a
-            phone. */}
-        <div className="contents md:grid mt-10 md:mt-12 md:grid-cols-12 md:gap-x-10 lg:gap-x-16 animate-pop-in">
-          <div className="order-4 md:order-none mt-6 md:mt-0 md:col-span-5 min-w-0 flex flex-col gap-8 md:gap-12">
+          <div className="mt-5 md:mt-6 grid grid-cols-[2fr_3fr] md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] gap-5 md:gap-8 items-start md:max-w-4xl">
+            {/* Swap the file at public/reid-graham-portrait.jpg to replace
+                the photo. */}
+            <img
+              src="/reid-graham-portrait.jpg"
+              alt="Reid Graham"
+              className="w-full aspect-[3/4] rounded-md object-cover object-top bg-secondary"
+            />
+
+            <p
+              data-design-id={designId.connect("about-description")}
+              data-design-kind="text"
+              className="font-display [font-weight:var(--intro-description-w)] text-sm md:text-lg lg:text-xl xl:text-2xl leading-[1.45] text-foreground text-balance whitespace-pre-line"
+            >
+              {resolveText(
+                overridesFile,
+                designId.connect("about-description"),
+                "I'm Reid Graham, a designer based in New York City with a background in Architecture and Scenic Design (yes I'm a theatre kid).\n\nMy work merges these disciplines to create immersive storytelling through the built environment.",
+              )}
+            </p>
+          </div>
+        </section>
+
+        <div aria-hidden className="my-10 md:my-14 h-px bg-foreground/15" />
+
+        <section>
+          {!resolveHidden(overridesFile, designId.connect("heading")) && (
+            /* One line at every width, sized in CSS to fit the page width (see
+               .contact-title) — the wrapper is the size container and carries
+               the heading's width in ems. Centered on phones. */
+            <div
+              className="[container-type:inline-size]"
+              style={{ "--title-ems": textEms(heading).toFixed(3) } as CSSProperties}
+            >
+              <h1
+                data-design-id={designId.connect("heading")}
+                data-design-kind="heading"
+                className="contact-title text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
+              >
+                {heading}
+              </h1>
+            </div>
+          )}
+
+          <div className="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-start">
             {/* Size container for the email (see `email-fit` in styles.css). */}
-            <section className="[container-type:inline-size]">
+            <section className="min-w-0 [container-type:inline-size]">
               <p className={contactLabel}>Email</p>
               <a
                 href={`mailto:${EMAIL}`}
@@ -117,55 +145,19 @@ function Contact() {
             {/* Phones: no preview card (unreadable at that width and a full
                 screen of scrolling) — just View Resume, which opens the PDF
                 in the phone's own viewer, and Download. Tablet and up keep
-                the card with its pop-up viewer. */}
-            <section>
+                the card (kept to a readable size) with its pop-up viewer. */}
+            <section className="min-w-0">
               <p className={contactLabel}>Resume</p>
               <div className="resume-actions-phone md:hidden">
                 <ResumeActions viewFirst className="justify-center" />
               </div>
-              <div className="hidden md:block">
+              <div className="hidden md:block max-w-sm">
                 <ResumeSection hideActions />
                 <ResumeActions className="mt-3" />
               </div>
             </section>
           </div>
-
-          {/* Phone only: a faint rule between the two halves — About first,
-              then Let's get in touch. */}
-          <div aria-hidden className="order-2 md:hidden my-10 h-px bg-foreground/15" />
-
-          <section id="about" className="order-1 md:order-none md:col-span-7 min-w-0 scroll-mt-24">
-            <h2
-              data-design-id={designId.connect("about-heading")}
-              data-design-kind="heading"
-              className="animate-heading-pop motion-reduce:animate-none origin-center md:origin-left text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-5xl lg:text-6xl"
-            >
-              {overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)"}
-            </h2>
-
-            <div className="mt-5 md:mt-6 grid grid-cols-[2fr_3fr] md:grid-cols-1 lg:grid-cols-[2fr_3fr] gap-5 md:gap-6 items-start">
-              {/* Swap the file at public/reid-graham-portrait.jpg to replace
-                  the photo. */}
-              <img
-                src="/reid-graham-portrait.jpg"
-                alt="Reid Graham"
-                className="w-full md:max-w-xs lg:max-w-none aspect-[3/4] rounded-md object-cover object-top bg-secondary"
-              />
-
-              <p
-                data-design-id={designId.connect("about-description")}
-                data-design-kind="text"
-                className="font-display [font-weight:var(--intro-description-w)] text-sm md:text-lg lg:text-xl xl:text-2xl leading-[1.45] text-foreground text-balance whitespace-pre-line"
-              >
-                {resolveText(
-                  overridesFile,
-                  designId.connect("about-description"),
-                  "I'm Reid Graham, a designer based in New York City with a background in Architecture and Scenic Design (yes I'm a theatre kid).\n\nMy work merges these disciplines to create immersive storytelling through the built environment.",
-                )}
-              </p>
-            </div>
-          </section>
-        </div>
+        </section>
       </main>
     </div>
   );
