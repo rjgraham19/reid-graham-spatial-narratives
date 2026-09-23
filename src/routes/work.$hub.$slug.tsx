@@ -232,11 +232,19 @@ const INTRO_TRIAL_SLUGS = new Set(["tab-renaissance", "you-cant-take-it-with-you
 
 type IntroAlign = "center" | "split";
 
-/* Description and subtitle share one type treatment (16/20/24px, all caps,
-   Regular) — the subtitle is the same, just grey. Trimmed to cap height and
-   baseline so the margins between blocks are the visible gaps. */
-const introStatement =
-  "uppercase text-base md:text-xl lg:text-2xl leading-[1.3] tracking-[0.02em] text-balance [text-box:trim-both_cap_alphabetic]";
+/* Subtitle and description share a size and weight (16/20/24px, Regular).
+   The subtitle is all caps and grey; the description is in sentence case,
+   white, with more open leading since lowercase needs more room between
+   lines than caps. Both trimmed to cap height and baseline so the margins
+   between blocks are the visible gaps. */
+const introStatementBase =
+  "text-base md:text-xl lg:text-2xl text-balance [text-box:trim-both_cap_alphabetic]";
+const introSubtitleType = `${introStatementBase} uppercase leading-[1.3] tracking-[0.02em]`;
+const introDescriptionType = `${introStatementBase} leading-[1.45]`;
+
+/* The breathing room above and below the description (subtitle →
+   description, description → credits): 48 / 64 / 96px. */
+const introDescriptionGap = "mt-12 md:mt-16 lg:mt-24";
 
 const introColumn = (align: IntroAlign) =>
   align === "center" ? "mx-auto max-w-6xl text-center" : "text-center md:text-left";
@@ -320,7 +328,7 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
       <p
         data-design-id={designId.projectSubtitle(project.slug)}
         data-design-kind="text"
-        className={`mt-[14px] ${align === "center" ? "mx-auto max-w-6xl" : ""} ${introStatement} intro-subtitle-text text-foreground/55 animate-intro-subtitle motion-reduce:animate-none`}
+        className={`mt-[14px] ${align === "center" ? "mx-auto max-w-6xl" : ""} ${introSubtitleType} text-foreground/55 animate-intro-subtitle motion-reduce:animate-none`}
         style={{ fontWeight: "var(--intro-description-w, 400)" }}
       >
         {project.subtitle}
@@ -388,13 +396,13 @@ function IntroBody({ project, align }: { project: Project; align: IntroAlign }) 
         <p
           data-design-id={designId.projectDescription(project.slug)}
           data-design-kind="text"
-          className={`${introStatement} intro-description-text`}
+          className={introDescriptionType}
           style={{ fontWeight: "var(--intro-description-w, 400)" }}
         >
           {project.description}
         </p>
       </div>
-      <div className="mt-10 md:mt-12 lg:mt-16">
+      <div className={introDescriptionGap}>
         <IntroCredits project={project} align={align} />
       </div>
     </RevealBlock>
@@ -410,60 +418,14 @@ const INTRO_MOCKUPS: [string, string][] = [
   ["reshuffling-the-deck", "Reshuffling the Deck"],
 ];
 
-/* Case trial on Garden of Earthly Delights: which of subtitle / description
-   drops the all-caps (see [data-case-trial] in styles.css). Kept in
-   localStorage so it holds across reloads and inside the panel's frame. */
-type CaseTrial = "a" | "b";
-const CASE_TRIAL_KEY = "intro-case-trial";
-
-function useCaseTrial(): [CaseTrial, (v: CaseTrial) => void] {
-  const [value, setValue] = useState<CaseTrial>("a");
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(CASE_TRIAL_KEY);
-      if (saved === "a" || saved === "b") setValue(saved);
-    } catch {}
-  }, []);
-  const set = (v: CaseTrial) => {
-    setValue(v);
-    try {
-      localStorage.setItem(CASE_TRIAL_KEY, v);
-    } catch {}
-  };
-  return [value, set];
-}
-
 const trialPill = "fixed left-4 z-[200] flex flex-wrap items-center gap-1 rounded-full border border-white/20 bg-black/85 p-1 text-[11px] text-white backdrop-blur";
 const trialOption = (active: boolean) =>
   `rounded-full px-3 py-1 ${active ? "bg-white text-black" : "hover:bg-white/15"}`;
 
-function IntroMockupTabs({
-  current,
-  hub,
-  panel,
-  caseTrial,
-  onCaseTrial,
-}: {
-  current: string;
-  hub: string;
-  panel: boolean;
-  caseTrial: CaseTrial;
-  onCaseTrial: (v: CaseTrial) => void;
-}) {
+function IntroMockupTabs({ current, hub, panel }: { current: string; hub: string; panel: boolean }) {
   if (!import.meta.env.DEV) return null;
   return (
     <>
-      {current === "tab-renaissance" && (
-        <div className={`${trialPill} bottom-14`}>
-          <span className="px-2 uppercase tracking-[0.15em] text-white/50">Case</span>
-          <button type="button" onClick={() => onCaseTrial("a")} className={trialOption(caseTrial === "a")}>
-            A · Subtitle normal case
-          </button>
-          <button type="button" onClick={() => onCaseTrial("b")} className={trialOption(caseTrial === "b")}>
-            B · Description normal case
-          </button>
-        </div>
-      )}
       <div className={`${trialPill} bottom-4`}>
         <span className="px-2 uppercase tracking-[0.15em] text-white/50">Mockup</span>
         {INTRO_MOCKUPS.map(([slug, label]) => (
@@ -607,7 +569,6 @@ function ProjectPageInner() {
   // Intro trial (localhost mockups): hero first, standard intro, General Sans.
   const introTrial = INTRO_TRIAL_SLUGS.has(project.slug);
   const introSplit = introTrial && project.heroPortrait === true;
-  const [caseTrial, setCaseTrial] = useCaseTrial();
   const isFieldHouse = project.slug === "field-house";
   const isTownhouse = project.slug === "townhouse";
   const isYctiwy = project.slug === "you-cant-take-it-with-you";
@@ -737,7 +698,6 @@ function ProjectPageInner() {
       className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
         panel ? " is-panel-frame" : ""
       }${introTrial ? " intro-font" : ""}`}
-      data-case-trial={isTab ? caseTrial : undefined}
       /* This project's own accent, exposed page-wide so controls that tint on
          hover — the hub-tag pill above the title, and anything else reading
          `--accent-color` — pick up the same colour the overlay gradient and
@@ -847,7 +807,7 @@ function ProjectPageInner() {
           <div className="relative z-10 order-2 px-6 md:px-12 lg:px-16 pt-4 lg:pt-5">
             <IntroHeader project={project} panel={!!panel} align="center" />
           </div>
-          <div className="order-3 px-6 md:px-12 lg:px-16 pt-10 md:pt-12 lg:pt-16 pb-14 md:pb-20">
+          <div className="order-3 px-6 md:px-12 lg:px-16 pt-12 md:pt-16 lg:pt-24 pb-14 md:pb-20">
             <IntroBody project={project} align="center" />
           </div>
         </>
@@ -857,8 +817,6 @@ function ProjectPageInner() {
           current={project.slug}
           hub={project.hub}
           panel={!!panel}
-          caseTrial={caseTrial}
-          onCaseTrial={setCaseTrial}
         />
       )}
       {!introTrial && (
@@ -1193,7 +1151,7 @@ function ProjectPageInner() {
            Stacks below it (centered) under md, like the "center" layout. */
         <aside className="px-6 md:px-0 pt-4 lg:pt-5 md:py-16 pb-14 md:self-center">
           <IntroHeader project={project} panel={!!panel} align="split" />
-          <div className="mt-10 md:mt-12 lg:mt-16">
+          <div className={introDescriptionGap}>
             <IntroBody project={project} align="split" />
           </div>
         </aside>

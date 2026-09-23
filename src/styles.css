@@ -1275,14 +1275,6 @@
   }
 }
 
-/* Case trial (Garden of Earthly Delights only, localhost switch):
-   A — subtitle in its written capitalisation, description stays all caps.
-   B — subtitle stays all caps, description back in sentence case. */
-[data-case-trial="a"] .intro-subtitle-text,
-[data-case-trial="b"] .intro-description-text {
-  text-transform: none !important;
-}
-
 /* Split layout (portrait hero beside the intro): the title may wrap, so from
    md up it's sized so its longest word (`--word-ems`) fits the column — no
    post-load shrink. Below md the split stacks, so it uses the usual sizes. */
