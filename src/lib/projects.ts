@@ -365,7 +365,7 @@ export const PROJECTS: Project[] = [
     accentColor: "#68691c",
     hub: "production-scenic",
     title: "You Can't Take It With You!",
-    subtitle: "Deerfield Studio Theatre",
+    subtitle: "Deerfield Performing Arts Center",
     mood: "warm",
     weight: "right",
     credits: [
@@ -544,7 +544,7 @@ export const PROJECTS: Project[] = [
     accentColor: "#d7d9e6",
     hub: "production-scenic",
     title: "The Diary of Anne Frank",
-    subtitle: "Deerfield Studio Theatre",
+    subtitle: "Deerfield Performing Arts Center",
     mood: "noir",
     weight: "right",
     credits: [

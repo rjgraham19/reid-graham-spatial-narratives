@@ -384,7 +384,7 @@ function IntroCredits({ project, align }: { project: Project; align: IntroAlign 
     >
       {myRole && (
         <div>
-          <p className={`${creditLabel} font-medium`}>My role</p>
+          <p className={`${creditLabel} font-normal`}>My role</p>
           <p className={`mt-1 ${creditRole}`}>{myRole.role}</p>
         </div>
       )}

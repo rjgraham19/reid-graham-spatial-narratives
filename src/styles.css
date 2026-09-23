@@ -1298,6 +1298,34 @@
   }
 }
 
+/* Text buttons — the project tags' treatment, shared by the site nav
+   (Projects, Let's Connect, the discipline dropdown) and the homepage's
+   discipline filter pills: General Sans Light at full white (no `quiet`
+   dimming), with a 1px, 25%-white outline that brightens on hover.
+   `--sized` also takes the tags' size and em-based padding (10px phone /
+   13px desktop); the homepage pills keep their own inline sizing, which is
+   tuned to fit their column. Unlayered, so it beats `.glass-button`. */
+.text-button {
+  font-family: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.text-button:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.text-button--sized {
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  padding: 0.7em 1.01em 0.7em 1.15em;
+}
+@media (min-width: 1024px) {
+  .text-button--sized {
+    font-size: 13px;
+  }
+}
+
 /* Split layout (portrait hero beside the intro): the title may wrap, so from
    md up it's sized so its longest word (`--word-ems`) fits the column — no
    post-load shrink. Below md the split stacks, so it uses the usual sizes. */

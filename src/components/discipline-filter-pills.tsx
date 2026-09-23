@@ -31,11 +31,12 @@ export function DisciplineFilterPills({ activeTag }: { activeTag?: ProjectTag })
              on a project page's footer pills, isActive is always false, so
              this keeps behaving exactly as a plain filter link there. */
           search={isActive ? {} : { tag: t }}
+          /* `text-button`: the project tags' treatment (General Sans Light,
+             full white, 1px outline) — see styles.css. No `touch`, so they
+             stay compact on phones like the tags. */
           className={glassButton({
-            quiet: true,
-            touch: true,
             sheen: true,
-            className: isActive ? "is-active" : "",
+            className: isActive ? "text-button is-active" : "text-button",
           })}
           /* .glass-button's own font-size/padding/tracking (sized for a
              compact nav pill) win over Tailwind utilities here since both

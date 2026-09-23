@@ -103,11 +103,11 @@ export function SiteNav({
             <Link
               to="/"
               activeProps={{
-                className: glassButton({ quiet: true, sheen: true, className: "is-active" }),
+                className: glassButton({ sheen: true, className: "text-button text-button--sized is-active" }),
               }}
               activeOptions={{ exact: true }}
               onMouseMove={trackSheen}
-              className={glassButton({ quiet: true, sheen: true })}
+              className={glassButton({ sheen: true, className: "text-button text-button--sized" })}
             >
               PROJECTS
             </Link>
@@ -128,9 +128,8 @@ export function SiteNav({
                       search={{ tag: p.tag }}
                       onMouseMove={trackSheen}
                       className={glassButton({
-                        quiet: true,
                         sheen: true,
-                        className: "w-full justify-center",
+                        className: "text-button text-button--sized w-full justify-center",
                       })}
                     >
                       {p.label}
@@ -149,10 +148,10 @@ export function SiteNav({
             <Link
               to="/contact"
               activeProps={{
-                className: glassButton({ quiet: true, sheen: true, className: "is-active" }),
+                className: glassButton({ sheen: true, className: "text-button text-button--sized is-active" }),
               }}
               onMouseMove={trackSheen}
-              className={glassButton({ quiet: true, sheen: true })}
+              className={glassButton({ sheen: true, className: "text-button text-button--sized" })}
             >
               LET'S CONNECT!
             </Link>
