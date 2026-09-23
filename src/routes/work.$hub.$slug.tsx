@@ -245,6 +245,10 @@ const INTRO_PROJECTS: [hub: string, slug: string, label: string][] = [
 ];
 const INTRO_TRIAL_SLUGS = new Set(INTRO_PROJECTS.map(([, slug]) => slug));
 
+/* Exchange Facility's top image: the Wavescapes render (a Design-Mode-added
+   gallery image, see design-media-additions.json). */
+const EXCHANGE_HERO_SRC = "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE_EDITEDRENDER.png";
+
 type IntroAlign = "center" | "split";
 
 /* Subtitle and description share a size and weight (16/20/24px, Regular).
@@ -352,11 +356,13 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
   );
 }
 
-/* Credits: MY ROLE and COLLABORATORS, each a small grey label over its
-   credit, left-aligned. Side by side on a wide "center" layout so the two
-   read as peers and the block stays short; stacked (tight gap) on narrow
-   screens and in the narrow "split" column. MY ROLE leads (first, white, a
-   touch heavier); collaborators sit at nearly the same size, just softer. */
+/* Credits: MY ROLE, then COLLABORATORS (tight gap), each a small grey label
+   over its credit. On "center" pages the stack is centered under the
+   centered description, film-credit style — never side by side, since a
+   long role (Lollapalooza's) squeezed the collaborators into a narrow
+   column. In the "split" column it stays left-aligned. MY ROLE leads
+   (first, white, a touch heavier); collaborators sit at nearly the same
+   size, just softer. */
 const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
 const creditRole = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground font-medium";
 const creditCollab = "text-[10px] lg:text-[13px] leading-relaxed tracking-[0.14em] text-foreground/70";
@@ -372,8 +378,8 @@ function IntroCredits({ project, align }: { project: Project; align: IntroAlign 
 
   return (
     <div
-      className={`text-left uppercase grid gap-y-3 ${
-        align === "center" ? "mx-auto max-w-6xl md:grid-cols-[auto_1fr] md:gap-x-14" : ""
+      className={`uppercase grid gap-y-3 ${
+        align === "center" ? "mx-auto max-w-4xl text-center [&_p]:text-balance" : "text-center md:text-left"
       }`}
     >
       {myRole && (
@@ -508,11 +514,18 @@ function ProjectPageInner() {
      skips anything `hidden`. Every other hardcoded `media[N]` reference on
      this page is untouched: appending at the end never shifts an existing
      index. */
+  /* The top image. Normally the project's cover; the Exchange Facility uses
+     its Wavescapes render instead (its cover is the old composite, and the
+     3D model now sits below the credits). */
+  const heroSrc =
+    project.slug === "the-exchange-facility" && INTRO_TRIAL_SLUGS.has(project.slug)
+      ? EXCHANGE_HERO_SRC
+      : project.cover;
   const lightboxMedia =
-    project.media.some((m) => m.src === project.cover)
+    project.media.some((m) => m.src === heroSrc)
       ? project.media
-      : [...project.media, { type: "image" as const, src: project.cover, caption: project.title, hidden: true }];
-  const heroLightboxIndex = lightboxMedia.findIndex((m) => m.src === project.cover);
+      : [...project.media, { type: "image" as const, src: heroSrc, caption: project.title, hidden: true }];
+  const heroLightboxIndex = lightboxMedia.findIndex((m) => m.src === heroSrc);
 
   const [lightbox, setLightbox] = useState<number | null>(null);
   const close = useCallback(() => setLightbox(null), []);
@@ -656,6 +669,9 @@ function ProjectPageInner() {
           !isTab &&
           !isRagsToRiches &&
           !(isLollapalooza && (item.id?.startsWith("gallery-") || item.id?.startsWith("drafting-"))) &&
+          // Exchange: the Wavescapes render is the top image now, so it
+          // doesn't repeat in the gallery (Nibi + Steam stay as a pair).
+          !(isExchange && introTrial && item.src === EXCHANGE_HERO_SRC) &&
           !item.hidden,
       ),
     mediaOrderFile[project.slug],
@@ -844,6 +860,19 @@ function ProjectPageInner() {
             <figure className="order-4 px-6 md:px-12 lg:px-16 pb-10 md:pb-14">
               <LollaRenderCarousel />
             </figure>
+          )}
+          {/* Exchange Facility: the Wavescapes render is the top image, and
+              the explorable 3D model (with its "Explore in 3D" controls and
+              the second half of the description in its overlay) follows the
+              credits at its usual full size. */}
+          {isExchange && (
+            <div className="order-4">
+              <ExchangeViewer
+                description={
+                  splitAt(project.description, "The Exchange facility enables the systemic circulation")[1]
+                }
+              />
+            </div>
           )}
         </>
       )}
@@ -1056,15 +1085,7 @@ function ProjectPageInner() {
             shows moving. With the standard intro the model itself is the
             top image instead. Lollapalooza's render carousel moves below
             the intro (see the intro block above). */}
-        {isExchange && introTrial && (
-          <ExchangeViewer
-            asHero
-            description={
-              splitAt(project.description, "The Exchange facility enables the systemic circulation")[1]
-            }
-          />
-        )}
-        {!isExchange && !(introTrial && isLollapalooza) && (
+        {(!isExchange || introTrial) && !(introTrial && isLollapalooza) && (
         <figure
           className={`z-0 relative ${
             /* Same margins as every other image/text block on the page, in
@@ -1154,7 +1175,7 @@ function ProjectPageInner() {
               data-design-kind="image"
               data-design-role="header"
               data-design-project={project.slug}
-              src={project.cover}
+              src={heroSrc}
               alt={project.title}
               className={`w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-1000 ease-cinematic ${
                 /* Field House's render is mostly sky (the building sits in
