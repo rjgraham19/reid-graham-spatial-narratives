@@ -69,9 +69,9 @@ function Contact() {
 
       <main className="flex-1 flex flex-col md:block pt-24 md:pt-28 lg:pt-32 pb-16 px-6 md:px-12 lg:px-16">
         {!resolveHidden(overridesFile, designId.connect("heading")) && (
-          /* One line from tablet up, sized in CSS to fit the page width (see
+          /* One line at every width, sized in CSS to fit the page width (see
              .contact-title) — the wrapper is the size container and carries
-             the heading's width in ems. Phones wrap it. */
+             the heading's width in ems. Centered on phones. */
           <div
             className="order-3 md:order-none [container-type:inline-size]"
             style={{ "--title-ems": textEms(heading).toFixed(3) } as CSSProperties}
@@ -79,7 +79,7 @@ function Contact() {
             <h1
               data-design-id={designId.connect("heading")}
               data-design-kind="heading"
-              className="contact-title font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
+              className="contact-title text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
             >
               {heading}
             </h1>
@@ -117,7 +117,7 @@ function Contact() {
             <section>
               <p className={contactLabel}>Resume</p>
               <ResumeSection hideActions />
-              <ResumeActions className="mt-3" />
+              <ResumeActions className="mt-3 justify-center md:justify-start" />
             </section>
           </div>
 
@@ -129,7 +129,7 @@ function Contact() {
             <h2
               data-design-id={designId.connect("about-heading")}
               data-design-kind="heading"
-              className="font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-5xl lg:text-6xl"
+              className="text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-5xl lg:text-6xl"
             >
               {overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)"}
             </h2>
