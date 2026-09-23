@@ -342,7 +342,7 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
    read as peers and the block stays short; stacked (tight gap) on narrow
    screens and in the narrow "split" column. MY ROLE leads (first, white, a
    touch heavier); collaborators sit at nearly the same size, just softer. */
-const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
+const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.14em] [font-weight:var(--intro-tags-w,300)] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
 const creditRole = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground font-medium";
 const creditCollab = "text-[10px] lg:text-[13px] leading-relaxed tracking-[0.14em] text-foreground/70";
 
@@ -376,7 +376,7 @@ function IntroCredits({ project, align }: { project: Project; align: IntroAlign 
             ) : (
               collaborators.map((c, i) => (
                 <span key={c.role}>
-                  {i > 0 && <span className="mx-2 text-foreground/30">·</span>}
+                  {i > 0 && <span className="mx-2.5 text-foreground/30">|</span>}
                   <span className="text-foreground/90">{c.name}</span>, {c.role}
                 </span>
               ))
