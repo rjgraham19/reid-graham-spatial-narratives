@@ -19,6 +19,7 @@ export function AnimatedHeading({
   as: Tag = "h1",
   fit = false,
   playOnLoad = false,
+  fitFloor,
 }: {
   text: string;
   className?: string;
@@ -37,6 +38,11 @@ export function AnimatedHeading({
    * alongside the hero image's own CSS entrance rather than trailing it.
    */
   playOnLoad?: boolean;
+  /**
+   * Smallest `--fit-scale` the fit may shrink to (default 0.62). A title held
+   * to one line (`lg:whitespace-nowrap`) needs more room to shrink.
+   */
+  fitFloor?: number;
 }) {
   // Precompute each word's starting letter index so the stagger stays
   // continuous across the title instead of restarting on every word.
@@ -48,7 +54,7 @@ export function AnimatedHeading({
     return { word, offset };
   });
 
-  const { ref, scale } = useFitText<HTMLHeadingElement>([text, fit]);
+  const { ref, scale } = useFitText<HTMLHeadingElement>([text, fit], fitFloor);
 
   return (
     <Tag

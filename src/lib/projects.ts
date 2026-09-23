@@ -364,7 +364,7 @@ export const PROJECTS: Project[] = [
     slug: "you-cant-take-it-with-you",
     accentColor: "#68691c",
     hub: "production-scenic",
-    title: "You Can't Take It With You",
+    title: "You Can't Take It With You!",
     subtitle: "Deerfield Studio Theatre",
     mood: "warm",
     weight: "right",

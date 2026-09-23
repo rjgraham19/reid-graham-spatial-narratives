@@ -224,8 +224,8 @@ function RoleAndCollaborators({ project }: { project: Project }) {
 
    Keeps the site's type rules: all-caps title, caps subtitle and credits,
    the standard glass tag pills. Typeface is General Sans (self-hosted, see
-   styles.css); per-element weights come from the CSS variables set in
-   `useGeneralSans`. The `.intro-trial` wrapper cancels any old visual-editor
+   styles.css), applied page-wide by the server-rendered `.intro-font` class,
+   which also sets the per-element weight variables. The `.intro-trial` wrapper cancels any old visual-editor
    nudges on these elements (see styles.css) — they were tuned for the
    previous layout. */
 const INTRO_TRIAL_SLUGS = new Set(["tab-renaissance", "you-cant-take-it-with-you", "reshuffling-the-deck"]);
@@ -241,9 +241,32 @@ const introStatement =
 const introColumn = (align: IntroAlign) =>
   align === "center" ? "mx-auto max-w-6xl text-center" : "text-center md:text-left";
 
+/* General Sans Semibold advance widths (em, uppercase + digits + common
+   punctuation), measured from the self-hosted font. Lets the server work out
+   how wide a title will set, so a one-line title can be sized in CSS before
+   anything loads. */
+const GENERAL_SANS_600_ADVANCE: Record<string, number> = {
+  A: 0.73, B: 0.647, C: 0.786, D: 0.727, E: 0.601, F: 0.568, G: 0.796, H: 0.763, I: 0.299,
+  J: 0.624, K: 0.68, L: 0.568, M: 0.928, N: 0.765, O: 0.799, P: 0.652, Q: 0.799, R: 0.685,
+  S: 0.663, T: 0.639, U: 0.734, V: 0.7, W: 0.97, X: 0.716, Y: 0.674, Z: 0.644,
+  "0": 0.614, "1": 0.359, "2": 0.558, "3": 0.577, "4": 0.595, "5": 0.571, "6": 0.577,
+  "7": 0.514, "8": 0.592, "9": 0.577,
+  " ": 0.209, "!": 0.287, "?": 0.518, "&": 0.693, "'": 0.256, "’": 0.27, ".": 0.263,
+  ",": 0.263, ":": 0.263, ";": 0.263, "-": 0.36, "–": 0.5, "—": 0.75, "/": 0.505,
+  "+": 0.66, "@": 0.975, "(": 0.318, ")": 0.318,
+};
+
+/** Width of an all-caps title in General Sans Semibold at the title's
+ *  -0.03em tracking, in ems — with 2% headroom for kerning and rounding. */
+function titleEms(text: string) {
+  let ems = 0;
+  for (const ch of text.toUpperCase()) ems += (GENERAL_SANS_600_ADVANCE[ch] ?? 0.7) - 0.03;
+  return ems * 1.02;
+}
+
 function IntroHeader({ project, panel, align }: { project: Project; panel: boolean; align: IntroAlign }) {
   return (
-    <div className={`intro-trial ${introColumn(align)}`}>
+    <div className={`intro-trial ${align === "center" ? "mx-auto text-center" : introColumn(align)}`}>
       {project.tags && project.tags.length > 0 && (
         /* The site's standard glass pills, minus the `quiet` dimming so the
            label sits at full white. */
@@ -268,18 +291,36 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
         </div>
       )}
 
-      <div data-design-id={designId.projectTitle(project.slug)} data-design-kind="heading">
+      {/* Centered layout: on a wide screen the title holds to one line and is
+          sized in CSS to fill the column (see .intro-title-center), so
+          nothing re-measures it after load. The wrapper is the size
+          container its `cqi` units read, and carries the title's width in
+          ems. Phones and tablets still wrap at full size. The split
+          layout's column is too narrow for one line, so it keeps wrapping. */}
+      <div
+        data-design-id={designId.projectTitle(project.slug)}
+        data-design-kind="heading"
+        className="[container-type:inline-size]"
+        style={
+          {
+            "--title-ems": titleEms(project.title).toFixed(3),
+            "--word-ems": Math.max(...project.title.split(" ").map(titleEms)).toFixed(3),
+          } as CSSProperties
+        }
+      >
         <AnimatedHeading
           text={project.title}
           fit
           playOnLoad
-          className="intro-title project-hero-title [font-weight:var(--intro-title-w,700)] [text-box:trim-both_cap_alphabetic] uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-balance"
+          className={`intro-title ${
+            align === "center" ? "intro-title-center lg:whitespace-nowrap" : "intro-title-split"
+          } [font-weight:var(--intro-title-w,700)] [text-box:trim-both_cap_alphabetic] uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-balance`}
         />
       </div>
       <p
         data-design-id={designId.projectSubtitle(project.slug)}
         data-design-kind="text"
-        className={`mt-[14px] ${introStatement} text-foreground/55 animate-intro-subtitle motion-reduce:animate-none`}
+        className={`mt-[14px] ${align === "center" ? "mx-auto max-w-6xl" : ""} ${introStatement} text-foreground/55 animate-intro-subtitle motion-reduce:animate-none`}
         style={{ fontWeight: "var(--intro-description-w, 400)" }}
       >
         {project.subtitle}
@@ -365,7 +406,7 @@ function IntroBody({ project, align }: { project: Project; align: IntroAlign }) 
    browsing inside the project panel's frame. */
 const INTRO_MOCKUPS: [string, string][] = [
   ["tab-renaissance", "Garden of Earthly Delights"],
-  ["you-cant-take-it-with-you", "You Can't Take It With You"],
+  ["you-cant-take-it-with-you", "You Can't Take It With You!"],
   ["reshuffling-the-deck", "Reshuffling the Deck"],
 ];
 
@@ -385,38 +426,6 @@ function IntroMockupTabs({ current, hub, panel }: { current: string; hub: string
       ))}
     </div>
   );
-}
-
-/* General Sans on this page (the trial's chosen font). Swaps in only once
-   the self-hosted files are loaded so a stand-in font never shows. */
-function useGeneralSans(enabled: boolean) {
-  useEffect(() => {
-    if (!enabled) return;
-    let cancelled = false;
-    const style = document.createElement("style");
-    style.id = "font-trial-style";
-    style.textContent = `
-      body, body *:not(code):not(pre) { font-family: "General Sans", ui-sans-serif, system-ui, sans-serif !important; }
-      :root {
-        --intro-title-w: 600;
-        --intro-tags-w: 300;
-        --intro-subtitle-w: 500;
-        --intro-description-w: 400;
-      }
-    `;
-    const ready = document.fonts
-      ? Promise.all([300, 400, 500, 600].map((w) => document.fonts.load(`${w} 1em "General Sans"`))).catch(() => {})
-      : Promise.resolve();
-    void ready.then(() => {
-      if (cancelled) return;
-      document.getElementById("font-trial-style")?.remove();
-      document.head.appendChild(style);
-    });
-    return () => {
-      cancelled = true;
-      style.remove();
-    };
-  }, [enabled]);
 }
 
 /** The hover cue on a silent inline video — tells a visitor this is where
@@ -546,7 +555,6 @@ function ProjectPageInner() {
   // Intro trial (localhost mockups): hero first, standard intro, General Sans.
   const introTrial = INTRO_TRIAL_SLUGS.has(project.slug);
   const introSplit = introTrial && project.heroPortrait === true;
-  useGeneralSans(introTrial);
   const isFieldHouse = project.slug === "field-house";
   const isTownhouse = project.slug === "townhouse";
   const isYctiwy = project.slug === "you-cant-take-it-with-you";
@@ -675,7 +683,7 @@ function ProjectPageInner() {
     <div
       className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
         panel ? " is-panel-frame" : ""
-      }`}
+      }${introTrial ? " intro-font" : ""}`}
       /* This project's own accent, exposed page-wide so controls that tint on
          hover — the hub-tag pill above the title, and anything else reading
          `--accent-color` — pick up the same colour the overlay gradient and
@@ -693,6 +701,18 @@ function ProjectPageInner() {
         onSyncAll={onSyncAll}
       />
 
+      {/* Intro trial: fetch General Sans with the page HTML rather than
+          when the stylesheet first asks for it, so the title's first paint
+          is already in the right face. React hoists this into <head>. */}
+      {introTrial && (
+        <link
+          rel="preload"
+          href="/fonts/general-sans-variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      )}
       {!panel && (
         <div data-design-protected="Protected navigation">
           <SiteNav variant={(isLollapalooza && scrubInView) || introTrial ? "top-transparent" : "top"} />
@@ -907,7 +927,7 @@ function ProjectPageInner() {
       <div
         className={`${
           introSplit
-            ? "relative md:grid md:grid-cols-[7fr_5fr] md:items-start md:gap-10 lg:gap-16 md:pr-12 lg:pr-16"
+            ? "relative md:grid md:grid-cols-[minmax(0,9fr)_minmax(0,11fr)] md:items-start md:gap-10 lg:gap-16 md:pr-12 lg:pr-16"
             : isPortraitHero
             ? "relative md:grid md:grid-cols-[8fr_5fr] md:gap-8 lg:gap-12 md:px-12 lg:px-16"
             : "relative"

@@ -1244,6 +1244,49 @@
   }
 }
 
+/* Intro trial typeface: General Sans across the whole page, applied in CSS
+   (server-rendered class on the page root) so the very first paint is
+   already in the right font — swapping it in from JS after hydration made
+   the title visibly jump. Per-element weights for the intro. */
+.intro-font,
+.intro-font *:not(code):not(pre) {
+  font-family: "General Sans", ui-sans-serif, system-ui, sans-serif !important;
+}
+.intro-font {
+  --intro-title-w: 600;
+  --intro-tags-w: 300;
+  --intro-subtitle-w: 500;
+  --intro-description-w: 400;
+}
+
+/* Intro trial title, centered layout. Below lg it wraps at the usual
+   project-title sizes (with the fit hook as a safety net for long words).
+   From lg up it holds to one line, sized purely in CSS: 100cqi (the title
+   wrapper's width, a size container) divided by the title's width in ems
+   (`--title-ems`, computed server-side from General Sans' glyph widths), so
+   the line fills the column without any post-load measuring. Capped at the
+   usual 6rem. */
+.intro-title-center {
+  font-size: calc(clamp(2.25rem, 7.4vw, 4.75rem) * var(--fit-scale, 1));
+}
+@media (min-width: 1024px) {
+  .intro-title-center {
+    font-size: min(6rem, calc(100cqi / var(--title-ems, 20)));
+  }
+}
+
+/* Split layout (portrait hero beside the intro): the title may wrap, so from
+   md up it's sized so its longest word (`--word-ems`) fits the column — no
+   post-load shrink. Below md the split stacks, so it uses the usual sizes. */
+.intro-title-split {
+  font-size: calc(clamp(2.25rem, 7.4vw, 4.75rem) * var(--fit-scale, 1));
+}
+@media (min-width: 768px) {
+  .intro-title-split {
+    font-size: min(6rem, calc(100cqi / var(--word-ems, 8)));
+  }
+}
+
 /* Intro trial (localhost mockups, see ProjectIntro in work.$hub.$slug.tsx):
    old visual-editor nudges (offsetX/offsetY) on the title/subtitle/
    description were tuned for the previous layout. Inside the new intro the
