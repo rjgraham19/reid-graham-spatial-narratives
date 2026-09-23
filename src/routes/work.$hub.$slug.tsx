@@ -248,7 +248,7 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
         /* The site's standard glass pills, minus the `quiet` dimming so the
            label sits at full white. */
         <div
-          className={`mb-4 lg:mb-5 flex flex-wrap gap-2 justify-center ${align === "split" ? "md:justify-start" : ""}`}
+          className={`mb-4 lg:mb-5 flex flex-wrap gap-2 justify-center animate-intro-tags motion-reduce:animate-none ${align === "split" ? "md:justify-start" : ""}`}
         >
           {project.tags.map((t: ProjectTag) => (
             <Link
@@ -272,13 +272,14 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
         <AnimatedHeading
           text={project.title}
           fit
+          playOnLoad
           className="intro-title project-hero-title [font-weight:var(--intro-title-w,700)] [text-box:trim-both_cap_alphabetic] uppercase leading-[0.95] lg:leading-[0.9] tracking-[-0.03em] text-balance"
         />
       </div>
       <p
         data-design-id={designId.projectSubtitle(project.slug)}
         data-design-kind="text"
-        className={`mt-[14px] ${introStatement} text-foreground/55`}
+        className={`mt-[14px] ${introStatement} text-foreground/55 animate-intro-subtitle motion-reduce:animate-none`}
         style={{ fontWeight: "var(--intro-description-w, 400)" }}
       >
         {project.subtitle}

@@ -18,6 +18,7 @@ export function AnimatedHeading({
   className,
   as: Tag = "h1",
   fit = false,
+  playOnLoad = false,
 }: {
   text: string;
   className?: string;
@@ -30,6 +31,12 @@ export function AnimatedHeading({
    * (see `.project-hero-title` in styles.css).
    */
   fit?: boolean;
+  /**
+   * Play the letter reveal from first paint (pure CSS, `animate-letter-in`)
+   * instead of waiting for hydration + scroll-into-view. Lets a title start
+   * alongside the hero image's own CSS entrance rather than trailing it.
+   */
+  playOnLoad?: boolean;
 }) {
   // Precompute each word's starting letter index so the stagger stays
   // continuous across the title instead of restarting on every word.
@@ -55,7 +62,16 @@ export function AnimatedHeading({
         {wordsWithOffset.map(({ word, offset }, wordIndex) => (
           <Fragment key={wordIndex}>
             <span className="inline-block whitespace-nowrap">
-              {[...word].map((ch, charIndex) => (
+              {[...word].map((ch, charIndex) =>
+                playOnLoad ? (
+                  <span
+                    key={charIndex}
+                    className="inline-block animate-letter-in motion-reduce:animate-none"
+                    style={{ animationDelay: `${0.15 + (offset + charIndex) * 0.012}s` }}
+                  >
+                    {ch}
+                  </span>
+                ) : (
                 <motion.span
                   key={charIndex}
                   className="inline-block"
@@ -70,7 +86,8 @@ export function AnimatedHeading({
                 >
                   {ch}
                 </motion.span>
-              ))}
+                ),
+              )}
             </span>
             {wordIndex < wordsWithOffset.length - 1 ? " " : null}
           </Fragment>

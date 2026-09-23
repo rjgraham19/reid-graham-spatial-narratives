@@ -293,6 +293,24 @@
 @utility animate-pop-in {
   animation: pop-in 0.9s var(--ease-cinematic) both;
 }
+
+/* CSS twin of AnimatedHeading's motion letter reveal, for titles that should
+   play from first paint (`playOnLoad`) alongside the hero's own entrance. */
+@keyframes letter-in {
+  from { opacity: 0; filter: blur(4px); transform: translateY(6px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+@utility animate-letter-in {
+  animation: letter-in 0.4s ease-out both;
+}
+/* Intro trial: tags fade in with the title's first letters, the subtitle
+   just after the title has mostly resolved. */
+@utility animate-intro-tags {
+  animation: fade-in 0.8s var(--ease-cinematic) 0.1s both;
+}
+@utility animate-intro-subtitle {
+  animation: fade-in 0.8s var(--ease-cinematic) 0.4s both;
+}
 @utility animate-twitch {
   animation: twitch 6s ease-in-out infinite;
 }
