@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { glassButton, trackSheen } from "@/components/glass-button";
 import { textEms } from "@/lib/title-metrics";
 import { SiteNav } from "@/components/site-nav";
-import { ResumeSection, ResumeActions } from "@/components/resume-viewer";
+import { scrollToReveal } from "@/hooks/use-lenis";
+import { ResumeInlineDocument, ResumeActions } from "@/components/resume-viewer";
 import designOverrides from "@/lib/design-overrides.json";
 import { mergeOverridesFiles, resolveText, resolveHidden, designModeStyleTag } from "@/lib/apply-overrides";
 import type { DesignOverridesFile } from "@/lib/design-overrides.types";
@@ -46,21 +47,24 @@ function Contact() {
   // Both headings are fitted using the longer one's width, so they match.
   const headingEms = Math.max(textEms(heading), textEms(aboutHeading)).toFixed(3);
 
-  // Monitors only: the résumé pull-down. Mounted on first open (so the PDF
-  // preview isn't rendered until asked for) and kept mounted after, so it
-  // can animate closed; opening scrolls it into view.
   const [resumeOpen, setResumeOpen] = useState(false);
   const [resumeMounted, setResumeMounted] = useState(false);
-  const pulldownRef = useRef<HTMLDivElement>(null);
-  const toggleResume = useCallback(() => {
-    setResumeOpen((open) => {
-      if (!open) {
-        setResumeMounted(true);
-        window.setTimeout(() => pulldownRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 520);
+  const pulldownRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const toggleResume = () => {
+    setResumeMounted(true);
+    setResumeOpen(!resumeOpen);
+  };
+  useEffect(() => {
+    if (!resumeOpen) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timer = window.setTimeout(() => {
+      if (window.matchMedia("(min-width: 768px)").matches) {
+        if (pulldownRef.current) scrollToReveal(pulldownRef.current);
       }
-      return !open;
-    });
-  }, []);
+    }, reduced ? 0 : 520);
+    return () => window.clearTimeout(timer);
+  }, [resumeOpen]);
 
   return (
     /* `intro-font`: General Sans, with the same weights as the project pages
@@ -165,7 +169,7 @@ function Contact() {
             </div>
           )}
 
-          <div className="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-2 mon:grid-cols-1 gap-8 md:gap-10 mon:gap-7 items-start">
+          <div className="mt-6 md:mt-8">
             {/* Size container for the email (see `email-fit` in styles.css). */}
             <section className="min-w-0 [container-type:inline-size]">
               <p className={contactLabel}>Email</p>
@@ -177,66 +181,34 @@ function Contact() {
               </a>
             </section>
 
-            {/* Résumé, three ways:
-                - Phones: View Resume (the PDF in the phone's own viewer) and
-                  Download — no preview card.
-                - Tablets: the preview card (readable size) with Download /
-                  Open under it.
-                - Monitors: View Resume toggles the preview open below both
-                  clusters (see the pull-down after this section), plus
-                  Download. */}
-            <section className="min-w-0">
+            <section className="mt-8 md:hidden">
               <p className={contactLabel}>Resume</p>
-              <div className="resume-actions-phone md:hidden">
-                <ResumeActions viewFirst className="justify-center" />
-              </div>
-              <div className="hidden md:block mon:hidden max-w-sm">
-                <ResumeSection hideActions />
-                <ResumeActions className="mt-3" />
-              </div>
-              <div className="hidden mon:flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={toggleResume}
-                  onMouseMove={trackSheen}
-                  aria-expanded={resumeOpen}
-                  aria-controls="resume-pulldown"
-                  className={glassButton({ sheen: true, className: "text-button text-button--sized gap-2" })}
-                >
-                  {resumeOpen ? "Hide Resume" : "View Resume"}
-                  <svg
-                    aria-hidden
-                    viewBox="0 0 12 12"
-                    width="10"
-                    height="10"
-                    className={`transition-transform duration-300 ${resumeOpen ? "rotate-180" : ""}`}
-                  >
-                    <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <ResumeActions downloadOnly />
-              </div>
+              <div className="resume-actions-phone"><ResumeActions viewFirst className="justify-center" /></div>
             </section>
           </div>
         </section>
         </div>
 
-        {/* Monitors: the résumé pull-down. Collapsed to zero height until
-            View Resume opens it, then it slides open, centered below both
-            clusters, and the page scrolls to it. Clicking the card still
-            opens the full-screen viewer. */}
-        <div
-          id="resume-pulldown"
-          ref={pulldownRef}
-          className={`hidden mon:grid transition-[grid-template-rows,opacity] duration-500 ease-cinematic ${
-            resumeOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-          }`}
-          aria-hidden={!resumeOpen}
-        >
-          <div className="min-h-0 overflow-hidden">
-            <div className="mx-auto w-full max-w-md pt-16">{resumeMounted && <ResumeSection hideActions />}</div>
+        <section ref={pulldownRef} aria-label="Resume" className="hidden md:block mx-auto mt-12 lg:mt-16 w-full max-w-3xl scroll-mt-28 border-t border-foreground/15 pt-6">
+          <h2 className="mb-5 font-display text-2xl font-semibold tracking-tight">Resume</h2>
+          <div className="flex flex-wrap items-center gap-3 pb-5">
+            <button type="button" ref={toggleRef} onClick={toggleResume} onMouseMove={trackSheen}
+              aria-expanded={resumeOpen} aria-controls="resume-pulldown" aria-label={resumeOpen ? "Collapse resume" : "View resume"}
+              className={glassButton({ sheen: true, className: "text-button text-button--sized gap-3" })}>
+              View Resume
+              <svg aria-hidden viewBox="0 0 12 12" width="12" height="12" className={`transition-transform duration-300 motion-reduce:transition-none ${resumeOpen ? "rotate-180" : ""}`}>
+                <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <ResumeActions />
           </div>
-        </div>
+          <div id="resume-pulldown" role="region" aria-label="Resume preview" inert={!resumeOpen} aria-hidden={!resumeOpen}
+            className={`grid transition-[grid-template-rows,opacity] duration-500 ease-cinematic motion-reduce:transition-none ${resumeOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+            <div className="min-h-0 overflow-hidden">
+              {resumeMounted && <ResumeInlineDocument />}
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );

@@ -158,6 +158,28 @@ export function ResumeActions({
   );
 }
 
+/** Full PDF in the page flow, with no nested scrolling or extra click to read. */
+export function ResumeInlineDocument() {
+  const [containerRef, width] = useElementWidth<HTMLDivElement>();
+  const [failed, setFailed] = useState(false);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const fallback = <p className="p-8 text-center text-foreground/70">Preview unavailable. You can still download the PDF or open it in a new tab above.</p>;
+  return (
+    <div ref={containerRef} className="w-full">
+      {failed ? fallback : (
+        <PdfErrorBoundary fallback={fallback}>
+          <div className={numPages === null ? "min-h-[500px]" : undefined}>
+            {numPages === null && <p role="status" className="py-4 text-center text-sm text-foreground/60">Loading resume…</p>}
+            <Suspense fallback={null}>
+              {width > 0 && <ResumeDocumentPages file={resumeUrl(resumeMetaJson as ResumeMeta)} width={width} onNumPages={setNumPages} onError={() => setFailed(true)} />}
+            </Suspense>
+          </div>
+        </PdfErrorBoundary>
+      )}
+    </div>
+  );
+}
+
 export function ResumeSection({ hideActions = false }: { hideActions?: boolean } = {}) {
   const [meta, setMeta] = useState<ResumeMeta>(resumeMetaJson as ResumeMeta);
   const [zoom, setZoom] = useState(false);

@@ -14,6 +14,7 @@ import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
 import { ExchangeViewer } from "@/components/exchange-viewer";
 import { LollaViewer } from "@/components/lolla-viewer";
+import { DrawingCarousel } from "@/components/drawing-carousel";
 import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 
@@ -2247,96 +2248,9 @@ function ProjectPageInner() {
       )}
 
 
-      {/* Lollapalooza — Technical Drafting Package. CAA's construction
-          drawings for the build, directly above the event-photo row below.
-
-          One sheet at a time on every screen — the drawings carry too much
-          fine detail to survive being shown six-across. Desktop gets a
-          spring-slide carousel with arrows + progress pills; mobile a plain
-          swipe carousel. Both put each sheet whole on a white card
-          (`object-contain`, fixed frame height) so nothing crops a dimension
-          string or title block, and tapping a sheet opens the shared
-          lightbox. */}
       {isLollapalooza && lollapaloozaDraftingMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pt-10">
-          {/* Same label treatment as the render carousel's "Renderings"
-              header above — a real section title, not a caption. */}
-          <div className="mx-auto max-w-[1200px]">
-            <p className="mb-3 text-left font-display font-light uppercase text-xl md:text-3xl tracking-wide text-foreground">
-              Technical drawings
-            </p>
-          </div>
-          <div className="md:hidden">
-            <SwipeGallery
-              slug={project.slug}
-              items={lollapaloozaDraftingMedia}
-              slideClassName="bg-white p-2"
-            />
-          </div>
-
-          <div className="hidden md:block">
-            <FramerCarousel
-              className="mx-auto max-w-[1200px]"
-              count={lollapaloozaDraftingMedia.length}
-              accentColor={project.accentColor}
-              thumbnails={lollapaloozaDraftingMedia.map(({ item }) => item.src)}
-              renderSlide={(i, ctrl) => {
-                const { item: m } = lollapaloozaDraftingMedia[i];
-                return (
-                  /* The white sheet wraps only the drawing (plus a thin
-                     mount) and sits centred, so the page's black shows down
-                     both sides. Not clickable — these read fine at this size
-                     and there's no isolated view to open. Arrows sit just off
-                     the card's edges and only render for the active slide.
-
-                     Every sheet renders at one fixed height so the frame is
-                     the same on every slide — the wider sheets used to hit the
-                     max-width cap first and come out shorter, leaving a gap
-                     above the thumbnail strip. The height is low enough that
-                     even the widest sheet stays under the width cap, so
-                     nothing crops; where a sheet is a touch narrower than the
-                     box it just gets white margins, invisible on the white
-                     card. */
-                  <div className="flex w-full justify-center pt-4 pb-2">
-                    <div className="relative">
-                      <div className="flex items-center justify-center bg-white p-3 shadow-lg">
-                        <img
-                          data-design-id={designId.projectMedia(project.slug, m.id!)}
-                          data-design-kind="image"
-                          src={m.src}
-                          alt={m.caption ?? project.title}
-                          loading="lazy"
-                          className="block h-[min(600px,64vh)] w-auto max-w-[min(1000px,84vw)] object-contain"
-                        />
-                      </div>
-                      {ctrl.isActive && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={ctrl.goPrev}
-                            disabled={ctrl.isFirst}
-                            aria-label="Previous drafting sheet"
-                            className="nav-arrow absolute right-full top-1/2 mr-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
-                          >
-                            ‹
-                          </button>
-                          <button
-                            type="button"
-                            onClick={ctrl.goNext}
-                            disabled={ctrl.isLast}
-                            aria-label="Next drafting sheet"
-                            className="nav-arrow absolute left-full top-1/2 ml-3 h-10 w-10 -translate-y-1/2 disabled:pointer-events-none disabled:opacity-30"
-                          >
-                            ›
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              }}
-            />
-          </div>
+          <DrawingCarousel slug={project.slug} items={lollapaloozaDraftingMedia} onOpen={setLightbox} />
         </section>
       )}
 
