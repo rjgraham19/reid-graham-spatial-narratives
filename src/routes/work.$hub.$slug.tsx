@@ -342,7 +342,7 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
    read as peers and the block stays short; stacked (tight gap) on narrow
    screens and in the narrow "split" column. MY ROLE leads (first, white, a
    touch heavier); collaborators sit at nearly the same size, just softer. */
-const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.14em] [font-weight:var(--intro-tags-w,300)] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
+const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
 const creditRole = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground font-medium";
 const creditCollab = "text-[10px] lg:text-[13px] leading-relaxed tracking-[0.14em] text-foreground/70";
 
@@ -363,13 +363,13 @@ function IntroCredits({ project, align }: { project: Project; align: IntroAlign 
     >
       {myRole && (
         <div>
-          <p className={creditLabel}>My role</p>
+          <p className={`${creditLabel} font-medium`}>My role</p>
           <p className={`mt-1 ${creditRole}`}>{myRole.role}</p>
         </div>
       )}
       {collaborators.length > 0 && (
         <div>
-          <p className={creditLabel}>{collabLabel}</p>
+          <p className={`${creditLabel} font-normal`}>{collabLabel}</p>
           <p className={`mt-1 ${creditCollab}`}>
             {collaborators.length === 1 ? (
               <span className="text-foreground/90">{collaborators[0].name}</span>
