@@ -38,7 +38,16 @@ const ZONES: {
  *  ever drags the camera; scroll-wheel zoom is switched off in the scene
  *  itself so an ordinary scroll never gets caught by the model and always
  *  keeps moving the page. */
-export function ExchangeViewer({ description }: { description: string }) {
+export function ExchangeViewer({
+  description,
+  asHero = false,
+}: {
+  description: string;
+  /** As the page's top image (standard project intro): flush to the top
+   *  and capped at the same share of the screen as other header photos, so
+   *  the title below it still shows on first view. */
+  asHero?: boolean;
+}) {
   const stage = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
   const controls = useRef<Awaited<
@@ -87,7 +96,7 @@ export function ExchangeViewer({ description }: { description: string }) {
   const zoneText = ZONES.find((z) => z.id === view);
 
   return (
-    <section className="pt-4 pb-10" aria-label="Explore the Exchange Facility">
+    <section className={asHero ? "pb-2" : "pt-4 pb-10"} aria-label="Explore the Exchange Facility">
       {/* Full-bleed and tall — this is the page's real header image, not a
           boxed-in embed, so it needs to fill the viewport the moment the
           page opens rather than sit behind a rounded frame with page
@@ -95,7 +104,7 @@ export function ExchangeViewer({ description }: { description: string }) {
       <div
         ref={stage}
         className="relative w-full overflow-hidden bg-black"
-        style={{ height: "clamp(480px, 85vh, 950px)" }}
+        style={{ height: asHero ? "clamp(440px, 70svh, 820px)" : "clamp(480px, 85vh, 950px)" }}
       >
         <div ref={host} className="absolute inset-0" data-lenis-prevent />
 

@@ -228,7 +228,22 @@ function RoleAndCollaborators({ project }: { project: Project }) {
    which also sets the per-element weight variables. The `.intro-trial` wrapper cancels any old visual-editor
    nudges on these elements (see styles.css) — they were tuned for the
    previous layout. */
-const INTRO_TRIAL_SLUGS = new Set(["tab-renaissance", "you-cant-take-it-with-you", "reshuffling-the-deck"]);
+/* Every project page on the main site uses the standard intro. The
+   Visualizations hub is left out — it isn't linked from the site yet. */
+const INTRO_PROJECTS: [hub: string, slug: string, label: string][] = [
+  ["production-scenic", "lollapalooza", "Lollapalooza"],
+  ["production-scenic", "you-cant-take-it-with-you", "You Can't Take It With You!"],
+  ["architecture", "the-exchange-facility", "Exchange Facility"],
+  ["architecture", "staging-aesthetics", "Staging Aesthetics"],
+  ["production-scenic", "reshuffling-the-deck", "Reshuffling the Deck"],
+  ["production-scenic", "true-west", "True West"],
+  ["production-scenic", "rags-to-riches", "Rags to Riches"],
+  ["production-scenic", "the-diary-of-anne-frank", "Anne Frank"],
+  ["architecture", "field-house", "Field House"],
+  ["architecture", "townhouse", "Townhouse"],
+  ["production-scenic", "tab-renaissance", "Garden of Earthly Delights"],
+];
+const INTRO_TRIAL_SLUGS = new Set(INTRO_PROJECTS.map(([, slug]) => slug));
 
 type IntroAlign = "center" | "split";
 
@@ -389,7 +404,17 @@ function IntroCredits({ project, align }: { project: Project; align: IntroAlign 
 }
 
 /* Everything after the header: the description, then the credits. */
-function IntroBody({ project, align }: { project: Project; align: IntroAlign }) {
+function IntroBody({
+  project,
+  align,
+  description = project.description,
+}: {
+  project: Project;
+  align: IntroAlign;
+  /** Defaults to the project's description. The Exchange Facility passes
+   *  only its first half — the second half sits in the 3D model's overlay. */
+  description?: string;
+}) {
   return (
     <RevealBlock className="intro-trial">
       <div className={introColumn(align)}>
@@ -399,7 +424,7 @@ function IntroBody({ project, align }: { project: Project; align: IntroAlign }) 
           className={introDescriptionType}
           style={{ fontWeight: "var(--intro-description-w, 400)" }}
         >
-          {project.description}
+          {description}
         </p>
       </div>
       <div className={introDescriptionGap}>
@@ -409,36 +434,29 @@ function IntroBody({ project, align }: { project: Project; align: IntroAlign }) 
   );
 }
 
-/* Localhost-only tab strip for flipping between the intro mockups. Plain
-   links (not router Links) so each page loads fresh; keeps `?panel=1` when
-   browsing inside the project panel's frame. */
-const INTRO_MOCKUPS: [string, string][] = [
-  ["tab-renaissance", "Garden of Earthly Delights"],
-  ["you-cant-take-it-with-you", "You Can't Take It With You!"],
-  ["reshuffling-the-deck", "Reshuffling the Deck"],
-];
-
-const trialPill = "fixed left-4 z-[200] flex flex-wrap items-center gap-1 rounded-full border border-white/20 bg-black/85 p-1 text-[11px] text-white backdrop-blur";
+/* Localhost-only strip for stepping through every project page that uses
+   the standard intro, for review. Plain links (not router Links) so each
+   page loads fresh; keeps `?panel=1` when browsing inside the project
+   panel's frame. Never renders in a production build. */
+const trialPill = "fixed left-4 right-4 z-[200] flex flex-wrap items-center gap-1 rounded-2xl border border-white/20 bg-black/85 p-1 text-[11px] text-white backdrop-blur md:right-auto";
 const trialOption = (active: boolean) =>
   `rounded-full px-3 py-1 ${active ? "bg-white text-black" : "hover:bg-white/15"}`;
 
-function IntroMockupTabs({ current, hub, panel }: { current: string; hub: string; panel: boolean }) {
+function IntroMockupTabs({ current, panel }: { current: string; panel: boolean }) {
   if (!import.meta.env.DEV) return null;
   return (
-    <>
-      <div className={`${trialPill} bottom-4`}>
-        <span className="px-2 uppercase tracking-[0.15em] text-white/50">Mockup</span>
-        {INTRO_MOCKUPS.map(([slug, label]) => (
-          <a
-            key={slug}
-            href={`/work/${hub}/${slug}${panel ? "?panel=1" : ""}`}
-            className={trialOption(current === slug)}
-          >
-            {label}
-          </a>
-        ))}
-      </div>
-    </>
+    <div className={`${trialPill} bottom-4`}>
+      <span className="px-2 uppercase tracking-[0.15em] text-white/50">Review</span>
+      {INTRO_PROJECTS.map(([hub, slug, label]) => (
+        <a
+          key={slug}
+          href={`/work/${hub}/${slug}${panel ? "?panel=1" : ""}`}
+          className={trialOption(current === slug)}
+        >
+          {label}
+        </a>
+      ))}
+    </div>
   );
 }
 
@@ -808,14 +826,30 @@ function ProjectPageInner() {
             <IntroHeader project={project} panel={!!panel} align="center" />
           </div>
           <div className="order-3 px-6 md:px-12 lg:px-16 pt-12 md:pt-16 lg:pt-24 pb-14 md:pb-20">
-            <IntroBody project={project} align="center" />
+            <IntroBody
+              project={project}
+              align="center"
+              description={
+                isExchange
+                  ? splitAt(project.description, "The Exchange facility enables the systemic circulation")[0]
+                  : undefined
+              }
+            />
           </div>
+          {/* Lollapalooza: its event-photo band is the top image (in the
+              hero slot), so the day/night render carousel — its old hero —
+              follows the intro instead of sitting between the photos and
+              the title. Same media, same order, title just moves up. */}
+          {isLollapalooza && (
+            <figure className="order-4 px-6 md:px-12 lg:px-16 pb-10 md:pb-14">
+              <LollaRenderCarousel />
+            </figure>
+          )}
         </>
       )}
       {introTrial && (
         <IntroMockupTabs
           current={project.slug}
-          hub={project.hub}
           panel={!!panel}
         />
       )}
@@ -962,7 +996,7 @@ function ProjectPageInner() {
              plain black, not the light zone's white — which is why the hero
              read as pressed straight against the black title block instead
              of eased into it. */
-          isFieldHouse ? " light-zone bg-background pt-6 md:pt-8" : ""
+          isFieldHouse && !introTrial ? " light-zone bg-background pt-6 md:pt-8" : ""
         }${
           /* Image-first trial (Garden of Earthly Delights): move the hero
              above the title, flush to the top edge of the window/panel. */
@@ -978,7 +1012,9 @@ function ProjectPageInner() {
             up-front showcase. Tapping one opens the shared lightbox by its
             real media index. */}
         {isLollapalooza && lollapaloozaGalleryMedia.length > 0 && (
-          <div className="py-8 md:py-12">
+          /* Standard intro: this band is the page's top image, so it sits
+             flush at the top rather than padded like a mid-page strip. */
+          <div className={introTrial ? "pb-2" : "py-8 md:py-12"}>
             <ImageAutoSlider
               speedSeconds={22}
               paused={lightbox != null}
@@ -999,7 +1035,7 @@ function ProjectPageInner() {
             this same description field now sits in `extendedDescription`,
             pinned beside the record-player scroll-scrub farther down
             instead of up here. */}
-        {isLollapalooza && (
+        {isLollapalooza && !introTrial && (
           <section className="px-6 md:px-12 lg:px-16 pb-6 md:pb-8 text-center">
             <RevealBlock>
               <p
@@ -1017,8 +1053,18 @@ function ProjectPageInner() {
         {/* Exchange Facility — no static hero photo. The live 3D model fills
             this slot instead (rendered further down, directly under the
             description), so nothing repeats a rendering the model already
-            shows moving. */}
-        {!isExchange && (
+            shows moving. With the standard intro the model itself is the
+            top image instead. Lollapalooza's render carousel moves below
+            the intro (see the intro block above). */}
+        {isExchange && introTrial && (
+          <ExchangeViewer
+            asHero
+            description={
+              splitAt(project.description, "The Exchange facility enables the systemic circulation")[1]
+            }
+          />
+        )}
+        {!isExchange && !(introTrial && isLollapalooza) && (
         <figure
           className={`z-0 relative ${
             /* Same margins as every other image/text block on the page, in
@@ -1089,7 +1135,7 @@ function ProjectPageInner() {
                  nothing is actually being cropped. Padding the image inside
                  its own box, on the page's own background, gives it back
                  that breathing room without touching the source file. */
-              isTownhouse ? "bg-background p-4 md:p-8" : "bg-secondary"
+              isTownhouse && !introSplit ? "bg-background p-4 md:p-8" : "bg-secondary"
             } ${
               /* On a wide screen the 8fr grid column stretches this well
                  past 900px, reading as oversized against the rest of the
@@ -1099,7 +1145,7 @@ function ProjectPageInner() {
                  without ballooning further just because a wide monitor has
                  the room. Only kicks in at lg — narrower than that the
                  column is already this size or smaller on its own. */
-              isTownhouse ? "lg:max-w-[720px]" : ""
+              isTownhouse && !introSplit ? "lg:max-w-[720px]" : ""
             }`}
             aria-label={`Enlarge ${project.title}`}
           >
@@ -1265,7 +1311,7 @@ function ProjectPageInner() {
           YCTIWU. Its own media[0] caption (which repeated this text with an
           "01 — " index) was dropped, and it's skipped in the generic
           description section below, so it shows here once. */}
-      {isFieldHouse && (
+      {isFieldHouse && !introTrial && (
         <section className="px-6 md:px-12 lg:px-16 pt-8 md:pt-10 pb-2 md:pb-4">
           <RevealBlock>
             <p
@@ -1287,7 +1333,7 @@ function ProjectPageInner() {
           static renderings — see the block right before the media gallery.
           Skipped in the generic description+credits band further down so
           it doesn't repeat. */}
-      {isExchange && (
+      {isExchange && !introTrial && (
         <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4">
           <RevealBlock>
             <p
@@ -1308,7 +1354,7 @@ function ProjectPageInner() {
           itself (the "Entire Facility" view's own bottom-left overlay)
           rather than a separate section here — removing that section
           brings the static renderings up sooner. */}
-      {isExchange && (
+      {isExchange && !introTrial && (
         <ExchangeViewer
           description={
             splitAt(
@@ -1401,7 +1447,7 @@ function ProjectPageInner() {
           would render twice. YCTIWY, True West and Anne Frank each have
           their own info block below the hero too now — skipped here for
           the same reason. */}
-      {!isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && !isRagsToRiches && !isReshuffling && !isYctiwy && !isTrueWest && !isAnneFrank && (
+      {!introTrial && !isPortraitHero && !isTab && !isFieldHouse && !isLollapalooza && !isExchange && !isRagsToRiches && !isReshuffling && !isYctiwy && !isTrueWest && !isAnneFrank && (
       <section className="px-6 md:px-12 lg:px-16 py-6 md:py-8 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8">
           <RevealBlock>
@@ -1432,7 +1478,7 @@ function ProjectPageInner() {
           photo-op sentence that used to be the back half of this same
           description now moves to the blurb beside the honky-tonk photo
           directly below, where it's actually about the pictured image. */}
-      {isRagsToRiches && (
+      {isRagsToRiches && !introTrial && (
         <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
           <RevealBlock>
             <p
