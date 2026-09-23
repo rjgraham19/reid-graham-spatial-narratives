@@ -34,7 +34,7 @@ const EMAIL = "reidjgraham@gmail.com";
 /* Small grey section labels (EMAIL, RESUME), the credit-label style from the
    project pages at a size that reads on a tablet, sitting close to the
    thing they label. */
-const contactLabel = "text-xs md:text-[13px] tracking-[0.14em] uppercase text-foreground/50 mb-2 md:mb-3";
+const contactLabel = "text-sm md:text-[13px] tracking-[0.14em] uppercase text-foreground/50 mb-2 md:mb-3";
 
 function Contact() {
   const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
@@ -114,10 +114,19 @@ function Contact() {
               </a>
             </section>
 
+            {/* Phones: no preview card (unreadable at that width and a full
+                screen of scrolling) — just View Resume, which opens the PDF
+                in the phone's own viewer, and Download. Tablet and up keep
+                the card with its pop-up viewer. */}
             <section>
               <p className={contactLabel}>Resume</p>
-              <ResumeSection hideActions />
-              <ResumeActions className="mt-3 justify-center md:justify-start" />
+              <div className="resume-actions-phone md:hidden">
+                <ResumeActions viewFirst className="justify-center" />
+              </div>
+              <div className="hidden md:block">
+                <ResumeSection hideActions />
+                <ResumeActions className="mt-3" />
+              </div>
             </section>
           </div>
 

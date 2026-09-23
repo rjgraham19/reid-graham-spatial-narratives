@@ -107,10 +107,10 @@ function DownloadLink({ href, className, onClick }: { href: string; className: s
   );
 }
 
-function OpenNewTabLink({ href, className }: { href: string; className: string }) {
+function OpenNewTabLink({ href, className, label = "Open in new tab" }: { href: string; className: string; label?: string }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" aria-label="Open resume PDF in a new tab" className={className}>
-      Open in new tab
+      {label}
     </a>
   );
 }
@@ -121,14 +121,34 @@ function OpenNewTabLink({ href, className }: { href: string; className: string }
  *  row below). Reads the static résumé metadata directly rather than the
  *  card's own state — fine since the only thing that updates it is Design
  *  Mode's uploader, which the public Contact page never renders. */
-export function ResumeActions({ className }: { className?: string }) {
+export function ResumeActions({
+  className,
+  viewFirst = false,
+}: {
+  className?: string;
+  /** Phone version, where there's no preview card: lead with "View Resume"
+   *  (the PDF in a new tab, i.e. the phone's own PDF viewer), then Download. */
+  viewFirst?: boolean;
+}) {
   const meta = resumeMetaJson as ResumeMeta;
   if (meta.updatedAt == null) return null;
   const url = resumeUrl(meta);
+  const btn = glassButton({ sheen: true, className: "text-button text-button--sized" });
+  const download = <DownloadLink href={url} className={btn} onClick={trackResumeDownload} />;
+  const open = <OpenNewTabLink href={url} className={btn} label={viewFirst ? "View Resume" : undefined} />;
   return (
     <div className={`flex flex-wrap gap-3${className ? ` ${className}` : ""}`}>
-      <DownloadLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} onClick={trackResumeDownload} />
-      <OpenNewTabLink href={url} className={glassButton({ sheen: true, className: "text-button text-button--sized" })} />
+      {viewFirst ? (
+        <>
+          {open}
+          {download}
+        </>
+      ) : (
+        <>
+          {download}
+          {open}
+        </>
+      )}
     </div>
   );
 }

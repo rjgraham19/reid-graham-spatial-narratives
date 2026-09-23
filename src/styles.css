@@ -886,6 +886,12 @@
   }
 }
 
+/* Contact page, phones: with no résumé preview card, View Resume / Download
+   PDF are the résumé, so they step up from the tags' 10px. */
+.resume-actions-phone .text-button--sized {
+  font-size: 12px;
+}
+
 /* The Contact page email address: its usual size, capped so the whole
    address fits its column on one line. 100cqi is the column's width (the
    wrapping <section> is a size container); 11.1 is "reidjgraham@gmail.com"
