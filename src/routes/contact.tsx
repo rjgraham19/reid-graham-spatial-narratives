@@ -138,7 +138,7 @@ function Contact() {
             <h2
               data-design-id={designId.connect("about-heading")}
               data-design-kind="heading"
-              className="text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-5xl lg:text-6xl"
+              className="animate-heading-pop motion-reduce:animate-none origin-center md:origin-left text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.9] tracking-[-0.02em] text-4xl md:text-5xl lg:text-6xl"
             >
               {overridesFile[designId.connect("about-heading")]?.base?.text ?? "About Me :)"}
             </h2>

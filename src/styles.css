@@ -267,6 +267,14 @@
   55% { transform: scale(1.03); }
   100% { opacity: 1; transform: scale(1); }
 }
+/* A livelier cousin of pop-in for a single heading (Contact's "About Me :)"):
+   quicker, a touch more overshoot, and a small settle-back before resting. */
+@keyframes heading-pop {
+  0% { opacity: 0; transform: translateY(8px) scale(0.86); }
+  50% { opacity: 1; transform: translateY(0) scale(1.06); }
+  72% { transform: scale(0.985); }
+  100% { opacity: 1; transform: scale(1); }
+}
 @keyframes twitch {
   0%, 92%, 100% { transform: translate(0,0) rotate(var(--twitch-r, 0deg)); }
   94% { transform: translate(1px, -1px) rotate(calc(var(--twitch-r, 0deg) + 0.4deg)); }
@@ -297,6 +305,9 @@
 }
 @utility animate-pop-in {
   animation: pop-in 0.9s var(--ease-cinematic) both;
+}
+@utility animate-heading-pop {
+  animation: heading-pop 0.7s cubic-bezier(0.34, 1.2, 0.5, 1) 0.15s both;
 }
 
 /* CSS twin of AnimatedHeading's motion letter reveal, for titles that should
