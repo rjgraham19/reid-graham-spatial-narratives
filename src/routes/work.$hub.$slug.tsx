@@ -342,9 +342,9 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
    read as peers and the block stays short; stacked (tight gap) on narrow
    screens and in the narrow "split" column. MY ROLE leads (first, white, a
    touch heavier); collaborators sit at nearly the same size, just softer. */
-const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.18em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
-const creditRole = "text-[10px] lg:text-[13px] tracking-[0.12em] text-foreground font-medium";
-const creditCollab = "text-[10px] lg:text-[13px] leading-relaxed tracking-[0.12em] text-foreground/70";
+const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
+const creditRole = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground font-medium";
+const creditCollab = "text-[10px] lg:text-[13px] leading-relaxed tracking-[0.14em] text-foreground/70";
 
 function IntroCredits({ project, align }: { project: Project; align: IntroAlign }) {
   const credits = (project.credits ?? []).filter((c) => !c.hidden);
@@ -1228,7 +1228,7 @@ function ProjectPageInner() {
 
             <div className="mt-6 md:mt-0">
               <RevealBlock>
-                <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+                <p className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
                   {italicizePhrase(project.extendedDescription ?? "", "The Garden of Earthly Delights")}
                 </p>
               </RevealBlock>
@@ -1459,7 +1459,7 @@ function ProjectPageInner() {
         <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center">
             <RevealBlock>
-              <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+              <p className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
                 A photo op that nods to Nashville's honky-tonk culture,
                 complete with an Opry-style ribbon microphone.
               </p>
@@ -1514,7 +1514,7 @@ function ProjectPageInner() {
               </figure>
             </RevealBlock>
             <RevealBlock delay={0.1}>
-              <p className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+              <p className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
                 At the "Rags to Riches" country carnival, every game revolves
                 around luck and money. The main attraction: a blinged-out,
                 Zoltar-inspired "Cash Cow" dispenses your financial fortunes.
@@ -1564,7 +1564,7 @@ function ProjectPageInner() {
             <blockquote
               data-design-id={designId.projectPullQuote(project.slug)}
               data-design-kind="text"
-              className="font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl"
+              className="body-statement font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl"
             >
               {project.pullQuote}
             </blockquote>
@@ -1637,7 +1637,7 @@ function ProjectPageInner() {
               /* Second pull quote — same weight and size as the one above the
                  image trio, sitting just under it and before the final
                  diagram. */
-              <blockquote className="mt-10 md:mt-12 max-w-4xl space-y-2 font-display font-light text-xl md:text-3xl leading-snug text-balance">
+              <blockquote className="body-statement mt-10 md:mt-12 max-w-4xl space-y-2 font-display font-light text-xl md:text-3xl leading-snug text-balance">
                 <span className="block">{project.dualityLines[0]}</span>
                 <span className="block">{project.dualityLines[1]}</span>
               </blockquote>
@@ -1732,7 +1732,7 @@ function ProjectPageInner() {
                   <RevealBlock>
                     <p
                       data-design-kind="text"
-                      className="mt-6 md:mt-8 max-w-4xl mx-auto font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center"
+                      className="body-statement mt-6 md:mt-8 max-w-4xl mx-auto font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center"
                     >
                       {project.extendedDescription}
                     </p>
@@ -1843,7 +1843,7 @@ function ProjectPageInner() {
                     <p
                       data-design-id={designId.projectPullQuote(project.slug)}
                       data-design-kind="text"
-                      className="mt-6 md:mt-8 font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-foreground/85 text-center"
+                      className="body-statement mt-6 md:mt-8 font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-foreground/85 text-center"
                     >
                       {project.pullQuote}
                     </p>
@@ -1989,7 +1989,7 @@ function ProjectPageInner() {
             <RevealBlock>
               <p
                 data-design-kind="text"
-                className="font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-3xl mb-8 md:mb-10"
+                className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-3xl mb-8 md:mb-10"
               >
                 {project.extendedDescription}
               </p>
