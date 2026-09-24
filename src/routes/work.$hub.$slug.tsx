@@ -1992,7 +1992,7 @@ function ProjectPageInner() {
                     <figcaption
                       data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
                       data-design-kind="text"
-                      className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed"
+                      className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed text-right"
                     >
                       {project.media[idx].caption}
                     </figcaption>
