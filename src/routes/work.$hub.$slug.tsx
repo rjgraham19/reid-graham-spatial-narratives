@@ -1300,13 +1300,15 @@ function ProjectPageInner() {
               column it ran a whole screen tall. Its width is capped so it
               stands about 55% of the viewport high (36svh wide × 1.52), and
               the passage beside it sits on its bottom edge — it describes
-              the marketing materials the animation ends on. */}
-          <div className="md:grid md:grid-cols-[auto_minmax(0,1fr)] md:gap-10 lg:gap-16 md:items-end">
+              the marketing materials the animation ends on. The two share the
+              row half-and-half, the video centred in its half so wide screens
+              don't leave it pinned to the left with empty space beside. */}
+          <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 md:items-end">
             <figure className="group">
               <button
                 type="button"
                 onClick={() => setLightbox(1)}
-                className="mx-auto md:mx-0 block w-full max-w-[36svh] md:w-[36svh] overflow-hidden bg-secondary"
+                className="mx-auto block w-full max-w-[min(100%,36svh)] overflow-hidden bg-secondary"
                 aria-label="Enlarge TaB closeup animation"
               >
                 <InViewVideo
