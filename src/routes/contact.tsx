@@ -38,6 +38,32 @@ const EMAIL = "reidjgraham@gmail.com";
    thing they label. */
 const contactLabel = "text-sm md:text-[13px] tracking-[0.14em] uppercase text-foreground/50 mb-2 md:mb-3";
 
+/* The portrait is a plain (top-to-bottom) JPEG: faded in on arrival, the
+   fade ran while it was still painting in strip by strip, and a grey
+   placeholder box faded in ahead of it. It now stays invisible until the
+   whole photo has decoded, then fades in once. `complete` catches the case
+   where it finished loading before React hydrated and onLoad never fires.
+   Swap the file at public/reid-graham-portrait.jpg to replace the photo. */
+function Portrait() {
+  const img = useRef<HTMLImageElement>(null);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (img.current?.complete && img.current.naturalWidth > 0) setReady(true);
+  }, []);
+  return (
+    <img
+      ref={img}
+      src="/reid-graham-portrait.jpg"
+      alt="Reid Graham"
+      decoding="async"
+      onLoad={() => setReady(true)}
+      className={`w-full aspect-[3/4] rounded-md object-cover object-top ${
+        ready ? "animate-tile-in motion-reduce:animate-none" : "opacity-0"
+      }`}
+    />
+  );
+}
+
 function Contact() {
   const { live, liveMedia, liveMediaOrder, onLocalPatch, onLocalReset, onSyncAll } = useLiveOverrides();
   const overridesFile = mergeOverridesFiles(designOverrides as DesignOverridesFile, live);
@@ -126,13 +152,7 @@ function Contact() {
           </div>
 
           <div className="mt-5 md:mt-6 grid grid-cols-[2fr_3fr] md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] mon:grid-cols-[2fr_3fr] gap-5 md:gap-8 items-start md:max-w-4xl">
-            {/* Swap the file at public/reid-graham-portrait.jpg to replace
-                the photo. */}
-            <img
-              src="/reid-graham-portrait.jpg"
-              alt="Reid Graham"
-              className="w-full aspect-[3/4] rounded-md object-cover object-top bg-secondary animate-tile-in motion-reduce:animate-none"
-            />
+            <Portrait />
 
             <p
               data-design-id={designId.connect("about-description")}
