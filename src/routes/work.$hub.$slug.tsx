@@ -1301,14 +1301,15 @@ function ProjectPageInner() {
               stands about 55% of the viewport high (36svh wide × 1.52), and
               the passage beside it sits on its bottom edge — it describes
               the marketing materials the animation ends on. The two share the
-              row half-and-half, the video centred in its half so wide screens
+              row half-and-half, meeting at the centre: the video pushed to the right
+              of its half and the passage kept to 3–4 lines in the other, so wide screens
               don't leave it pinned to the left with empty space beside. */}
           <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 md:items-end">
             <figure className="group">
               <button
                 type="button"
                 onClick={() => setLightbox(1)}
-                className="mx-auto block w-full max-w-[min(100%,36svh)] overflow-hidden bg-secondary"
+                className="mx-auto md:mr-0 block w-full max-w-[min(100%,36svh)] overflow-hidden bg-secondary"
                 aria-label="Enlarge TaB closeup animation"
               >
                 <InViewVideo
@@ -1321,7 +1322,7 @@ function ProjectPageInner() {
 
             <div className="mt-6 md:mt-0">
               <RevealBlock>
-                <p className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+                <p className="body-statement md:max-w-[42rem] font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
                   {italicizePhrase(project.extendedDescription ?? "", "The Garden of Earthly Delights")}
                 </p>
               </RevealBlock>
