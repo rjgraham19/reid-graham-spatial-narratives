@@ -74,7 +74,6 @@ export function TownhouseViewer() {
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">Spatial study</p>
           <h2 className="text-2xl font-medium">Explore Townhouse</h2>
         </div>
-        <p className="text-sm text-muted-foreground">Concrete, glass block, and the spaces between.</p>
       </div>
 
       <div className="relative overflow-hidden rounded-md bg-[#050507]" style={{ height: 'clamp(340px, 65vh, 760px)' }}>

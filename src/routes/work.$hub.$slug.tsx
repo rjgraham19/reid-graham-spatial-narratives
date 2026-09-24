@@ -251,6 +251,11 @@ const INTRO_TRIAL_SLUGS = new Set(INTRO_PROJECTS.map(([, slug]) => slug));
    gallery image, see design-media-additions.json). */
 const EXCHANGE_HERO_SRC = "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE_EDITEDRENDER.png";
 
+/* Gallery images shown but not clickable into the lightbox. Staging
+   Aesthetics' closing image is a composite of several sub-images; it stays
+   non-clickable until it's split into separate assets. */
+const NOT_ISOLATABLE_MEDIA = new Set(["media-mt3ipvcu-itx0k"]);
+
 /* Each top image's width ÷ height, measured from the files. The hero is
    the first thing on the page, so until its file arrives the browser would
    otherwise give it no height — everything below drew up near the top and
@@ -1291,12 +1296,17 @@ function ProjectPageInner() {
               its own field now (extendedDescription) so it can sit here,
               beside the imagery it actually explains, without also being
               duplicated in the short intro above. */}
-          <div className="md:grid md:grid-cols-2 md:gap-8 lg:gap-12 md:items-start">
+          {/* The animation is a tall portrait (1358×2066); at a full half
+              column it ran a whole screen tall. Its width is capped so it
+              stands about 55% of the viewport high (36svh wide × 1.52), and
+              the passage beside it sits on its bottom edge — it describes
+              the marketing materials the animation ends on. */}
+          <div className="md:grid md:grid-cols-[auto_minmax(0,1fr)] md:gap-10 lg:gap-16 md:items-end">
             <figure className="group">
               <button
                 type="button"
                 onClick={() => setLightbox(1)}
-                className="block w-full overflow-hidden bg-secondary md:max-w-[95%]"
+                className="mx-auto md:mx-0 block w-full max-w-[36svh] md:w-[36svh] overflow-hidden bg-secondary"
                 aria-label="Enlarge TaB closeup animation"
               >
                 <InViewVideo
@@ -1976,6 +1986,17 @@ function ProjectPageInner() {
                       className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                     />
                   </button>
+                  {/* Scenic groundplan (left) / scenic elevation (right) —
+                      the site's standard gallery caption treatment. */}
+                  {project.media[idx].caption && (
+                    <figcaption
+                      data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
+                      data-design-kind="text"
+                      className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed"
+                    >
+                      {project.media[idx].caption}
+                    </figcaption>
+                  )}
                 </figure>
               ))}
             </div>
@@ -2154,6 +2175,7 @@ function ProjectPageInner() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {galleryMedia.map(({ item: m, index: i }) => {
               const mediaId = designId.projectMedia(project.slug, m.id!);
+              const isolatable = !NOT_ISOLATABLE_MEDIA.has(m.id ?? "");
               const isHalf = m.layout === "half";
               const role = m.addedByDesignMode ? (isHalf ? "half-width image" : "full-width image") : "gallery image";
               const mediaEl =
@@ -2190,7 +2212,9 @@ function ProjectPageInner() {
                     src={m.src}
                     alt={m.decorative ? "" : (m.alt ?? m.caption ?? project.title)}
                     loading="lazy"
-                    className="block w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+                    className={`block w-full h-auto object-cover ${
+                      isolatable ? "group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic" : ""
+                    }`}
                   />
                 );
               return (
@@ -2210,6 +2234,8 @@ function ProjectPageInner() {
                     <a href={m.link} className="block w-full overflow-hidden bg-secondary">
                       {mediaEl}
                     </a>
+                  ) : !isolatable ? (
+                    <div className="block w-full overflow-hidden bg-secondary">{mediaEl}</div>
                   ) : (
                     <button
                       type="button"

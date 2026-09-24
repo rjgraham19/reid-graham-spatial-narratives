@@ -50,7 +50,13 @@ export function ImageAutoSlider({
   imageClassName?: string;
 }) {
   const n = images.length;
-  const loop = n > 0 ? [...images, ...images] : [];
+  // One "set" is the images repeated until it's comfortably wider than any
+  // screen (≥ 10 tiles), so the belt never runs out and shows black before
+  // the loop comes back round. The track is two identical sets; sliding it
+  // by exactly -50% lands on the seam.
+  const reps = n > 0 ? Math.max(1, Math.ceil(10 / n)) : 0;
+  const set = Array.from({ length: reps }, () => images).flat();
+  const loop = [...set, ...set];
   const clickable = typeof onImageClick === "function";
 
   // The belt never stops moving on its own, so a click aimed at one tile can
@@ -70,10 +76,11 @@ export function ImageAutoSlider({
     >
       <style>{IAS_CSS}</style>
       <div
-        className="ias-track flex w-max gap-4 md:gap-6"
+        className="ias-track flex w-max"
         style={
           {
-            animationDuration: `${speedSeconds}s`,
+            // Scaled by the repeats so the belt keeps the same on-screen speed.
+            animationDuration: `${speedSeconds * Math.max(1, reps)}s`,
             animationDirection: reverse ? "reverse" : "normal",
             animationPlayState: paused || hovering ? "paused" : "running",
           } as CSSProperties
@@ -81,10 +88,12 @@ export function ImageAutoSlider({
       >
         {loop.map((src, i) => {
           const idx = i % n;
-          const isDupe = i >= n;
+          const isDupe = i >= n; // only the first pass of the images is announced
           const alt = imageAlts?.[idx] ?? "";
           const tileClass = cn(
-            "ias-item h-48 w-48 shrink-0 overflow-hidden shadow-2xl sm:h-60 sm:w-60 md:h-80 md:w-80 lg:h-[22rem] lg:w-[22rem]",
+            // Trailing margin on every tile (not a flex gap) so the two sets
+            // are exactly equal widths and the -50% slide is seamless.
+            "ias-item mr-4 md:mr-6 h-48 w-48 shrink-0 overflow-hidden shadow-2xl sm:h-60 sm:w-60 md:h-80 md:w-80 lg:h-[22rem] lg:w-[22rem]",
             imageClassName,
           );
           const img = (
@@ -92,7 +101,7 @@ export function ImageAutoSlider({
               src={src}
               alt={alt}
               aria-hidden={isDupe || undefined}
-              loading="lazy"
+              loading="eager"
               draggable={false}
               className="h-full w-full object-cover"
             />

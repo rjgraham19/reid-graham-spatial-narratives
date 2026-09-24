@@ -97,8 +97,17 @@ export function LollaViewer() {
            width keeps the aspect ratio within what the camera was actually
            framed for, on any screen. */
         className="relative mx-auto overflow-hidden rounded-md bg-[#050507]"
+        /* Height follows the width at the stage's own proportions (~1.74:1 —
+           the point where the orthographic camera fits the model's width and
+           its height together; see lolla-scene's resize). A fixed 65vh made
+           narrow screens far taller than that, and the camera filled the
+           extra height with empty grey ground above and below. Capped at
+           the old desktop height, with a floor so the controls still fit. */
         style={{
-          height: "clamp(340px, 65vh, 760px)",
+          width: "100%",
+          aspectRatio: "1.74",
+          minHeight: "240px",
+          maxHeight: "clamp(340px, 65vh, 760px)",
           maxWidth: "1280px",
           cursor: loaded && !revealed ? "pointer" : revealed ? "grab" : undefined,
         }}

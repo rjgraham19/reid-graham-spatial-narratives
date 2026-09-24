@@ -567,8 +567,8 @@ export const PROJECTS: Project[] = [
       { type: "image", src: anne, caption: "Full attic set — skeletal framing over the annex" },
       { type: "image", src: anneSketch, caption: "Conceptual sketch by Reid Graham" },
       { type: "image", src: anneDet, caption: "Kitchen detail — stove, sink and stacked slatting" },
-      { type: "image", src: anneDrawingLeft, caption: "Section — skeletal framing and stair" },
-      { type: "image", src: anneDrawingRight, caption: "Ground plan" },
+      { type: "image", src: anneDrawingLeft, caption: "Scenic groundplan" },
+      { type: "image", src: anneDrawingRight, caption: "Scenic elevation" },
     ],
   },
   {

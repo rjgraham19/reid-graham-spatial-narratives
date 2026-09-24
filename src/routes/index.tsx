@@ -144,7 +144,7 @@ function Home() {
             src={HERO_URL}
             alt=""
             aria-hidden
-            className="absolute inset-0 w-full h-full object-cover"
+            className="animate-tile-in absolute inset-0 w-full h-full object-cover"
           />
           {/* Darkest at the TOP, where the wordmark now sits (it moved up
               to sit flush with the viewport edge) — the old bottom-heavy
@@ -168,7 +168,7 @@ function Home() {
             src={HERO_URL}
             alt=""
             aria-hidden
-            className="absolute inset-0 w-full h-full object-contain object-right"
+            className="animate-tile-in absolute inset-0 w-full h-full object-contain object-right"
           />
           <div className="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background to-transparent" />
         </div>
@@ -194,7 +194,10 @@ function Home() {
           {/* Same thin/uppercase treatment "Design" gets next to the bold
               wordmark in the nav bar — no italics, no serif, just a lighter
               weight of the same display face. */}
-          <p className="mt-2 md:mt-3 font-display font-thin uppercase tracking-[0.04em] text-foreground/80 text-[clamp(1.1rem,3vw,2rem)]">
+          <p
+            className="animate-title-lr mt-2 md:mt-3 font-display font-thin uppercase tracking-[0.04em] text-foreground/80 text-[clamp(1.1rem,3vw,2rem)]"
+            style={{ animationDelay: "0.15s" }}
+          >
             | creative designer
           </p>
         </div>

@@ -131,7 +131,7 @@ function Contact() {
             <img
               src="/reid-graham-portrait.jpg"
               alt="Reid Graham"
-              className="w-full aspect-[3/4] rounded-md object-cover object-top bg-secondary"
+              className="w-full aspect-[3/4] rounded-md object-cover object-top bg-secondary animate-tile-in motion-reduce:animate-none"
             />
 
             <p
@@ -162,7 +162,7 @@ function Contact() {
               <h1
                 data-design-id={designId.connect("heading")}
                 data-design-kind="heading"
-                className="contact-title text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
+                className="contact-title animate-heading-pop motion-reduce:animate-none origin-center md:origin-left text-center md:text-left font-display [font-weight:var(--intro-title-w)] uppercase leading-[0.85] tracking-[-0.03em]"
               >
                 {heading}
               </h1>
@@ -190,7 +190,7 @@ function Contact() {
         </div>
 
         <section ref={pulldownRef} aria-label="Resume" className="hidden md:block mx-auto mt-12 lg:mt-16 w-full max-w-3xl scroll-mt-28 border-t border-foreground/15 pt-6">
-          <h2 className="mb-5 font-display text-2xl font-semibold tracking-tight">Resume</h2>
+          <h2 className="mb-5 font-display text-2xl font-semibold uppercase tracking-tight">Resume</h2>
           <div className="flex flex-wrap items-center gap-3 pb-5">
             <button type="button" ref={toggleRef} onClick={toggleResume} onMouseMove={trackSheen}
               aria-expanded={resumeOpen} aria-controls="resume-pulldown" aria-label={resumeOpen ? "Collapse resume" : "View resume"}
