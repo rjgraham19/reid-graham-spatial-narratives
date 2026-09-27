@@ -3,7 +3,9 @@ import "./true-west-groundplan.css";
 
 const media = "/design-media/true-west/";
 
-/** The approved composition, including equal swatch-to-plan offsets. */
+/** The approved composition and entrance from true-west-animation.zip:
+ *  the plan stays still; both swatches fade in together while rising
+ *  gently (≤40px) over 950ms, once, when the drawing comes into view. */
 export function TrueWestGroundplan({ animate = true }: { animate?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -35,11 +37,11 @@ export function TrueWestGroundplan({ animate = true }: { animate?: boolean }) {
           if (!entries.some((entry) => entry.isIntersecting)) return;
           observer?.disconnect();
           show();
-          const distance = Math.min(120, root.clientWidth * 0.075);
+          const distance = Math.min(40, root.clientWidth * 0.025);
           animations = cards.map((card) => card.animate([
             { opacity: 0, transform: `translateY(${distance}px)` },
             { opacity: 1, transform: "translateY(0)" },
-          ], { duration: 1200, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }));
+          ], { duration: 950, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }));
         }, { threshold: 0.25 });
         observer.observe(root);
       });

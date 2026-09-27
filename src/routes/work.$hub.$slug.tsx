@@ -2513,7 +2513,7 @@ function ProjectPageInner() {
                   transition={{ duration: 0.28 }}
                   onClick={close}
                   className="cursor-zoom-out"
-                  style={{ width: "min(100%, calc((100dvh - 160px) * 1984 / 1032))" }}
+                  style={{ width: "min(100%, calc((100dvh - 160px) * 2048 / 1032))" }}
                 >
                   <TrueWestGroundplan animate={false} />
                 </motion.div>
