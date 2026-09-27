@@ -1,0 +1,35 @@
+/* Coordinates use the original 2048px-wide artwork, not viewport pixels. */
+.tw-groundplan {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1984 / 1032;
+  margin: 0;
+  isolation: isolate;
+}
+.tw-groundplan .tw-plan {
+  display: block;
+  position: relative;
+  left: -1.612903%;
+  width: 103.225806%;
+  max-width: none;
+  clip-path: inset(0 1.5625%);
+  height: auto;
+}
+.tw-groundplan .tw-swatch {
+  position: absolute;
+  top: 61.821705%; /* 638 / 1032 */
+  width: 19.758065%; /* 392 / 1984, after cropping 32px from each side */
+  aspect-ratio: 1;
+  height: auto;
+  object-fit: fill;
+  z-index: 1;
+  opacity: 1;
+  transform: none;
+}
+.tw-groundplan .tw-swatch--lush { left: 2.872984%; } /* original x=89: 132px left of the plan edge, matching Wild West */
+.tw-groundplan .tw-swatch--west {
+  left: 50.806452%; /* original x=1040, minus 32px crop; extra clearance */
+}
+@media (prefers-reduced-motion: reduce) {
+  .tw-groundplan .tw-swatch { opacity: 1 !important; transform: none !important; }
+}

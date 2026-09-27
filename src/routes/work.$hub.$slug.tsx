@@ -16,6 +16,7 @@ import { ExchangeViewer } from "@/components/exchange-viewer";
 import { LollaViewer } from "@/components/lolla-viewer";
 import { DrawingCarousel } from "@/components/drawing-carousel";
 import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
+import { TrueWestGroundplan } from "@/components/true-west-groundplan";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 
 import tabAnimation from "@/assets/rg/tab-animation.svg";
@@ -1739,21 +1740,14 @@ function ProjectPageInner() {
           </section>
 
           <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-8 md:pb-10">
-            <figure className="group">
-              <button
-                type="button"
-                onClick={() => setLightbox(4)}
-                className="block w-full overflow-hidden bg-secondary"
-                aria-label={project.media[4].caption ?? "Plan comparison diagram"}
-              >
-                <img
-                  src={project.media[4].src}
-                  alt={project.media[4].caption ?? project.title}
-                  loading="lazy"
-                  className="w-full h-auto object-contain group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                />
-              </button>
-            </figure>
+            <button
+              type="button"
+              onClick={() => setLightbox(4)}
+              className="block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+              aria-label="Enlarge Suburbia and Wild West groundplan comparison"
+            >
+              <TrueWestGroundplan />
+            </button>
           </section>
         </>
       )}
@@ -2509,6 +2503,19 @@ function ProjectPageInner() {
                     zoom={zoom}
                     animateZoom={!pinchStart.current}
                   />
+                </motion.div>
+              ) : isTrueWest && lightboxMedia[lightbox].src === project.media[4].src ? (
+                <motion.div
+                  key={lightbox}
+                  initial={{ opacity: 0, x: lightboxDirection * 32 }}
+                  animate={{ opacity: 1, x: 0, scale: zoom }}
+                  exit={{ opacity: 0, x: -lightboxDirection * 32 }}
+                  transition={{ duration: 0.28 }}
+                  onClick={close}
+                  className="cursor-zoom-out"
+                  style={{ width: "min(100%, calc((100dvh - 160px) * 1984 / 1032))" }}
+                >
+                  <TrueWestGroundplan animate={false} />
                 </motion.div>
               ) : (
                 <motion.img
