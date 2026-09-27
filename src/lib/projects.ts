@@ -598,7 +598,7 @@ export const PROJECTS: Project[] = [
       },
       {
         type: "image",
-        src: "/design-media/field-house/FIELDHOUSE_AXONPERSPECTIVE.jpg",
+        src: "/design-media/field-house/CROPPED_FIELDHOUSE_AXONPERSPECTIVE.jpg",
         layout: "half",
         caption: "Isometric Diagram",
       },
