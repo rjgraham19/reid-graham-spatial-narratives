@@ -1746,7 +1746,9 @@ function ProjectPageInner() {
               className="block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
               aria-label="Enlarge Suburbia and Wild West groundplan comparison"
             >
-              <TrueWestGroundplan />
+              {/* Entrance switched off at Reid's request (2026-09-27) until it's
+                  reworked — drop animate={false} to bring it back. */}
+              <TrueWestGroundplan animate={false} />
             </button>
           </section>
         </>
