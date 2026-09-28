@@ -26,6 +26,8 @@
   opacity: 1;
   transform: none;
 }
+/* Hidden from the first paint until the entrance plays (see the component). */
+.tw-groundplan[data-anim="pending"] .tw-swatch { opacity: 0; }
 .tw-groundplan .tw-swatch--lush { left: 0; }
 .tw-groundplan .tw-swatch--west { left: 46.435547%; } /* 951 / 2048 */
 @media (prefers-reduced-motion: reduce) {
