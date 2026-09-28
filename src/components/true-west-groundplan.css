@@ -28,7 +28,12 @@
 }
 /* Hidden from the first paint until the entrance plays (see the component). */
 .tw-groundplan[data-anim="pending"] .tw-swatch { opacity: 0; }
-.tw-groundplan .tw-swatch--lush { left: 0; }
+/* The Suburbia swatch art is ~94% slightly translucent (alpha 200–254). Its
+   top part sits over the peach drawing and reads correctly, but the part
+   hanging below the drawing sat over the black page and went dark and muddy,
+   looking cut off. Backing it with the drawing's own peach (#DBBAA1) makes
+   all of it read the way the top does. Wild West is fully opaque. */
+.tw-groundplan .tw-swatch--lush { left: 0; background-color: #dbbaa1; }
 .tw-groundplan .tw-swatch--west { left: 46.435547%; } /* 951 / 2048 */
 @media (prefers-reduced-motion: reduce) {
   .tw-groundplan .tw-swatch { opacity: 1 !important; transform: none !important; }
