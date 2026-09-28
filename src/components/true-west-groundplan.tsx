@@ -73,7 +73,7 @@ export function TrueWestGroundplan({ animate = true }: { animate?: boolean }) {
       <noscript>
         <style>{`.tw-groundplan[data-anim="pending"] .tw-swatch { opacity: 1; }`}</style>
       </noscript>
-      <img className="tw-plan" src={`${media}TRUEWEST_DRAWING.png`} width={2048} height={906}
+      <img className="tw-plan" src={`${media}TRUEWEST_DRAWING_4096.png`} width={4096} height={1814}
         alt="True West groundplans: suburban kitchen at left and desert kitchen at right." />
       <img className="tw-swatch tw-swatch--lush" src={`${media}CROPPED_PANTONELUSH.png`} width={1846} height={1852}
         alt="Suburbia — Artificial Lushness" />

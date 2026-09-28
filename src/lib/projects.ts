@@ -10,7 +10,7 @@ import trueWest from "@/assets/rg/true-west-full.jpg";
 import trueWestDet from "@/assets/rg/true-west-detail.jpg";
 import trueWestRender1 from "@/assets/rg/true-west-render1.jpg";
 import trueWestRender2 from "@/assets/rg/true-west-render2.jpg";
-const trueWestDiagram = "/design-media/true-west/TRUEWEST_DRAWING.png";
+const trueWestDiagram = "/design-media/true-west/TRUEWEST_DRAWING_4096.png";
 import anne from "@/assets/rg/anne-frank-full.jpg";
 import anneDet from "@/assets/rg/anne-frank-detail.jpg";
 import anneSketch from "@/assets/rg/anne-frank-sketch.webp";
