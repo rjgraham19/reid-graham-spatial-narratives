@@ -42,8 +42,13 @@ export function TrueWestGroundplan({ animate = true }: { animate?: boolean }) {
             { opacity: 0, transform: `translateY(${distance}px)` },
             { opacity: 1, transform: "translateY(0)" },
           ], { duration: 950, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }));
-        }, { threshold: 0.25 });
-        observer.observe(root);
+        }, { threshold: 0.6 });
+        // Watch a swatch, not the whole drawing: the swatches hang off its
+        // bottom edge, so a quarter of the drawing in view (the package's
+        // trigger) still left them below the fold — the entrance played
+        // out of sight and they were already still when they scrolled in.
+        // Both share one row, so the first stands in for the pair.
+        observer.observe(cards[0]);
       });
 
     return () => {
