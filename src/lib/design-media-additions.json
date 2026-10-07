@@ -45,10 +45,10 @@
     {
       "id": "media-mt3ipvcu-itx0k",
       "type": "image",
-      "src": "/design-media/staging-aesthetics/aesthetics.jpeg.png",
+      "src": "/design-media/staging-aesthetics/aesthetics-crop.jpg",
       "decorative": true,
       "layout": "full",
-      "filename": "aesthetics.jpeg.png"
+      "filename": "aesthetics-crop.jpg"
     }
   ]
 }

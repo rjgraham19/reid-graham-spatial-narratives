@@ -13,7 +13,7 @@ import trueWestRender2 from "@/assets/rg/true-west-render2.jpg";
 const trueWestDiagram = "/design-media/true-west/TRUEWEST_DRAWING_4096.png";
 import anne from "@/assets/rg/anne-frank-full.jpg";
 import anneDet from "@/assets/rg/anne-frank-detail.jpg";
-import anneSketch from "@/assets/rg/anne-frank-sketch.webp";
+import anneSketch from "@/assets/rg/anne-frank-sketch-crop.png"; // tight crop (2026-10); was anne-frank-sketch.webp
 import anneDrawingLeft from "@/assets/rg/anne-frank-drawing-left.webp";
 import anneDrawingRight from "@/assets/rg/anne-frank-drawing-right.webp";
 import reshuf from "@/assets/rg/reshuffling-full.jpg";

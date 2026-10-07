@@ -273,6 +273,17 @@ const EXCHANGE_HERO_SRC = "/design-media/the-exchange-facility/EXCHANGE_WAVESCAP
    non-clickable until it's split into separate assets. */
 const NOT_ISOLATABLE_MEDIA = new Set(["media-mt3ipvcu-itx0k"]);
 
+/* Gallery images swapped for tighter crops (2026-10) whose spacing on the
+   page was tuned around the old file's empty bands. These margins give
+   back exactly the trimmed space — as a share of the image's width, so it
+   holds at every screen size — so the artwork stays where it was.
+   - Staging's closing composite: 210px of 2240 trimmed off the top (9.375%)
+     and 150 off the bottom (6.7%); its old Design-Mode -137px pull from md
+     up is folded in here. */
+const CROP_SPACING: Record<string, string> = {
+  "media-mt3ipvcu-itx0k": "mt-[9.375%] md:mt-[calc(9.375%-137px)] mb-[6.7%]",
+};
+
 /* Each top image's width ÷ height, measured from the files. The hero is
    the first thing on the page, so until its file arrives the browser would
    otherwise give it no height — everything below drew up near the top and
@@ -284,7 +295,7 @@ const NOT_ISOLATABLE_MEDIA = new Set(["media-mt3ipvcu-itx0k"]);
 const HERO_ASPECT: Record<string, number> = {
   "you-cant-take-it-with-you": 5109 / 3309,
   "the-exchange-facility": 1332 / 1101,
-  "staging-aesthetics": 2000 / 2310,
+  "staging-aesthetics": 2000 / 1652, // tighter crop (2026-10), was 2000 / 2310
   "reshuffling-the-deck": 1989 / 2219,
   "true-west": 5632 / 3168,
   "rags-to-riches": 2000 / 1340,
@@ -1060,7 +1071,14 @@ function ProjectPageInner() {
         }`}
       >
       <div
-        className="relative"
+        /* Staging's hero is a tight crop (2026-10) — much shorter than the
+           intro column beside it. Centred against that column so the model
+           sits level with the text, as it did when the old file's dark
+           headroom pushed it down; every other split page keeps its hero
+           flush to the top. The model sits low in the frame (its middle is
+           ~57% down), so the photo is lifted 7% to centre the model itself,
+           not the frame, on the text. */
+        className={`relative${isStaging && introSplit ? " md:self-center md:-translate-y-[7%]" : ""}`}
       >
         {/* Lollapalooza — the gallery-* event photos as an endless, clickable
             band between the title and the hero. The same photos still sit in
@@ -1931,7 +1949,15 @@ function ProjectPageInner() {
                   spacing exactly as it was. */}
               <div className="pt-4 md:pt-14 lg:pt-16">
                 <RevealBlock from="left">
-                  <figure className="group">
+                  {/* The sketch file is a tight crop (2026-10). The old square
+                      file had empty bands above and below the drawing (19.7%
+                      and 19.1% of its width; now 1.7% and 2.6%), and the
+                      page's spacing was tuned around them — including a
+                      Design-Mode -207px pull on desktop. These margins put
+                      the drawing and the quote exactly where they were, at
+                      every width: 18% back on top (plus the old pull from
+                      md up), 16.5% back below. */}
+                  <figure className="group mt-[18%] md:mt-[calc(18%-207px)]">
                     <button
                       type="button"
                       onClick={() => setLightbox(1)}
@@ -1954,7 +1980,7 @@ function ProjectPageInner() {
                     <p
                       data-design-id={designId.projectPullQuote(project.slug)}
                       data-design-kind="text"
-                      className="body-statement mt-6 md:mt-8 font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-foreground/85 text-center"
+                      className="body-statement mt-[calc(1.5rem+16.5%)] md:mt-[calc(2rem+16.5%)] font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-foreground/85 text-center"
                     >
                       {project.pullQuote}
                     </p>
@@ -2068,6 +2094,10 @@ function ProjectPageInner() {
                     src={project.media[2].src} {...mediaDims(project.media[2].src)}
                     alt={project.media[2].caption?.trim() || project.title}
                     loading="lazy"
+                    /* The sketch file is a tight crop (2026-10): the old one
+                       carried empty margin round the drawing. Full box width
+                       — 86.6% matched the old size exactly, but read too
+                       small next to the closeup (Reid). */
                     className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
                 </button>
@@ -2240,7 +2270,7 @@ function ProjectPageInner() {
               return (
                 <figure
                   key={m.id}
-                  className={`group ${isHalf ? "md:col-span-1" : "md:col-span-2"} ${
+                  className={`group ${CROP_SPACING[m.id ?? ""] ?? ""} ${isHalf ? "md:col-span-1" : "md:col-span-2"} ${
                     isStaging ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"}` : ""
                   }`}
                 >

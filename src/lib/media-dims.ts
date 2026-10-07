@@ -8,6 +8,7 @@
  */
 import m_anne_frank_detail from "@/assets/rg/anne-frank-detail.jpg";
 import m_anne_frank_full from "@/assets/rg/anne-frank-full.jpg";
+import m_anne_frank_sketch_crop from "@/assets/rg/anne-frank-sketch-crop.png";
 import m_exchange_nibi_render from "@/assets/rg/exchange-nibi-render.png";
 import m_exchange_render from "@/assets/rg/exchange-render.jpg";
 import m_exchange_steam_render from "@/assets/rg/exchange-steam-render.png";
@@ -63,6 +64,7 @@ import m_yctiwy_fullview from "@/assets/rg/yctiwy-fullview.jpg";
 import m_yctiwy_sketch from "@/assets/rg/yctiwy-sketch.png";
 
 const DIMS: Record<string, [number, number]> = {
+  [m_anne_frank_sketch_crop]: [1800, 1200],
   [m_anne_frank_detail]: [1620, 1080],
   [m_anne_frank_full]: [1612, 1080],
   [m_exchange_nibi_render]: [1332, 934],
@@ -104,7 +106,7 @@ const DIMS: Record<string, [number, number]> = {
   [m_reshuffling_full]: [1989, 2219],
   [m_reshuffling_view1]: [1680, 1149],
   [m_reshuffling_view2]: [1680, 1149],
-  [m_staging_full]: [2000, 2310],
+  [m_staging_full]: [2000, 1652],
   [m_tab_drawing_left]: [1584, 2891],
   [m_tab_drawing_right]: [2400, 2711],
   [m_tab_full]: [1929, 1329],
@@ -117,13 +119,14 @@ const DIMS: Record<string, [number, number]> = {
   [m_yctiwy_drawing_display]: [1800, 1166],
   [m_yctiwy_drawing]: [9297, 6020],
   [m_yctiwy_fullview]: [5109, 3309],
-  [m_yctiwy_sketch]: [3000, 3000],
+  [m_yctiwy_sketch]: [2600, 1500],
   "/design-media/field-house/CROPPED_FIELDHOUSE_AXONPERSPECTIVE.jpg": [4465, 2873],
   "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg": [4413, 1547],
   "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg": [1224, 792],
   "/design-media/field-house/FIELDHOUSE_RESIZED_GP1.jpg": [2000, 2526],
   "/design-media/field-house/FIELDHOUSE_RESIZED_GP2.jpg": [2000, 2526],
   "/design-media/staging-aesthetics/aesthetics.jpeg.png": [2240, 3360],
+  "/design-media/staging-aesthetics/aesthetics-crop.jpg": [2240, 3000],
   "/design-media/the-exchange-facility/EXCHANGE_DIAGRAM.jpg": [8000, 4500],
   "/design-media/the-exchange-facility/EXCHANGE_NIBIOASIS.jpg": [5100, 3300],
   "/design-media/the-exchange-facility/EXCHANGE_NIBI_EDITEDRENDER.png": [1332, 934],

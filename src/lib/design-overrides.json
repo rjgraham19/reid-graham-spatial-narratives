@@ -4,14 +4,6 @@
       "text": ""
     }
   },
-  "project.you-cant-take-it-with-you.media.drawing": {
-    "desktop": {
-      "layoutShiftY": -198
-    },
-    "mobile": {
-      "layoutShiftY": -68
-    }
-  },
   "project.you-cant-take-it-with-you.media.drawing.caption": {
     "base": {
       "text": "Wall Elevations, Technical Drafting"
@@ -184,25 +176,10 @@
       "widthPct": 100
     }
   },
-  "project.staging-aesthetics.media.media-mt3ipvcu-itx0k": {
-    "desktop": {
-      "layoutShiftY": -137
-    }
-  },
   "project.you-cant-take-it-with-you.title": {
     "mobile": {
       "offsetX": 0,
       "offsetY": 3
-    }
-  },
-  "project.you-cant-take-it-with-you.media.sketch": {
-    "mobile": {
-      "layoutShiftY": -22
-    }
-  },
-  "project.the-diary-of-anne-frank.media.1": {
-    "desktop": {
-      "layoutShiftY": -207
     }
   },
   "project.the-diary-of-anne-frank.media.2": {
