@@ -281,7 +281,9 @@ function SlowReveal({ children, className, delay = 0, from = "up" }: RevealBlock
       initial="hidden"
       whileInView="shown"
       viewport={
-        hasText ? { once: true, margin: "0px 0px -25% 0px" } : { once: true, amount: 0 }
+        // Text waits until 30% of the block shows (an amount, not a margin, so
+        // a block at the very end of a short page can still reach it).
+        hasText ? { once: true, amount: 0.3 } : { once: true, amount: 0 }
       }
       variants={{
         hidden: { opacity: 0, ...side },

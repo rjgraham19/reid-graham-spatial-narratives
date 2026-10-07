@@ -28,7 +28,10 @@ export function useScrollImageFade(rootRef: RefObject<HTMLElement | null>, key: 
     const fold = window.innerHeight;
     const imgs = Array.from(
       root.querySelectorAll<HTMLImageElement>('img[data-design-kind="image"]'),
-    ).filter((img) => !img.closest("[data-reveal]") && img.getBoundingClientRect().top > fold);
+    ).filter((img) => {
+      if (img.closest("[data-reveal]") || inCarousel(img, root)) return false;
+      return img.getBoundingClientRect().top > fold;
+    });
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -49,4 +52,18 @@ export function useScrollImageFade(rootRef: RefObject<HTMLElement | null>, key: 
       for (const img of imgs) delete img.dataset.scrollFade;
     };
   }, [rootRef, key]);
+}
+
+/* Slides parked off to the side of a carousel only "enter the viewport" when
+ * swiped to — a fade there reads as the slide arriving blank, like a loading
+ * lag. Any image inside a sideways-scrolling or clipped track is left alone. */
+function inCarousel(img: HTMLElement, root: HTMLElement): boolean {
+  if (img.closest('[aria-roledescription="carousel"]')) return true;
+  for (let el = img.parentElement; el && el !== root; el = el.parentElement) {
+    const { overflowX } = getComputedStyle(el);
+    if ((overflowX === "auto" || overflowX === "scroll") && el.scrollWidth > el.clientWidth + 1) {
+      return true;
+    }
+  }
+  return false;
 }
