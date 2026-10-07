@@ -147,8 +147,12 @@ export function RevealBlock(props: RevealBlockProps) {
 }
 
 function QuickReveal({ children, className, delay = 0, from = "up" }: RevealBlockProps) {
+  // Same policy as the slow reveal below: with reduced motion the content
+  // is simply there — no fade, no slide.
+  const reduce = useReducedMotion();
   const offset =
     from === "left" ? { x: -32 } : from === "right" ? { x: 32 } : { y: 16 };
+  if (reduce) return <div data-reveal className={className}>{children}</div>;
   return (
     <motion.div
       data-reveal

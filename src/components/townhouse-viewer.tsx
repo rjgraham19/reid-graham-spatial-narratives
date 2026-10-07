@@ -18,38 +18,51 @@ export function TownhouseViewer() {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState('');
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  // Bumped by "Try again" to re-run the load effect from scratch.
+  const [attempt, setAttempt] = useState(0);
 
   // The scene only exists while the popup is open — mounted on open,
   // torn down on close so nothing keeps a WebGL context in the background.
+  // Any failure (no WebGL, failed download, or the 30s limit) tears down
+  // whatever was half-built and shows the preview image instead.
   useEffect(() => {
     if (!open || !host.current) return;
-    let cancelled = false;
+    let live = true;
+    const hostEl = host.current;
     setReady(false);
+    setFailed(false);
     setStatus('Loading model…');
+    const fail = () => {
+      if (!live) return;
+      live = false;
+      window.clearTimeout(timer);
+      controls.current?.dispose();
+      controls.current = null;
+      hostEl.replaceChildren();
+      setFailed(true);
+      setStatus('3D view unavailable');
+    };
+    const timer = window.setTimeout(fail, 30_000);
     import('./townhouse-scene')
       .then(async ({ createTownhouseScene }) => {
-        if (cancelled || !host.current) return;
-        const view = createTownhouseScene(host.current);
+        if (!live) return;
+        const view = createTownhouseScene(hostEl);
         controls.current = view;
         await view.load();
-        if (!cancelled) {
-          setReady(true);
-          setStatus('');
-        }
+        if (!live) return;
+        window.clearTimeout(timer);
+        setReady(true);
+        setStatus('');
       })
-      .catch(() => {
-        if (!cancelled) {
-          controls.current?.dispose();
-          controls.current = null;
-          setStatus('The 3D view could not load.');
-        }
-      });
+      .catch(fail);
     return () => {
-      cancelled = true;
+      live = false;
+      window.clearTimeout(timer);
       controls.current?.dispose();
       controls.current = null;
     };
-  }, [open]);
+  }, [open, attempt]);
 
   // While the popup is up: freeze the page behind it and let Esc close it,
   // so a scroll or pinch meant for the model never reaches the page.
@@ -130,13 +143,37 @@ export function TownhouseViewer() {
                 className="absolute inset-4 overflow-hidden rounded-md bg-[#050507] shadow-[0_0_120px_rgba(0,0,0,0.85)] sm:inset-8 md:inset-14"
               />
 
-              {!ready && (
+              {failed && (
+                <img
+                  src="/models/townhouse-preview.png"
+                  alt="Townhouse exterior with concrete walls, glass blocks, and open terraces"
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] rounded-md object-contain sm:inset-8 sm:h-[calc(100%-4rem)] sm:w-[calc(100%-4rem)] md:inset-14 md:h-[calc(100%-7rem)] md:w-[calc(100%-7rem)]"
+                />
+              )}
+
+              {!ready && !failed && (
                 <p
                   role="status"
                   className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-foreground/70"
                 >
                   {status || 'Loading model…'}
                 </p>
+              )}
+              {failed && (
+                <div
+                  className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded bg-black/60 px-3 py-2 text-xs uppercase tracking-[0.14em] text-white/75 backdrop-blur-sm sm:bottom-12 md:bottom-[4.5rem]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span role="status">{status}</span>
+                  <button
+                    type="button"
+                    onClick={() => setAttempt((n) => n + 1)}
+                    className="underline underline-offset-4 text-white hover:text-white/80"
+                  >
+                    Try again
+                  </button>
+                </div>
               )}
 
               {ready && (

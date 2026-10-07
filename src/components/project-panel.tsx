@@ -136,7 +136,16 @@ export function ProjectPanel({
   // listener once it loads, since key events inside it don't bubble out here.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") requestClose();
+      if (e.key !== "Escape") return;
+      // Same guard as the frame's own listener: never close the project
+      // out from under a viewer that's open inside it.
+      try {
+        const frameDoc = panelRef.current?.querySelector("iframe")?.contentDocument;
+        if (frameDoc?.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      } catch {
+        /* frame not reachable — fall through and close */
+      }
+      requestClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -192,8 +201,15 @@ export function ProjectPanel({
         // forever, one extra live observer per shuffle.
         observerRef.current?.disconnect();
 
+        // Escape closes the topmost thing only. If the project has its own
+        // viewer open (image lightbox, Townhouse 3D), that viewer's listener
+        // handles this Escape — checked synchronously here, since this
+        // document listener runs before the project's window listener and
+        // the MutationObserver state below can lag a frame behind.
         doc.addEventListener("keydown", (ev) => {
-          if ((ev as KeyboardEvent).key === "Escape") requestClose();
+          if ((ev as KeyboardEvent).key !== "Escape") return;
+          if (doc.querySelector('[role="dialog"][aria-modal="true"]')) return;
+          requestClose();
         });
 
         /* Fallback only. The frame's scrollbar is hidden by a stylesheet rule

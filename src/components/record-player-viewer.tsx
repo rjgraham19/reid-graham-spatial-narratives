@@ -2,14 +2,20 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { useScrollProgress } from "@/hooks/use-scroll-progress";
 import type { RecordPlayerScene } from "./record-player-scene";
 
-export function RecordPlayerViewer({ wrapperRef, onProgress }: {
+export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
   wrapperRef: RefObject<HTMLDivElement | null>;
   onProgress: (progress: number) => void;
+  /** "static" when the scroll animation can't run — reduced motion is on,
+   *  or the scene failed — so the page can drop the tall scroll runway it
+   *  only needs for the animation. "animated" otherwise. */
+  onModeChange?: (mode: "animated" | "static") => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const control = useRef<RecordPlayerScene | null>(null);
   const progress = useRef(0);
   const [ready, setReady] = useState(false);
+  const modeCb = useRef(onModeChange);
+  modeCb.current = onModeChange;
   useScrollProgress(wrapperRef, (p) => {
     progress.current = p;
     control.current?.seek(p);
@@ -24,10 +30,13 @@ export function RecordPlayerViewer({ wrapperRef, onProgress }: {
     let visible = false;
     let failed = false;
     const media = matchMedia("(prefers-reduced-motion: reduce)");
+    const report = () => modeCb.current?.(media.matches || failed ? "static" : "animated");
+    report(); // decided on mount, before the visitor reaches the section
     const stop = () => {
       control.current?.dispose();
       control.current = null;
       setReady(false);
+      report();
     };
     const start = async () => {
       if (cancelled || starting || control.current || !near || media.matches || failed) return;
@@ -69,7 +78,13 @@ export function RecordPlayerViewer({ wrapperRef, onProgress }: {
       control.current?.setVisible(visible);
     });
     visibleObserver.observe(el);
-    const preference = () => { if (media.matches) stop(); else void start(); };
+    const preference = () => {
+      if (media.matches) stop();
+      else {
+        report();
+        void start();
+      }
+    };
     media.addEventListener("change", preference);
     return () => {
       cancelled = true;

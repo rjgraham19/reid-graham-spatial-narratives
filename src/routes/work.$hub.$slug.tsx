@@ -20,6 +20,9 @@ import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
 import { TrueWestGroundplan } from "@/components/true-west-groundplan";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 import { ProjectCredits } from "@/components/project-credits";
+import { stripThumb } from "@/lib/strip-thumbs";
+import { displayCopy } from "@/lib/display-copies";
+import { mediaDims } from "@/lib/media-dims";
 
 import tabAnimation from "@/assets/rg/tab-animation.svg";
 import { InlineAnimatedSvg } from "@/components/inline-animated-svg";
@@ -504,6 +507,21 @@ function ProjectPageInner() {
 
   const [lightbox, setLightbox] = useState<number | null>(null);
   const close = useCallback(() => setLightbox(null), []);
+
+  /* Keyboard focus: remember what opened the lightbox (the image button)
+     and hand focus back to it on close, so Escape → Escape walks out one
+     layer at a time — image, then the project panel. */
+  const lightboxOpener = useRef<HTMLElement | null>(null);
+  const lightboxOpen = lightbox != null;
+  useEffect(() => {
+    if (lightboxOpen) {
+      lightboxOpener.current = document.activeElement as HTMLElement | null;
+      return;
+    }
+    const opener = lightboxOpener.current;
+    lightboxOpener.current = null;
+    if (opener?.isConnected) opener.focus({ preventScroll: true });
+  }, [lightboxOpen]);
   const step = useCallback(
     (delta: number) => {
       setLightbox((cur) => {
@@ -689,7 +707,10 @@ function ProjectPageInner() {
   const recordCaptionRef = useRef<HTMLParagraphElement>(null);
   const updateRecordCaption = (p: number) => {
     const el = recordCaptionRef.current;
-    if (el) el.style.opacity = String(Math.min(1, Math.max(0, (p - 0.04) / 0.12)));
+    if (!el) return;
+    // Static layout (no scroll animation): the caption simply shows.
+    if (recordStaticRef.current) el.style.opacity = "1";
+    else el.style.opacity = String(Math.min(1, Math.max(0, (p - 0.04) / 0.12)));
   };
 
   // The fixed nav's own translucent/blurred backdrop sits at the very top of
@@ -709,6 +730,22 @@ function ProjectPageInner() {
     observer.observe(el);
     return () => observer.disconnect();
   }, [isLollapalooza]);
+
+  /* The 400vh runway only exists for the scroll animation. When the viewer
+     reports it can't run (reduced motion, or the scene failed) the section
+     collapses to a single static screen with the caption showing. The
+     switch waits until the section is off screen, so a late failure never
+     yanks the page out from under someone mid-scroll. */
+  const [recordWantsStatic, setRecordWantsStatic] = useState(false);
+  const [recordStatic, setRecordStatic] = useState(false);
+  const recordStaticRef = useRef(false);
+  recordStaticRef.current = recordStatic;
+  useEffect(() => {
+    if (recordWantsStatic !== recordStatic && !scrubInView) setRecordStatic(recordWantsStatic);
+  }, [recordWantsStatic, recordStatic, scrubInView]);
+  useEffect(() => {
+    if (recordStatic && recordCaptionRef.current) recordCaptionRef.current.style.opacity = "1";
+  }, [recordStatic]);
 
   const pageRootRef = useRef<HTMLDivElement>(null);
   useScrollImageFade(pageRootRef, project.slug);
@@ -1037,9 +1074,14 @@ function ProjectPageInner() {
             <ImageAutoSlider
               speedSeconds={22}
               paused={lightbox != null}
-              images={lollapaloozaGalleryMedia.map(({ item }: { item: MediaItem }) => item.src)}
+              /* Tile-sized square copies (see strip-thumbs.ts); the
+                 full-size photos still open in the lightbox. */
+              images={lollapaloozaGalleryMedia.map(({ item }: { item: MediaItem }) => stripThumb(item.src).src)}
+              imageSrcSets={lollapaloozaGalleryMedia.map(
+                ({ item }: { item: MediaItem }) => stripThumb(item.src).srcSet ?? "",
+              )}
               imageAlts={lollapaloozaGalleryMedia.map(
-                ({ item }: { item: MediaItem }) => item.caption ?? "",
+                ({ item }: { item: MediaItem }) => item.caption?.trim() || "Club Magenta event photo",
               )}
               onImageClick={(i: number) => setLightbox(lollapaloozaGalleryMedia[i].index)}
             />
@@ -1409,8 +1451,8 @@ function ProjectPageInner() {
                   aria-label={`Enlarge ${project.media[idx].caption}`}
                 >
                   <img
-                    src={project.media[idx].src}
-                    alt={project.media[idx].caption ?? project.title}
+                    src={project.media[idx].src} {...mediaDims(project.media[idx].src)}
+                    alt={project.media[idx].caption?.trim() || project.title}
                     loading="lazy"
                     className="w-full h-auto"
                   />
@@ -1424,12 +1466,22 @@ function ProjectPageInner() {
       {/* Lollapalooza — record-player scroll-controlled 3D, full-bleed background
           with the project blurb pinned in the black space beside it (desktop). */}
       {isLollapalooza && (
-        <div ref={recordScrubWrapperRef} className="relative w-full h-[400vh] lolla-bg" data-record-player-section>
+        <div
+          ref={recordScrubWrapperRef}
+          className={`relative w-full lolla-bg ${recordStatic ? "" : "h-[400vh]"}`}
+          data-record-player-section
+          data-mode={recordStatic ? "static" : "animated"}
+        >
           {/* svh, not vh: on a phone the sticky frame must fit the space that's
               actually visible with the address bar showing, or its bottom is cut
-              off. vh measures the tall viewport the bar is hidden in. */}
-          <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
-            <RecordPlayerViewer wrapperRef={recordScrubWrapperRef} onProgress={updateRecordCaption} />
+              off. vh measures the tall viewport the bar is hidden in. In the
+              static layout it's just one screen, no runway to stick through. */}
+          <div className={`${recordStatic ? "relative" : "sticky top-0"} h-[100svh] w-full overflow-hidden`}>
+            <RecordPlayerViewer
+              wrapperRef={recordScrubWrapperRef}
+              onProgress={updateRecordCaption}
+              onModeChange={(mode) => setRecordWantsStatic(mode === "static")}
+            />
             {/* The blurb, pinned inside the sticky frame so it holds its spot
                 for the whole scrub; opacity is driven by scroll progress (see
                 recordCaptionRef above) so it fades in just after the
@@ -1536,13 +1588,13 @@ function ProjectPageInner() {
                   type="button"
                   onClick={() => setLightbox(1)}
                   className="block w-full overflow-hidden bg-secondary"
-                  aria-label={project.media[1].caption ?? project.title}
+                  aria-label={project.media[1].caption?.trim() || project.title}
                 >
                   <img
                     data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                     data-design-kind="image"
-                    src={project.media[1].src}
-                    alt={project.media[1].caption ?? project.title}
+                    src={project.media[1].src} {...mediaDims(project.media[1].src)}
+                    alt={project.media[1].caption?.trim() || project.title}
                     loading="lazy"
                     className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
@@ -1566,13 +1618,13 @@ function ProjectPageInner() {
                   type="button"
                   onClick={() => setLightbox(2)}
                   className="block w-full overflow-hidden bg-secondary"
-                  aria-label={project.media[2].caption ?? project.title}
+                  aria-label={project.media[2].caption?.trim() || project.title}
                 >
                   <img
                     data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                     data-design-kind="image"
-                    src={project.media[2].src}
-                    alt={project.media[2].caption ?? project.title}
+                    src={project.media[2].src} {...mediaDims(project.media[2].src)}
+                    alt={project.media[2].caption?.trim() || project.title}
                     loading="lazy"
                     className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
@@ -1599,13 +1651,13 @@ function ProjectPageInner() {
                 type="button"
                 onClick={() => setLightbox(3)}
                 className="block w-full overflow-hidden bg-secondary"
-                aria-label={project.media[3].caption ?? project.title}
+                aria-label={project.media[3].caption?.trim() || project.title}
               >
                 <img
                   data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
                   data-design-kind="image"
-                  src={project.media[3].src}
-                  alt={project.media[3].caption ?? project.title}
+                  src={project.media[3].src} {...mediaDims(project.media[3].src)}
+                  alt={project.media[3].caption?.trim() || project.title}
                   loading="lazy"
                   className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                 />
@@ -1648,13 +1700,13 @@ function ProjectPageInner() {
                   type="button"
                   onClick={() => setLightbox(1)}
                   className="block h-full w-full overflow-hidden bg-secondary"
-                  aria-label={project.media[1].caption ?? "True West — second act"}
+                  aria-label={project.media[1].caption?.trim() || "True West — second act"}
                 >
                   <img
                     data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                     data-design-kind="image"
-                    src={project.media[1].src}
-                    alt={project.media[1].caption ?? project.title}
+                    src={project.media[1].src} {...mediaDims(project.media[1].src)}
+                    alt={project.media[1].caption?.trim() || project.title}
                     loading="lazy"
                     className="h-full w-full object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
@@ -1667,13 +1719,13 @@ function ProjectPageInner() {
                     type="button"
                     onClick={() => setLightbox(2)}
                     className="block w-full overflow-hidden bg-secondary"
-                    aria-label={project.media[2].caption ?? "Rendered model study"}
+                    aria-label={project.media[2].caption?.trim() || "Rendered model study"}
                   >
                     <img
                       data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                       data-design-kind="image"
-                      src={project.media[2].src}
-                      alt={project.media[2].caption ?? project.title}
+                      src={project.media[2].src} {...mediaDims(project.media[2].src)}
+                      alt={project.media[2].caption?.trim() || project.title}
                       loading="lazy"
                       className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                     />
@@ -1684,13 +1736,13 @@ function ProjectPageInner() {
                     type="button"
                     onClick={() => setLightbox(3)}
                     className="block w-full overflow-hidden bg-secondary"
-                    aria-label={project.media[3].caption ?? "Rendered model study"}
+                    aria-label={project.media[3].caption?.trim() || "Rendered model study"}
                   >
                     <img
                       data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
                       data-design-kind="image"
-                      src={project.media[3].src}
-                      alt={project.media[3].caption ?? project.title}
+                      src={project.media[3].src} {...mediaDims(project.media[3].src)}
+                      alt={project.media[3].caption?.trim() || project.title}
                       loading="lazy"
                       className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                     />
@@ -1884,13 +1936,13 @@ function ProjectPageInner() {
                       type="button"
                       onClick={() => setLightbox(1)}
                       className="block w-full overflow-hidden"
-                      aria-label={project.media[1].caption ?? "Conceptual sketch"}
+                      aria-label={project.media[1].caption?.trim() || "Conceptual sketch"}
                     >
                       <img
                         data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                         data-design-kind="image"
-                        src={project.media[1].src}
-                        alt={project.media[1].caption ?? project.title}
+                        src={project.media[1].src} {...mediaDims(project.media[1].src)}
+                        alt={project.media[1].caption?.trim() || project.title}
                         loading="lazy"
                         className="w-full h-auto object-contain group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                       />
@@ -1917,13 +1969,13 @@ function ProjectPageInner() {
                     type="button"
                     onClick={() => setLightbox(2)}
                     className="block w-full overflow-hidden bg-secondary"
-                    aria-label={project.media[2].caption ?? "Set closeup"}
+                    aria-label={project.media[2].caption?.trim() || "Set closeup"}
                   >
                     <img
                       data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                       data-design-kind="image"
-                      src={project.media[2].src}
-                      alt={project.media[2].caption ?? project.title}
+                      src={project.media[2].src} {...mediaDims(project.media[2].src)}
+                      alt={project.media[2].caption?.trim() || project.title}
                       loading="lazy"
                       className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                     />
@@ -1943,13 +1995,13 @@ function ProjectPageInner() {
                     type="button"
                     onClick={() => setLightbox(idx)}
                     className="block w-full overflow-hidden"
-                    aria-label={project.media[idx].caption ?? `Technical drawing ${idx - 2}`}
+                    aria-label={project.media[idx].caption?.trim() || `Technical drawing ${idx - 2}`}
                   >
                     <img
                       data-design-id={designId.projectMedia(project.slug, project.media[idx].id ?? String(idx))}
                       data-design-kind="image"
-                      src={project.media[idx].src}
-                      alt={project.media[idx].caption ?? project.title}
+                      src={project.media[idx].src} {...mediaDims(project.media[idx].src)}
+                      alt={project.media[idx].caption?.trim() || project.title}
                       loading="lazy"
                       className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                     />
@@ -1979,13 +2031,13 @@ function ProjectPageInner() {
                 type="button"
                 onClick={() => setLightbox(1)}
                 className="block w-full overflow-hidden bg-secondary"
-                aria-label={project.media[1].caption ?? "Closeup"}
+                aria-label={project.media[1].caption?.trim() || "Enlarge the set closeup"}
               >
                 <img
                   data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                   data-design-kind="image"
-                  src={project.media[1].src}
-                  alt={project.media[1].caption ?? project.title}
+                  src={project.media[1].src} {...mediaDims(project.media[1].src)}
+                  alt={project.media[1].caption?.trim() || project.title}
                   loading="lazy"
                   className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                 />
@@ -2008,13 +2060,13 @@ function ProjectPageInner() {
                   type="button"
                   onClick={() => setLightbox(2)}
                   className="block w-full overflow-hidden bg-black p-6 md:p-8"
-                  aria-label={project.media[2].caption ?? "Sketch"}
+                  aria-label={project.media[2].caption?.trim() || "Sketch"}
                 >
                   <img
                     data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                     data-design-kind="image"
-                    src={project.media[2].src}
-                    alt={project.media[2].caption ?? project.title}
+                    src={project.media[2].src} {...mediaDims(project.media[2].src)}
+                    alt={project.media[2].caption?.trim() || project.title}
                     loading="lazy"
                     className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
@@ -2027,13 +2079,13 @@ function ProjectPageInner() {
                   type="button"
                   onClick={() => setLightbox(3)}
                   className="block w-full overflow-hidden bg-black p-6 md:p-8"
-                  aria-label={project.media[3].caption ?? "Drawing"}
+                  aria-label={project.media[3].caption?.trim() || "Drawing"}
                 >
                   <img
                     data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
                     data-design-kind="image"
-                    src={project.media[3].src}
-                    alt={project.media[3].caption ?? project.title}
+                    src={displayCopy(project.media[3].src)} {...mediaDims(displayCopy(project.media[3].src))}
+                    alt={project.media[3].caption?.trim() || project.title}
                     loading="lazy"
                     className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
@@ -2072,13 +2124,13 @@ function ProjectPageInner() {
                   type="button"
                   onClick={() => setLightbox(0)}
                   className="block w-full"
-                  aria-label={project.media[0].caption ?? "Axonometric"}
+                  aria-label={project.media[0].caption?.trim() || "Axonometric"}
                 >
                   <img
                     data-design-id={designId.projectMedia(project.slug, project.media[0].id ?? "0")}
                     data-design-kind="image"
-                    src={project.media[0].src}
-                    alt={project.media[0].caption ?? project.title}
+                    src={project.media[0].src} {...mediaDims(project.media[0].src)}
+                    alt={project.media[0].caption?.trim() || project.title}
                     loading="lazy"
                     /* Real desktop only (lg+): the axon runs narrower than its
                        column and nudged slightly, a composition tuned at wide
@@ -2108,13 +2160,13 @@ function ProjectPageInner() {
                         type="button"
                         onClick={() => setLightbox(idx)}
                         className="block w-full aspect-square overflow-hidden bg-secondary"
-                        aria-label={project.media[idx].caption ?? `Render ${idx}`}
+                        aria-label={project.media[idx].caption?.trim() || `Render ${idx}`}
                       >
                         <img
                           data-design-id={designId.projectMedia(project.slug, project.media[idx].id ?? String(idx))}
                           data-design-kind="image"
-                          src={project.media[idx].src}
-                          alt={project.media[idx].caption ?? project.title}
+                          src={project.media[idx].src} {...mediaDims(project.media[idx].src)}
+                          alt={project.media[idx].caption?.trim() || project.title}
                           loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                         />
@@ -2177,8 +2229,8 @@ function ProjectPageInner() {
                     data-design-media-id={m.addedByDesignMode ? m.id : undefined}
                     data-design-caption={m.caption}
                     data-design-decorative={m.decorative ? "1" : undefined}
-                    src={m.src}
-                    alt={m.decorative ? "" : (m.alt ?? m.caption ?? project.title)}
+                    src={m.src} {...mediaDims(m.src)}
+                    alt={m.decorative ? "" : (m.alt?.trim() || m.caption?.trim() || project.title)}
                     loading="lazy"
                     className={`block w-full h-auto object-cover ${
                       isolatable ? "group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic" : ""
@@ -2209,7 +2261,7 @@ function ProjectPageInner() {
                       type="button"
                       onClick={() => setLightbox(i)}
                       className="block w-full overflow-hidden bg-secondary"
-                      aria-label={m.caption ?? `Media ${i + 1}`}
+                      aria-label={m.caption?.trim() || `Media ${i + 1}`}
                     >
                       {mediaEl}
                     </button>
@@ -2281,14 +2333,14 @@ function ProjectPageInner() {
                       <button
                         type="button"
                         onClick={() => setLightbox(index)}
-                        aria-label={m.caption ?? "Open photo"}
+                        aria-label={m.caption?.trim() || "Open photo"}
                         className="block overflow-hidden bg-secondary shadow-lg transition-transform duration-300 hover:scale-[1.01]"
                       >
                         <img
                           data-design-id={designId.projectMedia(project.slug, m.id!)}
                           data-design-kind="image"
-                          src={m.src}
-                          alt={m.caption ?? project.title}
+                          src={m.src} {...mediaDims(m.src)}
+                          alt={m.caption?.trim() || project.title}
                           loading="lazy"
                           className="block max-h-[74vh] w-auto max-w-[min(1000px,84vw)] object-contain"
                         />
@@ -2492,7 +2544,7 @@ function ProjectPageInner() {
                 <motion.img
                   key={lightbox}
                   src={lightboxMedia[lightbox].src}
-                  alt={lightboxMedia[lightbox].caption ?? project.title}
+                  alt={lightboxMedia[lightbox].caption?.trim() || project.title}
                   onClick={close}
                   initial={{ opacity: 0, x: lightboxDirection * 32 }}
                   animate={{ opacity: 1, x: 0, scale: zoom }}

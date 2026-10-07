@@ -68,7 +68,7 @@ export function SwipeGallery({
               key={m.id}
               type="button"
               onClick={() => onOpen(i)}
-              aria-label={m.caption ?? "Open image"}
+              aria-label={m.caption?.trim() || "Open image"}
               className={`w-full shrink-0 snap-start ${slideClassName}`}
             >
               {img}

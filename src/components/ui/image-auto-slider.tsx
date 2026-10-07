@@ -26,6 +26,7 @@ const DEFAULT_IMAGES = [
 export function ImageAutoSlider({
   images = DEFAULT_IMAGES,
   imageAlts,
+  imageSrcSets,
   speedSeconds = 40,
   reverse = false,
   paused = false,
@@ -37,6 +38,9 @@ export function ImageAutoSlider({
   images?: string[];
   /** Optional alt / label per image (parallel to `images`). */
   imageAlts?: string[];
+  /** Optional `srcset` per image (parallel to `images`) — small, tile-sized
+   *  copies, so a 22rem card never downloads a multi-megabyte original. */
+  imageSrcSets?: string[];
   /** Seconds for one full pass of the (duplicated) track. Lower = faster. */
   speedSeconds?: number;
   /** Scroll left-to-right instead of right-to-left. */
@@ -99,9 +103,13 @@ export function ImageAutoSlider({
           const img = (
             <img
               src={src}
+              srcSet={imageSrcSets?.[idx]}
+              // The tile's rendered width at each breakpoint (see tileClass).
+              sizes={imageSrcSets ? "(min-width: 1024px) 352px, (min-width: 768px) 320px, (min-width: 640px) 240px, 192px" : undefined}
               alt={alt}
               aria-hidden={isDupe || undefined}
               loading="eager"
+              decoding="async"
               draggable={false}
               className="h-full w-full object-cover"
             />

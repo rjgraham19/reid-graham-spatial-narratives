@@ -1,9 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type SvgatorPlayer = { play: () => void };
+type SvgatorPlayer = {
+  play: () => void;
+  seekTo?: (ms: number) => void;
+  duration?: number;
+};
 type SvgatorRoot = SVGSVGElement & {
   svgatorPlayer?: { ready: (cb: (player: SvgatorPlayer) => void) => void };
 };
+
+/* How long to wait for the embedded player script to initialise before
+   giving up on playback (the artwork itself stays). */
+const PLAYER_WAIT_MS = 5000;
 
 /**
  * Embeds an SVGator-exported SVG that carries its own <script>.
@@ -22,25 +30,42 @@ type SvgatorRoot = SVGSVGElement & {
  * An IntersectionObserver here calls play() once the graphic scrolls into
  * view. If the file does turn out to self-start, this is harmless: play()
  * on an already-running animation is a no-op.
+ *
+ * Resilience: the box reserves the artwork's proportions (`aspectRatio`)
+ * from first paint, so nothing below it moves when the markup arrives. If
+ * the fetch fails, the same file is shown as a plain <img> (its static
+ * artwork, no script). Player start-up retries are bounded. Under
+ * prefers-reduced-motion the animation is skipped to its final frame
+ * instead of played.
  */
 export function InlineAnimatedSvg({
   src,
   className,
+  aspectRatio = "16 / 9",
 }: {
   src: string;
   className?: string;
+  /** The artwork's proportions, reserved before it loads. */
+  aspectRatio?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     let observer: IntersectionObserver | null = null;
     let retry: ReturnType<typeof setTimeout> | undefined;
+    const abort = new AbortController();
     const container = containerRef.current;
     if (!container) return;
+    setFailed(false);
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    fetch(src)
-      .then((res) => res.text())
+    fetch(src, { signal: abort.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
       .then((markup) => {
         if (cancelled || !container) return;
         container.innerHTML = markup;
@@ -57,15 +82,19 @@ export function InlineAnimatedSvg({
         const svg = container.querySelector("svg") as SvgatorRoot | null;
         if (!svg) return;
 
+        const startedAt = performance.now();
         const play = () => {
           if (cancelled) return;
           if (!svg.svgatorPlayer) {
-            // the embedded script may still be initialising
-            retry = setTimeout(play, 50);
+            // The embedded script may still be initialising — but not
+            // forever; past the limit the artwork just stays as it is.
+            if (performance.now() - startedAt < PLAYER_WAIT_MS) retry = setTimeout(play, 50);
             return;
           }
           svg.svgatorPlayer.ready((player) => {
-            if (!cancelled) player.play();
+            if (cancelled) return;
+            if (reduced && player.seekTo && player.duration) player.seekTo(player.duration);
+            else if (!reduced) player.play();
           });
         };
 
@@ -79,14 +108,22 @@ export function InlineAnimatedSvg({
           { threshold: 0.25 },
         );
         observer.observe(svg);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
       });
 
     return () => {
       cancelled = true;
+      abort.abort();
       observer?.disconnect();
       if (retry) clearTimeout(retry);
     };
   }, [src]);
 
-  return <div ref={containerRef} className={className} />;
+  return (
+    <div ref={containerRef} className={className} style={{ aspectRatio }}>
+      {failed && <img src={src} alt="" className="block h-full w-full" />}
+    </div>
+  );
 }

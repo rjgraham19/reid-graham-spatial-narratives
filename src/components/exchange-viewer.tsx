@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import type { ExchangeView } from "./exchange-scene";
 
+/* The facility's vertical section — the same three zones the model's
+   buttons name — shown from first paint until the model is ready, and kept
+   if it can't load. Same pattern as Townhouse's preview image. */
+const POSTER_SRC = "/models/exchange-section-poster.jpg";
+
+/* Give up on the model after this long and leave the drawing in place
+   (with a retry) rather than an open-ended "Loading…". */
+const LOAD_TIMEOUT_MS = 30_000;
+
 const ZONES: {
   id: ExchangeView;
   overline?: string;
@@ -56,39 +65,64 @@ export function ExchangeViewer({
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
   const [view, setView] = useState<ExchangeView>("overall");
+  // Bumped by "Try again" to re-run the load effect from scratch.
+  const [attempt, setAttempt] = useState(0);
 
+  // Any failure — no WebGL, the model or decoder failing to load, or the
+  // time limit — tears down whatever was half-built and leaves the section
+  // drawing showing.
   useEffect(() => {
     if (!stage.current || !host.current) return;
-    let cancelled = false;
+    let live = true; // false once unmounted, or once this attempt gave up
+    let timer: number | undefined;
     const hostEl = host.current;
+    const fail = () => {
+      if (!live) return;
+      live = false;
+      window.clearTimeout(timer);
+      controls.current?.dispose();
+      controls.current = null;
+      hostEl.replaceChildren();
+      setError(true);
+    };
     const nearObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         nearObserver.disconnect();
+        timer = window.setTimeout(fail, LOAD_TIMEOUT_MS);
         import("./exchange-scene")
           .then(async ({ createExchangeScene }) => {
-            if (cancelled) return;
+            if (!live) return;
             const scene = createExchangeScene(hostEl);
             controls.current = scene;
             await scene.load();
-            if (!cancelled) setReady(true);
+            if (!live) return;
+            window.clearTimeout(timer);
+            setReady(true);
           })
-          .catch(() => {
-            if (!cancelled) setError(true);
-          });
+          .catch(fail);
       },
       { rootMargin: "600px 0px" },
     );
     nearObserver.observe(stage.current);
     return () => {
-      cancelled = true;
+      live = false;
+      window.clearTimeout(timer);
       nearObserver.disconnect();
       controls.current?.dispose();
       controls.current = null;
     };
-  }, []);
+  }, [attempt]);
+
+  const retry = () => {
+    setError(false);
+    setReady(false);
+    setView("overall");
+    setAttempt((n) => n + 1);
+  };
 
   const selectZone = (id: ExchangeView) => {
+    if (!ready) return;
     setView(id);
     controls.current?.select(id);
   };
@@ -108,11 +142,27 @@ export function ExchangeViewer({
       >
         <div ref={host} className="absolute inset-0" data-lenis-prevent />
 
+        <img
+          src={POSTER_SRC}
+          alt={error ? "Exchange Facility section: Nibi Oasis, Wavescapes and Steam Sanctuary" : ""}
+          aria-hidden={error ? undefined : true}
+          decoding="async"
+          draggable={false}
+          className="pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-700"
+          style={{ opacity: ready && !error ? 0 : 1 }}
+        />
+
         {/* The zone nav sits inside the model's own empty headroom rather
             than as a separate row above it — folding it in moves the model
             itself up and closes what would otherwise be dead space at the
-            top of the viewport. */}
-        <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black via-black/60 to-transparent px-6 pb-10 pt-6 md:px-12 lg:px-16">
+            top of the viewport. Inert until the model is ready; gone if it
+            can't load, since there's nothing for it to move. */}
+        {!error && (
+        <div
+          className={`absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black via-black/60 to-transparent px-6 pb-10 pt-6 md:px-12 lg:px-16 transition-opacity duration-500 ${
+            ready ? "" : "opacity-50"
+          }`}
+        >
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white/60">
             Explore in 3D
           </p>
@@ -122,6 +172,7 @@ export function ExchangeViewer({
                 key={z.id}
                 type="button"
                 aria-pressed={view === z.id}
+                disabled={!ready}
                 onClick={() => selectZone(z.id)}
                 className={`rounded-md border px-4 py-2.5 text-left text-sm transition-colors ${
                   view === z.id
@@ -143,14 +194,27 @@ export function ExchangeViewer({
             ))}
           </div>
         </div>
+        )}
 
-        {!ready && (
+        {!ready && !error && (
           <p
             role="status"
-            className="pointer-events-none absolute bottom-6 left-6 text-xs uppercase tracking-[0.18em] text-white/60"
+            className="pointer-events-none absolute bottom-6 right-6 text-xs uppercase tracking-[0.18em] text-white/60"
           >
-            {error ? "The model could not load." : "Loading the facility…"}
+            Loading the facility…
           </p>
+        )}
+        {error && (
+          <div className="absolute bottom-4 right-4 flex items-center gap-3 rounded bg-black/60 px-3 py-2 text-xs uppercase tracking-[0.14em] text-white/75 backdrop-blur-sm">
+            <span role="status">3D view unavailable</span>
+            <button
+              type="button"
+              onClick={retry}
+              className="underline underline-offset-4 text-white hover:text-white/80"
+            >
+              Try again
+            </button>
+          </div>
         )}
 
         {/* Zone copy, inside the viewport so it never gets skipped past on a
@@ -172,7 +236,7 @@ export function ExchangeViewer({
         {/* The project description, folded into the "Entire Facility" view
             itself rather than living in its own section below — bottom-left
             so it never fights the zone nav's scrim at the top. */}
-        {ready && view === "overall" && (
+        {view === "overall" && (
           <div className="hidden lg:block absolute left-6 bottom-6 max-w-sm rounded-md bg-black/50 p-4 backdrop-blur-sm">
             <p className="font-display font-light text-base leading-snug tracking-tight text-white/90">
               {description}
@@ -235,7 +299,7 @@ export function ExchangeViewer({
           <p className="text-sm leading-relaxed text-foreground/70">{zoneText.text}</p>
         </div>
       )}
-      {ready && view === "overall" && (
+      {view === "overall" && (
         <div className="lg:hidden mt-4 px-6 md:px-12 lg:px-16">
           <p className="font-display font-light text-base leading-snug tracking-tight text-foreground/80">
             {description}

@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { LollaControls, LollaView } from "./lolla-scene";
+import poster from "@/assets/rg/lollapalooza-render-night-poster.jpg";
+
+/* Give up on the model after this long and leave the rendering in place
+   (with a retry) rather than an open-ended "Loading…". */
+const LOAD_TIMEOUT_MS = 30_000;
 
 // Same labels and order as TownhouseViewer's view row.
 const VIEWS: { label: string; view: LollaView }[] = [
@@ -30,39 +35,56 @@ export function LollaViewer() {
   const [revealed, setRevealed] = useState(false);
   const [gableShown, setGableShown] = useState(false);
   const [errored, setErrored] = useState(false);
+  // Bumped by "Try again" to re-run the load effect from scratch.
+  const [attempt, setAttempt] = useState(0);
 
   // Load a little before the section arrives, so the model is already
-  // sitting there live by the time it scrolls into view.
+  // sitting there live by the time it scrolls into view. Any failure — no
+  // WebGL, the model or decoder failing to load, or the time limit — tears
+  // down whatever was half-built and leaves the rendering showing.
   useEffect(() => {
     if (!stage.current || !host.current) return;
-    let cancelled = false;
+    let live = true; // false once unmounted, or once this attempt gave up
+    let timer: number | undefined;
     const hostEl = host.current;
+    const fail = () => {
+      if (!live) return;
+      live = false;
+      window.clearTimeout(timer);
+      controls.current?.dispose();
+      controls.current = null;
+      hostEl.replaceChildren();
+      pendingReveal.current = false;
+      setErrored(true);
+    };
     const nearObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         nearObserver.disconnect();
+        timer = window.setTimeout(fail, LOAD_TIMEOUT_MS);
         import("./lolla-scene")
           .then(async ({ createLollaScene }) => {
-            if (cancelled) return;
+            if (!live) return;
             const scene = createLollaScene(hostEl);
             controls.current = scene;
             await scene.load();
-            if (!cancelled) setLoaded(true);
+            if (!live) return;
+            window.clearTimeout(timer);
+            setLoaded(true);
           })
-          .catch(() => {
-            if (!cancelled) setErrored(true);
-          });
+          .catch(fail);
       },
       { rootMargin: "600px 0px" },
     );
     nearObserver.observe(stage.current);
     return () => {
-      cancelled = true;
+      live = false;
+      window.clearTimeout(timer);
       nearObserver.disconnect();
       controls.current?.dispose();
       controls.current = null;
     };
-  }, []);
+  }, [attempt]);
 
   // If the model was clicked before it finished loading, fire the reveal it
   // deferred as soon as loading catches up.
@@ -74,14 +96,24 @@ export function LollaViewer() {
     }
   }, [loaded]);
 
+  // Only hand the click to the scene once it has finished loading — before
+  // that the scene ignores reveal(), so the click is queued instead and the
+  // effect above plays it the moment loading completes.
   const activate = () => {
-    if (revealed) return;
-    if (controls.current) {
-      controls.current.reveal();
-      setRevealed(true);
-    } else {
+    if (revealed || errored) return;
+    if (!loaded || !controls.current) {
       pendingReveal.current = true;
+      return;
     }
+    controls.current.reveal();
+    setRevealed(true);
+  };
+
+  const retry = () => {
+    setErrored(false);
+    setLoaded(false);
+    setRevealed(false);
+    setAttempt((n) => n + 1);
   };
 
   return (
@@ -114,11 +146,11 @@ export function LollaViewer() {
         onClick={activate}
         // Keyboard equivalent of the click, dropped once revealed — after
         // that the canvas itself takes tab focus for its own arrow-key orbit.
-        role={!revealed ? "button" : undefined}
-        tabIndex={!revealed ? 0 : undefined}
-        aria-label={!revealed ? "Explore the pavilion in 3D" : undefined}
+        role={!revealed && !errored ? "button" : undefined}
+        tabIndex={!revealed && !errored ? 0 : undefined}
+        aria-label={!revealed && !errored ? "Explore the pavilion in 3D" : undefined}
         onKeyDown={
-          !revealed
+          !revealed && !errored
             ? (e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -129,6 +161,19 @@ export function LollaViewer() {
         }
       >
         <div ref={host} className="absolute inset-0" data-lenis-prevent />
+
+        {/* The night rendering — the whole pavilion under its tent, on dark,
+            the way the model opens. Shown from first paint until the model
+            has loaded, and kept if it can't (no WebGL, failed download). */}
+        <img
+          src={poster}
+          alt={errored ? "Club Magenta pavilion at night (rendering)" : ""}
+          aria-hidden={errored ? undefined : true}
+          decoding="async"
+          draggable={false}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
+          style={{ opacity: loaded && !errored ? 0 : 1 }}
+        />
 
         {!loaded && !errored && (
           <p
@@ -147,12 +192,19 @@ export function LollaViewer() {
           </p>
         )}
         {errored && (
-          <p
-            role="status"
-            className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-foreground/70"
-          >
-            The 3D view could not load.
-          </p>
+          <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded bg-black/60 px-3 py-2 text-xs uppercase tracking-[0.14em] text-white/75 backdrop-blur-sm">
+            <span role="status">3D view unavailable</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                retry();
+              }}
+              className="underline underline-offset-4 text-white hover:text-white/80"
+            >
+              Try again
+            </button>
+          </div>
         )}
 
         {revealed && (

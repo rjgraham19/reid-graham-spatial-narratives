@@ -14,9 +14,12 @@ export function scrollToReveal(element: HTMLElement) {
   }
 }
 
-/** Site-wide smooth scrolling. Individual pages can still layer their own motion on top. */
+/** Site-wide smooth scrolling. Individual pages can still layer their own motion on top.
+ *  Skipped entirely for visitors with reduced motion: the browser's own
+ *  scrolling is left alone (and scrollToReveal falls back to an instant jump). */
 export function useLenis() {
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t: number) => 1 - Math.pow(1 - t, 3),

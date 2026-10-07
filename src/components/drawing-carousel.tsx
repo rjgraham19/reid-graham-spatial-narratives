@@ -49,9 +49,9 @@ export function DrawingCarousel({ slug, items, onOpen }: {
               const crop = paperFrames[item.src];
               return (
               <div key={item.id} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${items.length}`} aria-hidden={i !== active} inert={i !== active} className="min-w-0 flex-[0_0_100%]">
-                <button type="button" onClick={() => onOpen(index)} aria-label={`Enlarge ${item.caption ?? "drawing"}`} className="relative flex aspect-[8/5] w-full items-center justify-center bg-white cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#E20074]">
+                <button type="button" onClick={() => onOpen(index)} aria-label={`Enlarge ${item.caption?.trim() || "drawing"}`} className="relative flex aspect-[8/5] w-full items-center justify-center bg-white cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#E20074]">
                   <span className={crop ? "relative block overflow-hidden" : "absolute inset-0"} style={crop ? { width: `min(100%, ${crop[2] / crop[3] / 1.6 * 100}%)`, aspectRatio: `${crop[2]} / ${crop[3]}` } : undefined}>
-                    <img data-design-id={designId.projectMedia(slug, item.id!)} data-design-kind="image" src={item.src} alt={item.caption ?? "Technical drawing"} draggable={false} className={crop ? "absolute max-w-none" : "block h-full w-full object-contain"} style={crop ? { width: `${2376 / crop[2] * 100}%`, left: `${-crop[0] / crop[2] * 100}%`, top: `${-crop[1] / crop[3] * 100}%` } : undefined} />
+                    <img data-design-id={designId.projectMedia(slug, item.id!)} data-design-kind="image" src={item.src} alt={item.caption?.trim() || "Technical drawing"} draggable={false} className={crop ? "absolute max-w-none" : "block h-full w-full object-contain"} style={crop ? { width: `${2376 / crop[2] * 100}%`, left: `${-crop[0] / crop[2] * 100}%`, top: `${-crop[1] / crop[3] * 100}%` } : undefined} />
                   </span>
                 </button>
               </div>
@@ -64,7 +64,7 @@ export function DrawingCarousel({ slug, items, onOpen }: {
       </div>
       <div className="mt-2 flex justify-center gap-1">
         {items.map(({ item }, i) => (
-          <button key={item.id} type="button" onClick={() => go(i)} aria-label={`View ${item.caption ?? `drawing ${i + 1}`}`} aria-current={active === i ? "true" : undefined} className="flex h-8 min-w-8 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E20074]">
+          <button key={item.id} type="button" onClick={() => go(i)} aria-label={`View ${item.caption?.trim() || `drawing ${i + 1}`}`} aria-current={active === i ? "true" : undefined} className="flex h-8 min-w-8 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E20074]">
             <span className={`h-1.5 rounded-full transition-all motion-reduce:transition-none ${active === i ? "w-6 bg-[#E20074]" : "w-1.5 bg-foreground/30"}`} />
           </button>
         ))}
