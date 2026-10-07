@@ -1548,19 +1548,21 @@ img[data-scroll-fade="in"] {
 }
 
 /* Phones (a column under 480px — phones, and the narrow split column on
-   tablets): no indent; each name on one line above its role (16 / 14px,
-   capped at the 16px phone subtitle); block centred under the intro. */
+   tablets): roles 16 / 14px, capped at the 16px phone subtitle. */
 @container (max-width: 30rem) {
   .pc-in { --t1: 16px; --t2: 14px; --lab: 10px; }
   .pc-in [data-tier="2"] { --lab: 10px; }
   .pc .pc-label { text-align: left; }
   .pc .pc-label br { display: none; }
-  .pc-s, .pc-group { display: block; }
-  .pc-s { margin-inline: auto; }
-  .pc .pc-group > .pc-cat { padding-right: 0; }
-  .pc-flow { flex-direction: column; gap: 14px; }
-  .pc-pair { flex-direction: column; gap: 7px; }
-  .pc-group[data-mine] .pc-val { text-align: left; }
+  /* Keep the hanging label + indent; span the full column; collaborators
+     side by side, wrapping; each name on one line above its role (a name
+     stacked beside a 14px role would be ~6px). Reid's credit centred. */
+  .pc-s { width: 100%; grid-template-columns: max-content minmax(0, 1fr); }
+  .pc .pc-group > .pc-cat { padding-right: 16px; }
+  .pc-flow { gap: 14px 22px; }
+  .pc-pair { flex-direction: column; gap: 6px; }
+  .pc-group[data-mine] .pc-pair { align-items: center; }
+  .pc-group[data-mine] .pc-label { text-align: center; }
 }
 
 /* Entrance, once, when the block scrolls into view (data-in): both labels
