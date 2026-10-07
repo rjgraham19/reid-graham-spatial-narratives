@@ -1507,39 +1507,38 @@ img[data-scroll-fade="in"] {
 }
 .pc .pc-val[data-mine] { font-weight: 600; color: #f5f5f5; }
 
+/* Layout, at every screen size: MY ROLE / COLLABORATORS sit at the left
+   margin with a full-width rule right under each; the credits themselves
+   (name + role) centre beneath, on the same centre line as the intro's
+   description above (same column; capped at the description's 72rem on
+   centred pages). Several people sit side by side as one centred group,
+   wrapping as needed. */
 .pc-s {
-  display: grid;
-  grid-template-columns: max-content minmax(0, auto);
-  width: fit-content;
-  max-width: 100%;
-}
-.pc[data-align="center"] .pc-s { margin-inline: auto; }
-.pc-group {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: subgrid;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
 }
 .pc-group + .pc-group { margin-top: 30px; }
-.pc .pc-group > .pc-cat { grid-area: 1 / 1; padding-right: 28px; margin-bottom: 6px; }
+.pc .pc-group > .pc-cat { margin-bottom: 6px; }
 .pc-rule {
-  grid-area: 2 / 1 / 3 / -1;
   display: block;
   height: 1px;
   margin-bottom: 16px;
   background: var(--rule);
 }
 .pc-flow {
-  grid-area: 3 / 2;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   align-items: flex-start;
   gap: 16px 32px;
 }
-/* Reid's role centred over the credits column. */
-.pc-group[data-mine] .pc-flow { justify-content: center; }
-.pc-group[data-mine] .pc-val { text-align: center; }
+/* Each role's box is shrink-wrapped to its longest line by
+   ProjectCredits (a wrapped line otherwise leaves its box full-width), so
+   the name sits exactly 7.5px from the text and centring measures the
+   real text. */
 .pc-pair { display: inline-flex; align-items: flex-start; gap: 7.5px; max-width: 100%; }
-.pc-pair > .pc-val { min-width: 0; }
+.pc-pair > .pc-val { min-width: 0; text-align: center; }
 
 /* Tablets (768–1023px windows): the subtitle steps down to 21px, so the
    roles step down to 20 / 18px to stay under it. */
@@ -1548,33 +1547,16 @@ img[data-scroll-fade="in"] {
 }
 
 /* Phones (a column under 480px — phones, and the narrow split column on
-   tablets): roles 16 / 14px, capped at the 16px phone subtitle. */
+   tablets): roles 16 / 14px, capped at the 16px phone subtitle; each name
+   on one line, centred above its role (stacked beside a 14px role it
+   would be ~6px). */
 @container (max-width: 30rem) {
   .pc-in { --t1: 16px; --t2: 14px; --lab: 10px; }
   .pc-in [data-tier="2"] { --lab: 10px; }
-  .pc .pc-label { text-align: left; }
+  .pc .pc-label { text-align: center; }
   .pc .pc-label br { display: none; }
-  /* Keep the hanging label + indent; span the full column; collaborators
-     side by side, wrapping; each name on one line above its role (a name
-     stacked beside a 14px role would be ~6px). Reid's credit centred. */
-  .pc-s { width: 100%; grid-template-columns: max-content minmax(0, 1fr); }
-  .pc .pc-group > .pc-cat { padding-right: 16px; }
   .pc-flow { gap: 14px 22px; }
-  .pc-pair { flex-direction: column; gap: 6px; }
-  .pc-group[data-mine] .pc-pair { align-items: center; }
-  .pc-group[data-mine] .pc-label { text-align: center; }
-}
-
-/* Phones (under 768px, where the intro above is centred): MY ROLE /
-   COLLABORATORS and their rules stay at the left, but the credits
-   themselves span the full width and centre under the description —
-   several people sit side by side as one centred group. Tablets keep the
-   indent, since the split pages' intro is left-aligned there. */
-@media (max-width: 767px) {
-  .pc-flow { grid-area: 3 / 1 / 4 / -1; justify-content: center; }
-  .pc-pair { align-items: center; }
-  .pc .pc-label,
-  .pc .pc-val { text-align: center; }
+  .pc-pair { flex-direction: column; align-items: center; gap: 6px; }
 }
 
 /* Entrance, once, when the block scrolls into view (data-in): both labels
