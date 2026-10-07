@@ -10,6 +10,7 @@ import { SectionTransitions } from "./SectionTransitions";
 import { SectionType } from "./SectionType";
 import { SectionImage } from "./SectionImage";
 import { SectionScroll } from "./SectionScroll";
+import { SectionCredits } from "./SectionCredits";
 import { SectionCarousels } from "./SectionCarousels";
 import { SectionWildcards } from "./SectionWildcards";
 import { Shortlist } from "./Shortlist";
@@ -96,6 +97,7 @@ export default function LabShell() {
           {active === "type" && <SectionType />}
           {active === "image" && <SectionImage />}
           {active === "scroll" && <SectionScroll />}
+          {active === "credits" && <SectionCredits />}
           {active === "carousels" && <SectionCarousels />}
           {active === "wildcards" && <SectionWildcards />}
           {active === "shortlist" && <Shortlist onJump={(cat) => go(cat as SectionId)} />}

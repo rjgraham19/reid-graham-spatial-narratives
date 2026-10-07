@@ -19,6 +19,7 @@ import { DrawingCarousel } from "@/components/drawing-carousel";
 import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
 import { TrueWestGroundplan } from "@/components/true-west-groundplan";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
+import { ProjectCredits } from "@/components/project-credits";
 
 import tabAnimation from "@/assets/rg/tab-animation.svg";
 import { InlineAnimatedSvg } from "@/components/inline-animated-svg";
@@ -122,6 +123,17 @@ export const Route = createFileRoute("/work/$hub/$slug")({
         { property: "og:description", content: p.description.slice(0, 160) },
         { property: "og:image", content: p.cover },
         { name: "twitter:image", content: p.cover },
+      ],
+      // Antonio sets the intro subtitle (above the fold) and the credits;
+      // its @font-face is `display: block`, so start the fetch right away.
+      links: [
+        {
+          rel: "preload",
+          as: "font",
+          type: "font/woff2",
+          href: "/fonts/antonio-variable.woff2",
+          crossOrigin: "anonymous",
+        },
       ],
     };
   },
@@ -281,14 +293,15 @@ const HERO_ASPECT: Record<string, number> = {
 
 type IntroAlign = "center" | "split";
 
-/* Subtitle and description share a size and weight (16/20/24px, Regular).
-   The subtitle is all caps and grey; the description is in sentence case,
-   white, with more open leading since lowercase needs more room between
-   lines than caps. Both trimmed to cap height and baseline so the margins
-   between blocks are the visible gaps. */
+/* Description: 16/20/24px General Sans Regular, sentence case, white, open
+   leading. Subtitle: Antonio Regular caps in grey (the condensed face the
+   credits use, see .intro-subtitle in styles.css), a step larger at
+   17/21/26px since condensed caps read smaller. Both trimmed to cap height
+   and baseline so the margins between blocks are the visible gaps. */
 const introStatementBase =
   "text-base md:text-xl lg:text-2xl text-balance [text-box:trim-both_cap_alphabetic]";
-const introSubtitleType = `${introStatementBase} uppercase leading-[1.3] tracking-[0.02em]`;
+const introSubtitleType =
+  "intro-subtitle text-[17px] md:text-[21px] lg:text-[26px] text-balance [text-box:trim-both_cap_alphabetic] uppercase leading-[1.15] tracking-[0.03em]";
 const introDescriptionType = `${introStatementBase} leading-[1.45]`;
 
 /* The breathing room above and below the description (subtitle →
@@ -367,60 +380,9 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
   );
 }
 
-/* Credits: MY ROLE, then COLLABORATORS (tight gap), each a small grey label
-   over its credit. On "center" pages the stack is centered under the
-   centered description, film-credit style — never side by side, since a
-   long role (Lollapalooza's) squeezed the collaborators into a narrow
-   column. In the "split" column it stays left-aligned. MY ROLE leads
-   (first, white, a touch heavier); collaborators sit at nearly the same
-   size, just softer. */
-const creditLabel = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground/50 [text-box:trim-start_cap_alphabetic]";
-const creditRole = "text-[10px] lg:text-[13px] tracking-[0.14em] text-foreground font-medium";
-const creditCollab = "text-[10px] lg:text-[13px] leading-relaxed tracking-[0.14em] text-foreground/70";
-
-function IntroCredits({ project, align }: { project: Project; align: IntroAlign }) {
-  const credits = (project.credits ?? []).filter((c) => !c.hidden);
-  const myRole = credits.find((c) => c.name === "Reid Graham");
-  const collaborators = credits.filter((c) => c.name !== "Reid Graham");
-  if (!myRole && collaborators.length === 0) return null;
-  // A lone advisor/director reads better as their own label than under
-  // "COLLABORATORS" — same rule the old credits block used for advisors.
-  const collabLabel = collaborators.length === 1 ? collaborators[0].role : "Collaborators";
-
-  return (
-    <div
-      className={`uppercase grid gap-y-3 ${
-        align === "center" ? "mx-auto max-w-4xl text-center [&_p]:text-balance" : "text-center md:text-left"
-      }`}
-    >
-      {myRole && (
-        <div>
-          <p className={`${creditLabel} font-normal`}>My role</p>
-          <p className={`mt-1 ${creditRole}`}>{myRole.role}</p>
-        </div>
-      )}
-      {collaborators.length > 0 && (
-        <div>
-          <p className={`${creditLabel} font-normal`}>{collabLabel}</p>
-          <p className={`mt-1 ${creditCollab}`}>
-            {collaborators.length === 1 ? (
-              <span className="text-foreground/90">{collaborators[0].name}</span>
-            ) : (
-              collaborators.map((c, i) => (
-                <span key={c.role}>
-                  {i > 0 && <span className="mx-2.5 text-foreground/30">|</span>}
-                  <span className="text-foreground/90">{c.name}</span>, {c.role}
-                </span>
-              ))
-            )}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* Everything after the header: the description, then the credits. */
+/* Everything after the header: the description, then the credits. The
+   credits sit outside the description's RevealBlock — they run their own
+   entrance (rules drawing, text fading up; see ProjectCredits). */
 function IntroBody({
   project,
   align,
@@ -433,21 +395,23 @@ function IntroBody({
   description?: string;
 }) {
   return (
-    <RevealBlock className="intro-trial">
-      <div className={introColumn(align)}>
-        <p
-          data-design-id={designId.projectDescription(project.slug)}
-          data-design-kind="text"
-          className={introDescriptionType}
-          style={{ fontWeight: "var(--intro-description-w, 400)" }}
-        >
-          {description}
-        </p>
-      </div>
+    <>
+      <RevealBlock className="intro-trial">
+        <div className={introColumn(align)}>
+          <p
+            data-design-id={designId.projectDescription(project.slug)}
+            data-design-kind="text"
+            className={introDescriptionType}
+            style={{ fontWeight: "var(--intro-description-w, 400)" }}
+          >
+            {description}
+          </p>
+        </div>
+      </RevealBlock>
       <div className={introDescriptionGap}>
-        <IntroCredits project={project} align={align} />
+        <ProjectCredits project={project} align={align} />
       </div>
-    </RevealBlock>
+    </>
   );
 }
 

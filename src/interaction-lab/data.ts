@@ -143,6 +143,7 @@ export type CategoryId =
   | "type"
   | "image"
   | "scroll"
+  | "credits"
   | "carousels"
   | "wildcards";
 
@@ -207,26 +208,32 @@ export const CATEGORIES: {
     lede: "How images and text arrive as you scroll down a project page. Flip between the quick reveal (lighter projects) and the slow, line-by-line reveal (moody projects) on the same mock page — both are the real site component.",
   },
   {
-    id: "carousels",
+    id: "credits",
     index: "08",
+    label: "Project Credits",
+    lede: "Film-billing credits against the current ones, role-first: each role in the bold white line with the name stacked small beside it. Two layouts, each in Antonio and in General Sans, with or without your name. Nothing in the credits is bigger than the subtitle.",
+  },
+  {
+    id: "carousels",
+    index: "09",
     label: "Carousels",
     lede: "Gallery and mobile image-browsing proposals. Mobile usability is the priority — the current project-image behaviour is weak on phones.",
   },
   {
     id: "wildcards",
-    index: "09",
+    index: "10",
     label: "Wildcards",
     lede: "Unrequested ideas that could make a portfolio spanning architecture, scenic and experiential design feel unusually immersive — still realistic and maintainable.",
   },
   {
     id: "shortlist",
-    index: "10",
+    index: "11",
     label: "Shortlist",
     lede: "Everything you have starred, gathered with its identifiers. Copy the list to hand back the exact set to transfer.",
   },
   {
     id: "findings",
-    index: "11",
+    index: "12",
     label: "Findings",
     lede: "What the explorations taught, and the recommended next steps for the real portfolio.",
   },
@@ -585,7 +592,92 @@ export const EXPERIMENTS: ExperimentMeta[] = [
     perf: "Cheap: transform + opacity on word spans; lines measured once after layout.",
   },
 
-  // 08 CAROUSELS
+  // 08 PROJECT CREDITS
+  {
+    id: "CREDITS-A",
+    category: "credits",
+    name: "Editorial Credits",
+    blurb:
+      "Small grey labels left, white credits right, fine 1px rules above, between and below. Your role leads at 24px Semibold; collaborators 19px Medium.",
+    platform: "both",
+    reference: "Editorial / magazine credit blocks",
+    perf: "Static: no motion, plain CSS grid.",
+  },
+  {
+    id: "CREDITS-B",
+    category: "credits",
+    name: "Film Billing Credits",
+    blurb:
+      "Tall condensed uppercase credits (Antonio) with tiny stacked grey labels beside them, after a film billing block. MY ROLE first, then a COLLABORATORS group, fine rules between.",
+    platform: "both",
+    reference: "Film poster billing block (screenshot from Reid)",
+    perf: "Static: no motion, plain CSS grid.",
+  },
+  {
+    id: "CREDITS-C",
+    category: "credits",
+    name: "Unified List, Marked Row",
+    blurb:
+      "One continuous role → name list, Reid first. A small MY ROLE note and a fine bracket in the left margin (joined to the row rules) mark his entry; alternative: a faint square outline.",
+    platform: "both",
+    reference: "Annotated film end-credits",
+    perf: "Static: no motion, plain CSS grid + one pseudo-element.",
+  },
+
+  {
+    id: "CREDITS-B1",
+    category: "credits",
+    name: "Margin Labels (role-first)",
+    blurb:
+      "MY ROLE / COLLABORATORS in a narrow left margin; each name stacked small and grey against its role, which is the bold white line. Name stack locked to the role's cap height.",
+    platform: "both",
+    reference: "Film poster billing block (screenshot from Reid)",
+    perf: "Static: no motion, plain CSS grid.",
+  },
+  {
+    id: "CREDITS-B2",
+    category: "credits",
+    name: "Bracketed Billing",
+    blurb:
+      "Billing columns with Reid's row marked by a fine bracket joined to its rules, MY ROLE set against it.",
+    platform: "both",
+    reference: "Film poster billing block + annotated end-credits",
+    perf: "Static: no motion, plain CSS grid.",
+  },
+  {
+    id: "CREDITS-B3",
+    category: "credits",
+    name: "Centred Billing Block",
+    blurb:
+      "Closest to the poster reference: credits flow and wrap, centred, a label stacked against every name, each group under a small category line.",
+    platform: "both",
+    reference: "Film poster billing block (screenshot from Reid)",
+    perf: "Static: no motion, flexbox.",
+  },
+
+  {
+    id: "CREDITS-B4",
+    category: "credits",
+    name: "Stacked Groups (role-first)",
+    blurb:
+      "MY ROLE and COLLABORATORS each on their own line above the group, everything left-aligned; names stacked small against bold roles, collaborators flowing like a billing block.",
+    platform: "both",
+    reference: "Film poster billing block (screenshot from Reid)",
+    perf: "Static: no motion, flexbox.",
+  },
+
+  {
+    id: "CREDITS-B5",
+    category: "credits",
+    name: "Indented Groups (role-first)",
+    blurb:
+      "MY ROLE and COLLABORATORS hang alone at the left; the fine rule (right under the category line) and the credits are indented beside them. Phones fall back to stacked groups.",
+    platform: "both",
+    reference: "Film poster billing block (screenshot from Reid)",
+    perf: "Static: no motion, CSS grid.",
+  },
+
+  // 09 CAROUSELS
   {
     id: "CAROUSEL-01",
     category: "carousels",
@@ -637,7 +729,7 @@ export const EXPERIMENTS: ExperimentMeta[] = [
     perf: "Cheap: index state, one crossfade.",
   },
 
-  // 09 WILDCARDS
+  // 10 WILDCARDS
   {
     id: "WILD-01",
     category: "wildcards",

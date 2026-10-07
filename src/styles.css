@@ -49,6 +49,15 @@
   font-display: block;
   src: url("/fonts/general-sans-variable-italic.woff2") format("woff2");
 }
+/* Antonio (Google Fonts, OFL, self-hosted, latin subset): the condensed face
+   for project-page subtitles and credits. Preloaded by the project route. */
+@font-face {
+  font-family: "Antonio";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url("/fonts/antonio-variable.woff2") format("woff2");
+}
 @font-face {
   font-family: "DM Sans";
   font-style: normal;
@@ -1437,4 +1446,161 @@ img[data-scroll-fade="in"] {
    override's bare [data-design-id="…"] rule, both !important. */
 .intro-trial [data-design-id] {
   transform: none !important;
+}
+
+/* Intro subtitle: Antonio Regular (condensed caps), 17 / 21 / 26px. Beats
+   the page-wide `.intro-font *` General Sans rule. */
+.intro-font .intro-subtitle {
+  font-family: "Antonio", "Arial Narrow", sans-serif !important;
+  font-weight: 400 !important;
+}
+
+/* ── Project credits (src/components/project-credits.tsx) ─────────────
+   Film-billing credits: a category label hanging left with a full-width
+   rule under it, credits indented beneath. Roles in Antonio caps, names
+   stacked small and grey beside them. */
+.pc {
+  container-type: inline-size;
+  --pc-fam: "Antonio", "Arial Narrow", sans-serif;
+  --cap: 0.859; /* Antonio's cap height ÷ font size (measured) */
+  --lab-lh: 1.1;
+  --rule: #303030;
+  color: #f5f5f5;
+  text-align: left;
+}
+/* Reid's role 24px, collaborators' 21px (never above the subtitle). The
+   name size is derived so a two-line stack = one role cap height:
+   lab = role × cap ÷ (line-height + cap). */
+.pc-in {
+  --t1: 24px;
+  --t2: 21px;
+  --lab: calc(var(--t1) * var(--cap) / (var(--lab-lh) + var(--cap)));
+}
+.pc-in [data-tier="2"] {
+  --t1: var(--t2);
+  --lab: calc(var(--t1) * var(--cap) / (var(--lab-lh) + var(--cap)));
+}
+.pc :is(.pc-cat, .pc-label, .pc-val) {
+  font-family: var(--pc-fam) !important;
+  text-transform: uppercase;
+  margin: 0;
+}
+.pc .pc-cat,
+.pc .pc-label {
+  font-size: var(--lab);
+  font-weight: 500;
+  line-height: var(--lab-lh);
+  letter-spacing: 0.06em;
+  color: #a0a0a0;
+  text-box: trim-both cap alphabetic;
+}
+.pc .pc-cat { white-space: nowrap; }
+.pc .pc-label { text-align: right; }
+.pc .pc-val {
+  font-size: var(--t1);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: 0.01em;
+  color: #d8d8d8;
+  text-box: trim-both cap alphabetic;
+  text-wrap: balance;
+}
+.pc .pc-val[data-mine] { font-weight: 600; color: #f5f5f5; }
+
+.pc-s {
+  display: grid;
+  grid-template-columns: max-content minmax(0, auto);
+  width: fit-content;
+  max-width: 100%;
+}
+.pc[data-align="center"] .pc-s { margin-inline: auto; }
+.pc-group {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+.pc-group + .pc-group { margin-top: 30px; }
+.pc .pc-group > .pc-cat { grid-area: 1 / 1; padding-right: 28px; margin-bottom: 6px; }
+.pc-rule {
+  grid-area: 2 / 1 / 3 / -1;
+  display: block;
+  height: 1px;
+  margin-bottom: 16px;
+  background: var(--rule);
+}
+.pc-flow {
+  grid-area: 3 / 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px 32px;
+}
+/* Reid's role centred over the credits column. */
+.pc-group[data-mine] .pc-flow { justify-content: center; }
+.pc-group[data-mine] .pc-val { text-align: center; }
+.pc-pair { display: inline-flex; align-items: flex-start; gap: 7.5px; max-width: 100%; }
+.pc-pair > .pc-val { min-width: 0; }
+
+/* Tablets (768–1023px windows): the subtitle steps down to 21px, so the
+   roles step down to 20 / 18px to stay under it. */
+@media (max-width: 1023px) {
+  .pc-in { --t1: 20px; --t2: 18px; }
+}
+
+/* Phones (a column under 480px — phones, and the narrow split column on
+   tablets): no indent; each name on one line above its role (16 / 14px,
+   capped at the 16px phone subtitle); block centred under the intro. */
+@container (max-width: 30rem) {
+  .pc-in { --t1: 16px; --t2: 14px; --lab: 10px; }
+  .pc-in [data-tier="2"] { --lab: 10px; }
+  .pc .pc-label { text-align: left; }
+  .pc .pc-label br { display: none; }
+  .pc-s, .pc-group { display: block; }
+  .pc-s { margin-inline: auto; }
+  .pc .pc-group > .pc-cat { padding-right: 0; }
+  .pc-flow { flex-direction: column; gap: 14px; }
+  .pc-pair { flex-direction: column; gap: 7px; }
+  .pc-group[data-mine] .pc-val { text-align: left; }
+}
+
+/* Entrance, once, when the block scrolls into view (data-in): both labels
+   fade in; both rules draw left → right together — same start, same
+   duration, so they land at the same moment — like a quick pencil stroke;
+   then the credits fade in group by group (--d). Text only fades, in
+   place (no lift — Reid). Timing follows the project's reveal pace: quick
+   0.5s ease-out, slow 1s on the site's soft in-out image-fade curve. */
+.pc {
+  --tx-dur: 0.5s;
+  --tx-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --rule-dur: 0.7s;
+  --rule-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --rule-lag: 0.12s;
+  --credit-lag: 0.38s;
+}
+.pc[data-pace="slow"] {
+  --tx-dur: 1s;
+  --tx-ease: cubic-bezier(0.68, 0, 0.22, 0.83);
+  --rule-dur: 0.9s;
+  --rule-lag: 0.18s;
+  --credit-lag: 0.5s;
+}
+.pc :is(.pc-cat, .pc-flow) {
+  opacity: 0;
+  transition: opacity var(--tx-dur) var(--tx-ease);
+}
+.pc .pc-flow { transition-delay: calc(var(--d, 0s) + var(--credit-lag)); }
+.pc .pc-rule {
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--rule-dur) var(--rule-ease), opacity calc(var(--rule-dur) * 0.4) linear;
+  transition-delay: var(--rule-lag);
+}
+.pc[data-in] :is(.pc-cat, .pc-flow, .pc-rule) { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .pc :is(.pc-cat, .pc-flow, .pc-rule) {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
