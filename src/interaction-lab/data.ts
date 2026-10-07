@@ -142,6 +142,7 @@ export type CategoryId =
   | "transitions"
   | "type"
   | "image"
+  | "scroll"
   | "carousels"
   | "wildcards";
 
@@ -200,26 +201,32 @@ export const CATEGORIES: {
     lede: "How images enter, respond and move — mask reveals, apertures, parallax, cursor previews, trails, stack separation. Tested on landscape, portrait and square.",
   },
   {
-    id: "carousels",
+    id: "scroll",
     index: "07",
+    label: "Scroll Reveal",
+    lede: "How images and text arrive as you scroll down a project page. Flip between the quick reveal (lighter projects) and the slow, line-by-line reveal (moody projects) on the same mock page — both are the real site component.",
+  },
+  {
+    id: "carousels",
+    index: "08",
     label: "Carousels",
     lede: "Gallery and mobile image-browsing proposals. Mobile usability is the priority — the current project-image behaviour is weak on phones.",
   },
   {
     id: "wildcards",
-    index: "08",
+    index: "09",
     label: "Wildcards",
     lede: "Unrequested ideas that could make a portfolio spanning architecture, scenic and experiential design feel unusually immersive — still realistic and maintainable.",
   },
   {
     id: "shortlist",
-    index: "09",
+    index: "10",
     label: "Shortlist",
     lede: "Everything you have starred, gathered with its identifiers. Copy the list to hand back the exact set to transfer.",
   },
   {
     id: "findings",
-    index: "10",
+    index: "11",
     label: "Findings",
     lede: "What the explorations taught, and the recommended next steps for the real portfolio.",
   },
@@ -556,7 +563,29 @@ export const EXPERIMENTS: ExperimentMeta[] = [
     perf: "Cheap: transform per card from one index var.",
   },
 
-  // 07 CAROUSELS
+  // 07 SCROLL REVEAL
+  {
+    id: "SCROLL-01",
+    category: "scroll",
+    name: "Soft Image Fade",
+    blurb:
+      "Images fade in with no movement at all — 0.8s on a slow-in, soft-landing curve, starting the moment any part of the image is on screen.",
+    platform: "both",
+    reference: "matthewplaia.com/work/the-art-house (Framer appear effect)",
+    perf: "Cheap: opacity only, one observer per image, plays once.",
+  },
+  {
+    id: "SCROLL-02",
+    category: "scroll",
+    name: "Line-by-Line Text",
+    blurb:
+      "Paragraphs and headings unroll one visual line at a time — each line rises 10px and fades in over 1s, 0.05s after the line above.",
+    platform: "both",
+    reference: "matthewplaia.com/work/the-art-house (Framer text effect)",
+    perf: "Cheap: transform + opacity on word spans; lines measured once after layout.",
+  },
+
+  // 08 CAROUSELS
   {
     id: "CAROUSEL-01",
     category: "carousels",
@@ -608,7 +637,7 @@ export const EXPERIMENTS: ExperimentMeta[] = [
     perf: "Cheap: index state, one crossfade.",
   },
 
-  // 08 WILDCARDS
+  // 09 WILDCARDS
   {
     id: "WILD-01",
     category: "wildcards",

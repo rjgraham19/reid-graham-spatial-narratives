@@ -169,6 +169,12 @@ export type Project = {
   /** Extra images used for the hover-collage preview on hub landing pages. */
   collage?: string[];
   mood?: Mood;
+  /**
+   * How content reveals on scroll. "slow" = soft image fades + line-by-line
+   * text, for the moodier design projects; default "quick" = the original
+   * snappy fade-up. See RevealPaceProvider in components/animated-text.tsx.
+   */
+  revealPace?: "quick" | "slow";
   /** Optional native HTML5 video (used on Staging Aesthetics). */
   video?: { src: string; poster?: string; caption?: string };
   /** Optional callout cards (used on Staging Aesthetics). */
@@ -387,6 +393,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "the-exchange-facility",
+    revealPace: "slow",
     accentColor: "#b89bec",
     heroTitleAbove: true,
     highlight: hlExchange,
@@ -417,6 +424,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "staging-aesthetics",
+    revealPace: "slow",
     accentColor: "#008bff",
     heroTitleAbove: true,
     heroPortrait: true,
@@ -452,6 +460,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "reshuffling-the-deck",
+    revealPace: "slow",
     accentColor: "#A79E95",
     heroPortrait: true,
     hub: "production-scenic",
@@ -480,6 +489,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "true-west",
+    revealPace: "slow",
     accentColor: "#c28127",
     highlight: hlTrueWest,
     highlightPosition: "50% 50%",
@@ -541,6 +551,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "the-diary-of-anne-frank",
+    revealPace: "slow",
     accentColor: "#d7d9e6",
     hub: "production-scenic",
     title: "The Diary of Anne Frank",
@@ -573,6 +584,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "field-house",
+    revealPace: "slow",
     accentColor: "#98A633",
     highlight: hlFieldHouse,
     highlightPosition: "70% 50%",

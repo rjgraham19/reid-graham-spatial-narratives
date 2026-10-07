@@ -5,7 +5,8 @@ import { textEms, longestWordEms } from "@/lib/title-metrics";
 import { AnimatePresence, motion } from "motion/react";
 import { SiteNav } from "@/components/site-nav";
 import { RecordPlayerViewer } from "@/components/record-player-viewer";
-import { AnimatedHeading, RevealBlock } from "@/components/animated-text";
+import { AnimatedHeading, RevealBlock, RevealPaceProvider } from "@/components/animated-text";
+import { useScrollImageFade } from "@/hooks/use-scroll-image-fade";
 import { BackChevron, CloseMark, glassButton, trackSheen } from "@/components/glass-button";
 import { formatTag } from "@/components/discipline-filter-pills";
 import { LightboxVideo } from "@/components/lightbox-video";
@@ -745,11 +746,15 @@ function ProjectPageInner() {
     return () => observer.disconnect();
   }, [isLollapalooza]);
 
+  const pageRootRef = useRef<HTMLDivElement>(null);
+  useScrollImageFade(pageRootRef, project.slug);
+
   return (
-    /* `is-panel-frame` marks this document as the one rendered inside the
+    <RevealPaceProvider pace={project.revealPace ?? "quick"}>
+    {/* `is-panel-frame` marks this document as the one rendered inside the
        panel. It's server-rendered from the panel=1 search param, so it's in
        the very first HTML the frame parses, which is what lets the stylesheet
-       hide the frame's scrollbar before anything is painted. */
+       hide the frame's scrollbar before anything is painted. */}
     <div
       className={`relative ${mood.wrap}${isLollapalooza ? " lolla-cursor lolla-bg" : ""}${
         panel ? " is-panel-frame" : ""
@@ -760,8 +765,10 @@ function ProjectPageInner() {
          the lightbox arrows use. Projects with no accent fall back to the
          site accent at the point of use. */
       style={project.accentColor ? ({ "--accent-color": project.accentColor } as React.CSSProperties) : undefined}
+      ref={pageRootRef}
+      data-reveal-pace={project.revealPace ?? "quick"}
     >
-      {responsiveCss && <style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
+      {responsiveCss &&<style dangerouslySetInnerHTML={{ __html: responsiveCss }} />}
       <DesignFrameBridge
         liveOverrides={live}
         liveMedia={liveMedia}
@@ -2579,5 +2586,6 @@ function ProjectPageInner() {
       )}
 
     </div>
+    </RevealPaceProvider>
   );
 }

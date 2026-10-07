@@ -1,5 +1,18 @@
-import { motion } from "motion/react";
-import { Fragment, type CSSProperties, type ReactNode } from "react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
+import {
+  Children,
+  Fragment,
+  cloneElement,
+  createContext,
+  isValidElement,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { useFitText } from "@/hooks/use-fit-text";
 
 /**
@@ -103,13 +116,20 @@ export function AnimatedHeading({
   );
 }
 
-/** Subtle fade-up reveal for a block of body content (description, credits, quotes). */
-export function RevealBlock({
-  children,
-  className,
-  delay = 0,
-  from = "up",
-}: {
+/**
+ * Reveal pace for every RevealBlock below a provider. "quick" is the
+ * original snappy fade-up; "slow" is the softer, moodier reveal (settings
+ * taken from matthewplaia.com) used on the darker design projects — set per
+ * project with `revealPace` in src/lib/projects.ts.
+ */
+export type RevealPace = "quick" | "slow";
+const RevealPaceContext = createContext<RevealPace>("quick");
+
+export function RevealPaceProvider({ pace, children }: { pace: RevealPace; children: ReactNode }) {
+  return <RevealPaceContext.Provider value={pace}>{children}</RevealPaceContext.Provider>;
+}
+
+type RevealBlockProps = {
   children: ReactNode;
   className?: string;
   delay?: number;
@@ -118,11 +138,20 @@ export function RevealBlock({
    *  side — for pairing two images that should read as converging toward
    *  each other (see the Anne Frank sketch/photo pair). */
   from?: "up" | "left" | "right";
-}) {
+};
+
+/** Subtle fade-up reveal for a block of body content (description, credits, quotes). */
+export function RevealBlock(props: RevealBlockProps) {
+  const pace = useContext(RevealPaceContext);
+  return pace === "slow" ? <SlowReveal {...props} /> : <QuickReveal {...props} />;
+}
+
+function QuickReveal({ children, className, delay = 0, from = "up" }: RevealBlockProps) {
   const offset =
     from === "left" ? { x: -32 } : from === "right" ? { x: 32 } : { y: 16 };
   return (
     <motion.div
+      data-reveal
       className={className}
       initial={{ opacity: 0, ...offset }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
@@ -130,6 +159,138 @@ export function RevealBlock({
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
     >
       {children}
+    </motion.div>
+  );
+}
+
+/* ── Slow reveal ─────────────────────────────────────────────────────
+ * Images (blocks with no text): opacity only, 0.8s on a slow-in / soft-
+ * landing curve, starting as soon as any part is on screen.
+ * Text: every word becomes an inline-block span; after layout, words are
+ * grouped into their visual lines and each line rises 10px + fades in over
+ * 1s, 0.05s after the line above — so paragraphs unroll a line at a time.
+ *
+ * Words are split by rebuilding the React children (strings inside plain
+ * DOM elements like <p>/<em>), never by touching the DOM, so React keeps
+ * ownership. Content rendered by a nested component (e.g. a credit row)
+ * isn't split and simply fades with the block. Design Mode edits text in
+ * place, so splitting is off there and blocks fade as a whole. */
+const SLOW_IMAGE_EASE = [0.68, 0, 0.22, 0.83] as const;
+const SLOW_TEXT_EASE = [0.4, 0, 0.2, 1] as const;
+const SPLIT_TEXT = import.meta.env.MODE !== "design";
+const NO_SPLIT_TAGS = new Set([
+  "svg", "img", "picture", "video", "canvas", "iframe", "textarea", "select", "code", "pre",
+]);
+
+type WordVariants = Variants;
+
+function splitWords(
+  node: ReactNode,
+  counter: { n: number },
+  lines: number[],
+  variants: WordVariants,
+): ReactNode {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node)
+      .split(/(\s+)/)
+      .map((part, i) => {
+        if (part === "" || /^\s+$/.test(part)) return part || null;
+        const index = counter.n++;
+        return (
+          <motion.span
+            key={i}
+            data-word
+            className="inline-block"
+            variants={variants}
+            custom={lines[index] ?? 0}
+          >
+            {part}
+          </motion.span>
+        );
+      });
+  }
+  if (!isValidElement<{ children?: ReactNode }>(node)) return node;
+  const isDomTag = typeof node.type === "string" && !NO_SPLIT_TAGS.has(node.type);
+  if ((!isDomTag && node.type !== Fragment) || node.props.children == null) return node;
+  return cloneElement(
+    node,
+    undefined,
+    Children.map(node.props.children, (c) => splitWords(c, counter, lines, variants)),
+  );
+}
+
+function SlowReveal({ children, className, delay = 0, from = "up" }: RevealBlockProps) {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [lines, setLines] = useState<number[]>([]);
+
+  const wordVariants = useMemo<WordVariants>(
+    () => ({
+      hidden: { opacity: 0.001, y: 10 },
+      shown: (line: number) => ({
+        opacity: 1,
+        y: 0,
+        transition: { duration: 1, ease: SLOW_TEXT_EASE, delay: delay + line * 0.05 },
+      }),
+    }),
+    [delay],
+  );
+
+  const counter = { n: 0 };
+  const content = SPLIT_TEXT
+    ? Children.map(children, (c) => splitWords(c, counter, lines, wordVariants))
+    : children;
+  const hasText = counter.n > 0;
+
+  // Group words into visual lines by their on-screen top edge. Every word is
+  // offset by the same 10px before it plays, so the grouping is unaffected.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || !hasText) return;
+    const measure = () => {
+      let line = -1;
+      let lastTop = -Infinity;
+      const next = Array.from(el.querySelectorAll<HTMLElement>("[data-word]")).map((w) => {
+        const top = w.getBoundingClientRect().top;
+        if (top > lastTop + 4) {
+          line += 1;
+          lastTop = top;
+        }
+        return line;
+      });
+      setLines((prev) => (prev.join() === next.join() ? prev : next));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [hasText]);
+
+  if (reduce) return <div data-reveal className={className}>{children}</div>;
+
+  const side = from === "left" ? { x: -32 } : from === "right" ? { x: 32 } : {};
+  return (
+    <motion.div
+      data-reveal
+      ref={ref}
+      className={className}
+      initial="hidden"
+      whileInView="shown"
+      viewport={
+        hasText ? { once: true, margin: "0px 0px -25% 0px" } : { once: true, amount: 0 }
+      }
+      variants={{
+        hidden: { opacity: 0, ...side },
+        shown: {
+          opacity: 1,
+          x: 0,
+          transition: hasText
+            ? { duration: 0.5, ease: SLOW_TEXT_EASE, delay }
+            : { duration: 0.8, ease: SLOW_IMAGE_EASE, delay },
+        },
+      }}
+    >
+      {content}
     </motion.div>
   );
 }

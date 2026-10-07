@@ -9,6 +9,7 @@ import { SectionGlass } from "./SectionGlass";
 import { SectionTransitions } from "./SectionTransitions";
 import { SectionType } from "./SectionType";
 import { SectionImage } from "./SectionImage";
+import { SectionScroll } from "./SectionScroll";
 import { SectionCarousels } from "./SectionCarousels";
 import { SectionWildcards } from "./SectionWildcards";
 import { Shortlist } from "./Shortlist";
@@ -94,6 +95,7 @@ export default function LabShell() {
           {active === "transitions" && <SectionTransitions />}
           {active === "type" && <SectionType />}
           {active === "image" && <SectionImage />}
+          {active === "scroll" && <SectionScroll />}
           {active === "carousels" && <SectionCarousels />}
           {active === "wildcards" && <SectionWildcards />}
           {active === "shortlist" && <Shortlist onJump={(cat) => go(cat as SectionId)} />}
