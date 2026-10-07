@@ -166,9 +166,13 @@ function QuickReveal({ children, className, delay = 0, from = "up" }: RevealBloc
 /* ── Slow reveal ─────────────────────────────────────────────────────
  * Images (blocks with no text): opacity only, 0.8s on a slow-in / soft-
  * landing curve, starting as soon as any part is on screen.
- * Text: every word becomes an inline-block span; after layout, words are
+ * Text: every word becomes a plain inline span; after layout, words are
  * grouped into their visual lines and each line rises 10px + fades in over
  * 1s, 0.05s after the line above — so paragraphs unroll a line at a time.
+ * Words stay display:inline and are offset with position:relative + `top`
+ * (inline boxes ignore transforms) so the text wraps exactly like plain text
+ * in every engine — inline-block words wrapped differently in Safari's
+ * balanced text and visibly re-flowed on iPad.
  *
  * Words are split by rebuilding the React children (strings inside plain
  * DOM elements like <p>/<em>), never by touching the DOM, so React keeps
@@ -200,7 +204,7 @@ function splitWords(
           <motion.span
             key={i}
             data-word
-            className="inline-block"
+            style={{ position: "relative" }}
             variants={variants}
             custom={lines[index] ?? 0}
           >
@@ -226,10 +230,10 @@ function SlowReveal({ children, className, delay = 0, from = "up" }: RevealBlock
 
   const wordVariants = useMemo<WordVariants>(
     () => ({
-      hidden: { opacity: 0.001, y: 10 },
+      hidden: { opacity: 0.001, top: 10 },
       shown: (line: number) => ({
         opacity: 1,
-        y: 0,
+        top: 0,
         transition: { duration: 1, ease: SLOW_TEXT_EASE, delay: delay + line * 0.05 },
       }),
     }),
