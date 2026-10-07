@@ -1565,6 +1565,18 @@ img[data-scroll-fade="in"] {
   .pc-group[data-mine] .pc-label { text-align: center; }
 }
 
+/* Phones (under 768px, where the intro above is centred): MY ROLE /
+   COLLABORATORS and their rules stay at the left, but the credits
+   themselves span the full width and centre under the description —
+   several people sit side by side as one centred group. Tablets keep the
+   indent, since the split pages' intro is left-aligned there. */
+@media (max-width: 767px) {
+  .pc-flow { grid-area: 3 / 1 / 4 / -1; justify-content: center; }
+  .pc-pair { align-items: center; }
+  .pc .pc-label,
+  .pc .pc-val { text-align: center; }
+}
+
 /* Entrance, once, when the block scrolls into view (data-in): both labels
    fade in; both rules draw left → right together — same start, same
    duration, so they land at the same moment — like a quick pencil stroke;
