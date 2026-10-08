@@ -7,15 +7,15 @@ import type { Project } from "@/lib/projects";
  *
  *   MY ROLE
  *   ─────────────────────────────────────────────
- *            REID    PRODUCTION DESIGNER + SCENIC PAINTER
- *            GRAHAM
+ *               PRODUCTION DESIGNER + SCENIC PAINTER
  *   COLLABORATORS
  *   ─────────────────────────────────────────────
  *                   ROSE    THESIS DIRECTOR
  *                   ALBAYAT
  *
  * Each credit is a ROLE in condensed white caps (Antonio) with the person's
- * name stacked small and grey beside it. Reid's role leads (24px Semibold);
+ * name stacked small and grey beside it — except Reid's own, which is just
+ * the role (his name is redundant on his site). Reid's role leads (24px Semibold);
  * collaborators' roles sit a step down (21px Medium); nothing is bigger
  * than the intro subtitle. On phones each name sits on one line above its
  * role.
@@ -141,8 +141,8 @@ export function ProjectCredits({ project, align }: { project: Project; align: "c
               <p className="pc-cat">My role</p>
               <span className="pc-rule" aria-hidden />
               <div className="pc-flow">
+                {/* Just the role — the name is redundant on Reid's own site. */}
                 <span className="pc-pair">
-                  <Name text={mine.name} />
                   <span className="pc-val" data-mine>
                     {mine.role}
                   </span>

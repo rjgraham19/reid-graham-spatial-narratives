@@ -1546,11 +1546,13 @@ img[data-scroll-fade="in"] {
   .pc-in { --t1: 20px; --t2: 18px; }
 }
 
-/* Phones (a column under 480px — phones, and the narrow split column on
-   tablets): roles 16 / 14px, capped at the 16px phone subtitle; each name
-   on one line, centred above its role (stacked beside a 14px role it
-   would be ~6px). */
-@container (max-width: 30rem) {
+/* Phones only (windows under 768px): roles 16 / 14px, capped at the 16px
+   phone subtitle; each name on one line, centred above its role (stacked
+   beside a 14px role it would be ~6px). Keyed to the window, not the
+   column: the split pages' narrow column on an iPad used to trip this and
+   stack the names there too — Reid wants names beside roles everywhere
+   but a phone. */
+@media (max-width: 767px) {
   .pc-in { --t1: 16px; --t2: 14px; --lab: 10px; }
   .pc-in [data-tier="2"] { --lab: 10px; }
   .pc .pc-label { text-align: center; }
@@ -1564,21 +1566,22 @@ img[data-scroll-fade="in"] {
    duration, so they land at the same moment — like a quick pencil stroke;
    then the credits fade in group by group (--d). Text only fades, in
    place (no lift — Reid). Timing follows the project's reveal pace: quick
-   0.5s ease-out, slow 1s on the site's soft in-out image-fade curve. */
+   0.4s ease-out, slow 0.8s on the site's soft in-out image-fade curve
+   (both a touch quicker than the first 0.5s / 1s — Reid). */
 .pc {
-  --tx-dur: 0.5s;
+  --tx-dur: 0.4s;
   --tx-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
   --rule-dur: 0.7s;
   --rule-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --rule-lag: 0.12s;
-  --credit-lag: 0.38s;
+  --credit-lag: 0.3s;
 }
 .pc[data-pace="slow"] {
-  --tx-dur: 1s;
+  --tx-dur: 0.8s;
   --tx-ease: cubic-bezier(0.68, 0, 0.22, 0.83);
   --rule-dur: 0.9s;
   --rule-lag: 0.18s;
-  --credit-lag: 0.5s;
+  --credit-lag: 0.4s;
 }
 .pc :is(.pc-cat, .pc-flow) {
   opacity: 0;
