@@ -2326,7 +2326,7 @@ function ProjectPageInner() {
 
       {isLollapalooza && lollapaloozaDraftingMedia.length > 0 && (
         <section className="px-6 md:px-12 lg:px-16 pt-10">
-          <DrawingCarousel slug={project.slug} items={lollapaloozaDraftingMedia} onOpen={setLightbox} />
+          <DrawingCarousel slug={project.slug} items={lollapaloozaDraftingMedia} />
         </section>
       )}
 

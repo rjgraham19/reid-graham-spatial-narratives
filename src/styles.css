@@ -1157,6 +1157,21 @@ img[data-scroll-fade="in"] {
   --sheen-strength: 46%;
 }
 
+/* The DAY / NIGHT tags on the Lollapalooza comparison render — the same
+   glass shape and thin 25% border as the "Back to Projects" button
+   (`.text-button`), keeping their original light, widely spaced lettering.
+   Labels only, so no hover or pointer. */
+.daynight-tag.glass-button {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-weight: 200;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  padding: 0.7em 1.01em 0.7em 1.2em;
+  cursor: default;
+  pointer-events: none;
+}
+
 /* The close (✕) controls that live inside a project's own scope — the inset
    panel's corner close, and the image lightbox's close — light their sheen in
    that project's accent on hover, the same as the hub-tag pill. `--accent-color`
