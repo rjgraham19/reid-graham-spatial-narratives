@@ -98,26 +98,33 @@ export function createRecordPlayerScene(host: HTMLDivElement, onFailure: () => v
       minY = Math.min(minY, projected.y); maxY = Math.max(maxY, projected.y);
     }
     if (!referenceFraming && boundsPoints.length && width && height) {
-      // A constant reference stage preserves the original shrink and camera
-      // pacing. `Math.max`, not `Math.min` — the stage column's aspect ratio
-      // varies a lot more than the reference box's does (a thin phone
-      // viewport is much taller/narrower than 660x720), and `min` always
-      // locked the scale to whichever dimension was more constrained. On a
-      // narrow column that's the width, so the model shrank to fit it and
-      // left the rest of the (much taller) column empty above and below.
-      // `max` lets the model grow to fill the more generous dimension
-      // instead; `fitScale` below — a real safety check against the
-      // model's actual projected silhouette, not a fixed reference box —
-      // still catches it before it overflows the column's edges.
-      const referenceScale = Math.max(width / 660, height / 720);
-      const fitScale = Math.min(width * 0.92 / ((maxX-minX)*640), height * 0.94 / ((maxY-minY)*360));
-      const scale = Math.min(referenceScale, fitScale);
+      // Every moment of the scrub is framed on the model's own projected
+      // silhouette: scaled to fill the stage (with a small margin) and
+      // centred in it. The recorded camera path still drives the angle,
+      // the orbit and the disc — but its pull-back no longer shrinks the
+      // model or lets it drift low. Framing the reference 1280×720 stage
+      // instead (the original approach) reproduced that pull-back exactly,
+      // which by the end of the scrub left the model in the middle third
+      // of a full-height pinned panel: a tall black band above it and
+      // another below, reading as big gaps before and after the section.
+      //
+      // The silhouette was projected above at the reference 16:9 aspect
+      // (NDC × 640 / × 360 = reference px). `scale` maps reference px to
+      // screen px; the fov change applies it, and the projection offset
+      // places the silhouette (see below).
+      const scale = Math.min(width * 0.94 / ((maxX-minX)*640), height * 0.94 / ((maxY-minY)*360));
+      const centerX = (minX + maxX) / 2;
       camera.aspect = width / height;
       camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * height / (720 * scale)));
       camera.updateProjectionMatrix();
-      // Center the reference stage, not each changing bounding box. The
-      // camera's deliberate descent and lateral move survive resizing.
-      camera.projectionMatrix.elements[8] -= (640-615) * 2 * scale / width;
+      // ndc = P·x / −z − P[8] (x) / − P[9] (y): subtracting shifts right/up.
+      // Centred across; vertically it rests on the stage's floor (3%
+      // margin) rather than being centred, so when a wide pose runs out of
+      // width before height, the spare space sits above the model — under
+      // the nav, while it's pinned — not below it, where it would read as
+      // a gap before the next section.
+      camera.projectionMatrix.elements[8] -= -centerX * 1280 * scale / width;
+      camera.projectionMatrix.elements[9] -= -0.97 - minY * 720 * scale / height;
       camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
     }
     requestDraw();

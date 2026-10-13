@@ -956,7 +956,7 @@ function ProjectPageInner() {
               follows the intro instead of sitting between the photos and
               the title. Same media, same order, title just moves up. */}
           {isLollapalooza && (
-            <figure className="order-4 px-6 md:px-12 lg:px-16 pb-10 md:pb-14">
+            <figure className="order-4 px-6 md:px-12 lg:px-16 pb-4 md:pb-4">
               <LollaRenderCarousel />
             </figure>
           )}
