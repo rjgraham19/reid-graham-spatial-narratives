@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ExchangeView } from "./exchange-scene";
+import { ASSET_BLURB_CLASS, ASSET_CAPTION_CLASS, ASSET_LABEL_CLASS } from "@/components/asset-frame";
 
 /* The facility's vertical section — the same three zones the model's
    buttons name — shown from first paint until the model is ready, and kept
@@ -140,7 +141,11 @@ export function ExchangeViewer({
         className="relative w-full overflow-hidden bg-black"
         style={{ height: asHero ? "clamp(440px, 70svh, 820px)" : "clamp(480px, 85vh, 950px)" }}
       >
-        <div ref={host} className="absolute inset-0" data-lenis-prevent />
+        {/* No data-lenis-prevent: wheel zoom is off here, so a scroll over
+            the model is a page scroll and must stay with the smooth
+            scroller — handing it to native scrolling mid-glide made the
+            page jump up and down. */}
+        <div ref={host} className="absolute inset-0" />
 
         <img
           src={POSTER_SRC}
@@ -163,7 +168,7 @@ export function ExchangeViewer({
             ready ? "" : "opacity-50"
           }`}
         >
-          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white/60">
+          <p className={`${ASSET_LABEL_CLASS} !text-white/80`}>
             Explore in 3D
           </p>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Facility view">
@@ -226,10 +231,10 @@ export function ExchangeViewer({
         {ready && zoneText?.text && (
           <div className="hidden lg:block absolute right-6 top-1/2 max-w-xs -translate-y-1/2 rounded-md bg-black/50 p-4 backdrop-blur-sm">
             <h3 className="font-display text-xl mb-1">{zoneText.label}</h3>
-            <p className="text-xs uppercase tracking-[0.15em] text-white/50 mb-2">
+            <p className={`mb-2 !mt-0 !text-left ${ASSET_CAPTION_CLASS} !text-white/55`}>
               {zoneText.subtitle}
             </p>
-            <p className="text-sm leading-relaxed text-white/80">{zoneText.text}</p>
+            <p className={`${ASSET_BLURB_CLASS} text-white`}>{zoneText.text}</p>
           </div>
         )}
 
@@ -238,7 +243,7 @@ export function ExchangeViewer({
             so it never fights the zone nav's scrim at the top. */}
         {view === "overall" && (
           <div className="hidden lg:block absolute left-6 bottom-6 max-w-sm rounded-md bg-black/50 p-4 backdrop-blur-sm">
-            <p className="font-display font-light text-base leading-snug tracking-tight text-white/90">
+            <p className={`${ASSET_BLURB_CLASS} text-white`}>
               {description}
             </p>
           </div>
@@ -293,15 +298,15 @@ export function ExchangeViewer({
       {ready && zoneText?.text && (
         <div className="lg:hidden mt-4 px-6 md:px-12 lg:px-16">
           <h3 className="font-display text-xl mb-1">{zoneText.label}</h3>
-          <p className="text-xs uppercase tracking-[0.15em] text-foreground/50 mb-2">
+          <p className={`mb-2 !mt-0 !text-left ${ASSET_CAPTION_CLASS}`}>
             {zoneText.subtitle}
           </p>
-          <p className="text-sm leading-relaxed text-foreground/70">{zoneText.text}</p>
+          <p className={ASSET_BLURB_CLASS}>{zoneText.text}</p>
         </div>
       )}
       {view === "overall" && (
         <div className="lg:hidden mt-4 px-6 md:px-12 lg:px-16">
-          <p className="font-display font-light text-base leading-snug tracking-tight text-foreground/80">
+          <p className={ASSET_BLURB_CLASS}>
             {description}
           </p>
         </div>

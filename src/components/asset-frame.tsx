@@ -22,7 +22,18 @@ export const ASSET_LABEL_CLASS =
 
 /** The interaction hint under the controls ("Drag the handle to…"). */
 export const ASSET_HINT_CLASS =
-  "min-h-[1.25rem] text-center font-display text-[11px] font-extralight uppercase tracking-[0.14em] text-foreground/55 md:text-[12px]";
+  "min-h-[1.25rem] text-center font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px]";
+
+/** An image's caption (sits 6px under it, right-aligned). Same type as the
+ *  hint — captions and instructions share one style. */
+export const ASSET_CAPTION_CLASS =
+  "mt-1.5 text-right font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px]";
+
+/** Supporting blurb (also styled site-wide via `.body-statement`). */
+export const ASSET_BLURB_CLASS = "body-statement font-display text-pretty";
+
+/** Footprint for an image group / asset below the hero (see `.asset-group`). */
+export const ASSET_GROUP_CLASS = "asset-group";
 
 /** A quiet text control for the row under a stage (view presets etc.). */
 export const ASSET_CONTROL_CLASS =

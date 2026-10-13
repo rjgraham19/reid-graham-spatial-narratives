@@ -186,7 +186,10 @@ export function LollaViewer() {
               : undefined
           }
         >
-          <div ref={host} className="absolute inset-0" data-lenis-prevent />
+          {/* Only once opened, when the wheel zooms the model. Before that a
+              scroll here is a page scroll and must stay with the smooth
+              scroller, or the page jumps up and down mid-glide. */}
+          <div ref={host} className="absolute inset-0" data-lenis-prevent={revealed ? "" : undefined} />
 
           {/* The night rendering — the whole pavilion under its tent, on dark,
               the way the model opens. Shown from first paint until the model

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useFitText } from "@/hooks/use-fit-text";
 import { textEms, longestWordEms } from "@/lib/title-metrics";
 import { AnimatePresence, motion } from "motion/react";
@@ -17,6 +17,7 @@ import { ExchangeViewer } from "@/components/exchange-viewer";
 import { LollaViewer } from "@/components/lolla-viewer";
 import { DrawingCarousel } from "@/components/drawing-carousel";
 import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
+import { ASSET_BLURB_CLASS, ASSET_GROUP_CLASS } from "@/components/asset-frame";
 import { TrueWestGroundplan } from "@/components/true-west-groundplan";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 import { ProjectCredits } from "@/components/project-credits";
@@ -283,6 +284,64 @@ const NOT_ISOLATABLE_MEDIA = new Set(["media-mt3ipvcu-itx0k"]);
 const CROP_SPACING: Record<string, string> = {
   "media-mt3ipvcu-itx0k": "mt-[9.375%] md:mt-[calc(9.375%-137px)] mb-[6.7%]",
 };
+
+/* Half-width images shown as a matched pair: one shared shape so they line
+   up top and bottom side by side (cropping a sliver off whichever edge
+   differs). Exchange's Nibi Oasis (1.43:1) and Steam Sanctuary (1.29:1)
+   renders meet in the middle at 1.36:1. */
+const PAIR_ASPECT: Record<string, string> = {
+  "media-mt3ils39-2501u": "aspect-[1.36] object-cover",
+  "media-mt3imc31-91zcc": "aspect-[1.36] object-cover",
+};
+
+/* Exchange's three physical-model photos, cut from one composite
+   (ExchangeFacility_PhysicalModel.png) into separate files. They follow
+   the Nibi + Steam render pair as one row at a shared height — each photo's
+   share of the width is its own width ÷ height, so all three come out
+   exactly as tall. On phones the two narrow ones pair up and the wide one
+   takes the next line. Not lightbox items: they aren't in `project.media`. */
+const EXCHANGE_MODEL_ROW_AFTER = "media-mt3imc31-91zcc";
+const EXCHANGE_MODEL_PHOTOS = [
+  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_1.jpg", width: 1109, height: 2491, wide: false },
+  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_2.jpg", width: 1231, height: 2491, wide: false },
+  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_3.jpg", width: 2016, height: 2491, wide: true },
+];
+const EXCHANGE_MODEL_BLURB =
+  "Cluster models provide an up-close view of the building’s structural elements and how the architecture meets the ground. Painted basswood, 3D printer filament, and Bristol board represent steel framing, repurposed copper, and concrete.";
+
+function ExchangeModelRow() {
+  return (
+    // From md up: photos + blurb span the full gallery width, so the row's
+    // edges line up with the renders above and the section below. The blurb
+    // takes a narrow column on the right; that leaves the photos a width at
+    // which they show whole at a shared, comfortable height — no cropping.
+    // Extra space above and below sets the row apart from the renders.
+    <figure className="md:col-span-2 my-3 md:my-10 md:flex md:items-start md:gap-8" aria-label="Physical models">
+      <div className="flex min-w-0 flex-wrap gap-3 md:flex-1 md:flex-nowrap md:gap-4">
+        {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
+          <div
+            key={photo.src}
+            className={`min-w-0 overflow-hidden bg-secondary ${photo.wide ? "basis-full md:basis-0" : "basis-0"}`}
+            style={{ flexGrow: photo.width / photo.height }}
+          >
+            <img
+              src={photo.src}
+              width={photo.width}
+              height={photo.height}
+              alt={`Exchange Facility physical model, view ${i + 1}`}
+              loading="lazy"
+              decoding="async"
+              className="block h-auto w-full"
+            />
+          </div>
+        ))}
+      </div>
+      <figcaption className={`mt-4 md:mt-0 md:w-[26%] md:shrink-0 ${ASSET_BLURB_CLASS}`}>
+        {EXCHANGE_MODEL_BLURB}
+      </figcaption>
+    </figure>
+  );
+}
 
 /* Each top image's width ÷ height, measured from the files. The hero is
    the first thing on the page, so until its file arrives the browser would
@@ -1336,7 +1395,7 @@ function ProjectPageInner() {
               row half-and-half, meeting at the centre: the video pushed to the right
               of its half and the passage kept to 3–4 lines in the other, so wide screens
               don't leave it pinned to the left with empty space beside. */}
-          <div className="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 md:items-end">
+          <div className={`${ASSET_GROUP_CLASS} md:grid md:grid-cols-2 md:gap-10 lg:gap-16 md:items-end`}>
             <figure className="group">
               <button
                 type="button"
@@ -1459,7 +1518,7 @@ function ProjectPageInner() {
           enough to read as two enlargeable pieces without breaking the sheet. */}
       {isTab && (
         <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-8 md:pb-12">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-[1584fr_2400fr] md:gap-16 lg:gap-20 md:items-start">
+          <div className={`${ASSET_GROUP_CLASS} grid grid-cols-1 gap-10 md:grid-cols-[1584fr_2400fr] md:gap-16 lg:gap-20 md:items-start`}>
             {[2, 3].map((idx) => (
               <figure key={idx} className="group">
                 <button
@@ -1517,7 +1576,7 @@ function ProjectPageInner() {
             <p
               ref={recordCaptionRef}
               style={{ opacity: 0 }}
-              className="record-player-caption absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-6 pb-8 pt-16 font-display font-light text-sm leading-snug tracking-tight text-white lg:inset-x-auto lg:left-[60%] lg:top-[46%] lg:bottom-auto lg:max-w-[30rem] lg:-translate-y-1/2 lg:bg-none lg:px-0 lg:pb-0 lg:pt-0 lg:text-xl xl:text-2xl"
+              className="record-player-caption body-statement absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-6 pb-8 pt-16 font-display text-white lg:inset-x-auto lg:left-[60%] lg:top-[46%] lg:bottom-auto lg:max-w-[30rem] lg:-translate-y-1/2 lg:bg-none lg:px-0 lg:pb-0 lg:pt-0"
             >
               {project.extendedDescription}
             </p>
@@ -1569,7 +1628,7 @@ function ProjectPageInner() {
           description now moves to the blurb beside the honky-tonk photo
           directly below, where it's actually about the pictured image. */}
       {isRagsToRiches && !introTrial && (
-        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-2 md:pb-4 text-center">
           <RevealBlock>
             <p
               data-design-id={designId.projectDescription(project.slug)}
@@ -1592,8 +1651,8 @@ function ProjectPageInner() {
           sits centered against the photo's height rather than pinned to
           its top edge. */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center">
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8">
+          <div className={`${ASSET_GROUP_CLASS} grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center`}>
             <RevealBlock>
               <p className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
                 A photo op that nods to Nashville's honky-tonk culture,
@@ -1628,8 +1687,8 @@ function ProjectPageInner() {
           now closing the page — Cash Cow used to sit after that closing
           image with this blurb stranded on its own between them. */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center">
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8">
+          <div className={`${ASSET_GROUP_CLASS} grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center`}>
             <RevealBlock>
               <figure className="group">
                 <button
@@ -1662,9 +1721,9 @@ function ProjectPageInner() {
 
       {/* Rags to Riches — full-width closing image, now last on the page. */}
       {isRagsToRiches && (
-        <section className="px-6 md:px-20 lg:px-28 pt-6 md:pt-8 pb-6 md:pb-8">
+        <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8 pb-6 md:pb-8">
           <RevealBlock>
-            <figure className="group">
+            <figure className={`group ${ASSET_GROUP_CLASS}`}>
               <button
                 type="button"
                 onClick={() => setLightbox(3)}
@@ -1700,7 +1759,7 @@ function ProjectPageInner() {
             <blockquote
               data-design-id={designId.projectPullQuote(project.slug)}
               data-design-kind="text"
-              className="body-statement font-display font-light text-xl md:text-3xl leading-snug text-balance max-w-4xl"
+              className={`${ASSET_GROUP_CLASS} body-statement font-display text-balance`}
             >
               {project.pullQuote}
             </blockquote>
@@ -1712,7 +1771,7 @@ function ProjectPageInner() {
       {isTrueWest && (
         <>
           <section className="px-6 md:px-12 lg:px-16 pt-3 md:pt-4 pb-6 md:pb-8">
-            <div className="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-3 md:gap-4">
+            <div className={`${ASSET_GROUP_CLASS} grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-3 md:gap-4`}>
               <figure className="group h-full animate-slide-from-left">
                 <button
                   type="button"
@@ -1773,7 +1832,7 @@ function ProjectPageInner() {
               /* Second pull quote — same weight and size as the one above the
                  image trio, sitting just under it and before the final
                  diagram. */
-              <blockquote className="body-statement mt-10 md:mt-12 max-w-4xl space-y-2 font-display font-light text-xl md:text-3xl leading-snug text-balance">
+              <blockquote className={`${ASSET_GROUP_CLASS} body-statement body-quote mt-10 md:mt-12 space-y-2 font-display text-balance`}>
                 <span className="block">{project.dualityLines[0]}</span>
                 <span className="block">{project.dualityLines[1]}</span>
               </blockquote>
@@ -1784,7 +1843,7 @@ function ProjectPageInner() {
             <button
               type="button"
               onClick={() => setLightbox(4)}
-              className="block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+              className={`${ASSET_GROUP_CLASS} block text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4`}
               aria-label="Enlarge Suburbia and Wild West groundplan comparison"
             >
               <TrueWestGroundplan />
@@ -1824,7 +1883,7 @@ function ProjectPageInner() {
                  which is what stacked into an oversized gap before the
                  video ever showed up. */
               <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-16 md:pb-24">
-                <div className="max-w-3xl mx-auto">
+                <div className={ASSET_GROUP_CLASS}>
                   {/* Same treatment as any other clickable media on the
                       page: a silent, looping, autoplaying-on-scroll moving
                       image with no visible controls. Sound and the scrub
@@ -1852,7 +1911,7 @@ function ProjectPageInner() {
                     </button>
                   </figure>
                   {video.caption && (
-                    <p className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed text-center">
+                    <p className="mt-1.5 font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px] text-center">
                       {video.caption}
                     </p>
                   )}
@@ -1861,7 +1920,7 @@ function ProjectPageInner() {
                   <RevealBlock>
                     <p
                       data-design-kind="text"
-                      className="body-statement mt-6 md:mt-8 max-w-4xl mx-auto font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-center"
+                      className={`${ASSET_GROUP_CLASS} body-statement mt-6 md:mt-8 font-display text-balance text-center`}
                     >
                       {project.extendedDescription}
                     </p>
@@ -1924,6 +1983,8 @@ function ProjectPageInner() {
           doesn't repeat). */}
       {!isTrueWest && (isAnneFrank || isYctiwy || isTownhouse || galleryMedia.length > 0) && (
       <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
+        {/* Every layout in this section keeps to the shared asset footprint. */}
+        <div className={ASSET_GROUP_CLASS}>
         {isAnneFrank ? (
           /* Anne Frank layout, per the supplied reference:
              upper band — conceptual sketch left (sitting higher), kitchen
@@ -2038,7 +2099,7 @@ function ProjectPageInner() {
                     <figcaption
                       data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
                       data-design-kind="text"
-                      className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed text-right"
+                      className="mt-1.5 font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px] text-right"
                     >
                       {project.media[idx].caption}
                     </figcaption>
@@ -2071,7 +2132,7 @@ function ProjectPageInner() {
               <figcaption
                 data-design-id={designId.projectMediaCaption(project.slug, project.media[1].id ?? "1")}
                 data-design-kind="text"
-                className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed"
+                className="mt-1.5 font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px]"
               >
                 {project.media[1].caption}
               </figcaption>
@@ -2205,7 +2266,7 @@ function ProjectPageInner() {
                         <figcaption
                           data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
                           data-design-kind="text"
-                          className="mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed text-right"
+                          className="mt-1.5 font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px] text-right"
                         >
                           {project.media[idx].caption}
                         </figcaption>
@@ -2262,14 +2323,14 @@ function ProjectPageInner() {
                     src={m.src} {...mediaDims(m.src)}
                     alt={m.decorative ? "" : (m.alt?.trim() || m.caption?.trim() || project.title)}
                     loading="lazy"
-                    className={`block w-full h-auto object-cover ${
+                    className={`block w-full h-auto object-cover ${PAIR_ASPECT[m.id ?? ""] ?? ""} ${
                       isolatable ? "group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic" : ""
                     }`}
                   />
                 );
               return (
+                <Fragment key={m.id}>
                 <figure
-                  key={m.id}
                   className={`group ${CROP_SPACING[m.id ?? ""] ?? ""} ${isHalf ? "md:col-span-1" : "md:col-span-2"} ${
                     isStaging ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"}` : ""
                   }`}
@@ -2298,7 +2359,7 @@ function ProjectPageInner() {
                   )}
                   {m.caption && (
                     <figcaption
-                      className={`mt-1.5 font-display font-extralight uppercase tracking-[0.08em] text-xs md:text-sm text-foreground/50 leading-relaxed ${
+                      className={`mt-1.5 font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px] ${
                         // Field House and Exchange match the plain, un-numbered,
                         // right-aligned caption style established on Townhouse —
                         // the numbered "01 — " prefix is this generic gallery's
@@ -2316,10 +2377,13 @@ function ProjectPageInner() {
                     </figcaption>
                   )}
                 </figure>
+                {isExchange && m.id === EXCHANGE_MODEL_ROW_AFTER && <ExchangeModelRow />}
+                </Fragment>
               );
             })}
           </div>
         )}
+        </div>
       </section>
       )}
 
