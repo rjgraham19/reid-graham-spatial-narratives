@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useReducedMotion } from "motion/react";
+import { ASSET_HINT_CLASS, ASSET_LABEL_CLASS, MIN_THUMBS, RAIL_LAYOUT_CLASS, railLayoutVars } from "@/components/asset-frame";
 
 /**
  * The standard project gallery: a small category label, a fixed-proportion
@@ -42,7 +43,6 @@ export type GallerySlide = {
   hint?: string;
 };
 
-const THUMB_GAP = 6; // px — matches the rail's `gap-1.5`
 
 function Chevron({ direction }: { direction: "left" | "right" }) {
   return (
@@ -100,7 +100,7 @@ export function ProjectGallery({
   fit = "contain",
   stageClassName = "",
   itemNoun = "slide",
-  minThumbs = 6,
+  minThumbs = MIN_THUMBS,
 }: {
   label: string;
   slides: GallerySlide[];
@@ -181,28 +181,14 @@ export function ProjectGallery({
       aria-label={label}
       style={{
         "--gallery-accent": accent,
-        "--stage-ratio": stageAspect,
-        // The rail's thumbnails share its width, so their stacked height is
-        // rail × Σ(1/aspect) + the gaps. Setting that equal to the stage's
-        // height (stage width ÷ stage ratio) gives the rail width below —
-        // `100%` is the grid's own width, so it holds at every size. Below
-        // `minThumbs`, the missing slots count as stage-shaped thumbnails.
-        "--thumb-k": slides.reduce((sum, slide) => sum + 1 / slide.aspect, 0) + Math.max(0, minThumbs - slides.length) / stageAspect,
-        "--thumb-gaps": `${THUMB_GAP * (Math.max(minThumbs, slides.length) - 1)}px`,
-        "--rail": "calc(((100% - var(--rail-gap)) / var(--stage-ratio) - var(--thumb-gaps)) / (var(--thumb-k) + 1 / var(--stage-ratio)))",
-        // Whole gallery width for a given maximum stage width.
-        "--gallery-max": "calc(var(--stage-max) * (1 + 1 / (var(--stage-ratio) * var(--thumb-k))) + var(--rail-gap) - var(--thumb-gaps) / var(--thumb-k))",
+        // Below `minThumbs`, the missing slots count as stage-shaped thumbnails.
+        ...railLayoutVars({
+          stageAspect,
+          thumbK: slides.reduce((sum, slide) => sum + 1 / slide.aspect, 0) + Math.max(0, minThumbs - slides.length) / stageAspect,
+          thumbCount: Math.max(minThumbs, slides.length),
+        }),
       } as CSSProperties}
-      // --stage-max: the main image is what's capped — short enough to stay
-      // under ~60% of the viewport, and ≤1000px wide on desktop. The rail is
-      // added on top; desktop also keeps to 85% of the content column.
-      className={
-        "mx-auto grid grid-cols-1 [--rail-gap:0px] [--stage-max:calc(60svh*var(--stage-ratio))] [grid-template-areas:'label'_'stage'_'thumbs'_'nav'] " +
-        "w-[min(100%,max(18rem,var(--stage-max)))] " +
-        "sm:grid-cols-[minmax(0,1fr)_var(--rail)] sm:gap-x-[var(--rail-gap)] sm:[--rail-gap:8px] sm:[grid-template-areas:'label_.'_'stage_thumbs'_'nav_.'] " +
-        "sm:w-[min(100%,max(18rem,var(--gallery-max)))] " +
-        "md:[--stage-max:min(1000px,calc(60svh*var(--stage-ratio)))] md:w-[min(85%,max(18rem,var(--gallery-max)))]"
-      }
+      className={RAIL_LAYOUT_CLASS}
       onKeyDown={(event) => {
         if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
         if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -212,7 +198,7 @@ export function ProjectGallery({
         go(active + (event.key === "ArrowRight" ? 1 : -1));
       }}
     >
-      <p className="mb-3 font-display text-[12px] font-extralight uppercase leading-none tracking-[0.14em] text-foreground/80 [grid-area:label] md:text-[14px]">
+      <p className={`${ASSET_LABEL_CLASS} [grid-area:label]`}>
         {label}
       </p>
 
@@ -300,7 +286,7 @@ export function ProjectGallery({
 
         {/* Reserved even when empty so the page never shifts between slides. */}
         {hasHints && (
-          <p className="-mt-1 min-h-[1.25rem] text-center font-display text-[11px] font-extralight uppercase tracking-[0.14em] text-foreground/55 md:text-[12px]">
+          <p className={`-mt-1 ${ASSET_HINT_CLASS}`}>
             {slides[active]?.hint ?? ""}
           </p>
         )}

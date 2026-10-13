@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CloseMark, glassButton, trackSheen } from '@/components/glass-button';
+import { AssetFrame, ASSET_STAGE_CLASS } from '@/components/asset-frame';
 import type { TownhouseControls } from './townhouse-scene';
 
 /* Compass labels map onto the scene's own corner names: front is south,
@@ -82,27 +83,41 @@ export function TownhouseViewer() {
 
   return (
     <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10" aria-label="Interactive Townhouse model">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">Spatial study</p>
-          <h2 className="text-2xl font-medium">Explore Townhouse</h2>
-        </div>
-      </div>
-
-      <div className="relative overflow-hidden rounded-md bg-[#050507]" style={{ height: 'clamp(340px, 65vh, 760px)' }}>
-        <img
-          src="/models/townhouse-preview.png"
-          alt="Townhouse exterior with concrete walls, glass blocks, and open terraces"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      <AssetFrame
+        label="Explore in 3D"
+        // The preview render is 1400 × 1100; 4:3 shows nearly all of it.
+        aspect={4 / 3}
+        ariaLabel="Townhouse 3D model"
+        controls={
+          /* The same thin-bordered glass button as "Back to Projects",
+             under the preview rather than on top of it. */
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            onMouseMove={trackSheen}
+            className={glassButton({ sheen: true, className: 'asset-cta text-button text-button--sized my-1.5' })}
+          >
+            Open 3D model
+          </button>
+        }
+      >
+        {/* The whole preview opens the model too — it's the obvious target. */}
         <button
           type="button"
+          tabIndex={-1}
+          aria-hidden
           onClick={() => setOpen(true)}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-md bg-white px-6 py-3 font-display font-extralight uppercase tracking-[0.08em] text-sm text-black shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4"
+          className={`${ASSET_STAGE_CLASS} block cursor-pointer bg-[#050507]`}
         >
-          Explore in 3D
+          <img
+            src="/models/townhouse-preview.png"
+            alt=""
+            decoding="async"
+            draggable={false}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
         </button>
-      </div>
+      </AssetFrame>
 
       {open &&
         createPortal(

@@ -1442,6 +1442,25 @@ img[data-scroll-fade="in"] {
   }
 }
 
+/* An asset's call-to-action ("Open 3D model") on a white light-zone page:
+   the same 7px shape and thin border as "Back to Projects", in ink on
+   white instead of white on dark glass, which reads as muddy grey there.
+   Unlayered, beside `.text-button`, so it can override it. */
+.light-zone .asset-cta.text-button {
+  color: var(--foreground);
+  background-color: transparent;
+  background-image: none;
+  border-color: hsl(0 0% 8% / 0.25);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.light-zone .asset-cta.text-button:hover {
+  border-color: hsl(0 0% 8% / 0.45);
+  background-color: hsl(0 0% 8% / 0.03);
+  box-shadow: none;
+}
+
 /* Split layout (portrait hero beside the intro): the title may wrap, so from
    md up it's sized so its longest word (`--word-ems`) fits the column — no
    post-load shrink. Below md the split stacks, so it uses the usual sizes. */
