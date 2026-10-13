@@ -85,7 +85,9 @@ export function TownhouseViewer() {
     <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10" aria-label="Interactive Townhouse model">
       <AssetFrame
         label="Explore in 3D"
-        // The preview render is 1400 × 1100; 4:3 shows nearly all of it.
+        // The preview is a capture of the model's own opening view (4:3,
+        // public/models/townhouse-preview.webp), so opening the model shows
+        // the same picture coming to life rather than a different render.
         aspect={4 / 3}
         ariaLabel="Townhouse 3D model"
         controls={
@@ -110,7 +112,7 @@ export function TownhouseViewer() {
           className={`${ASSET_STAGE_CLASS} block cursor-pointer bg-[#050507]`}
         >
           <img
-            src="/models/townhouse-preview.png"
+            src="/models/townhouse-preview.webp"
             alt=""
             decoding="async"
             draggable={false}
@@ -160,7 +162,7 @@ export function TownhouseViewer() {
 
               {failed && (
                 <img
-                  src="/models/townhouse-preview.png"
+                  src="/models/townhouse-preview.webp"
                   alt="Townhouse exterior with concrete walls, glass blocks, and open terraces"
                   onClick={(e) => e.stopPropagation()}
                   className="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] rounded-md object-contain sm:inset-8 sm:h-[calc(100%-4rem)] sm:w-[calc(100%-4rem)] md:inset-14 md:h-[calc(100%-7rem)] md:w-[calc(100%-7rem)]"

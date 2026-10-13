@@ -145,17 +145,24 @@ export function ExchangeViewer({
             the model is a page scroll and must stay with the smooth
             scroller — handing it to native scrolling mid-glide made the
             page jump up and down. */}
-        <div ref={host} className="absolute inset-0" />
-
-        <img
-          src={POSTER_SRC}
-          alt={error ? "Exchange Facility section: Nibi Oasis, Wavescapes and Steam Sanctuary" : ""}
-          aria-hidden={error ? undefined : true}
-          decoding="async"
-          draggable={false}
-          className="pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-700"
-          style={{ opacity: ready && !error ? 0 : 1 }}
+        {/* Hidden until the model is ready, then faded in, so a different
+            image never stands in for it first. */}
+        <div
+          ref={host}
+          className="absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none"
+          style={{ opacity: ready && !error ? 1 : 0 }}
         />
+
+        {/* The section drawing, only if the model can't load at all. */}
+        {error && (
+          <img
+            src={POSTER_SRC}
+            alt="Exchange Facility section: Nibi Oasis, Wavescapes and Steam Sanctuary"
+            decoding="async"
+            draggable={false}
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain"
+          />
+        )}
 
         {/* The zone nav sits inside the model's own empty headroom rather
             than as a separate row above it — folding it in moves the model

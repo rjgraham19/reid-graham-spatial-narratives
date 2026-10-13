@@ -189,20 +189,28 @@ export function LollaViewer() {
           {/* Only once opened, when the wheel zooms the model. Before that a
               scroll here is a page scroll and must stay with the smooth
               scroller, or the page jumps up and down mid-glide. */}
-          <div ref={host} className="absolute inset-0" data-lenis-prevent={revealed ? "" : undefined} />
-
-          {/* The night rendering — the whole pavilion under its tent, on dark,
-              the way the model opens. Shown from first paint until the model
-              has loaded, and kept if it can't (no WebGL, failed download). */}
-          <img
-            src={poster}
-            alt={errored ? "Club Magenta pavilion at night (rendering)" : ""}
-            aria-hidden={errored ? undefined : true}
-            decoding="async"
-            draggable={false}
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
-            style={{ opacity: loaded && !errored ? 0 : 1 }}
+          {/* Hidden until the model is fully loaded, then faded in — so the
+              first thing anyone sees is the model itself, never a half-built
+              scene or a different image standing in for it. */}
+          <div
+            ref={host}
+            className="absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none"
+            style={{ opacity: loaded && !errored ? 1 : 0 }}
+            data-lenis-prevent={revealed ? "" : undefined}
           />
+
+          {/* The night rendering, only if the model can't load at all (no
+              WebGL, failed download). It used to stand in while loading too,
+              but swapping a render for the model read as a glitch. */}
+          {errored && (
+            <img
+              src={poster}
+              alt="Club Magenta pavilion at night (rendering)"
+              decoding="async"
+              draggable={false}
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            />
+          )}
 
           {!loaded && !errored && (
             <p role="status" className="pointer-events-none absolute bottom-4 left-4 font-display text-[11px] font-extralight uppercase tracking-[0.14em] text-white/60">
