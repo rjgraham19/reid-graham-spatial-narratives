@@ -4,6 +4,7 @@ import day from "@/assets/rg/lollapalooza-render-day.jpg";
 import night from "@/assets/rg/lollapalooza-render-night.jpg";
 import full from "@/assets/rg/lollapalooza-render-full.jpg";
 import oasis from "@/assets/rg/lollapalooza-render-oasis.jpg";
+import lounge from "@/assets/rg/lollapalooza-render-lounge.jpg";
 
 /* Starts just left of the lamppost so the T-Mobile Club Magenta roof
    logo lands fully on the night side and never gets sliced by the
@@ -31,9 +32,13 @@ function DayNightComparison({ active }: { active: boolean }) {
     <div ref={frame} className="absolute inset-0 select-none">
       <img src={night} alt="Club Magenta exterior at night" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
       <img src={day} alt="Club Magenta exterior by day" draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }} />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-2.5 flex justify-between px-2.5 sm:top-4 sm:px-4">
-        <span className="daynight-tag glass-button">Day</span>
-        <span className="daynight-tag glass-button">Night</span>
+      {/* Plain labels, not boxed — framed tags read as buttons that did
+          nothing. Bottom corners, in the site's caption type (12/13px
+          extralight caps, as ASSET_CAPTION_CLASS), white with a soft shadow
+          so they hold up over both the bright lawn and the night scene. */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-between px-3 font-display text-[12px] font-extralight uppercase leading-none tracking-[0.12em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.65)] sm:bottom-4 sm:px-4 md:text-[13px]">
+        <span>Day</span>
+        <span>Night</span>
       </div>
       <span aria-hidden className="pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-white/85" style={{ left: `${position}%` }} />
 
@@ -93,9 +98,13 @@ function DayNightThumb() {
 }
 
 const slides: GallerySlide[] = [
-  { id: "day-night", caption: "Day and night", aspect: 16 / 9, render: (active) => <DayNightComparison active={active} />, thumb: <DayNightThumb />, hint: "Drag the handle to compare day and night" },
-  { id: "interior", caption: "Interior view", aspect: 2000 / 1444, src: full, alt: "Club Magenta — interior view rendering" },
-  { id: "oasis", caption: "Oasis lounge space", aspect: 2000 / 1240, src: oasis, alt: "Club Magenta — oasis lounge space rendering" },
+  { id: "day-night", caption: "Day and night", aspect: 16 / 9, render: (active) => <DayNightComparison active={active} />, thumb: <DayNightThumb /> },
+  // Re-lit renders (2026-10-13), all 16:9 like the stage, so nothing is
+  // cropped. The day half of the comparison was re-lit too; the night half
+  // is unchanged (same framing, matched to the pixel).
+  { id: "interior", caption: "Interior view", aspect: 16 / 9, src: full, alt: "Club Magenta — interior view rendering" },
+  { id: "lounge", caption: "Lounge seating", aspect: 16 / 9, src: lounge, alt: "Club Magenta — lounge seating rendering" },
+  { id: "oasis", caption: "Oasis lounge space", aspect: 16 / 9, src: oasis, alt: "Club Magenta — oasis lounge space rendering" },
 ];
 
 export function LollaRenderCarousel() {
