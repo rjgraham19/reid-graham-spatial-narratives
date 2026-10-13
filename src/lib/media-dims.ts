@@ -62,6 +62,7 @@ import m_yctiwy_drawing_display from "@/assets/rg/yctiwy-drawing-display.png";
 import m_yctiwy_drawing from "@/assets/rg/yctiwy-drawing.png";
 import m_yctiwy_fullview from "@/assets/rg/yctiwy-fullview.jpg";
 import m_yctiwy_sketch from "@/assets/rg/yctiwy-sketch.png";
+import m_yctiwy_sketch_display from "@/assets/rg/yctiwy-sketch-display.png";
 
 const DIMS: Record<string, [number, number]> = {
   [m_anne_frank_sketch_crop]: [1800, 1200],
@@ -116,10 +117,11 @@ const DIMS: Record<string, [number, number]> = {
   [m_true_west_render1]: [1280, 551],
   [m_true_west_render2]: [1280, 561],
   [m_yctiwy_closeup]: [1395, 1865],
-  [m_yctiwy_drawing_display]: [1800, 1166],
+  [m_yctiwy_drawing_display]: [1554, 1049],
   [m_yctiwy_drawing]: [9297, 6020],
   [m_yctiwy_fullview]: [5109, 3309],
   [m_yctiwy_sketch]: [2600, 1500],
+  [m_yctiwy_sketch_display]: [1400, 736],
   "/design-media/field-house/CROPPED_FIELDHOUSE_AXONPERSPECTIVE.jpg": [4465, 2873],
   "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg": [4413, 1547],
   "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg": [1224, 792],

@@ -316,7 +316,7 @@ function ExchangeModelRow() {
     // takes a narrow column on the right; that leaves the photos a width at
     // which they show whole at a shared, comfortable height — no cropping.
     // Extra space above and below sets the row apart from the renders.
-    <figure className="md:col-span-2 my-3 md:my-10 md:flex md:items-start md:gap-8" aria-label="Physical models">
+    <figure className="md:col-span-2 my-3 md:my-10 md:flex md:items-end md:gap-8" aria-label="Physical models">
       <div className="flex min-w-0 flex-wrap gap-3 md:flex-1 md:flex-nowrap md:gap-4">
         {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
           <div
@@ -1842,9 +1842,12 @@ function ProjectPageInner() {
                  one does — 0% and 951/2048 = 46.4355% of the drawing, per
                  true-west-groundplan.css. Same box as the drawing below, so
                  the percentages line up at every width. Stacked on phones. */
+              /* Wild West sits in the next row, so it starts on the line
+                 right after Suburbia's last line ("…greenery.") — wherever
+                 that wraps — while keeping its rightward start. */
               <div className={`${ASSET_GROUP_CLASS} mb-6 md:mb-8 grid grid-cols-1 gap-3 md:grid-cols-[46.4355%_1fr] md:gap-0`}>
-                <p className="body-statement font-display text-pretty md:pr-[6%]">{project.dualityLines[1]}</p>
-                <p className="body-statement font-display text-pretty md:pr-[6%]">{project.dualityLines[0]}</p>
+                <p className="body-statement font-display text-pretty md:col-start-1 md:row-start-1 md:pr-[6%]">{project.dualityLines[1]}</p>
+                <p className="body-statement font-display text-pretty md:col-start-2 md:row-start-2 md:pr-[6%]">{project.dualityLines[0]}</p>
               </div>
             )}
             <button
@@ -2002,7 +2005,9 @@ function ProjectPageInner() {
           again (media[0], the same photo as the hero, is hidden so it
           doesn't repeat). */}
       {!isTrueWest && (isAnneFrank || isYctiwy || isTownhouse || galleryMedia.length > 0) && (
-      <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10">
+      /* YCTIWU: no top padding, and pulled up a further 24px from md — its
+         images follow the credits closely (56px at desktop). */
+      <section className={`px-6 md:px-12 lg:px-16 ${isYctiwy ? "pb-8 md:-mt-6 md:pb-10" : "py-8 md:py-10"}`}>
         {/* Every layout in this section keeps to the shared asset footprint. */}
         <div className={ASSET_GROUP_CLASS}>
         {isAnneFrank ? (
@@ -2137,11 +2142,16 @@ function ProjectPageInner() {
             </div>
           </div>
         ) : isYctiwy ? (
-          // Custom YCTIWU layout: closeup (left) + sketch (top-right, on dark) + drawing (bottom-right)
+          // Custom YCTIWU layout. Top row: the set photo (left) beside the
+          // sketch with the "Slanted walls…" blurb under it (right) — the
+          // right column stretches to the photo's height and centres the
+          // sketch + blurb pair in it (equal space above and below; the blurb
+          // text centred in the column). Below, centred under the
+          // pair: the technical drawing. Sketch + drawing are cropped display
+          // copies (see display-copies.ts); the lightbox opens the originals.
+          <div className="space-y-3 md:space-y-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            {/* Left column: the set photo, then the "Slanted walls…" blurb
-                directly beneath it — beside the stacked sketch + drawing. */}
-            <div>
+            {/* Left: the set photo. */}
             {!project.media[1]?.hidden && (
             <figure className="group">
               <button
@@ -2159,6 +2169,9 @@ function ProjectPageInner() {
                   className="w-full h-auto object-cover animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                 />
               </button>
+              {/* Only when there's text — an empty caption still added its
+                  margin under the photo and threw off the bottom alignment. */}
+              {project.media[1].caption?.trim() && (
               <figcaption
                 data-design-id={designId.projectMediaCaption(project.slug, project.media[1].id ?? "1")}
                 data-design-kind="text"
@@ -2166,66 +2179,73 @@ function ProjectPageInner() {
               >
                 {project.media[1].caption}
               </figcaption>
+              )}
             </figure>
             )}
-            {project.pullQuote && (
-              <RevealBlock>
-                <p
-                  data-design-id={designId.projectPullQuote(project.slug)}
-                  data-design-kind="text"
-                  className="body-statement mt-6 md:mt-8 font-display text-balance"
-                >
-                  {project.pullQuote}
-                </p>
-              </RevealBlock>
-            )}
-            </div>
 
-            {/* Sketch + drawing stacked, right column */}
-            <div className="flex flex-col gap-3 md:gap-4">
+            {/* Right: the sketch and the blurb under it, centred together in
+                the column — the space above the sketch equals the space
+                below the blurb's last line, both measured against the photo. */}
+            <div className="flex flex-col gap-4 md:justify-center md:gap-8">
               {!project.media[2]?.hidden && (
-              <figure className="group">
+              <div>
+              <figure className="group w-full">
                 <button
                   type="button"
                   onClick={() => setLightbox(2)}
-                  className="block w-full overflow-hidden bg-black p-6 md:p-8"
+                  className="block w-full overflow-hidden bg-black"
                   aria-label={project.media[2].caption?.trim() || "Sketch"}
                 >
                   <img
                     data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                     data-design-kind="image"
-                    src={project.media[2].src} {...mediaDims(project.media[2].src)}
+                    src={displayCopy(project.media[2].src)} {...mediaDims(displayCopy(project.media[2].src))}
                     alt={project.media[2].caption?.trim() || project.title}
                     loading="lazy"
-                    /* The sketch file is a tight crop (2026-10): the old one
-                       carried empty margin round the drawing. Full box width
-                       — 86.6% matched the old size exactly, but read too
-                       small next to the closeup (Reid). */
                     className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
                   />
                 </button>
               </figure>
+              </div>
               )}
-              {!project.media[3]?.hidden && (
-              <figure className="group">
-                <button
-                  type="button"
-                  onClick={() => setLightbox(3)}
-                  className="block w-full overflow-hidden bg-black p-6 md:p-8"
-                  aria-label={project.media[3].caption?.trim() || "Drawing"}
-                >
-                  <img
-                    data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
-                    data-design-kind="image"
-                    src={displayCopy(project.media[3].src)} {...mediaDims(displayCopy(project.media[3].src))}
-                    alt={project.media[3].caption?.trim() || project.title}
-                    loading="lazy"
-                    className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
-                  />
-                </button>
-              </figure>
+              {project.pullQuote && (
+                <RevealBlock>
+                  <p
+                    data-design-id={designId.projectPullQuote(project.slug)}
+                    data-design-kind="text"
+                    className="body-statement font-display text-pretty text-center"
+                  >
+                    {project.pullQuote}
+                  </p>
+                </RevealBlock>
               )}
             </div>
+          </div>
+
+          {/* The technical drawing, centred under the pair, with the same
+              56px of visible space above it as there is between the credits
+              and the pair. Its display copy keeps a black margin of 58/1554
+              of its width over the artwork (≈3.17% of the column at 85%
+              width), so the gap is 56px less that — exact at every width. */}
+          {!project.media[3]?.hidden && (
+          <figure className="group mx-auto md:!mt-[calc(56px-3.17%)] md:w-[85%]">
+            <button
+              type="button"
+              onClick={() => setLightbox(3)}
+              className="block w-full overflow-hidden bg-black"
+              aria-label={project.media[3].caption?.trim() || "Drawing"}
+            >
+              <img
+                data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
+                data-design-kind="image"
+                src={displayCopy(project.media[3].src)} {...mediaDims(displayCopy(project.media[3].src))}
+                alt={project.media[3].caption?.trim() || project.title}
+                loading="lazy"
+                className="w-full h-auto object-contain animate-image-fade group-hover:scale-[1.01] transition-transform duration-700 ease-cinematic"
+              />
+            </button>
+          </figure>
+          )}
           </div>
         ) : isTownhouse ? (
           // Custom Townhouse layout (its longer passage now sits above the
