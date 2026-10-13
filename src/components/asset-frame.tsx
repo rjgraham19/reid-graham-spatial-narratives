@@ -88,6 +88,7 @@ export function AssetFrame({
   controls,
   hint,
   reserveControls = false,
+  intro,
   children,
 }: {
   label: string;
@@ -100,6 +101,9 @@ export function AssetFrame({
   controls?: ReactNode;
   /** Hold the controls row's height before `controls` is passed. */
   reserveControls?: boolean;
+  /** A blurb introducing the asset, set above its label on the stage's
+   *  own left edge. */
+  intro?: ReactNode;
   /** Interaction hint; pass a string (even "") to reserve its line. */
   hint?: string;
   /** The stage — use `ASSET_STAGE_CLASS` on its outer element. */
@@ -118,7 +122,10 @@ export function AssetFrame({
         ...railLayoutVars({ stageAspect: aspect, thumbK: MIN_THUMBS / aspect, thumbCount: MIN_THUMBS }),
       } as CSSProperties}
     >
-      <p className={`${ASSET_LABEL_CLASS} [grid-area:label]`}>{label}</p>
+      <div className="[grid-area:label]">
+        {intro && <div className="mb-8 md:mb-10">{intro}</div>}
+        <p className={ASSET_LABEL_CLASS}>{label}</p>
+      </div>
       <div className="[grid-area:stage]">{children}</div>
       {/* With `reserveControls`, the row's height is held even while there
           are no controls yet, so the hint can sit right under the stage

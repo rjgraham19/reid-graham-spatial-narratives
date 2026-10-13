@@ -1357,6 +1357,38 @@ img[data-scroll-fade="in"] {
   }
 }
 
+/* Stacked record-player layout — every window narrower than desktop, and
+   any portrait-shaped one: the model takes all the height left above the
+   blurb, and the blurb sits directly beneath it. The earlier version kept
+   the model in a fixed-height box with the blurb pinned to the frame's
+   bottom edge, which left a tall black band between them (and right
+   before "Explore in 3D") whenever the model ran out of width before
+   height — e.g. a half-width monitor window. Overrides the stage's
+   absolute placement above and the caption's absolute/lg: utilities. */
+@media (max-width: 1023px), (orientation: portrait) {
+  .record-player-frame {
+    display: flex;
+    flex-direction: column;
+    padding-top: max(76px, env(safe-area-inset-top));
+  }
+  .record-player-frame .record-player-stage {
+    position: relative;
+    inset: auto;
+    width: 92%;
+    margin-inline: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .record-player-frame .record-player-caption {
+    position: relative;
+    inset: auto;
+    translate: none;
+    max-width: none;
+    background: none;
+    padding: 16px 4% max(28px, env(safe-area-inset-bottom));
+  }
+}
+
 /* Intro trial typeface: General Sans across the whole page, applied in CSS
    (server-rendered class on the page root) so the very first paint is
    already in the right font — swapping it in from JS after hydration made
@@ -1395,10 +1427,9 @@ img[data-scroll-fade="in"] {
    Supporting blurb — `.body-statement`: the paragraphs beside or between
    images, one step below the 16/20/24px intro description so they read as
    supporting: 16/18/20px Regular, sentence case, 1.5 leading, 85%.
-   (Projects' `pullQuote` fields are descriptive blurbs and take this.)
-   Unlayered, so it wins over their older font-light / text-3xl utilities.
-   Quotation-style statements (`.body-quote`, e.g. True West's duality
-   lines) keep the description's size — quotations are left as they were. */
+   (Projects' `pullQuote` fields and True West's duality lines are
+   descriptive blurbs and take this.)
+   Unlayered, so it wins over their older font-light / text-3xl utilities. */
 .intro-font .body-statement {
   font-size: 1rem;
   font-weight: var(--intro-description-w, 400);
@@ -1407,24 +1438,14 @@ img[data-scroll-fade="in"] {
   text-transform: none;
   opacity: 0.85;
 }
-.intro-font .body-statement.body-quote {
-  line-height: 1.45;
-  opacity: 1;
-}
 @media (min-width: 768px) {
   .intro-font .body-statement {
     font-size: 1.125rem;
-  }
-  .intro-font .body-statement.body-quote {
-    font-size: 1.25rem;
   }
 }
 @media (min-width: 1024px) {
   .intro-font .body-statement {
     font-size: 1.25rem;
-  }
-  .intro-font .body-statement.body-quote {
-    font-size: 1.5rem;
   }
 }
 
@@ -1471,24 +1492,6 @@ img[data-scroll-fade="in"] {
   }
 }
 
-/* An asset's call-to-action ("Open 3D model") on a white light-zone page:
-   the same 7px shape and thin border as "Back to Projects", in ink on
-   white instead of white on dark glass, which reads as muddy grey there.
-   Unlayered, beside `.text-button`, so it can override it. */
-.light-zone .asset-cta.text-button {
-  color: var(--foreground);
-  background-color: transparent;
-  background-image: none;
-  border-color: hsl(0 0% 8% / 0.25);
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-.light-zone .asset-cta.text-button:hover {
-  border-color: hsl(0 0% 8% / 0.45);
-  background-color: hsl(0 0% 8% / 0.03);
-  box-shadow: none;
-}
 
 /* Split layout (portrait hero beside the intro): the title may wrap, so from
    md up it's sized so its longest word (`--word-ems`) fits the column — no

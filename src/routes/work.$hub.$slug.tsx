@@ -17,7 +17,7 @@ import { ExchangeViewer } from "@/components/exchange-viewer";
 import { LollaViewer } from "@/components/lolla-viewer";
 import { DrawingCarousel } from "@/components/drawing-carousel";
 import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
-import { ASSET_BLURB_CLASS, ASSET_GROUP_CLASS } from "@/components/asset-frame";
+import { ASSET_GROUP_CLASS } from "@/components/asset-frame";
 import { TrueWestGroundplan } from "@/components/true-west-groundplan";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 import { ProjectCredits } from "@/components/project-credits";
@@ -336,7 +336,9 @@ function ExchangeModelRow() {
           </div>
         ))}
       </div>
-      <figcaption className={`mt-4 md:mt-0 md:w-[26%] md:shrink-0 ${ASSET_BLURB_CLASS}`}>
+      {/* Same size as the render captions above (12/13px) — a note on the
+          photos, kept secondary to them; sentence case so it reads as prose. */}
+      <figcaption className="mt-3 md:mt-0 md:w-[24%] md:shrink-0 font-display text-[12px] font-light leading-relaxed text-foreground/65 text-pretty md:text-[13px]">
         {EXCHANGE_MODEL_BLURB}
       </figcaption>
     </figure>
@@ -1553,7 +1555,7 @@ function ProjectPageInner() {
               actually visible with the address bar showing, or its bottom is cut
               off. vh measures the tall viewport the bar is hidden in. In the
               static layout it's just one screen, no runway to stick through. */}
-          <div className={`${recordStatic ? "relative" : "sticky top-0"} h-[100svh] w-full overflow-hidden`}>
+          <div className={`record-player-frame ${recordStatic ? "relative" : "sticky top-0"} h-[100svh] w-full overflow-hidden`}>
             <RecordPlayerViewer
               wrapperRef={recordScrubWrapperRef}
               onProgress={updateRecordCaption}
@@ -1654,7 +1656,8 @@ function ProjectPageInner() {
         <section className="px-6 md:px-12 lg:px-16 pt-6 md:pt-8">
           <div className={`${ASSET_GROUP_CLASS} grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 md:items-center`}>
             <RevealBlock>
-              <p className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance">
+              {/* Right-aligned from md up, against the photo it describes. */}
+              <p className="body-statement font-display text-balance md:text-right">
                 A photo op that nods to Nashville's honky-tonk culture,
                 complete with an Opry-style ribbon microphone.
               </p>
@@ -1744,9 +1747,10 @@ function ProjectPageInner() {
         </section>
       )}
 
-      {/* Pull quote — skipped on Anne Frank, whose pullQuote instead sits
-          under the sketch in its own bespoke gallery layout below. */}
-      {project.pullQuote && !isAnneFrank && (
+      {/* Pull quote — skipped on Anne Frank and YCTIWY, whose pullQuote
+          instead sits in their own bespoke gallery layouts below (under the
+          sketch / under the set photo). */}
+      {project.pullQuote && !isAnneFrank && !isYctiwy && (
         <section
           className={`px-6 md:px-12 lg:px-16 ${
             /* True West runs this straight into the image trio below it, so
@@ -1828,18 +1832,21 @@ function ProjectPageInner() {
               </div>
             </div>
 
-            {project.dualityLines && (
-              /* Second pull quote — same weight and size as the one above the
-                 image trio, sitting just under it and before the final
-                 diagram. */
-              <blockquote className={`${ASSET_GROUP_CLASS} body-statement body-quote mt-10 md:mt-12 space-y-2 font-display text-balance`}>
-                <span className="block">{project.dualityLines[0]}</span>
-                <span className="block">{project.dualityLines[1]}</span>
-              </blockquote>
-            )}
           </section>
 
           <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-8 md:pb-10">
+            {project.dualityLines && (
+              /* The two worlds, each above its own half of the groundplan:
+                 Suburbia (dualityLines[1]) starts where the left Pantone
+                 swatch starts, Wild West (dualityLines[0]) where the right
+                 one does — 0% and 951/2048 = 46.4355% of the drawing, per
+                 true-west-groundplan.css. Same box as the drawing below, so
+                 the percentages line up at every width. Stacked on phones. */
+              <div className={`${ASSET_GROUP_CLASS} mb-6 md:mb-8 grid grid-cols-1 gap-3 md:grid-cols-[46.4355%_1fr] md:gap-0`}>
+                <p className="body-statement font-display text-pretty md:pr-[6%]">{project.dualityLines[1]}</p>
+                <p className="body-statement font-display text-pretty md:pr-[6%]">{project.dualityLines[0]}</p>
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setLightbox(4)}
@@ -1971,7 +1978,20 @@ function ProjectPageInner() {
       )}
 
       {/* Media gallery */}
-      {isTownhouse && <TownhouseViewer />}
+      {/* Townhouse — the longer passage sits above the 3D model it
+          introduces (the top-of-page description stays short), on the
+          model's own left edge. */}
+      {isTownhouse && (
+        <TownhouseViewer
+          intro={project.extendedDescription && (
+            <RevealBlock>
+              <p data-design-kind="text" className="body-statement font-display text-balance">
+                {project.extendedDescription}
+              </p>
+            </RevealBlock>
+          )}
+        />
+      )}
       {isLollapalooza && <LollaViewer />}
       {/* Skipped where every media item already appears in a bespoke layout
           above, which would otherwise repeat the whole set — and, for the
@@ -2008,7 +2028,7 @@ function ProjectPageInner() {
                   drawing. Scoped to this column only, so the kitchen photo
                   and the technical drawings below keep their existing
                   spacing exactly as it was. */}
-              <div className="pt-4 md:pt-14 lg:pt-16">
+              <div className="relative z-10 pt-4 md:pt-14 lg:pt-16">
                 <RevealBlock from="left">
                   {/* The sketch file is a tight crop (2026-10). The old square
                       file had empty bands above and below the drawing (19.7%
@@ -2049,8 +2069,12 @@ function ProjectPageInner() {
                 )}
               </div>
 
-              {/* Right: kitchen closeup, dropped lower than the sketch */}
-              <RevealBlock from="right" className="md:mt-24 lg:mt-32">
+              {/* Right: kitchen closeup, dropped lower than the sketch. From
+                  md up it's ~16% wider than its column, growing leftward
+                  under the "rawness…" blurb — the photo's top-left corner is
+                  black, so the white text still reads over it (the left
+                  column sits above it, z-10). */}
+              <RevealBlock from="right" className="relative z-0 md:mt-24 md:-ml-[16%] lg:mt-32">
                 <figure className="group">
                   <button
                     type="button"
@@ -2072,12 +2096,15 @@ function ProjectPageInner() {
             </div>
 
             {/* Technical drawings — separate images so each opens on its own,
-                but placed in one row with tops aligned so they read parallel.
-                Their source ratios differ slightly (1.97 vs 2.09), so heights
-                won't match exactly; alignment is to the top edge. */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 md:items-start">
-              {[3, 4].map((idx) => (
-                <figure key={idx} className="group">
+                in one row at a shared height: each takes its own width ÷
+                height share of the row, so the two come out exactly as tall
+                (their ratios differ, 1.97 vs 2.09) and their captions line
+                up. Whole drawings, nothing cropped. Stacked on phones. */}
+            <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
+              {[3, 4].map((idx) => {
+                const { width = 2, height = 1 } = mediaDims(project.media[idx].src);
+                return (
+                <figure key={idx} className="group min-w-0 md:basis-0" style={{ flexGrow: width / height }}>
                   <button
                     type="button"
                     onClick={() => setLightbox(idx)}
@@ -2105,13 +2132,16 @@ function ProjectPageInner() {
                     </figcaption>
                   )}
                 </figure>
-              ))}
+                );
+              })}
             </div>
           </div>
         ) : isYctiwy ? (
           // Custom YCTIWU layout: closeup (left) + sketch (top-right, on dark) + drawing (bottom-right)
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            {/* Closeup, left column */}
+            {/* Left column: the set photo, then the "Slanted walls…" blurb
+                directly beneath it — beside the stacked sketch + drawing. */}
+            <div>
             {!project.media[1]?.hidden && (
             <figure className="group">
               <button
@@ -2138,6 +2168,18 @@ function ProjectPageInner() {
               </figcaption>
             </figure>
             )}
+            {project.pullQuote && (
+              <RevealBlock>
+                <p
+                  data-design-id={designId.projectPullQuote(project.slug)}
+                  data-design-kind="text"
+                  className="body-statement mt-6 md:mt-8 font-display text-balance"
+                >
+                  {project.pullQuote}
+                </p>
+              </RevealBlock>
+            )}
+            </div>
 
             {/* Sketch + drawing stacked, right column */}
             <div className="flex flex-col gap-3 md:gap-4">
@@ -2186,9 +2228,8 @@ function ProjectPageInner() {
             </div>
           </div>
         ) : isTownhouse ? (
-          // Custom Townhouse layout: the longer passage (the top-of-page
-          // description stays short) sits directly above this imagery, then
-          // the axonometric upright on the left, the three renders stacked
+          // Custom Townhouse layout (its longer passage now sits above the
+          // 3D model, further up): the axonometric upright on the left, the three renders stacked
           // as a column on the right — nothing else follows it. The axon is
           // shown at its own natural proportions (w-full h-auto, no
           // object-cover and no fixed aspect-ratio box), so it can never be
@@ -2198,16 +2239,6 @@ function ProjectPageInner() {
           // ending short and leaving black beside the lower renders.
           // items-start keeps both columns starting on the same line.
           <>
-          {project.extendedDescription && (
-            <RevealBlock>
-              <p
-                data-design-kind="text"
-                className="body-statement font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance max-w-3xl mb-8 md:mb-10"
-              >
-                {project.extendedDescription}
-              </p>
-            </RevealBlock>
-          )}
           <div className="grid grid-cols-1 md:grid-cols-[19fr_10fr] gap-6 md:gap-10 md:items-start">
             {!project.media[0]?.hidden && (
               <figure className="group overflow-hidden lg:mt-[150px]">

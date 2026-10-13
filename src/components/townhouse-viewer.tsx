@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { CloseMark, glassButton, trackSheen } from '@/components/glass-button';
 import { AssetFrame, ASSET_STAGE_CLASS } from '@/components/asset-frame';
@@ -13,7 +13,7 @@ const VIEWS = [
   { label: 'SW', target: 'Front left' },
 ] as const;
 
-export function TownhouseViewer() {
+export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
   const host = useRef<HTMLDivElement>(null);
   const controls = useRef<TownhouseControls | null>(null);
   const [open, setOpen] = useState(false);
@@ -90,26 +90,16 @@ export function TownhouseViewer() {
         // the same picture coming to life rather than a different render.
         aspect={4 / 3}
         ariaLabel="Townhouse 3D model"
-        controls={
-          /* The same thin-bordered glass button as "Back to Projects",
-             under the preview rather than on top of it. */
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            onMouseMove={trackSheen}
-            className={glassButton({ sheen: true, className: 'asset-cta text-button text-button--sized my-1.5' })}
-          >
-            Open 3D model
-          </button>
-        }
+        // Same as the other 3D sections: no separate button — the preview
+        // itself is the click target, with the shared hint beneath it.
+        hint="Click the model to explore"
+        intro={intro}
       >
-        {/* The whole preview opens the model too — it's the obvious target. */}
         <button
           type="button"
-          tabIndex={-1}
-          aria-hidden
           onClick={() => setOpen(true)}
-          className={`${ASSET_STAGE_CLASS} block cursor-pointer bg-[#050507]`}
+          aria-label="Explore the Townhouse in 3D"
+          className={`${ASSET_STAGE_CLASS} block cursor-pointer bg-[#050507] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground`}
         >
           <img
             src="/models/townhouse-preview.webp"
