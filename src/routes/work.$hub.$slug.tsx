@@ -299,15 +299,15 @@ const PAIR_ASPECT: Record<string, string> = {
    (ExchangeFacility_PhysicalModel.png) into separate files. They follow
    the Nibi + Steam render pair as one row at a shared height — each photo's
    share of the width is its own width ÷ height, so all three come out
-   exactly as tall. On phones the two narrow ones pair up and the wide one
-   takes the next line. Clicking any of them opens the lightbox on all three
+   exactly as tall. They stay together in that one row at every size, phones
+   included. Clicking any of them opens the lightbox on all three
    together — the same three photos, side by side with the same gaps as on
    the page — rather than one at a time. */
 const EXCHANGE_MODEL_ROW_AFTER = "media-mt3imc31-91zcc";
 const EXCHANGE_MODEL_PHOTOS = [
-  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_1.jpg", width: 1109, height: 2491, wide: false },
-  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_2.jpg", width: 1231, height: 2491, wide: false },
-  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_3.jpg", width: 2016, height: 2491, wide: true },
+  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_1.jpg", width: 1109, height: 2491 },
+  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_2.jpg", width: 1231, height: 2491 },
+  { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_3.jpg", width: 2016, height: 2491 },
 ];
 /* Lightbox slot for the three-photo view. Not a real file — the lightbox
    recognises it and lays out EXCHANGE_MODEL_PHOTOS itself. */
@@ -327,11 +327,11 @@ function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
     <div className="md:col-span-2 my-3 md:my-10">
     <p className={ASSET_LABEL_CLASS}>Physical Models</p>
     <figure className="md:flex md:items-end md:gap-8" aria-label="Physical models">
-      <div className="flex min-w-0 flex-wrap gap-3 md:flex-1 md:flex-nowrap md:gap-4">
+      <div className="flex min-w-0 gap-2 sm:gap-3 md:flex-1 md:gap-4">
         {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
           <div
             key={photo.src}
-            className={`min-w-0 overflow-hidden bg-secondary ${photo.wide ? "basis-full md:basis-0" : "basis-0"}`}
+            className="min-w-0 basis-0 overflow-hidden bg-secondary"
             style={{ flexGrow: photo.width / photo.height }}
           >
             <button
