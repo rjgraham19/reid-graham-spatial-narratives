@@ -314,14 +314,14 @@ const EXCHANGE_MODEL_BLURB =
   "Element models isolate key clusters of the building for an up-close look at its infrastructure.";
 
 function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
+  // From md up: photos + blurb span the full gallery width, so the row's
+  // edges line up with the renders above and the section below. The blurb
+  // takes a narrow column on the right; that leaves the photos a width at
+  // which they show whole at a shared, comfortable height — no cropping.
+  // Extra space above and below sets the row apart from the renders.
   return (
     <div className="md:col-span-2 my-3 md:my-10">
     <p className={ASSET_LABEL_CLASS}>Physical Models</p>
-    // From md up: photos + blurb span the full gallery width, so the row's
-    // edges line up with the renders above and the section below. The blurb
-    // takes a narrow column on the right; that leaves the photos a width at
-    // which they show whole at a shared, comfortable height — no cropping.
-    // Extra space above and below sets the row apart from the renders.
     <figure className="md:flex md:items-end md:gap-8" aria-label="Physical models">
       <div className="flex min-w-0 flex-wrap gap-3 md:flex-1 md:flex-nowrap md:gap-4">
         {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
