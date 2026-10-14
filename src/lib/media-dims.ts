@@ -8,7 +8,9 @@
  */
 import m_anne_frank_detail from "@/assets/rg/anne-frank-detail.jpg";
 import m_anne_frank_full from "@/assets/rg/anne-frank-full.jpg";
-import m_anne_frank_sketch_crop from "@/assets/rg/anne-frank-sketch-crop.png";
+import m_anne_frank_sketch_trim from "@/assets/rg/anne-frank-sketch-trim.png";
+import m_anne_frank_drawing_left_trim from "@/assets/rg/anne-frank-drawing-left-trim.png";
+import m_anne_frank_drawing_right_trim from "@/assets/rg/anne-frank-drawing-right-trim.png";
 import m_exchange_nibi_render from "@/assets/rg/exchange-nibi-render.png";
 import m_exchange_render from "@/assets/rg/exchange-render.jpg";
 import m_exchange_steam_render from "@/assets/rg/exchange-steam-render.png";
@@ -49,8 +51,7 @@ import m_reshuffling_full from "@/assets/rg/reshuffling-full.jpg";
 import m_reshuffling_view1 from "@/assets/rg/reshuffling-view1.jpg";
 import m_reshuffling_view2 from "@/assets/rg/reshuffling-view2.jpg";
 import m_staging_full from "@/assets/rg/staging-full.jpg";
-import m_tab_drawing_left from "@/assets/rg/tab-drawing-left.jpg";
-import m_tab_drawing_right from "@/assets/rg/tab-drawing-right.jpg";
+import m_tab_drawing_merged from "@/assets/rg/tab-drawing-merged.jpg";
 import m_tab_full from "@/assets/rg/tab-full.jpg";
 import m_true_west_detail from "@/assets/rg/true-west-detail.jpg";
 import m_true_west_diagram from "@/assets/rg/true-west-diagram.png";
@@ -65,7 +66,9 @@ import m_yctiwy_sketch from "@/assets/rg/yctiwy-sketch.png";
 import m_yctiwy_sketch_display from "@/assets/rg/yctiwy-sketch-display.png";
 
 const DIMS: Record<string, [number, number]> = {
-  [m_anne_frank_sketch_crop]: [1800, 1200],
+  [m_anne_frank_sketch_trim]: [1463, 1188],
+  [m_anne_frank_drawing_left_trim]: [2400, 1077],
+  [m_anne_frank_drawing_right_trim]: [2400, 998],
   [m_anne_frank_detail]: [1620, 1080],
   [m_anne_frank_full]: [1612, 1080],
   [m_exchange_nibi_render]: [1332, 934],
@@ -108,8 +111,7 @@ const DIMS: Record<string, [number, number]> = {
   [m_reshuffling_view1]: [1680, 1149],
   [m_reshuffling_view2]: [1680, 1149],
   [m_staging_full]: [2000, 1652],
-  [m_tab_drawing_left]: [1584, 2891],
-  [m_tab_drawing_right]: [2400, 2711],
+  [m_tab_drawing_merged]: [3984, 2891],
   [m_tab_full]: [1929, 1329],
   [m_true_west_detail]: [5876, 3910],
   [m_true_west_diagram]: [8000, 3542],
@@ -137,6 +139,7 @@ const DIMS: Record<string, [number, number]> = {
   "/design-media/the-exchange-facility/EXCHANGE_VERTICALSECTION.png": [5100, 3300],
   "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE.jpg": [5100, 3300],
   "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE_EDITEDRENDER.png": [1332, 1101],
+  "/design-media/the-exchange-facility/EXCHANGE_MODELS_COMBINED.jpg": [4356, 2491],
   "/design-media/townhouse/TOWNHOUSE_AXONX2.png": [1865, 1143],
   "/design-media/townhouse/TOWNHOUSE_AXON_UPRIGHT.jpg": [1143, 1865],
   "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg": [1184, 1035],

@@ -13,18 +13,17 @@ import trueWestRender2 from "@/assets/rg/true-west-render2.jpg";
 const trueWestDiagram = "/design-media/true-west/TRUEWEST_DRAWING_4096.png";
 import anne from "@/assets/rg/anne-frank-full.jpg";
 import anneDet from "@/assets/rg/anne-frank-detail.jpg";
-import anneSketch from "@/assets/rg/anne-frank-sketch-crop.png"; // tight crop (2026-10); was anne-frank-sketch.webp
-import anneDrawingLeft from "@/assets/rg/anne-frank-drawing-left.webp";
-import anneDrawingRight from "@/assets/rg/anne-frank-drawing-right.webp";
+import anneSketch from "@/assets/rg/anne-frank-sketch-trim.png"; // trimmed to the drawing (2026-10-13); from anne-frank-sketch-crop.png
+import anneDrawingLeft from "@/assets/rg/anne-frank-drawing-left-trim.png"; // empty border trimmed (2026-10-13)
+import anneDrawingRight from "@/assets/rg/anne-frank-drawing-right-trim.png"; // empty border trimmed (2026-10-13)
 import reshuf from "@/assets/rg/reshuffling-full.jpg";
 import reshufView1 from "@/assets/rg/reshuffling-view1.jpg";
 import reshufView2 from "@/assets/rg/reshuffling-view2.jpg";
 import tab from "@/assets/rg/tab-full.jpg";
-// Two halves of one 8000px-wide technical drawing, exported separately so each
-// can be enlarged on its own. Both are scaled by the same factor, so placing
-// them side by side reconstructs the original at a single consistent scale.
-import tabDrawingLeft from "@/assets/rg/tab-drawing-left.jpg";
-import tabDrawingRight from "@/assets/rg/tab-drawing-right.jpg";
+// The PINK FOUNTAIN drawing, rejoined (2026-10-13) from its two exported
+// halves (tab-drawing-left/right.jpg, kept) into one image so it shows and
+// enlarges as a single sheet.
+import tabDrawing from "@/assets/rg/tab-drawing-merged.jpg";
 import ragsRichesFull from "@/assets/rg/rags-riches-full.jpg";
 import ragsRichesZoltar from "@/assets/rg/rags-riches-zoltar.jpg";
 import ragsRichesCountryClose from "@/assets/rg/rags-riches-country-close.jpg";
@@ -676,8 +675,7 @@ export const PROJECTS: Project[] = [
     media: [
       { type: "image", src: tab, caption: "Installation, branding, PINK FOUNTAIN diagram, and TaB Soda pop-up" },
       { type: "video", src: "/tab-closeup-animation.mp4" },
-      { type: "image", src: tabDrawingLeft, caption: "PINK FOUNTAIN — components and modular seating types" },
-      { type: "image", src: tabDrawingRight, caption: "PINK FOUNTAIN — exploded assembly and installation plan" },
+      { type: "image", src: tabDrawing, caption: "PINK FOUNTAIN — components, modular seating types, and exploded assembly" },
     ],
   },
 

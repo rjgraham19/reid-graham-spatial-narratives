@@ -1,39 +1,41 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { CloseMark, glassButton, trackSheen } from '@/components/glass-button';
 import { AssetFrame, ASSET_STAGE_CLASS } from '@/components/asset-frame';
+import { ModelViewControls, type CompassView } from '@/components/model-view-controls';
 import type { TownhouseControls } from './townhouse-scene';
 
 /* Compass labels map onto the scene's own corner names: front is south,
    right is east, so front-right reads as SE and so on. */
-const VIEWS = [
-  { label: 'NE', target: 'Rear right' },
-  { label: 'NW', target: 'Rear left' },
-  { label: 'SE', target: 'Front right' },
-  { label: 'SW', target: 'Front left' },
-] as const;
+const TARGETS = {
+  NE: 'Rear right',
+  NW: 'Rear left',
+  SE: 'Front right',
+  SW: 'Front left',
+} as const satisfies Record<CompassView, string>;
 
+/** Give up after this long and show the preview image (with a retry). */
+const LOAD_TIMEOUT_MS = 30_000;
+
+/** Embedded in the page and live from the start, the same way as the
+ *  Lollapalooza model: it loads a little ahead of scroll, fades in when
+ *  ready, and can be dragged straight away. The view row (shared with
+ *  LollaViewer) is on show from the start, inactive until the model is in.
+ *  No popup and no click to open it. */
 export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
+  const stage = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
   const controls = useRef<TownhouseControls | null>(null);
-  const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState('');
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   // Bumped by "Try again" to re-run the load effect from scratch.
   const [attempt, setAttempt] = useState(0);
 
-  // The scene only exists while the popup is open — mounted on open,
-  // torn down on close so nothing keeps a WebGL context in the background.
-  // Any failure (no WebGL, failed download, or the 30s limit) tears down
+  // Any failure (no WebGL, failed download, or the time limit) tears down
   // whatever was half-built and shows the preview image instead.
   useEffect(() => {
-    if (!open || !host.current) return;
+    if (!stage.current || !host.current) return;
     let live = true;
+    let timer: number | undefined;
     const hostEl = host.current;
-    setReady(false);
-    setFailed(false);
-    setStatus('Loading model…');
     const fail = () => {
       if (!live) return;
       live = false;
@@ -42,168 +44,100 @@ export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
       controls.current = null;
       hostEl.replaceChildren();
       setFailed(true);
-      setStatus('3D view unavailable');
     };
-    const timer = window.setTimeout(fail, 30_000);
-    import('./townhouse-scene')
-      .then(async ({ createTownhouseScene }) => {
-        if (!live) return;
-        const view = createTownhouseScene(hostEl);
-        controls.current = view;
-        await view.load();
-        if (!live) return;
-        window.clearTimeout(timer);
-        setReady(true);
-        setStatus('');
-      })
-      .catch(fail);
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        near.disconnect();
+        timer = window.setTimeout(fail, LOAD_TIMEOUT_MS);
+        import('./townhouse-scene')
+          .then(async ({ createTownhouseScene }) => {
+            if (!live) return;
+            const view = createTownhouseScene(hostEl);
+            controls.current = view;
+            await view.load();
+            if (!live) return;
+            window.clearTimeout(timer);
+            setReady(true);
+          })
+          .catch(fail);
+      },
+      { rootMargin: '600px 0px' },
+    );
+    near.observe(stage.current);
+    // The scene only paints on change; repaint whenever it scrolls back in,
+    // in case the browser dropped the picture while it was off screen.
+    const back = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) controls.current?.redraw();
+    });
+    back.observe(stage.current);
     return () => {
       live = false;
       window.clearTimeout(timer);
+      near.disconnect();
+      back.disconnect();
       controls.current?.dispose();
       controls.current = null;
     };
-  }, [open, attempt]);
+  }, [attempt]);
 
-  // While the popup is up: freeze the page behind it and let Esc close it,
-  // so a scroll or pinch meant for the model never reaches the page.
-  useEffect(() => {
-    if (!open) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
+  const retry = () => {
+    setFailed(false);
+    setReady(false);
+    setAttempt((n) => n + 1);
+  };
 
   return (
     <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10" aria-label="Interactive Townhouse model">
       <AssetFrame
         label="Explore in 3D"
-        // The preview is a capture of the model's own opening view (4:3,
-        // public/models/townhouse-preview.webp), so opening the model shows
-        // the same picture coming to life rather than a different render.
         aspect={4 / 3}
         ariaLabel="Townhouse 3D model"
-        // Same as the other 3D sections: no separate button — the preview
-        // itself is the click target, with the shared hint beneath it.
-        hint="Click the model to explore"
+        reserveControls
         intro={intro}
+        controls={
+          !failed && (
+            <ModelViewControls disabled={!ready} onView={(v) => controls.current?.view(TARGETS[v])} />
+          )
+        }
       >
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Explore the Townhouse in 3D"
-          className={`${ASSET_STAGE_CLASS} block cursor-pointer bg-[#050507] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground`}
-        >
-          <img
-            src="/models/townhouse-preview.webp"
-            alt=""
-            decoding="async"
-            draggable={false}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        </button>
-      </AssetFrame>
-
-      {open &&
-        createPortal(
+        <div ref={stage} className={`${ASSET_STAGE_CLASS} bg-[#050507]`} style={{ cursor: ready ? 'grab' : undefined }}>
+          {/* Hidden until fully loaded, then faded in. */}
           <div
-            /* Above the fixed site nav (z-110) so the model view is
-               unobstructed, unlike the image lightbox which sits under it.
-               The perimeter carries a soft vignette so the dark margin
-               reads as a frame around the model, and clicking it closes. */
-            className="intro-font fixed inset-0 z-[130] flex flex-col animate-fade-in-fast"
-            style={{ background: 'radial-gradient(ellipse at center, #0c0c0f 0%, #000 78%)' }}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Townhouse 3D model"
-            onClick={() => setOpen(false)}
-          >
-            <div className="flex items-center justify-between px-6 py-5">
-              <span className="text-[10px] tracking-[0.3em] uppercase text-foreground/70">Townhouse — 3D</span>
+            ref={host}
+            className="absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none"
+            style={{ opacity: ready && !failed ? 1 : 0 }}
+          />
+
+          {failed && (
+            <img
+              src="/models/townhouse-preview.webp"
+              alt="Townhouse exterior with concrete walls, glass blocks, and open terraces"
+              decoding="async"
+              draggable={false}
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+
+          {!ready && !failed && (
+            <p role="status" className="pointer-events-none absolute bottom-4 left-4 font-display text-[11px] font-extralight uppercase tracking-[0.14em] text-white/60">
+              Loading model…
+            </p>
+          )}
+          {failed && (
+            <div className="absolute bottom-4 left-4 flex items-center gap-3 font-display text-[11px] font-extralight uppercase tracking-[0.14em] text-white/75">
+              <span role="status">3D view unavailable</span>
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen(false);
-                }}
-                onMouseMove={trackSheen}
-                className={`lightbox-close ${glassButton({ touch: true, sheen: true })}`}
-                aria-label="Close"
+                onClick={retry}
+                className="underline underline-offset-4 text-white hover:text-white/80"
               >
-                <CloseMark />
+                Try again
               </button>
             </div>
-
-            {/* The dark margin around the model is the click-out zone; the
-                model itself stops the click so a drag never closes it. */}
-            <div className="relative flex-1">
-              <div
-                ref={host}
-                onClick={(e) => e.stopPropagation()}
-                className="absolute inset-4 overflow-hidden rounded-md bg-[#050507] shadow-[0_0_120px_rgba(0,0,0,0.85)] sm:inset-8 md:inset-14"
-              />
-
-              {failed && (
-                <img
-                  src="/models/townhouse-preview.webp"
-                  alt="Townhouse exterior with concrete walls, glass blocks, and open terraces"
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] rounded-md object-contain sm:inset-8 sm:h-[calc(100%-4rem)] sm:w-[calc(100%-4rem)] md:inset-14 md:h-[calc(100%-7rem)] md:w-[calc(100%-7rem)]"
-                />
-              )}
-
-              {!ready && !failed && (
-                <p
-                  role="status"
-                  className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-foreground/70"
-                >
-                  {status || 'Loading model…'}
-                </p>
-              )}
-              {failed && (
-                <div
-                  className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded bg-black/60 px-3 py-2 text-xs uppercase tracking-[0.14em] text-white/75 backdrop-blur-sm sm:bottom-12 md:bottom-[4.5rem]"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span role="status">{status}</span>
-                  <button
-                    type="button"
-                    onClick={() => setAttempt((n) => n + 1)}
-                    className="underline underline-offset-4 text-white hover:text-white/80"
-                  >
-                    Try again
-                  </button>
-                </div>
-              )}
-
-              {ready && (
-                <div
-                  className="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-2 sm:bottom-12 md:bottom-[4.5rem]"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {VIEWS.map((v) => (
-                    <button
-                      key={v.label}
-                      type="button"
-                      onClick={() => controls.current?.view(v.target)}
-                      className="rounded-md border border-white/25 bg-black/40 px-4 py-2 text-sm text-white backdrop-blur-sm hover:bg-white/10"
-                    >
-                      {v.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>,
-          document.body,
-        )}
+          )}
+        </div>
+      </AssetFrame>
     </section>
   );
 }

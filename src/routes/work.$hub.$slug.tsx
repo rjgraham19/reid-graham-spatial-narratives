@@ -17,7 +17,7 @@ import { ExchangeViewer } from "@/components/exchange-viewer";
 import { LollaViewer } from "@/components/lolla-viewer";
 import { DrawingCarousel } from "@/components/drawing-carousel";
 import { LollaRenderCarousel } from "@/components/lolla-render-carousel";
-import { ASSET_GROUP_CLASS } from "@/components/asset-frame";
+import { ASSET_GROUP_CLASS, ASSET_LABEL_CLASS } from "@/components/asset-frame";
 import { TrueWestGroundplan } from "@/components/true-west-groundplan";
 import { TownhouseViewer } from "@/components/townhouse-viewer";
 import { ProjectCredits } from "@/components/project-credits";
@@ -28,6 +28,7 @@ import { mediaDims } from "@/lib/media-dims";
 import tabAnimation from "@/assets/rg/tab-animation.svg";
 import { InlineAnimatedSvg } from "@/components/inline-animated-svg";
 import { InViewVideo } from "@/components/in-view-video";
+import { HoverScrubVideo } from "@/components/hover-scrub-video";
 import {
   HUBS,
   PROJECTS,
@@ -299,24 +300,29 @@ const PAIR_ASPECT: Record<string, string> = {
    the Nibi + Steam render pair as one row at a shared height — each photo's
    share of the width is its own width ÷ height, so all three come out
    exactly as tall. On phones the two narrow ones pair up and the wide one
-   takes the next line. Not lightbox items: they aren't in `project.media`. */
+   takes the next line. Clicking any of them opens the lightbox on all three
+   together, side by side (EXCHANGE_MODELS_COMBINED.jpg — the three files
+   joined edge to edge), rather than one at a time. */
 const EXCHANGE_MODEL_ROW_AFTER = "media-mt3imc31-91zcc";
 const EXCHANGE_MODEL_PHOTOS = [
   { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_1.jpg", width: 1109, height: 2491, wide: false },
   { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_2.jpg", width: 1231, height: 2491, wide: false },
   { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_3.jpg", width: 2016, height: 2491, wide: true },
 ];
+const EXCHANGE_MODELS_COMBINED_SRC = "/design-media/the-exchange-facility/EXCHANGE_MODELS_COMBINED.jpg";
 const EXCHANGE_MODEL_BLURB =
-  "Cluster models provide an up-close view of the building’s structural elements and how the architecture meets the ground. Painted basswood, 3D printer filament, and Bristol board represent steel framing, repurposed copper, and concrete.";
+  "Element models isolate key clusters of the building for an up-close look at its infrastructure.";
 
-function ExchangeModelRow() {
+function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
   return (
+    <div className="md:col-span-2 my-3 md:my-10">
+    <p className={ASSET_LABEL_CLASS}>Physical Models</p>
     // From md up: photos + blurb span the full gallery width, so the row's
     // edges line up with the renders above and the section below. The blurb
     // takes a narrow column on the right; that leaves the photos a width at
     // which they show whole at a shared, comfortable height — no cropping.
     // Extra space above and below sets the row apart from the renders.
-    <figure className="md:col-span-2 my-3 md:my-10 md:flex md:items-end md:gap-8" aria-label="Physical models">
+    <figure className="md:flex md:items-end md:gap-8" aria-label="Physical models">
       <div className="flex min-w-0 flex-wrap gap-3 md:flex-1 md:flex-nowrap md:gap-4">
         {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
           <div
@@ -324,15 +330,22 @@ function ExchangeModelRow() {
             className={`min-w-0 overflow-hidden bg-secondary ${photo.wide ? "basis-full md:basis-0" : "basis-0"}`}
             style={{ flexGrow: photo.width / photo.height }}
           >
-            <img
-              src={photo.src}
-              width={photo.width}
-              height={photo.height}
-              alt={`Exchange Facility physical model, view ${i + 1}`}
-              loading="lazy"
-              decoding="async"
-              className="block h-auto w-full"
-            />
+            <button
+              type="button"
+              onClick={onOpen}
+              className="block w-full cursor-zoom-in"
+              aria-label="Enlarge the three physical models"
+            >
+              <img
+                src={photo.src}
+                width={photo.width}
+                height={photo.height}
+                alt={`Exchange Facility physical model, view ${i + 1}`}
+                loading="lazy"
+                decoding="async"
+                className="block h-auto w-full"
+              />
+            </button>
           </div>
         ))}
       </div>
@@ -342,6 +355,7 @@ function ExchangeModelRow() {
         {EXCHANGE_MODEL_BLURB}
       </figcaption>
     </figure>
+    </div>
   );
 }
 
@@ -516,17 +530,6 @@ function IntroMockupTabs({ current, panel }: { current: string; panel: boolean }
   );
 }
 
-/** The hover cue on a silent inline video — tells a visitor this is where
- *  to click for the real, full-sound experience in the lightbox. Drawn
- *  rather than a glyph, to match BackChevron / CloseMark. */
-function ExpandIcon() {
-  return (
-    <svg aria-hidden viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2H2v4M10 2h4v4M6 14H2v-4M10 14h4v-4" />
-    </svg>
-  );
-}
-
 function ProjectPage() {
   /* TanStack Router reuses this same component instance across a slug
      change (Lollapalooza -> True West, say) rather than remounting it —
@@ -571,10 +574,16 @@ function ProjectPageInner() {
     project.slug === "the-exchange-facility" && INTRO_TRIAL_SLUGS.has(project.slug)
       ? EXCHANGE_HERO_SRC
       : project.cover;
-  const lightboxMedia =
-    project.media.some((m) => m.src === heroSrc)
+  const lightboxMedia = [
+    ...(project.media.some((m) => m.src === heroSrc)
       ? project.media
-      : [...project.media, { type: "image" as const, src: heroSrc, caption: project.title, hidden: true }];
+      : [...project.media, { type: "image" as const, src: heroSrc, caption: project.title, hidden: true }]),
+    // Exchange: the three physical-model photos open as one side-by-side
+    // view. Appended last, so no existing index moves.
+    ...(project.slug === "the-exchange-facility"
+      ? [{ type: "image" as const, src: EXCHANGE_MODELS_COMBINED_SRC, caption: "Physical models", hidden: true }]
+      : []),
+  ];
   const heroLightboxIndex = lightboxMedia.findIndex((m) => m.src === heroSrc);
 
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -1430,8 +1439,13 @@ function ProjectPageInner() {
           rather than appearing as a visible hard cut. */}
       {isTab && (
         <div className="w-full bg-black">
+          {/* The artwork never rises into the top 110 of its 1080 units, so
+              that strip only added black between the closeup animation and
+              the graphic. The view window starts below it instead. */}
           <InlineAnimatedSvg
             src={tabAnimation}
+            viewBox="0 110 1920 970"
+            aspectRatio="1920 / 970"
             className="block w-full [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
           />
         </div>
@@ -1507,38 +1521,26 @@ function ProjectPageInner() {
       )}
 
       {/* TaB: Renaissance — the PINK FOUNTAIN technical drawing, directly under
-          the transition animation where the page turns white.
-
-          It's one drawing split into two files so each half can be enlarged on
-          its own, so the two must read as a single sheet rather than as two
-          images that happen to sit together. Both halves were scaled by the
-          same factor at export, so sizing the columns to their pixel widths
-          (1584 and 2400) keeps every line weight and label at one consistent
-          scale across the seam. They're top-aligned for the same reason.
-
-          The gap is wider than the drawing's own internal spacing, per Reid —
-          enough to read as two enlargeable pieces without breaking the sheet. */}
+          the transition animation where the page turns white. One image now
+          (the two exported halves rejoined into tab-drawing-merged.jpg), so it
+          reads and enlarges as a single sheet. */}
       {isTab && (
         <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-8 md:pb-12">
-          <div className={`${ASSET_GROUP_CLASS} grid grid-cols-1 gap-10 md:grid-cols-[1584fr_2400fr] md:gap-16 lg:gap-20 md:items-start`}>
-            {[2, 3].map((idx) => (
-              <figure key={idx} className="group">
-                <button
-                  type="button"
-                  onClick={() => setLightbox(idx)}
-                  className="block w-full"
-                  aria-label={`Enlarge ${project.media[idx].caption}`}
-                >
-                  <img
-                    src={project.media[idx].src} {...mediaDims(project.media[idx].src)}
-                    alt={project.media[idx].caption?.trim() || project.title}
-                    loading="lazy"
-                    className="w-full h-auto"
-                  />
-                </button>
-              </figure>
-            ))}
-          </div>
+          <figure className={`${ASSET_GROUP_CLASS} group`}>
+            <button
+              type="button"
+              onClick={() => setLightbox(2)}
+              className="block w-full"
+              aria-label={`Enlarge ${project.media[2].caption}`}
+            >
+              <img
+                src={project.media[2].src} {...mediaDims(project.media[2].src)}
+                alt={project.media[2].caption?.trim() || project.title}
+                loading="lazy"
+                className="w-full h-auto"
+              />
+            </button>
+          </figure>
         </section>
       )}
 
@@ -1894,31 +1896,16 @@ function ProjectPageInner() {
                  video ever showed up. */
               <section className="px-6 md:px-12 lg:px-16 pt-4 md:pt-6 pb-16 md:pb-24">
                 <div className={ASSET_GROUP_CLASS}>
-                  {/* Same treatment as any other clickable media on the
-                      page: a silent, looping, autoplaying-on-scroll moving
-                      image with no visible controls. Sound and the scrub
-                      bar only exist in the lightbox this opens — the
-                      "expand" cue on hover is what tells a visitor that's
-                      where to get them, rather than the clip trying to be
-                      a full player in both places at once. */}
-                  <figure className="group relative">
-                    <button
-                      type="button"
-                      onClick={() => setLightbox(videoIndex)}
-                      /* The border itself is the hover cue now — brightening
-                         it reads as "this whole pane is about to open"
-                         rather than a floating control sitting on top of
-                         the footage. The expand mark stays tucked in the
-                         corner, small and quiet, just confirming what a
-                         click here does rather than demanding attention. */
-                      className="block w-full overflow-hidden border border-white/[0.07] bg-black transition-colors duration-200 hover:border-white/30"
-                      aria-label={`Enlarge ${project.title} video`}
-                    >
-                      <InViewVideo src={video.src} className="w-full h-auto" />
-                      <span className="absolute bottom-2.5 right-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white/60 opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
-                        <ExpandIcon />
-                      </span>
-                    </button>
+                  {/* A silent, looping, autoplaying-on-scroll moving image with
+                      no frame around it. Hover brings up a thin scrub bar and
+                      a play/pause mark (fading away again after); clicking
+                      the footage opens it, with sound, in the lightbox. */}
+                  <figure>
+                    <HoverScrubVideo
+                      src={video.src}
+                      onOpen={() => setLightbox(videoIndex)}
+                      label={`Enlarge ${project.title} video`}
+                    />
                   </figure>
                   {video.caption && (
                     <p className="mt-1.5 font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px] text-center">
@@ -2035,14 +2022,13 @@ function ProjectPageInner() {
                   spacing exactly as it was. */}
               <div className="relative z-10 pt-4 md:pt-14 lg:pt-16">
                 <RevealBlock from="left">
-                  {/* The sketch file is a tight crop (2026-10). The old square
-                      file had empty bands above and below the drawing (19.7%
-                      and 19.1% of its width; now 1.7% and 2.6%), and the
-                      page's spacing was tuned around them — including a
-                      Design-Mode -207px pull on desktop. These margins put
-                      the drawing and the quote exactly where they were, at
-                      every width: 18% back on top (plus the old pull from
-                      md up), 16.5% back below. */}
+                  {/* The sketch file is trimmed to the drawing itself
+                      (anne-frank-sketch-trim.png, 2026-10-13): no empty
+                      strip on the left, so the drawing fills the column and
+                      its left edge sits on the content margin. The top margin
+                      still holds its old spot (18%, plus the old Design-Mode
+                      pull from md up); below it, only a normal gap to the
+                      quote — the old 16.5% spacer read as dead black space. */}
                   <figure className="group mt-[18%] md:mt-[calc(18%-207px)]">
                     <button
                       type="button"
@@ -2066,7 +2052,7 @@ function ProjectPageInner() {
                     <p
                       data-design-id={designId.projectPullQuote(project.slug)}
                       data-design-kind="text"
-                      className="body-statement mt-[calc(1.5rem+16.5%)] md:mt-[calc(2rem+16.5%)] font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-foreground/85 text-center"
+                      className="body-statement mt-8 md:mt-12 font-display font-light text-xl md:text-3xl leading-snug tracking-tight text-balance text-foreground/85 text-center"
                     >
                       {project.pullQuote}
                     </p>
@@ -2317,7 +2303,10 @@ function ProjectPageInner() {
                         <figcaption
                           data-design-id={designId.projectMediaCaption(project.slug, project.media[idx].id ?? String(idx))}
                           data-design-kind="text"
-                          className="mt-1.5 font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px] text-right"
+                          /* Townhouse only: one step smaller and Regular rather
+                             than ExtraLight, so the captions read cleanly on
+                             this page's white background. */
+                          className="mt-1.5 font-display text-[11px] font-normal uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[12px] text-right"
                         >
                           {project.media[idx].caption}
                         </figcaption>
@@ -2428,7 +2417,9 @@ function ProjectPageInner() {
                     </figcaption>
                   )}
                 </figure>
-                {isExchange && m.id === EXCHANGE_MODEL_ROW_AFTER && <ExchangeModelRow />}
+                {isExchange && m.id === EXCHANGE_MODEL_ROW_AFTER && (
+                  <ExchangeModelRow onOpen={() => setLightbox(lightboxMedia.findIndex((x) => x.src === EXCHANGE_MODELS_COMBINED_SRC))} />
+                )}
                 </Fragment>
               );
             })}

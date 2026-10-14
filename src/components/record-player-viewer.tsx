@@ -14,6 +14,9 @@ export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
   const control = useRef<RecordPlayerScene | null>(null);
   const progress = useRef(0);
   const [ready, setReady] = useState(false);
+  // True when the model won't run at all (reduced motion or a failure) —
+  // only then does the still image stand in for it.
+  const [isStatic, setIsStatic] = useState(false);
   const modeCb = useRef(onModeChange);
   modeCb.current = onModeChange;
   useScrollProgress(wrapperRef, (p) => {
@@ -30,7 +33,11 @@ export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
     let visible = false;
     let failed = false;
     const media = matchMedia("(prefers-reduced-motion: reduce)");
-    const report = () => modeCb.current?.(media.matches || failed ? "static" : "animated");
+    const report = () => {
+      const still = media.matches || failed;
+      setIsStatic(still);
+      modeCb.current?.(still ? "static" : "animated");
+    };
     report(); // decided on mount, before the visitor reaches the section
     const stop = () => {
       control.current?.dispose();
@@ -97,9 +104,15 @@ export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
   }, []);
   return (
     <div className="record-player-stage" role="img" aria-label="Magenta and silver Lollapalooza record player, animated by scrolling">
-      <img src="/models/record-player/poster.webp" alt="" width="830" height="960" loading="lazy"
-        className="record-player-poster" style={{ visibility: ready ? "hidden" : "visible" }} />
-      <div ref={host} className="absolute inset-0" style={{ visibility: ready ? "visible" : "hidden" }} data-record-player-canvas />
+      {/* No stand-in picture while the model loads (the soft front-view
+          still read as a blurry placeholder) — just the page background and
+          a thin loading line, then the model fades in. The still is kept
+          only for when the model won't run at all. */}
+      {isStatic && !ready && (
+        <img src="/models/record-player/poster.webp" alt="" width="830" height="960" loading="lazy" className="record-player-poster" />
+      )}
+      {!isStatic && <div aria-hidden className="record-player-loading" style={{ opacity: ready ? 0 : 1 }} />}
+      <div ref={host} className="absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none" style={{ opacity: ready ? 1 : 0 }} data-record-player-canvas />
     </div>
   );
 }

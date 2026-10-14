@@ -1289,6 +1289,34 @@ img[data-scroll-fade="in"] {
   height: 100%;
   object-fit: contain;
 }
+/* While the model loads: nothing but the page background and one thin,
+   quiet line sweeping across the middle of the model's column. */
+.record-player-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(160px, 40%);
+  height: 1px;
+  translate: -50% 0;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.08);
+  transition: opacity 400ms ease;
+}
+.record-player-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: rgb(255 255 255 / 0.45);
+  animation: record-player-loading 1.4s ease-in-out infinite;
+}
+@keyframes record-player-loading {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .record-player-loading::after { animation: none; width: 100%; opacity: 0.4; }
+}
 /* This side-blurb offset only makes sense at the desktop layout (see
    `.record-player-caption`'s own lg: classes in the JSX) — below that
    the caption moves to a bottom band instead, so it's scoped here to
@@ -1371,6 +1399,8 @@ img[data-scroll-fade="in"] {
     max-width: none;
     background: none;
     padding: 16px 4% max(28px, env(safe-area-inset-bottom));
+    /* Sits directly under the model here, so it centres on it. */
+    text-align: center;
   }
 }
 

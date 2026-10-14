@@ -7,6 +7,9 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 export interface TownhouseControls {
   load(): Promise<void>;
   view(name: 'Front right' | 'Front left' | 'Rear right' | 'Rear left'): void;
+  /** Paint again — the canvas only renders on change, and a browser may
+   *  drop its picture while it is scrolled out of view. */
+  redraw(): void;
   dispose(): void;
 }
 export function createTownhouseScene(host: HTMLDivElement): TownhouseControls {
@@ -32,6 +35,9 @@ export function createTownhouseScene(host: HTMLDivElement): TownhouseControls {
   const orbit = new OrbitControls(camera, renderer.domElement);
   orbit.enableDamping = false;orbit.maxPolarAngle = Math.PI*.49;orbit.minZoom=.45;orbit.maxZoom=5;
   orbit.listenToKeyEvents(renderer.domElement);
+  // Live on the page as soon as it loads (no click to opt in), so a wheel
+  // over it must keep scrolling the page — same as lolla/exchange scenes.
+  orbit.enableZoom = false;
   // Three.js sets touch-action:none on the canvas the moment OrbitControls
   // connects, so it can capture a one-finger drag as orbit — that also blocks
   // the browser's native touch-scroll over the whole element. On a phone,
@@ -110,6 +116,7 @@ export function createTownhouseScene(host: HTMLDivElement): TownhouseControls {
       });
       const size=bounds.getSize(new THREE.Vector3());span=Math.max(size.x,size.y,size.z);bounds.getCenter(homeTarget);resize();view('Front right');
     }, view,
+    redraw: render,
     dispose() {disposed=true;observer.disconnect();orbit.dispose();if(model)disposeModel(model);draco.dispose();ripple.dispose();environment.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();}
   };
 }

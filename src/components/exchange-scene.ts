@@ -99,7 +99,7 @@ export function createExchangeScene(host: HTMLDivElement) {
     const offset = isolated ? new THREE.Vector3(10, 0, 0) : new THREE.Vector3();
     const target = box.getCenter(new THREE.Vector3()).add(offset);
     const size = box.getSize(new THREE.Vector3());
-    const nextSpan = Math.max(size.x, size.y, size.z) * (isolated ? 0.68 : 0.62);
+    let nextSpan = Math.max(size.x, size.y, size.z) * (isolated ? 0.68 : 0.62);
     const direction =
       view === "nibi"
         ? new THREE.Vector3(1, 0.65, 0.45)
@@ -108,7 +108,40 @@ export function createExchangeScene(host: HTMLDivElement) {
           : view === "steam"
             ? new THREE.Vector3(1, 0.2, 0.55)
             : new THREE.Vector3(1, 0.45, 0.65);
-    const nextCamera = target.clone().add(direction.normalize().multiplyScalar(85));
+    direction.normalize();
+    // Whole facility: frame what's actually on screen. The centre of the
+    // 3D box isn't the centre of the drawing once it's seen from above at
+    // an angle, which left the model crowding the top with empty space
+    // under it. Project every visible piece (the faint ground plane aside)
+    // onto the view, then aim at the middle of that and fit it with an
+    // even margin all round.
+    if (!isolated) {
+      const zAxis = direction.clone();
+      const xAxis = new THREE.Vector3(0, 1, 0).cross(zAxis).normalize();
+      const yAxis = zAxis.clone().cross(xAxis);
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      const corner = new THREE.Vector3();
+      for (const item of meshes) {
+        if (item.zone === "ground") continue;
+        // Measured at rest — a piece may still be pulled out from a
+        // single-zone view that this selection is about to undo.
+        const b = new THREE.Box3().setFromObject(item.mesh).translate(item.base.clone().sub(item.mesh.position));
+        for (let i = 0; i < 8; i++) {
+          corner.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z).sub(target);
+          const px = corner.dot(xAxis), py = corner.dot(yAxis);
+          x0 = Math.min(x0, px); x1 = Math.max(x1, px);
+          y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+        }
+      }
+      if (Number.isFinite(x0)) {
+        target.addScaledVector(xAxis, (x0 + x1) / 2).addScaledVector(yAxis, (y0 + y1) / 2);
+        const { width, height } = host.getBoundingClientRect();
+        const a = width && height ? width / height : 16 / 9;
+        const halfW = (x1 - x0) / 2, halfH = (y1 - y0) / 2;
+        nextSpan = Math.max(halfW / Math.max(a, 1), halfH * Math.min(a, 1)) * 1.1;
+      }
+    }
+    const nextCamera = target.clone().add(direction.clone().multiplyScalar(85));
     const startCam = camera.position.clone(),
       startTarget = orbit.target.clone(),
       startSpan = span;

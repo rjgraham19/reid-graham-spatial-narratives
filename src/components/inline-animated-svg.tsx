@@ -42,11 +42,15 @@ export function InlineAnimatedSvg({
   src,
   className,
   aspectRatio = "16 / 9",
+  viewBox,
 }: {
   src: string;
   className?: string;
   /** The artwork's proportions, reserved before it loads. */
   aspectRatio?: string;
+  /** Replaces the file's own viewBox — to trim empty space off the
+   *  artwork without re-exporting it. Pair with a matching aspectRatio. */
+  viewBox?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
@@ -81,6 +85,7 @@ export function InlineAnimatedSvg({
 
         const svg = container.querySelector("svg") as SvgatorRoot | null;
         if (!svg) return;
+        if (viewBox) svg.setAttribute("viewBox", viewBox);
 
         const startedAt = performance.now();
         const play = () => {
@@ -119,7 +124,7 @@ export function InlineAnimatedSvg({
       observer?.disconnect();
       if (retry) clearTimeout(retry);
     };
-  }, [src]);
+  }, [src, viewBox]);
 
   return (
     <div ref={containerRef} className={className} style={{ aspectRatio }}>

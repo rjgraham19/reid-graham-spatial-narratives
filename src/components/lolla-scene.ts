@@ -65,6 +65,10 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
   orbit.maxZoom = 3;
   orbit.maxPolarAngle = Math.PI * 0.49;
   orbit.listenToKeyEvents(renderer.domElement);
+  // The model is live as soon as it loads (no click to opt in), so a wheel
+  // over it must keep scrolling the page — with enableZoom off, OrbitControls
+  // lets the wheel event through. Same as exchange-scene.ts.
+  orbit.enableZoom = false;
   // Three.js sets touch-action:none on the canvas the moment OrbitControls
   // connects, so it can capture a one-finger drag as orbit — that also blocks
   // the browser's native touch-scroll over the whole element. On a phone,
