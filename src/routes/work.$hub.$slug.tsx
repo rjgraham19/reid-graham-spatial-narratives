@@ -301,15 +301,19 @@ const PAIR_ASPECT: Record<string, string> = {
    share of the width is its own width ÷ height, so all three come out
    exactly as tall. On phones the two narrow ones pair up and the wide one
    takes the next line. Clicking any of them opens the lightbox on all three
-   together, side by side (EXCHANGE_MODELS_COMBINED.jpg — the three files
-   joined edge to edge), rather than one at a time. */
+   together — the same three photos, side by side with the same gaps as on
+   the page — rather than one at a time. */
 const EXCHANGE_MODEL_ROW_AFTER = "media-mt3imc31-91zcc";
 const EXCHANGE_MODEL_PHOTOS = [
   { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_1.jpg", width: 1109, height: 2491, wide: false },
   { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_2.jpg", width: 1231, height: 2491, wide: false },
   { src: "/design-media/the-exchange-facility/EXCHANGE_MODEL_3.jpg", width: 2016, height: 2491, wide: true },
 ];
-const EXCHANGE_MODELS_COMBINED_SRC = "/design-media/the-exchange-facility/EXCHANGE_MODELS_COMBINED.jpg";
+/* Lightbox slot for the three-photo view. Not a real file — the lightbox
+   recognises it and lays out EXCHANGE_MODEL_PHOTOS itself. */
+const EXCHANGE_MODELS_LIGHTBOX = "exchange-physical-models";
+/* Their combined width ÷ height (each is 2491px tall). */
+const EXCHANGE_MODELS_ASPECT = EXCHANGE_MODEL_PHOTOS.reduce((sum, p) => sum + p.width / p.height, 0);
 const EXCHANGE_MODEL_BLURB =
   "Element models isolate key clusters of the building for an up-close look at its infrastructure.";
 
@@ -581,7 +585,7 @@ function ProjectPageInner() {
     // Exchange: the three physical-model photos open as one side-by-side
     // view. Appended last, so no existing index moves.
     ...(project.slug === "the-exchange-facility"
-      ? [{ type: "image" as const, src: EXCHANGE_MODELS_COMBINED_SRC, caption: "Physical models", hidden: true }]
+      ? [{ type: "image" as const, src: EXCHANGE_MODELS_LIGHTBOX, caption: "Physical models", hidden: true }]
       : []),
   ];
   const heroLightboxIndex = lightboxMedia.findIndex((m) => m.src === heroSrc);
@@ -2418,7 +2422,7 @@ function ProjectPageInner() {
                   )}
                 </figure>
                 {isExchange && m.id === EXCHANGE_MODEL_ROW_AFTER && (
-                  <ExchangeModelRow onOpen={() => setLightbox(lightboxMedia.findIndex((x) => x.src === EXCHANGE_MODELS_COMBINED_SRC))} />
+                  <ExchangeModelRow onOpen={() => setLightbox(lightboxMedia.findIndex((x) => x.src === EXCHANGE_MODELS_LIGHTBOX))} />
                 )}
                 </Fragment>
               );
@@ -2662,6 +2666,32 @@ function ProjectPageInner() {
                     zoom={zoom}
                     animateZoom={!pinchStart.current}
                   />
+                </motion.div>
+              ) : lightboxMedia[lightbox].src === EXCHANGE_MODELS_LIGHTBOX ? (
+                /* Exchange: the three model photos together, at one shared
+                   height with the same gaps as on the page. */
+                <motion.div
+                  key={lightbox}
+                  initial={{ opacity: 0, x: lightboxDirection * 32 }}
+                  animate={{ opacity: 1, x: 0, scale: zoom }}
+                  exit={{ opacity: 0, x: -lightboxDirection * 32 }}
+                  transition={{ duration: 0.28 }}
+                  onClick={close}
+                  className="flex cursor-zoom-out select-none gap-3 md:gap-4"
+                  style={{ width: `min(100%, calc((100dvh - 160px) * ${EXCHANGE_MODELS_ASPECT} + 2rem))` }}
+                >
+                  {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
+                    <img
+                      key={photo.src}
+                      src={photo.src}
+                      width={photo.width}
+                      height={photo.height}
+                      alt={`Exchange Facility physical model, view ${i + 1}`}
+                      draggable={false}
+                      className="block h-auto min-w-0 basis-0"
+                      style={{ flexGrow: photo.width / photo.height }}
+                    />
+                  ))}
                 </motion.div>
               ) : isTrueWest && lightboxMedia[lightbox].src === project.media[4].src ? (
                 <motion.div

@@ -139,7 +139,6 @@ const DIMS: Record<string, [number, number]> = {
   "/design-media/the-exchange-facility/EXCHANGE_VERTICALSECTION.png": [5100, 3300],
   "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE.jpg": [5100, 3300],
   "/design-media/the-exchange-facility/EXCHANGE_WAVESCAPE_EDITEDRENDER.png": [1332, 1101],
-  "/design-media/the-exchange-facility/EXCHANGE_MODELS_COMBINED.jpg": [4356, 2491],
   "/design-media/townhouse/TOWNHOUSE_AXONX2.png": [1865, 1143],
   "/design-media/townhouse/TOWNHOUSE_AXON_UPRIGHT.jpg": [1143, 1865],
   "/design-media/townhouse/TOWNHOUSE_RENDER1.jpg": [1184, 1035],
