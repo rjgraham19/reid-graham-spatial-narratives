@@ -157,7 +157,7 @@ export function createRecordPlayerScene(host: HTMLDivElement, onFailure: () => v
   const tile = document.createElement("canvas");
   tile.width = 64; tile.height = 128;
   const context = tile.getContext("2d")!;
-  context.fillStyle = "#c2c0bd";
+  context.fillStyle = "#a2a6aa";
   context.fillRect(0, 0, 64, 128);
   for (const [x,y] of [[32,32],[0,96],[64,96]]) {
     context.fillStyle = "#686766";
@@ -215,7 +215,7 @@ export function createRecordPlayerScene(host: HTMLDivElement, onFailure: () => v
     if (kind === "brushed") Object.assign(props, { color: "#d0d2d5", roughness: 0.3, metalness: 1, anisotropy: 0.55, anisotropyRotation: Math.PI / 2, normalMap: brushedNormal, normalScale: new THREE.Vector2(0.12, 0.12), roughnessMap: brushedRoughness });
     if (kind === "sculpture") Object.assign(props, { color: "#c7c4bc", roughness: 0.18, metalness: 0.95 });
     if (kind === "dark") Object.assign(props, { color: "#171617", roughness: 0.9 });
-    if (kind === "grille") Object.assign(props, { color: "#d0ceca", map: grilleMap, bumpMap: grilleRelief, bumpScale: 0.055, metalnessMap: grilleRelief, roughness: 0.38, metalness: 0.8 });
+    if (kind === "grille") Object.assign(props, { color: "#d0d2d5", map: grilleMap, bumpMap: grilleRelief, bumpScale: 0.035, roughness: 0.28, metalness: 1 });
     if (kind === "speaker-top") Object.assign(props, { color: "#777571", roughness: 0.8, metalness: 0.35 });
     if (kind === "button") Object.assign(props, { color: "#ffffff", map: maps.button, roughness: 0.48, metalness: 0.25 });
     if (kind === "disc") Object.assign(props, { color: "#ffffff", map: maps.disc, emissive: "#ffffff", emissiveMap: maps.disc, emissiveIntensity: 0.3, metalness: 0, roughness: 0.52, specularIntensity: 0.18 });
@@ -234,6 +234,7 @@ export function createRecordPlayerScene(host: HTMLDivElement, onFailure: () => v
     // Present a broad studio reflection to the control face instead of its
     // black sector. Other metals retain their approved reflection orientation.
     if (kind === "housing") mat.envMapRotation.y = Math.PI * 0.65;
+    if (kind === "grille") { mat.envMapIntensity = 1.0; mat.envMapRotation.y = Math.PI * 1.2; }
     // Subpixel grain fades to its average instead of sparkling on small screens.
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.capColor = { value: new THREE.Color("#777571") };
