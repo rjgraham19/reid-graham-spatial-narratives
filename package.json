@@ -10,7 +10,13 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check:layout": "playwright test",
+    "check:layout:update": "playwright test --update-snapshots",
+    "audit:capture": "node scripts/audit/capture.mjs",
+    "media:insets": "node scripts/audit/media-insets.mjs",
+    "audit:inventory": "node scripts/audit/inventory.mjs",
+    "media:generate": "node scripts/audit/media-insets.mjs && node scripts/audit/responsive-media.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -70,8 +76,10 @@
     "vite-tsconfig-paths": "^6.0.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.7.7",
+    "@playwright/test": "^1.64.0",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
@@ -85,6 +93,7 @@
     "globals": "^15.15.0",
     "nitro": "3.0.260603-beta",
     "prettier": "^3.7.3",
+    "sharp": "^0.35.5",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.0.16"
