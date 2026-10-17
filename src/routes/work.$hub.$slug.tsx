@@ -1,3 +1,4 @@
+import { useModalFocus } from '@/hooks/use-modal-focus';
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useFitText } from "@/hooks/use-fit-text";
@@ -25,6 +26,7 @@ import { stripThumb } from "@/lib/strip-thumbs";
 import { displayCopy } from "@/lib/display-copies";
 import { mediaDims } from "@/lib/media-dims";
 
+import { SubjectImage } from '@/components/subject-image';
 import tabAnimation from "@/assets/rg/tab-animation.svg";
 import { InlineAnimatedSvg } from "@/components/inline-animated-svg";
 import { InViewVideo } from "@/components/in-view-video";
@@ -340,7 +342,7 @@ function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
               className="block w-full cursor-zoom-in"
               aria-label="Enlarge the three physical models"
             >
-              <img
+              <SubjectImage
                 src={photo.src}
                 width={photo.width}
                 height={photo.height}
@@ -598,6 +600,7 @@ function ProjectPageInner() {
      layer at a time — image, then the project panel. */
   const lightboxOpener = useRef<HTMLElement | null>(null);
   const lightboxOpen = lightbox != null;
+  useModalFocus(lightboxOpen, '[role="dialog"][aria-modal="true"]');
   useEffect(() => {
     if (lightboxOpen) {
       lightboxOpener.current = document.activeElement as HTMLElement | null;
@@ -1294,7 +1297,7 @@ function ProjectPageInner() {
             }`}
             aria-label={`Enlarge ${project.title}`}
           >
-            <img
+            <SubjectImage
               data-design-id={designId.projectMedia(project.slug, project.media[0]?.id ?? "0")}
               data-design-kind="image"
               data-design-role="header"
@@ -1537,7 +1540,7 @@ function ProjectPageInner() {
               className="block w-full"
               aria-label={`Enlarge ${project.media[2].caption}`}
             >
-              <img
+              <SubjectImage
                 src={project.media[2].src} {...mediaDims(project.media[2].src)}
                 alt={project.media[2].caption?.trim() || project.title}
                 loading="lazy"
@@ -1676,7 +1679,7 @@ function ProjectPageInner() {
                   className="block w-full overflow-hidden bg-secondary"
                   aria-label={project.media[1].caption?.trim() || project.title}
                 >
-                  <img
+                  <SubjectImage
                     data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                     data-design-kind="image"
                     src={project.media[1].src} {...mediaDims(project.media[1].src)}
@@ -1706,7 +1709,7 @@ function ProjectPageInner() {
                   className="block w-full overflow-hidden bg-secondary"
                   aria-label={project.media[2].caption?.trim() || project.title}
                 >
-                  <img
+                  <SubjectImage
                     data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                     data-design-kind="image"
                     src={project.media[2].src} {...mediaDims(project.media[2].src)}
@@ -1739,7 +1742,7 @@ function ProjectPageInner() {
                 className="block w-full overflow-hidden bg-secondary"
                 aria-label={project.media[3].caption?.trim() || project.title}
               >
-                <img
+                <SubjectImage
                   data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
                   data-design-kind="image"
                   src={project.media[3].src} {...mediaDims(project.media[3].src)}
@@ -1789,7 +1792,7 @@ function ProjectPageInner() {
                   className="block h-full w-full overflow-hidden bg-secondary"
                   aria-label={project.media[1].caption?.trim() || "True West — second act"}
                 >
-                  <img
+                  <SubjectImage
                     data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                     data-design-kind="image"
                     src={project.media[1].src} {...mediaDims(project.media[1].src)}
@@ -1808,7 +1811,7 @@ function ProjectPageInner() {
                     className="block w-full overflow-hidden bg-secondary"
                     aria-label={project.media[2].caption?.trim() || "Rendered model study"}
                   >
-                    <img
+                    <SubjectImage
                       data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                       data-design-kind="image"
                       src={project.media[2].src} {...mediaDims(project.media[2].src)}
@@ -1825,7 +1828,7 @@ function ProjectPageInner() {
                     className="block w-full overflow-hidden bg-secondary"
                     aria-label={project.media[3].caption?.trim() || "Rendered model study"}
                   >
-                    <img
+                    <SubjectImage
                       data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
                       data-design-kind="image"
                       src={project.media[3].src} {...mediaDims(project.media[3].src)}
@@ -2040,7 +2043,7 @@ function ProjectPageInner() {
                       className="block w-full overflow-hidden"
                       aria-label={project.media[1].caption?.trim() || "Conceptual sketch"}
                     >
-                      <img
+                      <SubjectImage
                         data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                         data-design-kind="image"
                         src={project.media[1].src} {...mediaDims(project.media[1].src)}
@@ -2077,7 +2080,7 @@ function ProjectPageInner() {
                     className="block w-full overflow-hidden bg-secondary"
                     aria-label={project.media[2].caption?.trim() || "Set closeup"}
                   >
-                    <img
+                    <SubjectImage
                       data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                       data-design-kind="image"
                       src={project.media[2].src} {...mediaDims(project.media[2].src)}
@@ -2106,7 +2109,7 @@ function ProjectPageInner() {
                     className="block w-full overflow-hidden"
                     aria-label={project.media[idx].caption?.trim() || `Technical drawing ${idx - 2}`}
                   >
-                    <img
+                    <SubjectImage
                       data-design-id={designId.projectMedia(project.slug, project.media[idx].id ?? String(idx))}
                       data-design-kind="image"
                       src={project.media[idx].src} {...mediaDims(project.media[idx].src)}
@@ -2150,7 +2153,7 @@ function ProjectPageInner() {
                 className="block w-full overflow-hidden bg-secondary"
                 aria-label={project.media[1].caption?.trim() || "Enlarge the set closeup"}
               >
-                <img
+                <SubjectImage
                   data-design-id={designId.projectMedia(project.slug, project.media[1].id ?? "1")}
                   data-design-kind="image"
                   src={project.media[1].src} {...mediaDims(project.media[1].src)}
@@ -2186,7 +2189,7 @@ function ProjectPageInner() {
                   className="block w-full overflow-hidden bg-black"
                   aria-label={project.media[2].caption?.trim() || "Sketch"}
                 >
-                  <img
+                  <SubjectImage
                     data-design-id={designId.projectMedia(project.slug, project.media[2].id ?? "2")}
                     data-design-kind="image"
                     src={displayCopy(project.media[2].src)} {...mediaDims(displayCopy(project.media[2].src))}
@@ -2225,7 +2228,7 @@ function ProjectPageInner() {
               className="block w-full overflow-hidden bg-black"
               aria-label={project.media[3].caption?.trim() || "Drawing"}
             >
-              <img
+              <SubjectImage
                 data-design-id={designId.projectMedia(project.slug, project.media[3].id ?? "3")}
                 data-design-kind="image"
                 src={displayCopy(project.media[3].src)} {...mediaDims(displayCopy(project.media[3].src))}
@@ -2258,7 +2261,7 @@ function ProjectPageInner() {
                   className="block w-full"
                   aria-label={project.media[0].caption?.trim() || "Axonometric"}
                 >
-                  <img
+                  <SubjectImage
                     data-design-id={designId.projectMedia(project.slug, project.media[0].id ?? "0")}
                     data-design-kind="image"
                     src={project.media[0].src} {...mediaDims(project.media[0].src)}
@@ -2294,7 +2297,7 @@ function ProjectPageInner() {
                         className="block w-full aspect-square overflow-hidden bg-secondary"
                         aria-label={project.media[idx].caption?.trim() || `Render ${idx}`}
                       >
-                        <img
+                        <SubjectImage
                           data-design-id={designId.projectMedia(project.slug, project.media[idx].id ?? String(idx))}
                           data-design-kind="image"
                           src={project.media[idx].src} {...mediaDims(project.media[idx].src)}
@@ -2353,7 +2356,7 @@ function ProjectPageInner() {
                     className="w-full h-auto object-cover"
                   />
                 ) : (
-                  <img
+                  <SubjectImage
                     data-design-id={mediaId}
                     data-design-kind="image"
                     data-design-role={role}
@@ -2476,7 +2479,7 @@ function ProjectPageInner() {
                         aria-label={m.caption?.trim() || "Open photo"}
                         className="block overflow-hidden bg-secondary shadow-lg transition-transform duration-300 hover:scale-[1.01]"
                       >
-                        <img
+                        <SubjectImage
                           data-design-id={designId.projectMedia(project.slug, m.id!)}
                           data-design-kind="image"
                           src={m.src} {...mediaDims(m.src)}
@@ -2681,7 +2684,7 @@ function ProjectPageInner() {
                   style={{ width: `min(100%, calc((100dvh - 160px) * ${EXCHANGE_MODELS_ASPECT} + 2rem))` }}
                 >
                   {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
-                    <img
+                    <SubjectImage
                       key={photo.src}
                       src={photo.src}
                       width={photo.width}

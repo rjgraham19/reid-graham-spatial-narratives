@@ -1,3 +1,4 @@
+import { responsiveMedia } from '@/lib/responsive-media';
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect } from "react";
 import { HERO_URL, PROJECT_TAGS, taggedProjects, type Project, type ProjectTag } from "@/lib/projects";
@@ -142,9 +143,10 @@ function Home() {
         <div className="absolute inset-0 md:hidden">
           <img
             src={HERO_URL}
+            {...responsiveMedia(HERO_URL, "(max-width: 767px) 100vw, 48vw")}
             alt=""
             aria-hidden
-            className="animate-tile-in absolute inset-0 w-full h-full object-cover"
+            fetchPriority="high" decoding="async" className="animate-tile-in absolute inset-0 w-full h-full object-cover"
           />
           {/* Darkest at the TOP, where the wordmark now sits (it moved up
               to sit flush with the viewport edge) — the old bottom-heavy
@@ -166,9 +168,10 @@ function Home() {
         <div className="hidden md:block absolute inset-y-0 right-0 md:w-[45%] lg:w-[48%] bg-black">
           <img
             src={HERO_URL}
+            {...responsiveMedia(HERO_URL, "(max-width: 767px) 100vw, 48vw")}
             alt=""
             aria-hidden
-            className="animate-tile-in absolute inset-0 w-full h-full object-contain object-right"
+            fetchPriority="high" decoding="async" className="animate-tile-in absolute inset-0 w-full h-full object-contain object-right"
           />
           <div className="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background to-transparent" />
         </div>

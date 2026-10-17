@@ -18,16 +18,16 @@ import type { CSSProperties, ReactNode } from "react";
 
 /** The category label above a stage ("Renderings", "Explore in 3D"). */
 export const ASSET_LABEL_CLASS =
-  "mb-3 font-display text-[12px] font-extralight uppercase leading-none tracking-[0.14em] text-foreground/80 md:text-[14px]";
+  "asset-label";
 
 /** The interaction hint under the controls ("Drag the handle to…"). */
 export const ASSET_HINT_CLASS =
-  "min-h-[1.25rem] text-center font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px]";
+  "asset-hint";
 
 /** An image's caption (sits 6px under it, right-aligned). Same type as the
  *  hint — captions and instructions share one style. */
 export const ASSET_CAPTION_CLASS =
-  "mt-1.5 text-right font-display text-[12px] font-extralight uppercase leading-normal tracking-[0.12em] text-foreground/55 md:text-[13px]";
+  "asset-caption";
 
 /** Supporting blurb (also styled site-wide via `.body-statement`). */
 export const ASSET_BLURB_CLASS = "body-statement font-display text-pretty";
@@ -37,7 +37,7 @@ export const ASSET_GROUP_CLASS = "asset-group";
 
 /** A quiet text control for the row under a stage (view presets etc.). */
 export const ASSET_CONTROL_CLASS =
-  "flex h-11 min-w-11 items-center justify-center px-2 font-display text-[11px] font-light uppercase tracking-[0.14em] text-foreground/65 transition-colors duration-200 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-[var(--asset-accent)] disabled:cursor-default disabled:opacity-30 motion-reduce:transition-none md:text-[12px]";
+  "asset-control flex h-11 min-w-11 items-center justify-center px-2 font-display text-[11px] font-light uppercase tracking-[0.14em] text-foreground/65 transition-colors duration-200 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-[var(--asset-accent)] disabled:cursor-default disabled:opacity-30 motion-reduce:transition-none md:text-[12px]";
 
 /** Outer class for an AssetFrame's stage. */
 export const ASSET_STAGE_CLASS = "relative aspect-[var(--stage-ratio)] w-full overflow-hidden";
@@ -80,6 +80,17 @@ export const RAIL_LAYOUT_CLASS =
   "sm:w-[min(100%,max(18rem,var(--gallery-max)))] " +
   "md:[--stage-max:min(1000px,calc(60svh*var(--stage-ratio)))] md:w-[min(85%,max(18rem,var(--gallery-max)))]";
 
+/** A single centred stage at the same size a gallery's stage would get:
+ *  the gallery's width (stage + rail + gap), with the rail's share split
+ *  evenly either side instead of all on the right — so the stage sits on
+ *  the page's centre line with equal margins. */
+const CENTRED_STAGE_CLASS =
+  "mx-auto grid grid-cols-1 [--rail-gap:0px] [--stage-max:calc(60svh*var(--stage-ratio))] [grid-template-areas:'label'_'stage'_'nav'] " +
+  "w-[min(100%,max(18rem,var(--stage-max)))] " +
+  "sm:[--rail-gap:8px] sm:grid-cols-[calc((var(--rail)+var(--rail-gap))/2)_minmax(0,1fr)_calc((var(--rail)+var(--rail-gap))/2)] sm:[grid-template-areas:'._label_.'_'._stage_.'_'._nav_.'] " +
+  "sm:w-[min(100%,max(18rem,var(--gallery-max)))] " +
+  "md:[--stage-max:min(1000px,calc(60svh*var(--stage-ratio)))] md:w-[min(85%,max(18rem,var(--gallery-max)))]";
+
 export function AssetFrame({
   label,
   aspect,
@@ -113,10 +124,10 @@ export function AssetFrame({
     <div
       role="region"
       aria-label={ariaLabel ?? label}
-      // Same grid as a gallery with the standard six stage-shaped
-      // thumbnails, the rail column just left empty — so a 3D stage comes
-      // out the same size, and on the same left edge, as a gallery's image.
-      className={RAIL_LAYOUT_CLASS}
+      // Sized like a gallery with the standard six stage-shaped
+      // thumbnails, so a 3D stage comes out the same size as a gallery's
+      // image — but centred, with the rail's space split evenly each side.
+      className={CENTRED_STAGE_CLASS}
       style={{
         "--asset-accent": accent,
         ...railLayoutVars({ stageAspect: aspect, thumbK: MIN_THUMBS / aspect, thumbCount: MIN_THUMBS }),

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { ASSET_CONTROL_CLASS } from "@/components/asset-frame";
 
 export type CompassView = "NE" | "NW" | "SE" | "SW";
@@ -18,6 +18,7 @@ export function ModelViewControls({
   /** Extra switches — use `ModelToggle`. */
   children?: ReactNode;
 }) {
+  const [selected,setSelected] = useState<CompassView | null>(null);
   return (
     <div className="flex flex-wrap items-center justify-center" role="group" aria-label="Model views">
       {VIEWS.map((v) => (
@@ -25,7 +26,8 @@ export function ModelViewControls({
           key={v}
           type="button"
           disabled={disabled}
-          onClick={() => onView(v)}
+          onClick={() => { setSelected(v); onView(v); }}
+          aria-pressed={selected === v}
           aria-label={`${v} isometric view`}
           className={ASSET_CONTROL_CLASS}
         >

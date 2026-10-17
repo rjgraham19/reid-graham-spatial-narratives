@@ -103,6 +103,7 @@ export function LollaViewer() {
     <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10" aria-label="Lolla pavilion model">
       <AssetFrame
         label="Explore in 3D"
+        hint="Drag to rotate · use presets on touch; swipe vertically to scroll"
         /* ~1.74:1 — the point where the orthographic camera fits the model's
            width and its height together (see lolla-scene's resize). Wider
            and the camera starts showing past the ground plane into black. */

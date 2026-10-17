@@ -94,6 +94,7 @@ export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
         aspect={4 / 3}
         ariaLabel="Townhouse 3D model"
         reserveControls
+        hint="Drag to rotate · use presets on touch; swipe vertically to scroll"
         intro={intro}
         controls={
           !failed && (

@@ -120,6 +120,17 @@ export function HoverScrubVideo({
         ref={bar}
         role="slider"
         aria-label="Video position"
+        tabIndex={0}
+        aria-valuenow={0}
+        onKeyDown={(e) => {
+          const v = video();
+          if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+          e.preventDefault();
+          // Before metadata loads, duration is NaN and seeking would throw.
+          if (!v || !Number.isFinite(v.duration) || v.duration <= 0) return;
+          v.currentTime = Math.max(0, Math.min(v.duration, v.currentTime + (e.key === "ArrowRight" ? 5 : -5)));
+          e.currentTarget.setAttribute("aria-valuenow", String(Math.round((v.currentTime / v.duration) * 100)));
+        }}
         aria-valuemin={0}
         aria-valuemax={100}
         className={`absolute inset-x-0 bottom-0 flex h-3 cursor-pointer items-end touch-none ${shown}`}

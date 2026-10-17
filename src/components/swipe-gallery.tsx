@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { designId } from "@/lib/design-ids";
 import type { MediaItem } from "@/lib/projects";
+import { mediaDims } from "@/lib/media-dims";
 
 /**
  * A bare-bones, one-at-a-time image carousel for phones: native horizontal
@@ -58,6 +59,7 @@ export function SwipeGallery({
               data-design-id={designId.projectMedia(slug, m.id!)}
               data-design-kind="image"
               src={m.src}
+              {...mediaDims(m.src)}
               alt={m.caption ?? ""}
               loading="lazy"
               className="h-auto w-full object-contain"

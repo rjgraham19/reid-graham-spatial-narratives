@@ -1,3 +1,4 @@
+import { useModalFocus } from '@/hooks/use-modal-focus';
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -68,6 +69,7 @@ export function ProjectPanel({
   onPrev?: () => void;
   onNext?: () => void;
 }) {
+  useModalFocus(true, '[role="dialog"][aria-modal="true"]');
   const panelRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<Element | null>(null);

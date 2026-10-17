@@ -1,3 +1,4 @@
+import { responsiveMedia } from '@/lib/responsive-media';
 import { useEffect, useRef, useState } from "react";
 import "./true-west-groundplan.css";
 
@@ -73,11 +74,11 @@ export function TrueWestGroundplan({ animate = true }: { animate?: boolean }) {
       <noscript>
         <style>{`.tw-groundplan[data-anim="pending"] .tw-swatch { opacity: 1; }`}</style>
       </noscript>
-      <img className="tw-plan" src={`${media}TRUEWEST_DRAWING_4096.png`} width={4096} height={1814}
+      <img className="tw-plan" src={`${media}TRUEWEST_DRAWING_4096.png`} {...responsiveMedia(`${media}TRUEWEST_DRAWING_4096.png`)} width={4096} height={1814}
         alt="True West groundplans: suburban kitchen at left and desert kitchen at right." />
       <img className="tw-swatch tw-swatch--lush" src={`${media}CROPPED_PANTONELUSH.webp`} width={800} height={800}
         alt="Suburbia — Artificial Lushness" />
-      <img className="tw-swatch tw-swatch--west" src={`${media}CROPPED_PANTONEWEST.png`} width={1845} height={1849}
+      <img className="tw-swatch tw-swatch--west" src={`${media}CROPPED_PANTONEWEST.png`} {...responsiveMedia(`${media}CROPPED_PANTONEWEST.png`)} width={1845} height={1849}
         alt="Wild West — Natural" />
     </div>
   );

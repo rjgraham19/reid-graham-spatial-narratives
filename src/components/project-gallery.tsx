@@ -1,3 +1,5 @@
+import { responsiveMedia } from '@/lib/responsive-media';
+import { mediaDims } from '@/lib/media-dims';
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useReducedMotion } from "motion/react";
@@ -65,6 +67,8 @@ function SlideImage({ slide, fit, className = "", designId = true, lazy = false 
     return (
       <img
         src={slide.src}
+        {...mediaDims(slide.src)}
+        {...responsiveMedia(slide.src)}
         alt={slide.alt}
         {...design}
         loading={lazy ? "lazy" : undefined}
@@ -82,6 +86,8 @@ function SlideImage({ slide, fit, className = "", designId = true, lazy = false 
   return (
     <img
       src={slide.src}
+        {...mediaDims(slide.src)}
+        {...responsiveMedia(slide.src)}
       alt={slide.alt}
       {...design}
       loading={lazy ? "lazy" : undefined}

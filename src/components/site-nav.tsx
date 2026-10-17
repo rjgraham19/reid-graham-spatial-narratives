@@ -1,3 +1,4 @@
+import { useModalFocus } from '@/hooks/use-modal-focus';
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -26,6 +27,7 @@ export function SiteNav({
 
   /* Any navigation closes the overlay. Watching the router rather than
      handling it link-by-link means back/forward and the wordmark close it too. */
+  useModalFocus(menuOpen, "#site-menu");
   const pathname = useRouterState({ select: (s) => s.location.href });
   useEffect(() => setMenuOpen(false), [pathname]);
 
@@ -111,7 +113,7 @@ export function SiteNav({
               PROJECTS
             </Link>
             <div
-              className="absolute right-0 top-full pt-3 opacity-0 pointer-events-none translate-y-1 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 transition-all duration-200 ease-cinematic"
+              className="absolute right-0 top-full pt-3 opacity-0 pointer-events-none translate-y-1 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 transition-all duration-200 ease-cinematic"
             >
               {/* No fixed width. The list shrink-to-fits the longest label —
                   "Production / Scenic" — and w-full below sizes the other two

@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+Read [DESIGN.md](./DESIGN.md) before changing layout, typography, media, motion, or controls. Run the relevant layout checks and preserve original assets.

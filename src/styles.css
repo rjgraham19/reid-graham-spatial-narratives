@@ -39,14 +39,14 @@
   font-family: "General Sans";
   font-style: normal;
   font-weight: 200 700;
-  font-display: block;
+  font-display: swap;
   src: url("/fonts/general-sans-variable.woff2") format("woff2");
 }
 @font-face {
   font-family: "General Sans";
   font-style: italic;
   font-weight: 200 700;
-  font-display: block;
+  font-display: swap;
   src: url("/fonts/general-sans-variable-italic.woff2") format("woff2");
 }
 /* Antonio (Google Fonts, OFL, self-hosted, latin subset): the condensed face
@@ -55,7 +55,7 @@
   font-family: "Antonio";
   font-style: normal;
   font-weight: 100 700;
-  font-display: block;
+  font-display: swap;
   src: url("/fonts/antonio-variable.woff2") format("woff2");
 }
 @font-face {
@@ -1685,3 +1685,25 @@ img[data-scroll-fade="in"] {
     transition: none !important;
   }
 }
+
+/* Shared optical layout and type roles. See DESIGN.md. */
+:root { --space-caption: 8px; --space-group: 24px; --space-section: 64px; --space-divider: 16px; }
+@media(min-width:768px) { :root { --space-section: 96px; } }
+.optical-frame { position: relative; display: block; overflow: hidden; aspect-ratio: var(--file-ratio); }
+.optical-frame > .optical-bitmap { position: absolute; width:100%; max-width:none; height:auto; left:0; top:0; }
+.optical-black { aspect-ratio:var(--subject-ratio); }
+.optical-black > .optical-bitmap { width:var(--bleed-width); left:var(--bleed-left); top:var(--bleed-top); }
+.light-zone .optical-black { aspect-ratio:var(--file-ratio); }
+.light-zone .optical-black > .optical-bitmap { width:100%; left:0; top:0; }
+.light-zone .optical-white { aspect-ratio:var(--subject-ratio); }
+.light-zone .optical-white > .optical-bitmap { width:var(--bleed-width); left:var(--bleed-left); top:var(--bleed-top); }
+.asset-label { margin-bottom:var(--space-divider); font-family:"General Sans",ui-sans-serif,system-ui,sans-serif; font-size:18px; font-weight:400; line-height:1.2; letter-spacing:.08em; text-transform:uppercase; }
+.asset-caption, figcaption[data-design-id$=".caption"], figure > figcaption:not(.body-statement) { margin-top:var(--space-caption); font-family:var(--font-body); font-size:11px; font-weight:400; line-height:1.5; letter-spacing:.12em; text-transform:uppercase; text-align:right; color:color-mix(in srgb,var(--foreground) 65%,transparent); }
+@media(min-width:768px) { .asset-caption,figcaption[data-design-id$=".caption"],figure > figcaption:not(.body-statement) { font-size:12px; } }
+.asset-hint { margin-top:8px; min-height:1.5em; font-family:var(--font-body); font-size:13px; font-weight:400; line-height:1.5; text-align:center; color:color-mix(in srgb,var(--foreground) 75%,transparent); }
+.asset-control { border:1px solid currentColor; border-radius:6px; margin:4px; background:transparent; color:color-mix(in srgb,var(--foreground) 80%,transparent); }
+.asset-control:hover, .asset-control[aria-pressed="true"], .asset-control[aria-checked="true"] { background:color-mix(in srgb,var(--foreground) 12%,transparent); color:var(--foreground); }
+.asset-control:active { background:color-mix(in srgb,var(--foreground) 22%,transparent); }
+:where(a,button,input,[tabindex="0"]):focus-visible { outline:2px solid var(--foreground); outline-offset:4px; }
+@media(prefers-reduced-motion:reduce) { img[data-scroll-fade] { opacity:1!important; animation:none!important; } }
+

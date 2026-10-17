@@ -1,3 +1,4 @@
+import { responsiveMedia } from '@/lib/responsive-media';
 import { Link } from "@tanstack/react-router";
 import { accentTitleColor, type Project } from "@/lib/projects";
 import { longestWordEms } from "@/lib/title-metrics";
@@ -43,6 +44,7 @@ export function ProjectTile({
      The entrance delay rides on the same style object when the grid asked for
      one — capped so a large filter ("All") still finishes quickly instead of
      trailing a visible tail. */
+  const source = project.highlight ?? project.cover;
   const style = {
     ...(project.accentColor
       ? { "--project-accent": accentTitleColor(project.accentColor) }
@@ -82,7 +84,8 @@ export function ProjectTile({
             loses its own shape at the edges. */}
         <div className="relative aspect-square overflow-hidden rounded-md bg-black border border-white/[0.07]">
           <img
-            src={project.highlight ?? project.cover}
+            src={source}
+            {...responsiveMedia(source, "(max-width: 767px) 50vw, 25vw")}
             alt={project.title}
             loading="lazy"
             style={{ objectPosition: project.highlightPosition ?? "50% 50%" }}
