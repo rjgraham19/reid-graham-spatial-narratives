@@ -29,7 +29,7 @@ Align within each actual column. Split heroes and centered viewers have delibera
 
 ## Controls and navigation
 
-Five roles: primary navigation (`glass-button text-button`), secondary/back (same surface), tag/filter (`hub-tag-pill`), icon-only (`glass-button--icon` / `nav-arrow`), in-content (`asset-control`). Only in-content `asset-control` buttons (3D view presets) use the outlined box with a pressed state, approved by Reid on October 17, 2026. Other buttons keep their existing styling. Every control gets a visible keyboard focus ring. Lollapalooza's retro button is a deliberate themed exception.
+Five roles: primary navigation (`glass-button text-button`), secondary/back (same surface), tag/filter (`hub-tag-pill`), icon-only (`glass-button--icon` / `nav-arrow`), in-content (`asset-control`). Lollapalooza and Townhouse model navigation match Exchange’s lightweight zone controls (Reid’s choice, October 18, 2026), with subdued borders and an accent-filled selected state. Lollapalooza and Exchange share the magnifier zoom puck. Other buttons keep their existing styling. Every control gets a visible keyboard focus ring. Lollapalooza's retro button is a deliberate themed exception.
 
 Overlays must close on Escape, contain keyboard focus and restore it. Touch users must keep vertical page scrolling over models. Hover-scrub video controls stay hover-only (Reid rejected always-visible controls).
 

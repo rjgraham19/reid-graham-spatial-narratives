@@ -1,27 +1,31 @@
 import { useState, type ReactNode } from "react";
-import { ASSET_CONTROL_CLASS } from "@/components/asset-frame";
+
+// Same lightweight surface and typography as Exchange's zone navigation.
+const MODEL_CONTROL_CLASS = "rounded-md border border-foreground/20 bg-background/30 px-4 py-2.5 text-sm font-light transition-colors hover:bg-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--asset-accent)] disabled:opacity-30 disabled:cursor-default";
 
 export type CompassView = "NE" | "NW" | "SE" | "SW";
 const VIEWS: CompassView[] = ["NE", "NW", "SE", "SW"];
 
 /** The row under an "Explore in 3D" stage: the four corner views, then any
- *  model-specific switches (Lolla's Gable) after a thin divider. Shared by
+ *  model-specific controls after a thin divider. Shared by
  *  LollaViewer and TownhouseViewer so the two read as the same control.
  *  Shown from the start; `disabled` only until the model is ready. */
 export function ModelViewControls({
   onView,
   disabled = false,
+  views = VIEWS,
   children,
 }: {
   onView: (view: CompassView) => void;
   disabled?: boolean;
+  views?: readonly CompassView[];
   /** Extra switches — use `ModelToggle`. */
   children?: ReactNode;
 }) {
   const [selected,setSelected] = useState<CompassView | null>(null);
   return (
-    <div className="flex flex-wrap items-center justify-center" role="group" aria-label="Model views">
-      {VIEWS.map((v) => (
+    <div className="flex flex-wrap items-center justify-center gap-2" role="group" aria-label="Model views">
+      {views.map((v) => (
         <button
           key={v}
           type="button"
@@ -29,16 +33,17 @@ export function ModelViewControls({
           onClick={() => { setSelected(v); onView(v); }}
           aria-pressed={selected === v}
           aria-label={`${v} isometric view`}
-          className={ASSET_CONTROL_CLASS}
+          className={MODEL_CONTROL_CLASS}
+          style={selected === v ? { background: "var(--asset-accent)", borderColor: "var(--asset-accent)", color: "black" } : undefined}
         >
           {v}
         </button>
       ))}
       {children && (
-        <>
-          <span aria-hidden className="mx-2 h-4 w-px bg-foreground/20" />
+        <div className="flex w-full items-center justify-center gap-2 sm:w-auto">
+          <span aria-hidden className="mx-2 hidden h-4 w-px bg-foreground/20 sm:block" />
           {children}
-        </>
+        </div>
       )}
     </div>
   );
@@ -64,7 +69,7 @@ export function ModelToggle({
       aria-checked={on}
       disabled={disabled}
       onClick={onToggle}
-      className={`${ASSET_CONTROL_CLASS} gap-2`}
+      className={`${MODEL_CONTROL_CLASS} flex items-center gap-2`}
     >
       {label}
       <span

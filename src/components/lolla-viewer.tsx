@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { LollaControls } from "./lolla-scene";
 import poster from "@/assets/rg/lollapalooza-render-night-poster.jpg";
 import { AssetFrame, ASSET_STAGE_CLASS } from "@/components/asset-frame";
+import { ModelZoomControls } from "@/components/model-zoom-controls";
 import { ModelToggle, ModelViewControls } from "@/components/model-view-controls";
 
 /* Give up on the model after this long and leave the rendering in place
@@ -103,7 +104,6 @@ export function LollaViewer() {
     <section className="px-6 md:px-12 lg:px-16 py-8 md:py-10" aria-label="Lolla pavilion model">
       <AssetFrame
         label="Explore in 3D"
-        hint="Drag to rotate · use presets on touch; swipe vertically to scroll"
         /* ~1.74:1 — the point where the orthographic camera fits the model's
            width and its height together (see lolla-scene's resize). Wider
            and the camera starts showing past the ground plane into black. */
@@ -115,12 +115,11 @@ export function LollaViewer() {
           !errored && (
             /* Under the model, not over it — same as the galleries. Inactive
                until the model is in and its roof has risen. */
-            <ModelViewControls disabled={!revealed} onView={(v) => controls.current?.view(v)}>
-              <ModelToggle
-                label="Gable"
-                on={gableShown}
+            <ModelViewControls views={["SE", "SW", "NE", "NW"]} disabled={!revealed} onView={(v) => controls.current?.view(v)}>
+              <ModelZoomControls
                 disabled={!revealed}
-                onToggle={() => setGableShown(controls.current?.toggleGable() ?? false)}
+                onZoomIn={() => controls.current?.zoom("in")}
+                onZoomOut={() => controls.current?.zoom("out")}
               />
             </ModelViewControls>
           )
@@ -139,6 +138,17 @@ export function LollaViewer() {
             className="absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none"
             style={{ opacity: loaded && !errored ? 1 : 0 }}
           />
+
+          {!errored && (
+            <div className="absolute right-3 top-3 z-10 cursor-default rounded-md backdrop-blur-md">
+              <ModelToggle
+                label="Gable"
+                on={gableShown}
+                disabled={!revealed}
+                onToggle={() => setGableShown(controls.current?.toggleGable() ?? false)}
+              />
+            </div>
+          )}
 
           {/* The night rendering, only if the model can't load at all (no
               WebGL, failed download). */}

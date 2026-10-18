@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { ModelZoomControls } from "./model-zoom-controls";
 import type { ExchangeView } from "./exchange-scene";
 import { ASSET_BLURB_CLASS, ASSET_CAPTION_CLASS, ASSET_LABEL_CLASS } from "@/components/asset-frame";
 
@@ -259,43 +260,12 @@ export function ExchangeViewer({
         {/* Floating zoom / reset puck — small, translucent, recedes until
             hovered so it never competes with the model itself. */}
         {ready && (
-          <div className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full border border-white/15 bg-black/30 px-1.5 py-1.5 opacity-50 backdrop-blur-md transition-opacity duration-200 hover:opacity-100">
-            <button
-              type="button"
-              aria-label="Zoom in"
-              title="Zoom in"
-              onClick={() => controls.current?.zoomIn()}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-white/80 hover:bg-white/15 hover:text-white"
-            >
-              <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <circle cx="7" cy="7" r="5" />
-                <path d="M7 4.6v4.8M4.6 7h4.8M11 11l3.5 3.5" strokeLinecap="round" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              aria-label="Zoom out"
-              title="Zoom out"
-              onClick={() => controls.current?.zoomOut()}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-white/80 hover:bg-white/15 hover:text-white"
-            >
-              <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <circle cx="7" cy="7" r="5" />
-                <path d="M4.6 7h4.8M11 11l3.5 3.5" strokeLinecap="round" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              aria-label="Reset view"
-              title="Reset view"
-              onClick={() => controls.current?.resetView()}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-white/80 hover:bg-white/15 hover:text-white"
-            >
-              <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <path d="M13 8A5 5 0 1 1 11.4 4.4" strokeLinecap="round" />
-                <path d="M13 3v3.5H9.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+          <div className="absolute bottom-4 right-4">
+            <ModelZoomControls
+              onZoomIn={() => controls.current?.zoomIn()}
+              onZoomOut={() => controls.current?.zoomOut()}
+              onReset={() => controls.current?.resetView()}
+            />
           </div>
         )}
       </div>

@@ -3,6 +3,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
+import { assignLollaRugs } from "./lolla-rugs";
 
 export type LollaView = "SE" | "SW" | "NE" | "NW";
 
@@ -34,6 +36,7 @@ export interface LollaControls {
    *  model is ready. Safe to call more than once — later calls are no-ops. */
   reveal(): void;
   view(name: LollaView): void;
+  zoom(direction: "in" | "out"): void;
   toggleGable(): boolean;
   dispose(): void;
 }
@@ -45,13 +48,18 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setClearColor("#050507");
+  // Match the record player's highlight rolloff on the metal sculptures.
+  // Matte materials opt out below so the pavilion palette stays unchanged.
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.68;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.VSMShadowMap;
+  // Preserve small wall recesses instead of blurring them with VSM.
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
   renderer.domElement.tabIndex = 0;
   renderer.domElement.setAttribute(
     "aria-label",
-    "Lolla pavilion model. Drag to orbit, scroll to zoom, or use the view buttons.",
+    "Lolla pavilion model. Drag to orbit. Use the buttons below to zoom or select a view.",
   );
   host.appendChild(renderer.domElement);
 
@@ -86,23 +94,28 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
   orbit.enabled = false;
   orbit.update();
 
-  scene.add(new THREE.AmbientLight(0xffffff, Math.PI * 0.4));
-  const key = new THREE.DirectionalLight(0xffffff, Math.PI * 0.7);
-  key.position.set(-15, 35, -20);
+  scene.add(new THREE.AmbientLight(0xffffff, Math.PI * 0.28));
+  const key = new THREE.DirectionalLight(0xffffff, Math.PI * 0.6);
+  // Keep a side-lit relief, with the light following the viewing azimuth.
+  key.position.set(-18, 22, 24);
   key.castShadow = true;
-  Object.assign(key.shadow.camera, { left: -25, right: 25, top: 25, bottom: -25, near: 1, far: 100 });
-  key.shadow.mapSize.set(2048, 2048);
-  key.shadow.radius = 2.5;
-  key.shadow.blurSamples = 8;
-  key.shadow.bias = -0.0003;
-  key.shadow.normalBias = 0.012;
+  Object.assign(key.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 75 });
+  const shadowSize = Math.min(4096, renderer.capabilities.maxTextureSize);
+  key.shadow.mapSize.set(shadowSize, shadowSize);
+  key.shadow.radius = 1;
+  // Use a depth offset, not a normal offset: the imported double-sided
+  // surfaces have mixed normal directions, which turn normalBias into
+  // false dark patches. Keep the depth offset small to retain wall relief.
+  key.shadow.bias = -0.0005;
+  key.shadow.normalBias = 0;
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xe5edff, Math.PI * 0.12);
-  fill.position.set(18, 12, 24);
+  const fill = new THREE.DirectionalLight(0xe5edff, Math.PI * 0.14);
+  fill.position.set(18, 12, -24);
   scene.add(fill);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
   let environment: THREE.WebGLRenderTarget | undefined;
+  let studioEnvironment: THREE.WebGLRenderTarget | undefined;
   try {
     const room = new RoomEnvironment();
     environment = pmrem.fromScene(room, 0.04);
@@ -127,8 +140,21 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
   let gableShown = false;
   let revealed = false;
 
+  let lightAzimuth = Number.NaN;
   const render = () => {
-    if (!disposed) renderer.render(scene, camera);
+    if (disposed) return;
+    const azimuth = Math.atan2(camera.position.x - orbit.target.x, camera.position.z - orbit.target.z);
+    if (azimuth !== lightAzimuth) {
+      lightAzimuth = azimuth;
+      // Thirty degrees off-camera preserves relief without crossing behind
+      // the visible wall face in any of the four corner presets.
+      // Update on orbit as well as presets, so neither wall face stays unlit.
+      const angle = azimuth - Math.PI / 6;
+      key.position.set(30 * Math.sin(angle), 22, 30 * Math.cos(angle));
+      fill.position.set(30 * Math.sin(angle + Math.PI), 12, 30 * Math.cos(angle + Math.PI));
+      renderer.shadowMap.needsUpdate = true;
+    }
+    renderer.render(scene, camera);
   };
   orbit.addEventListener("change", render);
 
@@ -279,7 +305,21 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
 
   return {
     async load() {
-      const gltf = await new GLTFLoader().setDRACOLoader(decoder).loadAsync("/models/lolla.glb");
+      const loadStudio = async () => {
+        try {
+          const hdr = await new HDRLoader().loadAsync("/models/record-player/studio_small_03_2k.hdr");
+          if (disposed) { hdr.dispose(); return; }
+          const generator = new THREE.PMREMGenerator(renderer);
+          try { studioEnvironment = generator.fromEquirectangular(hdr); }
+          finally { hdr.dispose(); generator.dispose(); }
+        } catch (error) {
+          console.warn("Lolla: using room reflections because the studio map could not load.", error);
+        }
+      };
+      const [gltf] = await Promise.all([
+        new GLTFLoader().setDRACOLoader(decoder).loadAsync("/models/lolla.glb"),
+        loadStudio(),
+      ]);
       if (disposed) {
         disposeModel(gltf.scene);
         return;
@@ -290,16 +330,36 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
         const name = mesh.name;
         const old = mesh.material;
         mesh.material =
-          name === "ANIMATED_CHROME" && environment
+          name === "ANIMATED_CHROME" || name === "3D shapes"
             ? new THREE.MeshStandardMaterial({
-                color: PALETTE[name],
-                metalness: 1,
-                roughness: 0.16,
-                envMap: environment.texture,
-                envMapIntensity: 1.2,
+                // A satin variant of the record-player sculpture finish:
+                // broader highlights and a small brightness floor keep the
+                // shapes silver even when they reflect a dark studio region.
+                color: "#d0d2d5",
+                metalness: 0.8,
+                roughness: 0.32,
+                emissive: "#bfc3c7",
+                emissiveIntensity: 0.08,
+                side: THREE.DoubleSide,
+                envMap: (studioEnvironment ?? environment)?.texture,
+                envMapIntensity: 0.85,
+                envMapRotation: new THREE.Euler(0, -Math.PI * 0.1, 0),
               })
-            : new THREE.MeshLambertMaterial({ color: PALETTE[name] || "#B5B5B8", side: THREE.DoubleSide });
+            : new THREE.MeshLambertMaterial({ color: PALETTE[name] || "#B5B5B8", side: THREE.DoubleSide, toneMapped: false });
         for (const material of Array.isArray(old) ? old : [old]) material.dispose();
+        // These solid imported shells are visible from both sides, but using
+        // both faces in the depth pass creates false patches on their fronts.
+        // Cast from the back faces, as Three normally does for solid meshes.
+        if (name === "MAGENTA_ANIMATED" || name === "TENT_ANIMATED") {
+          mesh.material.shadowSide = THREE.BackSide;
+        }
+        if (name === "FURNITURE_ANIMATED" && assignLollaRugs(mesh.geometry)) {
+          mesh.material = [mesh.material, new THREE.MeshLambertMaterial({
+            color: "#a9a9a9",
+            side: THREE.DoubleSide,
+            toneMapped: false,
+          })];
+        }
         mesh.castShadow = name !== "GRASS_ANIMATED";
         mesh.receiveShadow = true;
       });
@@ -320,10 +380,22 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
       roofAction.setLoop(THREE.LoopOnce, 1);
       roofAction.clampWhenFinished = true;
 
+      renderer.shadowMap.needsUpdate = true;
       render();
     },
     reveal,
     view,
+    zoom(direction) {
+      if (disposed || !orbit.enabled) return;
+      camera.zoom = THREE.MathUtils.clamp(
+        camera.zoom * (direction === "in" ? 1.25 : 1 / 1.25),
+        orbit.minZoom,
+        orbit.maxZoom,
+      );
+      camera.updateProjectionMatrix();
+      orbit.update();
+      render();
+    },
     toggleGable,
     dispose() {
       disposed = true;
@@ -337,6 +409,7 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
         disposeModel(root);
       }
       environment?.dispose();
+      studioEnvironment?.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     },
