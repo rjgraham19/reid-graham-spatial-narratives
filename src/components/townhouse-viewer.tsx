@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AssetFrame, ASSET_STAGE_CLASS } from '@/components/asset-frame';
-import { ModelViewControls, type CompassView } from '@/components/model-view-controls';
+import { ModelToggle, ModelViewControls, type CompassView } from '@/components/model-view-controls';
+import { ModelZoomControls } from '@/components/model-zoom-controls';
 import type { TownhouseControls } from './townhouse-scene';
 
 /* Compass labels map onto the scene's own corner names: front is south,
@@ -25,6 +26,7 @@ export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
   const host = useRef<HTMLDivElement>(null);
   const controls = useRef<TownhouseControls | null>(null);
   const [ready, setReady] = useState(false);
+  const [siteShown, setSiteShown] = useState(true);
   const [failed, setFailed] = useState(false);
   // Bumped by "Try again" to re-run the load effect from scratch.
   const [attempt, setAttempt] = useState(0);
@@ -84,6 +86,7 @@ export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
   const retry = () => {
     setFailed(false);
     setReady(false);
+    setSiteShown(true);
     setAttempt((n) => n + 1);
   };
 
@@ -94,11 +97,16 @@ export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
         aspect={4 / 3}
         ariaLabel="Townhouse 3D model"
         reserveControls
-        hint="Drag to rotate · use presets on touch; swipe vertically to scroll"
         intro={intro}
         controls={
           !failed && (
-            <ModelViewControls disabled={!ready} onView={(v) => controls.current?.view(TARGETS[v])} />
+            <ModelViewControls disabled={!ready} onView={(v) => controls.current?.view(TARGETS[v])}>
+              <ModelZoomControls
+                disabled={!ready}
+                onZoomIn={() => controls.current?.zoom('in')}
+                onZoomOut={() => controls.current?.zoom('out')}
+              />
+            </ModelViewControls>
           )
         }
       >
@@ -109,6 +117,13 @@ export function TownhouseViewer({ intro }: { intro?: ReactNode } = {}) {
             className="absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none"
             style={{ opacity: ready && !failed ? 1 : 0 }}
           />
+
+          {!failed && (
+            <div className="absolute right-3 top-3 z-10 cursor-default rounded-md text-white backdrop-blur-md">
+              <ModelToggle label="Site" on={siteShown} disabled={!ready}
+                onToggle={() => setSiteShown(controls.current?.toggleSite() ?? true)} />
+            </div>
+          )}
 
           {failed && (
             <img
