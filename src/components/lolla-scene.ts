@@ -316,8 +316,13 @@ export function createLollaScene(host: HTMLDivElement): LollaControls {
           console.warn("Lolla: using room reflections because the studio map could not load.", error);
         }
       };
+      // lolla-lite.glb is lolla.glb (kept as the source) simplified from 1.8M
+      // to 367K triangles with gltf-transform + meshoptimizer, normals rebuilt
+      // with a 30° crease; 9.3MB -> 1.7MB and a fraction of the setup freeze.
+      // Simplification only collapses onto existing vertices, so the exact
+      // rug planes assignLollaRugs looks for survive.
       const [gltf] = await Promise.all([
-        new GLTFLoader().setDRACOLoader(decoder).loadAsync("/models/lolla.glb"),
+        new GLTFLoader().setDRACOLoader(decoder).loadAsync("/models/lolla-lite.glb"),
         loadStudio(),
       ]);
       if (disposed) {
