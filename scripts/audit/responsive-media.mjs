@@ -5,9 +5,9 @@ const records=JSON.parse(await fs.readFile('audit/media-insets.json','utf8'));
 await fs.mkdir('public/optimized',{recursive:true});
 const imports=[],entries=[],report=[];
 for(const [index,r] of records.entries()) {
-  if(r.bytes<150000)continue;
+  if(r.bytes<80000)continue;
   const hash=crypto.createHash('sha256').update(await fs.readFile(r.file)).digest('hex').slice(0,12);
-  const widths=[...new Set([640,1280,2560].map(w=>Math.min(w,r.width)))];
+  const widths=[...new Set([320,640,1280,2560].map(w=>Math.min(w,r.width)))];
   const variants=[];
   for(const width of widths){const url=`/optimized/${hash}-${width}.webp`;const dest=`public${url}`;
     try {await fs.access(dest)} catch {await sharp(r.file).resize({width,withoutEnlargement:true}).webp({quality:88,effort:5}).toFile(dest)}

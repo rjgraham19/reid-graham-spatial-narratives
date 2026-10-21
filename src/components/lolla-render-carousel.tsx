@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { ProjectGallery, type GallerySlide } from "@/components/project-gallery";
+import { GALLERY_THUMB_SIZES, ProjectGallery, type GallerySlide } from "@/components/project-gallery";
+import { responsiveMedia } from "@/lib/responsive-media";
 import day from "@/assets/rg/lollapalooza-render-day.jpg";
 import night from "@/assets/rg/lollapalooza-render-night.jpg";
 import full from "@/assets/rg/lollapalooza-render-full.jpg";
@@ -11,7 +12,7 @@ import lounge from "@/assets/rg/lollapalooza-render-lounge.jpg";
    handle on first load. */
 const INITIAL_SLIDER_POSITION = 28;
 
-const clamp = (value: number) => Math.max(0, Math.min(100, value));
+const clamp =(value: number) => Math.max(0, Math.min(100, value));
 
 /* Only the handle moves the comparison. Pressing or swiping anywhere else
    on the image belongs to the carousel, so someone swiping to the next
@@ -30,8 +31,8 @@ function DayNightComparison({ active }: { active: boolean }) {
 
   return (
     <div ref={frame} className="absolute inset-0 select-none">
-      <img src={night} alt="Club Magenta exterior at night" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
-      <img src={day} alt="Club Magenta exterior by day" draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }} />
+      <img src={night} {...responsiveMedia(night)} alt="Club Magenta exterior at night" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
+      <img src={day} {...responsiveMedia(day)} alt="Club Magenta exterior by day" draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }} />
       {/* Plain labels, not boxed — framed tags read as buttons that did
           nothing. Bottom corners, in the site's caption type (12/13px
           extralight caps, as ASSET_CAPTION_CLASS), white with a soft shadow
@@ -91,8 +92,8 @@ function DayNightComparison({ active }: { active: boolean }) {
 function DayNightThumb() {
   return (
     <>
-      <img src={night} alt="" decoding="async" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
-      <img src={day} alt="" decoding="async" draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: "inset(0 50% 0 0)" }} />
+      <img src={night} {...responsiveMedia(night, GALLERY_THUMB_SIZES)} alt="" decoding="async" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
+      <img src={day} {...responsiveMedia(day, GALLERY_THUMB_SIZES)} alt="" decoding="async" draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: "inset(0 50% 0 0)" }} />
     </>
   );
 }

@@ -30,6 +30,7 @@ export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
     let cancelled = false;
     let starting = false;
     let near = false;
+    let pageLoaded = false;
     let visible = false;
     let failed = false;
     const media = matchMedia("(prefers-reduced-motion: reduce)");
@@ -46,7 +47,7 @@ export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
       report();
     };
     const start = async () => {
-      if (cancelled || starting || control.current || !near || media.matches || failed) return;
+      if (cancelled || starting || control.current || (!near && !pageLoaded) || media.matches || failed) return;
       starting = true;
       try {
         const { createRecordPlayerScene } = await import("./record-player-scene");
@@ -71,15 +72,22 @@ export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
        real connection that chain can still be running by the time the
        scrub section actually reaches the viewport, leaving the static
        poster (which used to be an actual video here) visible for a beat
-       once scrolling starts. This section is guaranteed to be part of the
-       current page — unlike genuinely below-the-fold content on a page a
-       visitor might never scroll to, there's no bandwidth saved by staying
-       lazy here — so the margin is wide enough that the observer fires
-       essentially on mount instead of waiting for the visitor to scroll
-       within reach of it. prefers-reduced-motion (below) still skips
-       loading it at all for anyone who has that set. */
-    const observer = new IntersectionObserver(([entry]) => { near = entry.isIntersecting; void start(); }, { rootMargin: "4000px 0px" });
+       once scrolling starts. But starting on mount (a 4000px margin) made
+       the chain fight the first screen for bandwidth and the main thread —
+       a phone sat frozen for ~10s. So: start once the page has finished
+       loading and the browser is idle, which still leaves plenty of lead
+       time before anyone scrolls down here — or straight away if the
+       visitor is already within 600px of it. prefers-reduced-motion
+       (below) still skips loading it at all for anyone who has that set. */
+    const observer = new IntersectionObserver(([entry]) => { near = entry.isIntersecting; void start(); }, { rootMargin: "600px 0px" });
     observer.observe(el);
+    let idleHandle = 0;
+    const afterLoad = () => {
+      const go = () => { pageLoaded = true; void start(); };
+      idleHandle = typeof requestIdleCallback === "function" ? requestIdleCallback(go, { timeout: 3000 }) : setTimeout(go, 500) as unknown as number;
+    };
+    if (document.readyState === "complete") afterLoad();
+    else window.addEventListener("load", afterLoad, { once: true });
     const visibleObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       control.current?.setVisible(visible);
@@ -97,6 +105,9 @@ export function RecordPlayerViewer({ wrapperRef, onProgress, onModeChange }: {
       cancelled = true;
       observer.disconnect();
       visibleObserver.disconnect();
+      window.removeEventListener("load", afterLoad);
+      if (typeof cancelIdleCallback === "function") cancelIdleCallback(idleHandle);
+      else clearTimeout(idleHandle);
       media.removeEventListener("change", preference);
       control.current?.dispose();
       control.current = null;

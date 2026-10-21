@@ -250,6 +250,8 @@ function Home() {
                 key={p.slug}
                 project={p}
                 appearIndex={i}
+                // The first two rows on a phone, the first row on desktop.
+                eager={i < 4}
                 onOpen={canPanel ? openProject : undefined}
               />
             ))}

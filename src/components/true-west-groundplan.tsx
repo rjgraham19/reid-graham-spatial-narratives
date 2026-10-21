@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import "./true-west-groundplan.css";
 
 const media = "/design-media/true-west/";
+/* Each swatch is 19.14% of the drawing's width (see the CSS), and the
+   drawing is never wider than ~1000px, so a swatch tops out near 192px. */
+const SWATCH_SIZES = "(max-width: 767px) 20vw, 192px";
 
 /** The approved composition and entrance from true-west-animation.zip:
  *  the plan stays still; both swatches fade in together while rising
@@ -76,9 +79,9 @@ export function TrueWestGroundplan({ animate = true }: { animate?: boolean }) {
       </noscript>
       <img className="tw-plan" src={`${media}TRUEWEST_DRAWING_4096.png`} {...responsiveMedia(`${media}TRUEWEST_DRAWING_4096.png`)} width={4096} height={1814}
         alt="True West groundplans: suburban kitchen at left and desert kitchen at right." />
-      <img className="tw-swatch tw-swatch--lush" src={`${media}CROPPED_PANTONELUSH.webp`} width={800} height={800}
+      <img className="tw-swatch tw-swatch--lush" src={`${media}CROPPED_PANTONELUSH.webp`} {...responsiveMedia(`${media}CROPPED_PANTONELUSH.webp`, SWATCH_SIZES)} width={800} height={800}
         alt="Suburbia — Artificial Lushness" />
-      <img className="tw-swatch tw-swatch--west" src={`${media}CROPPED_PANTONEWEST.png`} {...responsiveMedia(`${media}CROPPED_PANTONEWEST.png`)} width={1845} height={1849}
+      <img className="tw-swatch tw-swatch--west" src={`${media}CROPPED_PANTONEWEST.png`} {...responsiveMedia(`${media}CROPPED_PANTONEWEST.png`, SWATCH_SIZES)} width={1845} height={1849}
         alt="Wild West — Natural" />
     </div>
   );

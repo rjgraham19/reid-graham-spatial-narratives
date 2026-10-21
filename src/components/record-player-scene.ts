@@ -317,7 +317,7 @@ export function createRecordPlayerScene(host: HTMLDivElement, onFailure: () => v
         return map;
       };
       const loadStudio = async () => {
-        const hdr = await new HDRLoader().loadAsync(ASSETS + "studio_small_03_2k.hdr");
+        const hdr = await new HDRLoader().loadAsync(ASSETS + "studio_small_03_1k.hdr");
         if (disposed) { hdr.dispose(); return; }
         const generator = new THREE.PMREMGenerator(renderer);
         try { studioEnvironment = generator.fromEquirectangular(hdr); }

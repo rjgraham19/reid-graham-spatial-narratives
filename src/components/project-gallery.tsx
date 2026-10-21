@@ -46,6 +46,11 @@ export type GallerySlide = {
 };
 
 
+/* Thumbnails are ~50–110px wide, so they take the smallest copy instead of
+   the full-width one the stage uses — which also kept every slide's big
+   file from downloading up front just to fill its thumbnail. */
+export const GALLERY_THUMB_SIZES = "200px";
+
 function Chevron({ direction }: { direction: "left" | "right" }) {
   return (
     <svg aria-hidden viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -55,12 +60,14 @@ function Chevron({ direction }: { direction: "left" | "right" }) {
 }
 
 /** The slide's image — honouring `trim` — filling whatever box it's put in. */
-function SlideImage({ slide, fit, className = "", designId = true, lazy = false }: {
+function SlideImage({ slide, fit, className = "", designId = true, lazy = false, sizes }: {
   slide: GallerySlide;
   fit: "cover" | "contain";
   className?: string;
   designId?: boolean;
   lazy?: boolean;
+  /** Overrides the full-width default — thumbnails pass GALLERY_THUMB_SIZES. */
+  sizes?: string;
 }) {
   const design = designId && slide.designId ? { "data-design-id": slide.designId, "data-design-kind": "image" } : {};
   if (slide.trim) {
@@ -68,7 +75,7 @@ function SlideImage({ slide, fit, className = "", designId = true, lazy = false 
       <img
         src={slide.src}
         {...mediaDims(slide.src)}
-        {...responsiveMedia(slide.src)}
+        {...responsiveMedia(slide.src, sizes)}
         alt={slide.alt}
         {...design}
         loading={lazy ? "lazy" : undefined}
@@ -87,7 +94,7 @@ function SlideImage({ slide, fit, className = "", designId = true, lazy = false 
     <img
       src={slide.src}
         {...mediaDims(slide.src)}
-        {...responsiveMedia(slide.src)}
+        {...responsiveMedia(slide.src, sizes)}
       alt={slide.alt}
       {...design}
       loading={lazy ? "lazy" : undefined}
@@ -260,7 +267,7 @@ export function ProjectGallery({
               }`}
               style={{ aspectRatio: String(slide.aspect) }}
             >
-              {slide.thumb ?? <SlideImage slide={{ ...slide, alt: "" }} fit="cover" designId={false} />}
+              {slide.thumb ?? <SlideImage slide={{ ...slide, alt: "" }} fit="cover" designId={false} sizes={GALLERY_THUMB_SIZES} />}
             </button>
           ))}
         </div>

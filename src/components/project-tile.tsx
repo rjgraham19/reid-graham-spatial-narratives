@@ -15,6 +15,7 @@ export function ProjectTile({
   project,
   onOpen,
   appearIndex,
+  eager,
 }: {
   project: Project;
   /**
@@ -36,6 +37,12 @@ export function ProjectTile({
    * replays for each new set; omit it and the tile renders statically.
    */
   appearIndex?: number;
+  /**
+   * Load the image straight away instead of lazily. For the tiles on the
+   * first screen — on a phone the biggest thing in view is a tile, and
+   * lazy-loading it held the page back by over a second.
+   */
+  eager?: boolean;
 }) {
   /* The project's accent, from the same `accentColor` that tints its overlay —
      used as given, except where it is too dark to read as a hover, which
@@ -87,7 +94,7 @@ export function ProjectTile({
             src={source}
             {...responsiveMedia(source, "(max-width: 767px) 50vw, 25vw")}
             alt={project.title}
-            loading="lazy"
+            loading={eager ? undefined : "lazy"}
             style={{ objectPosition: project.highlightPosition ?? "50% 50%" }}
             className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.06] transition-all duration-[900ms] ease-cinematic"
           />
