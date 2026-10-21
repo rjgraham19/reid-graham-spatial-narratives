@@ -58,18 +58,21 @@ export function createExchangeScene(host: HTMLDivElement) {
   const render = () => {
     if (!disposed) renderer.render(scene, camera);
   };
-  // A render-on-demand canvas (redrawing only in response to a select() or
-  // a drag) turns out to go blank between those events in this embed —
-  // the on-demand model that TownhouseViewer/LollaViewer both use is fine
-  // for a canvas the browser keeps actively compositing, but this one loads
-  // and frames itself before ever entering the viewport, and nothing then
-  // forces a second paint until the visitor interacts. renderer.setAnimationLoop
-  // (rather than a bare requestAnimationFrame loop) is three.js's own
-  // continuous-rendering driver — it keeps the canvas continuously fresh
-  // the same way any live three.js viewer would.
-  const renderLoop = () => {
-    renderer.setAnimationLoop(disposed ? null : render);
+  // Drawn on demand, coalesced to one draw per frame. A continuous
+  // setAnimationLoop used to stand in for this, because a plain on-demand
+  // canvas went blank: it loads and frames itself before ever entering the
+  // viewport, and nothing forced another paint until the visitor
+  // interacted. Redrawing whenever the canvas comes into view (or the tab
+  // comes back) covers that case without ~450 draw calls every frame,
+  // forever — which kept the page from ever going idle.
+  let pending = 0;
+  const requestRender = () => {
+    if (!pending && !disposed) pending = requestAnimationFrame(() => { pending = 0; render(); });
   };
+  const io = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) requestRender(); });
+  io.observe(renderer.domElement);
+  document.addEventListener("visibilitychange", requestRender);
+  renderer.domElement.addEventListener("webglcontextrestored", requestRender);
   const resize = () => {
     const { width, height } = host.getBoundingClientRect();
     if (!width || !height) return;
@@ -88,7 +91,7 @@ export function createExchangeScene(host: HTMLDivElement) {
   };
   const ro = new ResizeObserver(resize);
   ro.observe(host);
-  orbit.addEventListener("change", render);
+  orbit.addEventListener("change", requestRender);
 
   function select(view: ExchangeView, immediate = false) {
     current = view;
@@ -273,7 +276,7 @@ export function createExchangeScene(host: HTMLDivElement) {
       // time, before the facility is ever asked to actually draw.
       renderer.compile(scene, camera);
       select("overall", true);
-      renderLoop();
+      requestRender();
     },
     select,
     zoomIn() {
@@ -292,7 +295,9 @@ export function createExchangeScene(host: HTMLDivElement) {
     dispose() {
       disposed = true;
       cancelAnimationFrame(frame);
-      renderer.setAnimationLoop(null);
+      cancelAnimationFrame(pending);
+      io.disconnect();
+      document.removeEventListener("visibilitychange", requestRender);
       ro.disconnect();
       orbit.dispose();
       decoder.dispose();
