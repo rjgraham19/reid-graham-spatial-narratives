@@ -165,7 +165,10 @@ function Contact() {
             <p
               data-design-id={designId.connect("about-description")}
               data-design-kind="text"
-              className="font-display [font-weight:var(--intro-description-w)] text-[15px] md:text-[19px] mon:text-[length:clamp(14px,2.9cqi,24px)] leading-[1.45] text-foreground whitespace-pre-line"
+              /* Side by side, the bio centers on the photo (even space above
+                 and below it). The photo itself stays top-aligned, so where
+                 the bio runs taller it keeps sitting right under the heading. */
+              className="md:self-center font-display [font-weight:var(--intro-description-w)] text-[15px] md:text-[19px] mon:text-[length:clamp(13px,2.9cqi,24px)] leading-[1.45] text-foreground whitespace-pre-line"
             >
               {resolveText(
                 overridesFile,
