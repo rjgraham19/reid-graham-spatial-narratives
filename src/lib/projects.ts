@@ -152,6 +152,8 @@ export type Project = {
   hub: Hub;
   title: string;
   subtitle: string;
+  /** An award or honour, shown as a small plain line under the subtitle. */
+  recognition?: string;
   year?: string;
   credits?: Credit[];
   description: string;
@@ -322,12 +324,12 @@ export const PROJECTS: Project[] = [
       { role: "Fabrication", name: "Revel Decor" },
     ],
     description:
-      "A lounge inspired by Y2K space aesthetics, giving festivalgoers a place to gather and enjoy elevated views of the main stage.",
-    // Longer passage, kept exactly as it read before — now pinned beside
-    // the record-player scroll-scrub farther down instead of up top, so it
-    // sits with the CD-player imagery it actually describes.
+      "Inspired by the reflective metallic material of Chicago’s Bean and Lollapalooza’s brand identity of stars and spirals, this cosmic lounge elevates the festival experience with prime views of the main stage.",
+    // Longer passage, pinned beside the record-player scroll-scrub farther
+    // down instead of up top, so it sits with the CD-player imagery it
+    // actually describes.
     extendedDescription:
-      "A giant CD player channels the early-2000s as an oversized photo backdrop for festivalgoers, with a spinning translucent magenta compact disc. At night, its chrome and brushed aluminum finishes pop against the glowing crescent moon inside the flip-open lid.",
+      "A giant Y2K CD player with a spinning translucent magenta compact disc becomes an oversized photo backdrop for festivalgoers. At night, its chrome and brushed aluminum finishes come to life with a glowing crescent moon inside the flipped-open lid.",
     cover: lollaClubMagenta,
     // The CGI render (formerly project.media[0]) that used to open the
     // gallery grid was cut — it's the same view as the hero image up top
@@ -432,11 +434,12 @@ export const PROJECTS: Project[] = [
     hub: "architecture",
     title: "Staging Aesthetics",
     subtitle: "Projecting the Politics of Time + Space",
+    recognition: "Recognized by the Wallenberg Foundation Awards",
     mood: "theatrical",
     weight: "right",
     tags: ["Experiential", "Architecture"],
     description:
-      "An interactive installation recognized with an Honorable Mention in the Wallenberg Foundation Awards uses projection mapping, animated visuals, and spatialized audio to explore the politics of architectural aesthetics.",
+      "Projecting national culture, the John F. Kennedy Center for the Performing Arts is a contentious site onto which competing visions of cultural identity are cast. This interactive installation utilizes projection mapping technology to explore alternative facades for the building, immersing viewers in the political stakes of architectural aesthetics.",
     credits: [
       { role: "Exhibition Designer + Model Maker + Projection Mapping Designer", name: "Reid Graham" },
       { role: "Faculty Advisor", name: "Peter Halquist" },
@@ -444,7 +447,7 @@ export const PROJECTS: Project[] = [
     // Longer passage, placed farther down alongside the physical-model video
     // rather than up top — the top-of-page description stays short.
     extendedDescription:
-      "The John F. Kennedy Center for the Performing Arts in Washington, D.C., serves as a contentious stage onto which competing visions of cultural identity are cast. Alternative facades for the building immerse viewers in the political stakes of national cultural expression.",
+      "Historical architectural aesthetics, each chosen for its serious engagement with the political territories of its own time and space, are explored in alternative facades for the building. Through projection, these past aesthetics come alive again with present agency. To project culture is to project the immaterial—the ever-evolving ideas, values, and artistic expressions of the people.",
     cover: stagingFull,
     media: [
       { type: "image", src: stagingFull, caption: "Physical model — day condition and night projection-mapped facade" },
@@ -472,7 +475,7 @@ export const PROJECTS: Project[] = [
       { role: "Production Designer + Scenic Painter", name: "Reid Graham" },
     ],
     description:
-      "A short film reimagining of Georges Méliès' The Living Playing Cards, brought to life through Virtual Production Technology.",
+      "A short film reimagining of Georges Méliès’ Les Cartes Vivantes (The Living Playing Cards). The production design combines virtual video backgrounds with traditional hand-painted freestanding flats in the foreground, using scenographic layering to bring the theatrical illusions of early silent cinema to life.",
     cover: reshuf,
     tags: ["Production/Scenic", "Experiential"],
     media: [
@@ -563,7 +566,7 @@ export const PROJECTS: Project[] = [
       { role: "Technical Director", name: "Michael Clack" },
     ],
     description:
-      "A set design grounded in the historical annex, a tribute to Anne and her diary's enduring legacy.",
+      "Rooted in the architectural details of the Secret Annex, the set design pays tribute to Anne and her diary’s enduring legacy.",
     // Trimmed to drop its second sentence, which now just repeats the
     // top-of-page description above almost word for word. Rendered under
     // the sketch in the bespoke gallery layout below (not the generic

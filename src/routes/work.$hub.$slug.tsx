@@ -471,6 +471,16 @@ function IntroHeader({ project, panel, align }: { project: Project; panel: boole
       >
         {project.subtitle}
       </p>
+      {/* Plain text, not a pill: the tags' size and light weight, kept quiet
+          so it reads as part of the subtitle lockup. */}
+      {project.recognition && (
+        <p
+          className={`mt-3 lg:mt-4 text-[10px] lg:text-[13px] leading-snug uppercase tracking-[0.14em] text-balance text-foreground/70 animate-intro-subtitle motion-reduce:animate-none ${align === "center" ? "mx-auto max-w-6xl" : ""}`}
+          style={{ fontWeight: "var(--intro-tags-w, 200)" }}
+        >
+          {project.recognition}
+        </p>
+      )}
     </div>
   );
 }
@@ -499,7 +509,8 @@ function IntroBody({
             className={introDescriptionType}
             style={{ fontWeight: "var(--intro-description-w, 400)" }}
           >
-            {description}
+            {/* Work titles inside the copy are set in italics. */}
+            {italicizePhrase(description, "Les Cartes Vivantes (The Living Playing Cards)")}
           </p>
         </div>
       </RevealBlock>
