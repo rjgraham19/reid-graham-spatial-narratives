@@ -153,7 +153,11 @@ function Contact() {
 
           {/* Phones: photo centered on top, bio below — side by side, the
               longer bio ran far past the bottom of a narrow photo. */}
-          <div className="mt-5 md:mt-6 grid grid-cols-1 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] mon:grid-cols-[2fr_3fr] gap-5 md:gap-8 items-start md:max-w-4xl">
+          {/* Monitors: the grid is a size container so the bio's type can
+              scale with it (cqi below) — photo and text column both grow in
+              proportion to it, so one ratio keeps the text about as tall as
+              the photo at every width instead of stepping between sizes. */}
+          <div className="mt-5 md:mt-6 grid grid-cols-1 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] mon:grid-cols-[2fr_3fr] mon:[container-type:inline-size] gap-5 md:gap-8 items-start md:max-w-4xl">
             <div className="w-3/5 max-w-[240px] mx-auto md:w-auto md:max-w-none md:mx-0">
               <Portrait />
             </div>
@@ -161,12 +165,12 @@ function Contact() {
             <p
               data-design-id={designId.connect("about-description")}
               data-design-kind="text"
-              className="font-display [font-weight:var(--intro-description-w)] text-center md:text-left text-sm md:text-lg xl:text-[14.5px] 2xl:text-[17px] leading-[1.45] text-foreground text-balance whitespace-pre-line"
+              className="font-display [font-weight:var(--intro-description-w)] text-[15px] md:text-[19px] mon:text-[length:clamp(14px,2.9cqi,24px)] leading-[1.45] text-foreground whitespace-pre-line"
             >
               {resolveText(
                 overridesFile,
                 designId.connect("about-description"),
-                "I’m Reid Graham, a designer based in New York City with a background in architecture and scenic design. (Yes, I’m a theater kid.) I bring a multidisciplinary lens and passion for creating immersive experiences through the built environment.\n\nToday, I work as an Experiential Designer at Creative Artists Agency (CAA), designing spaces and experiences across live entertainment.",
+                "I’m Reid Graham, a designer based in New York City with a background in architecture and scenic design. (Yes, I’m a theater kid.) I bring a multidisciplinary lens and passion for creating immersive experiences through the built environment.\n\nToday, I work as an Experiential Designer at Creative Artists Agency (CAA), designing spaces and experiences across live entertainment.",
               )}
             </p>
           </div>
