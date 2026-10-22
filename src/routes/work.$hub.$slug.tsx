@@ -356,8 +356,11 @@ function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
         ))}
       </div>
       {/* Same size as the render captions above (12/13px) — a note on the
-          photos, kept secondary to them; sentence case so it reads as prose. */}
-      <figcaption className="mt-3 md:mt-0 md:w-[24%] md:shrink-0 font-display text-[12px] font-light leading-relaxed text-foreground/65 text-pretty md:text-[13px]">
+          photos, kept secondary to them; sentence case so it reads as prose.
+          Left-aligned (overriding the site-wide right-aligned caption rule
+          in styles.css) so it starts beside the photos rather than hugging
+          the far margin. */}
+      <figcaption className="mt-3 md:mt-0 md:w-[24%] md:shrink-0 !text-left font-display text-[12px] font-light leading-relaxed text-foreground/65 text-pretty md:text-[13px]">
         {EXCHANGE_MODEL_BLURB}
       </figcaption>
     </figure>
@@ -2422,10 +2425,11 @@ function ProjectPageInner() {
                         // right-aligned caption style established on Townhouse —
                         // the numbered "01 — " prefix is this generic gallery's
                         // own default, not something every project should carry.
-                        isFieldHouse || isExchange ? "text-right" : ""
+                        // Reshuffling's "SCENE 1/2" captions number themselves.
+                        isFieldHouse || isExchange || isReshuffling ? "text-right" : ""
                       }`}
                     >
-                      {!m.addedByDesignMode && !isFieldHouse && !isExchange && `${String(i + 1).padStart(2, "0")} — `}
+                      {!m.addedByDesignMode && !isFieldHouse && !isExchange && !isReshuffling && `${String(i + 1).padStart(2, "0")} — `}
                       <span
                         data-design-id={designId.projectMediaCaption(project.slug, m.id!)}
                         data-design-kind="text"

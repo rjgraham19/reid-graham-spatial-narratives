@@ -482,11 +482,11 @@ export const PROJECTS: Project[] = [
       // Same photo as `cover` — hidden so the generic gallery grid below
       // doesn't repeat the hero image a second time.
       { type: "image", src: reshuf, caption: "On-set: virtual production stage with painted flats and camera rig", hidden: true },
-      // Captions removed for now (per Reid) — layout: "half" puts these two
-      // side by side in the generic gallery grid on wide viewports instead
-      // of each taking a full-width row.
-      { type: "image", src: reshufView1, layout: "half" },
-      { type: "image", src: reshufView2, layout: "half" },
+      // Scene captions per Reid — layout: "half" puts these two side by side
+      // in the generic gallery grid on wide viewports instead of each taking
+      // a full-width row.
+      { type: "image", src: reshufView2, layout: "half", caption: "SCENE 1: ENCHANTED GARDEN" },
+      { type: "image", src: reshufView1, layout: "half", caption: "SCENE 2: CRYSTAL PALACE" },
     ],
   },
   {
