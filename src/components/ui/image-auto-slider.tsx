@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -33,6 +33,7 @@ export function ImageAutoSlider({
   onImageClick,
   className,
   imageClassName,
+  imageSizes = "(min-width: 1024px) 352px, (min-width: 768px) 320px, (min-width: 640px) 240px, 192px",
 }: {
   /** Image URLs, in order. Rendered twice for the seamless loop. */
   images?: string[];
@@ -52,6 +53,9 @@ export function ImageAutoSlider({
   className?: string;
   /** Extra classes on each tile — e.g. to change the card size. */
   imageClassName?: string;
+  /** `sizes` for the tile images — pass one matching `imageClassName` when
+   *  it changes the card size. Defaults to the built-in card sizes. */
+  imageSizes?: string;
 }) {
   const n = images.length;
   // One "set" is the images repeated until it's comfortably wider than any
@@ -63,21 +67,14 @@ export function ImageAutoSlider({
   const loop = [...set, ...set];
   const clickable = typeof onImageClick === "function";
 
-  // The belt never stops moving on its own, so a click aimed at one tile can
-  // land on whatever slid into that spot by the time it registers — the
-  // photo that opens doesn't match the one the eye was on. Pausing on hover
-  // (not just CSS `:hover`, since the inline `animationPlayState` below would
-  // always win over a stylesheet rule) freezes the frame the moment the
-  // pointer arrives, so whatever's under the cursor when it's clicked is
-  // still what was there when the click was aimed.
-  const [hovering, setHovering] = useState(false);
-
+  // The belt keeps moving under the pointer (Reid: pausing on hover made the
+  // band feel stuck). It was paused on hover so a click couldn't land on a
+  // tile that slid in; at these speeds a tile takes seconds to cross, so
+  // the click still opens the photo actually under the cursor. Hovering a
+  // tile still lifts it (see .ias-item:hover). It does stop while the
+  // lightbox is open (`paused`).
   return (
-    <div
-      className={cn("ias-root relative w-full overflow-hidden", className)}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
-    >
+    <div className={cn("ias-root relative w-full overflow-hidden", className)}>
       <style>{IAS_CSS}</style>
       <div
         className="ias-track flex w-max"
@@ -86,7 +83,7 @@ export function ImageAutoSlider({
             // Scaled by the repeats so the belt keeps the same on-screen speed.
             animationDuration: `${speedSeconds * Math.max(1, reps)}s`,
             animationDirection: reverse ? "reverse" : "normal",
-            animationPlayState: paused || hovering ? "paused" : "running",
+            animationPlayState: paused ? "paused" : "running",
           } as CSSProperties
         }
       >
@@ -105,7 +102,7 @@ export function ImageAutoSlider({
               src={src}
               srcSet={imageSrcSets?.[idx]}
               // The tile's rendered width at each breakpoint (see tileClass).
-              sizes={imageSrcSets ? "(min-width: 1024px) 352px, (min-width: 768px) 320px, (min-width: 640px) 240px, 192px" : undefined}
+              sizes={imageSrcSets ? imageSizes : undefined}
               alt={alt}
               aria-hidden={isDupe || undefined}
               loading="eager"

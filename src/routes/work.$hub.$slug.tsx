@@ -1204,6 +1204,12 @@ function ProjectPageInner() {
             <ImageAutoSlider
               speedSeconds={22}
               paused={lightbox != null}
+              /* Bigger than the default cards: this band is the page's hero,
+                 so it's sized close to the other heroes (~60% of the window
+                 height on a laptop, 70% of the width on a phone) to give the
+                 event photos their moment. */
+              imageClassName="h-[68vw] w-[68vw] sm:h-80 sm:w-80 md:h-96 md:w-96 lg:h-[min(60svh,36rem)] lg:w-[min(60svh,36rem)]"
+              imageSizes="(min-width: 1024px) min(60svh, 576px), (min-width: 768px) 384px, (min-width: 640px) 320px, 68vw"
               /* Tile-sized square copies (see strip-thumbs.ts); the
                  full-size photos still open in the lightbox. */
               images={lollapaloozaGalleryMedia.map(({ item }: { item: MediaItem }) => stripThumb(item.src).src)}
