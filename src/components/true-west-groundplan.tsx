@@ -4,8 +4,8 @@ import "./true-west-groundplan.css";
 
 const media = "/design-media/true-west/";
 /* Each swatch is 19.14% of the drawing's width (see the CSS), and the
-   drawing is never wider than ~1000px, so a swatch tops out near 192px. */
-const SWATCH_SIZES = "(max-width: 767px) 20vw, 192px";
+   drawing is never wider than ~1400px, so a swatch tops out near 270px. */
+const SWATCH_SIZES = "(max-width: 767px) 20vw, 270px";
 
 /** The approved composition and entrance from true-west-animation.zip:
  *  the plan stays still; both swatches fade in together while rising

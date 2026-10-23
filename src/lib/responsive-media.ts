@@ -175,4 +175,4 @@ const variants:Record<string,{src:string;srcSet:string}>={
 ["/design-media/true-west/CROPPED_PANTONEWEST.png"]: {src:"/optimized/f29d1ecdbd1d-1845.webp",srcSet:"/optimized/f29d1ecdbd1d-320.webp 320w, /optimized/f29d1ecdbd1d-640.webp 640w, /optimized/f29d1ecdbd1d-1280.webp 1280w, /optimized/f29d1ecdbd1d-1845.webp 1845w"},
 ["/design-media/true-west/TRUEWEST_DRAWING_4096.png"]: {src:"/optimized/508623cd3b6c-2560.webp",srcSet:"/optimized/508623cd3b6c-320.webp 320w, /optimized/508623cd3b6c-640.webp 640w, /optimized/508623cd3b6c-1280.webp 1280w, /optimized/508623cd3b6c-2560.webp 2560w"},
 };
-export function responsiveMedia(src:string|undefined,sizes='(max-width: 767px) calc(100vw - 48px), (max-width: 1200px) 85vw, 1000px'){return src&&variants[src]?{...variants[src],sizes}:{};}
+export function responsiveMedia(src:string|undefined,sizes='(max-width: 767px) calc(100vw - 48px), (max-width: 1555px) 90vw, 1400px'){return src&&variants[src]?{...variants[src],sizes}:{};}

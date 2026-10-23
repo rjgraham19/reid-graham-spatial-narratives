@@ -1494,8 +1494,9 @@ img[data-scroll-fade="in"] {
 }
 
 /* Asset footprint — every image group, carousel or 3D viewer below a
-   project's hero: the full gutter width on phones, 85% of the content
-   column and at most 1000px from tablet up, centred. Proportions are the
+   project's hero: the full gutter width on phones, 90% of the content
+   column and at most 1400px from tablet up, centred (was 85% / 1000px —
+   on big screens the images stopped growing and the margins ballooned). Proportions are the
    images' own; nothing is cropped to fit. Heroes are the exception. */
 .asset-group {
   width: 100%;
@@ -1503,8 +1504,8 @@ img[data-scroll-fade="in"] {
 }
 @media (min-width: 768px) {
   .asset-group {
-    width: 85%;
-    max-width: 1000px;
+    width: 90%;
+    max-width: 1400px;
   }
 }
 

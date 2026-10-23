@@ -11,8 +11,8 @@ import type { CSSProperties, ReactNode } from "react";
  *        controls row              quiet, beneath the stage — never over it
  *          hint line               interaction instruction, space reserved
  *
- * The stage is capped at ~60% of the viewport tall and 1000px wide; desktop
- * keeps the whole thing to 85% of the content column. On phones the stage
+ * The stage is capped at ~70% of the viewport tall and 1400px wide; desktop
+ * keeps the whole thing to 90% of the content column. On phones the stage
  * takes the full width and any thumbnails drop beneath it.
  */
 
@@ -78,7 +78,7 @@ export const RAIL_LAYOUT_CLASS =
   "w-[min(100%,max(18rem,var(--stage-max)))] " +
   "sm:grid-cols-[minmax(0,1fr)_var(--rail)] sm:gap-x-[var(--rail-gap)] sm:[--rail-gap:8px] sm:[grid-template-areas:'label_.'_'stage_thumbs'_'nav_.'] " +
   "sm:w-[min(100%,max(18rem,var(--gallery-max)))] " +
-  "md:[--stage-max:min(1000px,calc(60svh*var(--stage-ratio)))] md:w-[min(85%,max(18rem,var(--gallery-max)))]";
+  "md:[--stage-max:min(1400px,calc(70svh*var(--stage-ratio)))] md:w-[min(90%,max(18rem,var(--gallery-max)))]";
 
 /** A single centred stage at the same size a gallery's stage would get:
  *  the gallery's width (stage + rail + gap), with the rail's share split
@@ -89,7 +89,7 @@ const CENTRED_STAGE_CLASS =
   "w-[min(100%,max(18rem,var(--stage-max)))] " +
   "sm:[--rail-gap:8px] sm:grid-cols-[calc((var(--rail)+var(--rail-gap))/2)_minmax(0,1fr)_calc((var(--rail)+var(--rail-gap))/2)] sm:[grid-template-areas:'._label_.'_'._stage_.'_'._nav_.'] " +
   "sm:w-[min(100%,max(18rem,var(--gallery-max)))] " +
-  "md:[--stage-max:min(1000px,calc(60svh*var(--stage-ratio)))] md:w-[min(85%,max(18rem,var(--gallery-max)))]";
+  "md:[--stage-max:min(1400px,calc(70svh*var(--stage-ratio)))] md:w-[min(90%,max(18rem,var(--gallery-max)))]";
 
 export function AssetFrame({
   label,
