@@ -893,6 +893,34 @@ img[data-scroll-fade="in"] {
   }
 }
 
+/* Contact page links (email, LinkedIn): the same response as a project
+   title — a lift, a slight swell, the accent colour — on the same curve,
+   scaled down so the big email address doesn't jump. The underline takes
+   the accent with it. Keyboard focus gets the same treatment. */
+.contact-link {
+  display: inline-block;
+  transform-origin: bottom left;
+  transition:
+    transform 900ms var(--ease-cinematic),
+    color 900ms var(--ease-cinematic),
+    text-decoration-color 900ms var(--ease-cinematic);
+}
+.contact-link:hover,
+.contact-link:focus-visible {
+  transform: translateY(-0.1em) scale(1.02);
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-link {
+    transition: color 300ms linear, text-decoration-color 300ms linear;
+  }
+  .contact-link:hover,
+  .contact-link:focus-visible {
+    transform: none;
+  }
+}
+
 /* The big project-page title. Size is the responsive clamp multiplied by
    `--fit-scale`, a number AnimatedHeading (with `fit`) drives down from 1 only
    when the title — a single unbreakable word at worst — would otherwise spill

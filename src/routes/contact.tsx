@@ -204,21 +204,26 @@ function Contact() {
           <div className="mt-6 md:mt-8">
             {/* Size container for the email (see `email-fit` in styles.css). */}
             <section className="min-w-0 [container-type:inline-size]">
-              {/* Label and address read as one group (~10px apart): no margin,
-                  and the address set solid (leading-none) so its line box
-                  doesn't add invisible space above the letters. */}
+              {/* Email group, then the Connect group ~24px below it. Each is a
+                  small label over its link, ~10px apart: no label margin, and
+                  each link set solid (leading-none) so its line box doesn't
+                  add invisible space above the letters. Underlines are drawn
+                  unbroken (skip-ink off) and low enough to clear the
+                  descenders, so they read as one straight line. Hover/focus:
+                  .contact-link in styles.css. */}
               <p className={contactLabel}>Email</p>
               <a
                 href={`mailto:${EMAIL}`}
-                className="email-fit block w-full font-display font-medium leading-none tracking-tight underline underline-offset-8 decoration-foreground/25 hover:decoration-foreground transition-colors whitespace-nowrap"
+                className="contact-link email-fit font-display font-medium leading-none tracking-tight underline underline-offset-[0.22em] decoration-2 [text-decoration-skip-ink:none] decoration-foreground/25 whitespace-nowrap"
               >
                 {EMAIL}
               </a>
+              <p className={`${contactLabel} mt-6`}>Connect</p>
               <a
                 href={LINKEDIN}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-block font-display text-lg md:text-xl leading-none text-foreground underline-offset-4 decoration-foreground/40 hover:underline focus-visible:underline"
+                className="contact-link mt-1 font-display text-lg md:text-xl leading-none text-foreground underline underline-offset-[0.22em] decoration-1 [text-decoration-skip-ink:none] decoration-foreground/40"
               >
                 LinkedIn
               </a>
