@@ -157,6 +157,8 @@ export const mediaInsets: Record<string, {width:number;height:number;background:
   ["/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg"]: {"width":1224,"height":792,"background":"none","insets":{"top":0,"right":0,"bottom":0,"left":0}},
   ["/design-media/field-house/FIELDHOUSE_RESIZED_GP1.jpg"]: {"width":2000,"height":2526,"background":"white","insets":{"top":0.04375,"right":0.017377567140600316,"bottom":0.0525,"left":0.009478672985781991}},
   ["/design-media/field-house/FIELDHOUSE_RESIZED_GP2.jpg"]: {"width":2000,"height":2526,"background":"white","insets":{"top":0.0775,"right":0.10584518167456557,"bottom":0.05125,"left":0.13270142180094788}},
+  ["/design-media/field-house/TENNISMODEL1_PSDEDIT.png"]: {"width":2000,"height":1125,"background":"white","insets":{"top":0.1511111111111111,"right":0.12625,"bottom":0.13111111111111112,"left":0.13}},
+  ["/design-media/field-house/TENNISMODEL2_PSDEDIT.png"]: {"width":2000,"height":1125,"background":"white","insets":{"top":0.2688888888888889,"right":0.10375,"bottom":0.2688888888888889,"left":0.11}},
   ["/design-media/staging-aesthetics/aesthetics-crop.jpg"]: {"width":2240,"height":3000,"background":"black","insets":{"top":0.04125,"right":0.06867671691792294,"bottom":0.025,"left":0.07370184254606366}},
   ["/design-media/staging-aesthetics/aesthetics.jpeg.png"]: {"width":2240,"height":3360,"background":"black","insets":{"top":0.1,"right":0.0675422138836773,"bottom":0.06625,"left":0.07317073170731707}},
   ["/design-media/the-exchange-facility/EXCHANGE_DIAGRAM.jpg"]: {"width":8000,"height":4500,"background":"none","insets":{"top":0,"right":0,"bottom":0,"left":0}},

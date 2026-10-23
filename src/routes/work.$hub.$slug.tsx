@@ -314,12 +314,19 @@ const EXCHANGE_MODEL_PHOTOS = [
 /* Lightbox slot for the three-photo view. Not a real file — the lightbox
    recognises it and lays out EXCHANGE_MODEL_PHOTOS itself. */
 const EXCHANGE_MODELS_LIGHTBOX = "exchange-physical-models";
+/* Field House's two physical-model photos: shown with the same row as
+   Exchange's, but each opens on its own in the lightbox. */
+const FIELDHOUSE_MODEL_PHOTOS = [
+  { src: "/design-media/field-house/TENNISMODEL1_PSDEDIT.png", width: 2000, height: 1125 },
+  { src: "/design-media/field-house/TENNISMODEL2_PSDEDIT.png", width: 2000, height: 1125 },
+];
 /* Their combined width ÷ height (each is 2491px tall). */
 const EXCHANGE_MODELS_ASPECT = EXCHANGE_MODEL_PHOTOS.reduce((sum, p) => sum + p.width / p.height, 0);
 const EXCHANGE_MODEL_BLURB =
   "Element models isolate key clusters of the building for an up-close look at its infrastructure.";
 
-function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
+function ExchangeModelRow({ onOpen, fieldhouse = false }: { onOpen: (index: number) => void; fieldhouse?: boolean }) {
+  const photos = fieldhouse ? FIELDHOUSE_MODEL_PHOTOS : EXCHANGE_MODEL_PHOTOS;
   // From md up: photos + blurb span the full gallery width, so the row's
   // edges line up with the renders above and the section below. The blurb
   // takes a narrow column on the right; that leaves the photos a width at
@@ -327,29 +334,32 @@ function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
   // Extra space above and below sets the row apart from the renders.
   return (
     <div className="md:col-span-2 my-3 md:my-10">
-    <p className={ASSET_LABEL_CLASS}>Physical Models</p>
+    <p className={ASSET_LABEL_CLASS}>{fieldhouse ? "Physical Model" : "Physical Models"}</p>
     <figure className="md:flex md:items-end md:gap-8" aria-label="Physical models">
-      <div className="flex min-w-0 gap-2 sm:gap-3 md:flex-1 md:gap-4">
-        {EXCHANGE_MODEL_PHOTOS.map((photo, i) => (
+      {/* Field House's two wide photos stack on phones (side by side they
+          shrank too small to read) and pair up from md; both are 16:9, so
+          equal shares keep them the same height. */}
+      <div className={`flex min-w-0 gap-2 sm:gap-3 md:flex-1 md:gap-4 ${fieldhouse ? "flex-col md:flex-row" : ""}`}>
+        {photos.map((photo, i) => (
           <div
             key={photo.src}
-            className="min-w-0 basis-0 overflow-hidden bg-secondary"
-            style={{ flexGrow: photo.width / photo.height }}
+            className={`min-w-0 overflow-hidden bg-secondary ${fieldhouse ? "md:flex-1 md:basis-0" : "basis-0"}`}
+            style={fieldhouse ? undefined : { flexGrow: photo.width / photo.height }}
           >
             <button
               type="button"
-              onClick={onOpen}
+              onClick={() => onOpen(i)}
               className="block w-full cursor-zoom-in"
-              aria-label="Enlarge the three physical models"
+              aria-label={fieldhouse ? `Enlarge physical model photo ${i + 1}` : "Enlarge the three physical models"}
             >
               <SubjectImage
                 src={photo.src}
                 width={photo.width}
                 height={photo.height}
-                alt={`Exchange Facility physical model, view ${i + 1}`}
+                alt={`${fieldhouse ? "Field House" : "Exchange Facility"} physical model, view ${i + 1}`}
                 loading="lazy"
                 decoding="async"
-                className="block h-auto w-full"
+                className={`block h-auto w-full${fieldhouse ? " aspect-[16/9] object-contain" : ""}`}
               />
             </button>
           </div>
@@ -360,9 +370,9 @@ function ExchangeModelRow({ onOpen }: { onOpen: () => void }) {
           Left-aligned (overriding the site-wide right-aligned caption rule
           in styles.css) so it starts beside the photos rather than hugging
           the far margin. */}
-      <figcaption className="mt-3 md:mt-0 md:w-[24%] md:shrink-0 !text-left font-display text-[12px] font-light leading-relaxed text-foreground/65 text-pretty md:text-[13px]">
+      {!fieldhouse && <figcaption className="mt-3 md:mt-0 md:w-[24%] md:shrink-0 !text-left font-display text-[12px] font-light leading-relaxed text-foreground/65 text-pretty md:text-[13px]">
         {EXCHANGE_MODEL_BLURB}
-      </figcaption>
+      </figcaption>}
     </figure>
     </div>
   );
@@ -602,6 +612,10 @@ function ProjectPageInner() {
     // view. Appended last, so no existing index moves.
     ...(project.slug === "the-exchange-facility"
       ? [{ type: "image" as const, src: EXCHANGE_MODELS_LIGHTBOX, caption: "Physical models", hidden: true }]
+      : []),
+    // Field House: each physical-model photo opens on its own.
+    ...(project.slug === "field-house"
+      ? FIELDHOUSE_MODEL_PHOTOS.map((p, i) => ({ type: "image" as const, src: p.src, caption: `Physical model, view ${i + 1}`, hidden: true }))
       : []),
   ];
   const heroLightboxIndex = lightboxMedia.findIndex((m) => m.src === heroSrc);
@@ -2445,6 +2459,9 @@ function ProjectPageInner() {
                 </Fragment>
               );
             })}
+            {isFieldHouse && (
+              <ExchangeModelRow fieldhouse onOpen={(i) => setLightbox(lightboxMedia.findIndex((x) => x.src === FIELDHOUSE_MODEL_PHOTOS[i].src))} />
+            )}
           </div>
         )}
         </div>
