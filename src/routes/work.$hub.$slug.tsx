@@ -315,7 +315,9 @@ const EXCHANGE_MODEL_PHOTOS = [
    recognises it and lays out EXCHANGE_MODEL_PHOTOS itself. */
 const EXCHANGE_MODELS_LIGHTBOX = "exchange-physical-models";
 /* Field House's two physical-model photos: shown with the same row as
-   Exchange's, but each opens on its own in the lightbox. */
+   Exchange's, right after the Isometric Diagram (so before the section
+   drawing), and each opens on its own in the lightbox. */
+const FIELDHOUSE_MODEL_ROW_AFTER = "/design-media/field-house/CROPPED_FIELDHOUSE_AXONPERSPECTIVE.jpg";
 const FIELDHOUSE_MODEL_PHOTOS = [
   { src: "/design-media/field-house/TENNISMODEL1_PSDEDIT.png", width: 2000, height: 1125 },
   { src: "/design-media/field-house/TENNISMODEL2_PSDEDIT.png", width: 2000, height: 1125 },
@@ -338,18 +340,23 @@ function ExchangeModelRow({ onOpen, fieldhouse = false }: { onOpen: (index: numb
     <figure className="md:flex md:items-end md:gap-8" aria-label="Physical models">
       {/* Field House's two wide photos stack on phones (side by side they
           shrank too small to read) and pair up from md; both are 16:9, so
-          equal shares keep them the same height. */}
-      <div className={`flex min-w-0 gap-2 sm:gap-3 md:flex-1 md:gap-4 ${fieldhouse ? "flex-col md:flex-row" : ""}`}>
+          equal shares keep them the same height. Their white backgrounds
+          run together, so there's no gap, and each is zoomed 1.22× inside
+          its 16:9 frame to trim the wide white border: the models span
+          ~74% / ~79% of the frame width, so 1.22 still leaves a little white
+          around both (measured insets: media-insets.ts). The lightbox shows
+          the full, uncropped photo. */}
+      <div className={`flex min-w-0 md:flex-1 ${fieldhouse ? "flex-col md:flex-row" : "gap-2 sm:gap-3 md:gap-4"}`}>
         {photos.map((photo, i) => (
           <div
             key={photo.src}
-            className={`min-w-0 overflow-hidden bg-secondary ${fieldhouse ? "md:flex-1 md:basis-0" : "basis-0"}`}
+            className={`min-w-0 overflow-hidden ${fieldhouse ? "bg-white aspect-[16/9] md:flex-1 md:basis-0" : "bg-secondary basis-0"}`}
             style={fieldhouse ? undefined : { flexGrow: photo.width / photo.height }}
           >
             <button
               type="button"
               onClick={() => onOpen(i)}
-              className="block w-full cursor-zoom-in"
+              className={`block w-full cursor-zoom-in ${fieldhouse ? "h-full" : ""}`}
               aria-label={fieldhouse ? `Enlarge physical model photo ${i + 1}` : "Enlarge the three physical models"}
             >
               <SubjectImage
@@ -359,7 +366,7 @@ function ExchangeModelRow({ onOpen, fieldhouse = false }: { onOpen: (index: numb
                 alt={`${fieldhouse ? "Field House" : "Exchange Facility"} physical model, view ${i + 1}`}
                 loading="lazy"
                 decoding="async"
-                className={`block h-auto w-full${fieldhouse ? " aspect-[16/9] object-contain" : ""}`}
+                className={fieldhouse ? "block h-full w-full object-cover scale-[1.22]" : "block h-auto w-full"}
               />
             </button>
           </div>
@@ -2359,7 +2366,7 @@ function ProjectPageInner() {
           // pairing logic needed, and every hand-authored item (no `layout`
           // set, treated as full) renders exactly as before.
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            {galleryMedia.map(({ item: m, index: i }) => {
+            {galleryMedia.map(({ item: m, index: i }, pos) => {
               const mediaId = designId.projectMedia(project.slug, m.id!);
               const isolatable = !NOT_ISOLATABLE_MEDIA.has(m.id ?? "");
               const isHalf = m.layout === "half";
@@ -2405,6 +2412,16 @@ function ProjectPageInner() {
                 );
               return (
                 <Fragment key={m.id}>
+                {m.sectionLabel && (
+                  /* Full-width row; the negative margin cancels the grid gap
+                     so the label sits the same distance above its images as
+                     the "Physical Models" label does. A label partway down
+                     the gallery opens a new group, so it gets the same extra
+                     space above it as the physical-models row. */
+                  <div className={`md:col-span-2 -mb-3 md:-mb-4 ${pos > 0 ? "mt-3 md:mt-10" : ""}`}>
+                    <p className={ASSET_LABEL_CLASS}>{m.sectionLabel}</p>
+                  </div>
+                )}
                 <figure
                   className={`group ${CROP_SPACING[m.id ?? ""] ?? ""} ${isHalf ? "md:col-span-1" : "md:col-span-2"} ${
                     isStaging ? `transform ${i % 2 === 0 ? "-rotate-1" : "rotate-1"}` : ""
@@ -2456,12 +2473,12 @@ function ProjectPageInner() {
                 {isExchange && m.id === EXCHANGE_MODEL_ROW_AFTER && (
                   <ExchangeModelRow onOpen={() => setLightbox(lightboxMedia.findIndex((x) => x.src === EXCHANGE_MODELS_LIGHTBOX))} />
                 )}
+                {isFieldHouse && m.src === FIELDHOUSE_MODEL_ROW_AFTER && (
+                  <ExchangeModelRow fieldhouse onOpen={(n) => setLightbox(lightboxMedia.findIndex((x) => x.src === FIELDHOUSE_MODEL_PHOTOS[n].src))} />
+                )}
                 </Fragment>
               );
             })}
-            {isFieldHouse && (
-              <ExchangeModelRow fieldhouse onOpen={(i) => setLightbox(lightboxMedia.findIndex((x) => x.src === FIELDHOUSE_MODEL_PHOTOS[i].src))} />
-            )}
           </div>
         )}
         </div>

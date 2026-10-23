@@ -135,6 +135,10 @@ export type MediaItem = {
    * set this explicitly.
    */
   layout?: "full" | "half";
+  /** A section label (same style as "Physical Models") shown across the
+   *  full gallery width just above this item, e.g. over a pair of halves.
+   *  Generic gallery only. */
+  sectionLabel?: string;
   /** True when Design Mode added this item — never true for hand-authored media. */
   addedByDesignMode?: boolean;
 };
@@ -485,8 +489,11 @@ export const PROJECTS: Project[] = [
       // Scene captions per Reid — layout: "half" puts these two side by side
       // in the generic gallery grid on wide viewports instead of each taking
       // a full-width row.
-      { type: "image", src: reshufView2, layout: "half", caption: "SCENE 1: ENCHANTED GARDEN" },
+      { type: "image", src: reshufView2, layout: "half", caption: "SCENE 1: ENCHANTED GARDEN", sectionLabel: "Camera Views" },
       { type: "image", src: reshufView1, layout: "half", caption: "SCENE 2: CRYSTAL PALACE" },
+      // Paint elevations for the two backdrops, in the same scene order.
+      { type: "image", src: "/design-media/reshuffling-the-deck/RESHUFFLING_ELEVATION1.png", layout: "half", alt: "Paint elevation, Scene 1: Garden", sectionLabel: "Drawings" },
+      { type: "image", src: "/design-media/reshuffling-the-deck/RESHUFFLING_ELEVATION2.png", layout: "half", alt: "Paint elevation, Scene 2: Palace" },
     ],
   },
   {

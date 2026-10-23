@@ -125,6 +125,8 @@ const DIMS: Record<string, [number, number]> = {
   [m_yctiwy_sketch]: [2600, 1500],
   [m_yctiwy_sketch_display]: [1400, 736],
   "/design-media/field-house/CROPPED_FIELDHOUSE_AXONPERSPECTIVE.jpg": [4465, 2873],
+  "/design-media/reshuffling-the-deck/RESHUFFLING_ELEVATION1.png": [1680, 1070],
+  "/design-media/reshuffling-the-deck/RESHUFFLING_ELEVATION2.png": [1680, 1070],
   "/design-media/field-house/FIELDHOUSE_CROPPEDSECTION.jpg": [4413, 1547],
   "/design-media/field-house/FIELDHOUSE_ILLUSTRATION.jpg": [1224, 792],
   "/design-media/field-house/FIELDHOUSE_RESIZED_GP1.jpg": [2000, 2526],
